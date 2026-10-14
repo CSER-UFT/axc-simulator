@@ -7,7 +7,7 @@
  *      20 mil pares sorteados em 16 bits); qualquer diferença interrompe a publicação;
  *   3. sintetiza com o Yosys para FPGA Xilinx 7 series (synth_xilinx -abc9, sem DSP) e lê a contagem de LUTs e
  *      CARRY4 e o caminho mais longo em células;
- *   4. grava data/synth.json, que a página lê.
+ *   4. calcula as métricas de erro (entradas uniformes, como a página) e grava tudo em data/synth.json.
  *
  * Uso: node scripts/synth.mjs [--jobs N] [--out data/synth.json]
  * Precisa de iverilog, vvp e yosys no PATH (no Ubuntu: apt install iverilog yosys).
@@ -19,7 +19,7 @@ import { cpus } from 'node:os';
 import { join } from 'node:path';
 import { buildUnit, unitName } from '../js/axc/units.js';
 import { toVerilog, testbench, vectors, moduleName } from '../js/axc/verilog.js';
-import { testInputs } from '../js/axc/metrics.js';
+import { testInputs, errorMetrics } from '../js/axc/metrics.js';
 import { PRESETS } from '../js/axc/presets.js';
 
 const exec = promisify(execCb);
@@ -56,6 +56,8 @@ async function one(cfg) {
         luts, carry4: cells.CARRY4 ?? 0, depth, cells,
         gates: unit.net.gates, gateDepth: unit.net.delay(),
     };
+    const em = errorMetrics(unit, testInputs(cfg.width, 'uniform'));
+    r.err = Object.fromEntries(['MED', 'WCE', 'MSE', 'NMED', 'MRED', 'EP'].map((k) => [k, em[k]]));
     console.log(`${name.padEnd(20)} ${String(luts).padStart(4)} LUTs ${String(r.carry4).padStart(2)} CARRY4  profundidade ${depth}  (${r.vectors} vetores conferidos)`);
     return r;
 }

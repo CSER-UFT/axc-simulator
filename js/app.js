@@ -68,17 +68,32 @@ function evaluateCurrent() {
     const dist = $('dist').value;
     const inp = testInputs(cfg.width, dist);
     const m = errorMetrics(unit, inp);
-    const exact = buildUnit(cfg.kind === 'mul' ? { kind: 'mul', width: cfg.width } : { kind: 'add', width: cfg.width, adder: 'exact' });
+    const exact = exactUnit(cfg);
     cur = { cfg, unit, m, inp, exact, dist, appCache: null };
     $('evalNote').textContent = inp.exhaustive
         ? `Avaliação exaustiva: todos os ${nf(inp.a.length)} pares de operandos.`
         : `Avaliação por amostragem: ${nf(inp.a.length)} pares com entradas ${distName[dist]} (semente fixa).`;
     renderSummary();
-    renderStruct();
-    renderError();
-    renderCmp();
-    if (tab === 'app') renderApp();
-    if (tab === 'synth') renderSynth();
+    // Só a aba visível é desenhada agora; as outras, quando forem abertas.
+    for (const k of Object.keys(dirty)) dirty[k] = true;
+    renderTab(tab);
+}
+
+/** Abas que precisam ser redesenhadas depois de uma mudança na unidade. */
+const dirty = { struct: true, error: true, cmp: true, app: true, synth: true };
+const RENDER = { struct: () => renderStruct(), error: () => renderError(), cmp: () => renderCmp(), app: () => renderApp(), synth: () => renderSynth() };
+function renderTab(name) {
+    if (!cur || !dirty[name]) return;
+    dirty[name] = false;
+    RENDER[name]();
+}
+
+/** Unidade exata de referência, guardada por tipo e largura (a de 16 bits demora a montar). */
+const exactCache = new Map();
+function exactUnit(cfg) {
+    const key = `${cfg.kind}${cfg.width}`;
+    if (!exactCache.has(key)) exactCache.set(key, buildUnit(cfg.kind === 'mul' ? { kind: 'mul', width: cfg.width } : { kind: 'add', width: cfg.width, adder: 'exact' }));
+    return exactCache.get(key);
 }
 
 // Resumo ----------------------------------------------------------------------------------------------------
@@ -295,10 +310,10 @@ function renderSynth() {
     }
     $('synthNote').innerHTML = `Cada configuração pré-definida é exportada em Verilog, conferida no Icarus Verilog com vetores do simulador e sintetizada com o Yosys para FPGA Xilinx 7 series, a cada publicação do site (${esc(synth.generated)}, ${esc(synth.tools.yosys.replace(/ \(.*/, ''))}, <code>${esc(synth.flow.replace('read_verilog; ', ''))}</code>). O Vivado costuma dar menos LUTs: compare as configurações entre si, não com números de outra ferramenta.`;
     const curName = cur ? unitName(cur.cfg) : null;
-    for (const d of synth.designs) if (!synthErr.has(d.name)) synthErr.set(d.name, null);
+    for (const d of synth.designs) if (!d.err && !synthErr.has(d.name)) synthErr.set(d.name, null);
     $('synthTable').innerHTML = '<tr><th>configuração</th><th>portas</th><th>LUTs</th><th>CARRY4</th><th>prof.</th><th>MRED</th></tr>'
         + synth.designs.map((d, k) => {
-            const e = synthErr.get(d.name);
+            const e = d.err ? d.err.MRED : synthErr.get(d.name);
             return `<tr data-k="${k}" class="${d.name === curName ? 'cur' : ''}"><td class="mono left">${esc(d.name)}</td><td>${d.gates}</td><td>${d.luts}</td><td>${d.carry4}</td><td>${d.depth}</td><td>${e === null ? '…' : pct(e)}</td></tr>`;
         }).join('');
     const group = (d) => `${d.cfg.kind}${d.cfg.width}`;
@@ -314,7 +329,7 @@ function renderSynth() {
     }
     $('synthCorr').textContent = total ? `Em ${pct(agree / total)} dos pares de configurações do mesmo grupo, o modelo de portas e a síntese concordam sobre qual é a menor. Onde discordam, o modelo erra: no FPGA, uma LUT de 6 entradas absorve várias portas, e a cadeia de carry faz a soma quase de graça.` : '';
     // Métricas de erro, aos poucos, para não travar a página.
-    const pending = ds.find((d) => synthErr.get(d.name) === null);
+    const pending = ds.find((d) => !d.err && synthErr.get(d.name) === null);
     if (pending) {
         setTimeout(() => {
             const u = buildUnit(pending.cfg);
@@ -423,8 +438,7 @@ function showTab(name) {
     store.set('axc.tab', name);
     for (const b of $('tabs').querySelectorAll('[data-tab]')) b.classList.toggle('sel', b.dataset.tab === name);
     for (const p of document.querySelectorAll('.pane')) p.classList.toggle('hidden', p.id !== `pane-${name}`);
-    if (name === 'app') renderApp();
-    if (name === 'synth') renderSynth();
+    renderTab(name);
 }
 $('tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 
@@ -447,7 +461,7 @@ themeButton.addEventListener('click', () => {
     document.documentElement.dataset.theme = next;
     store.set('axc.theme', next);
     updateThemeIcon();
-    if (cur) renderError();
+    if (cur) { dirty.error = true; renderTab(tab); }
 });
 updateThemeIcon();
 const help = new Help($('readme'));
@@ -458,6 +472,5 @@ evaluateCurrent();
 showTab(tab);
 fetch('data/synth.json').then((r) => (r.ok ? r.json() : null)).catch(() => null).then((d) => {
     synth = d;
-    if (cur) { renderSummary(); renderCmp(); }
-    if (tab === 'synth') renderSynth();
+    if (cur) { renderSummary(); dirty.cmp = true; dirty.synth = true; renderTab(tab); }
 });

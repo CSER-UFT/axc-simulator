@@ -62,7 +62,20 @@ const clampAt = (img, x, y) => img.data[Math.min(img.h - 1, Math.max(0, y)) * im
 export function applyFilter(img, filter, unit, { gain = 180 } = {}) {
     const { w, h } = img;
     const n = w * h;
-    const mul = (as, bs) => (unit?.kind === 'mul' ? unit.net.evaluate(as, bs) : Float64Array.from(as, (x, k) => x * bs[k]));
+    // Com um multiplicador, os produtos são sempre pixel (0 a 255) vezes um dos poucos pesos do filtro: o circuito
+    // é avaliado uma vez para cada combinação, e o filtro consulta essa tabela.
+    let table = null;
+    const product = (x, w) => {
+        if (!table) {
+            const ws = [...new Set(filter === 'gain' ? [gain] : (KERNELS[filter] ?? []))];
+            const as = new Uint32Array(256 * ws.length), bs = new Uint32Array(256 * ws.length);
+            ws.forEach((wt, i) => { for (let p = 0; p < 256; p++) { as[i * 256 + p] = p; bs[i * 256 + p] = wt; } });
+            const y = unit.net.evaluate(as, bs);
+            table = new Map(ws.map((wt, i) => [wt, y.subarray(i * 256, (i + 1) * 256)]));
+        }
+        return table.get(w)[x];
+    };
+    const mul = (as, bs) => (unit?.kind === 'mul' ? Float64Array.from(as, (x, k) => product(x, bs[k])) : Float64Array.from(as, (x, k) => x * bs[k]));
     const add = (as, bs) => (unit?.kind === 'add' ? unit.net.evaluate(as, bs) : Float64Array.from(as, (x, k) => x + bs[k]));
     const out = new Uint8ClampedArray(n);
     if (filter === 'gain') {
@@ -81,6 +94,19 @@ export function applyFilter(img, filter, unit, { gain = 180 } = {}) {
         return { w, h, data: out };
     }
     // Gaussiano 3 x 3: nove produtos por pixel e oito somas.
+    if (unit?.kind !== 'add') {
+        // Somas exatas: um laço direto, com os produtos da tabela (ou exatos).
+        const K = KERNELS[filter];
+        const tab = K.map((wt) => (unit ? (product(0, wt), table.get(wt)) : Float64Array.from({ length: 256 }, (_, p) => p * wt)));
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                let acc = 0;
+                for (let t = 0; t < 9; t++) acc += tab[t][clampAt(img, x + (t % 3) - 1, y + Math.floor(t / 3) - 1)];
+                out[y * w + x] = Math.min(255, Math.floor(acc / 256));
+            }
+        }
+        return { w, h, data: out };
+    }
     const prods = [];
     KERNELS[filter].forEach((wt, t) => {
         const dx = (t % 3) - 1, dy = Math.floor(t / 3) - 1;
