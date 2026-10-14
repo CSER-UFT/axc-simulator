@@ -20,7 +20,7 @@ Somadores e multiplicadores aproximados são construídos porta a porta, avaliad
 ## Executar
 
 ```
-npm start      # servidor em http://localhost:8005
+npm start      # servidor local sem cache em http://localhost:8005
 npm test       # testes (Node 20 ou mais novo; o teste do Verilog roda se houver iverilog)
 npm run synth  # exporta, confere e sintetiza as configurações pré-definidas (precisa de iverilog e yosys)
 ```

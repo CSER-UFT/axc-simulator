@@ -7,7 +7,7 @@
   "scripts": {
     "test": "node --test test/*.test.js",
     "synth": "node scripts/synth.mjs",
-    "start": "python3 -m http.server 8005"
+    "start": "node scripts/serve.mjs 8005"
   },
   "engines": {
     "node": ">=20"
