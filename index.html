@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Simulador de Computação Aproximada</title>
+        <meta name="description" content="Simulador didático de computação aproximada: somadores e multiplicadores aproximados no nível de portas, métricas de erro, custo, fronteira de Pareto e o efeito numa aplicação de imagem." />
+        <link rel="icon" href="./svg/cpu.svg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
+        <link rel="stylesheet" type="text/css" href="./css/index.css" />
+        <link rel="stylesheet" type="text/css" href="./css/axc.css" />
+        <script>
+            // Aplica o tema antes da primeira pintura, para não piscar.
+            try {
+                const theme = localStorage.getItem('axc.theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.dataset.theme = theme;
+            } catch { document.documentElement.dataset.theme = 'light'; }
+        </script>
+    </head>
+    <body>
+        <header id="header">
+            <div class="brand"><span class="icon i-cpu brand-mark" aria-hidden="true"></span><span class="brand-name">Simulador de Computação <b>Aproximada</b></span></div>
+            <div class="tools">
+                <button type="button" id="theme-toggle" class="btn icon-btn" title="Alternar contraste"><span class="icon i-moon" aria-hidden="true"></span><span class="sr-only">Alternar contraste</span></button>
+                <button type="button" id="open-ajuda" class="btn">Ajuda</button>
+            </div>
+        </header>
+        <div id="readme" class="readme"></div>
+        <main>
+            <div>
+                <section>
+                    <h2>Unidade aritmética</h2>
+                    <div class="row">
+                        <label>Tipo <select id="kind"><option value="mul">Multiplicador</option><option value="add">Somador</option></select></label>
+                        <label>Largura <select id="width"><option value="8">8 bits</option><option value="16">16 bits</option></select></label>
+                    </div>
+                    <div id="mulCfg">
+                        <label class="slider">Colunas truncadas <input type="range" id="kTrunc" min="0" max="16" value="0" /> <output id="kTruncV">0</output></label>
+                        <label class="slider">Colunas aproximadas <input type="range" id="kApprox" min="0" max="16" value="6" /> <output id="kApproxV">6</output></label>
+                        <label class="check"><input type="checkbox" id="approxCarry" checked /> vem um previsto (AND) na primeira coluna exata</label>
+                    </div>
+                    <div id="addCfg" class="hidden">
+                        <label>Técnica <select id="adder">
+                            <option value="exact">exato (ripple carry)</option>
+                            <option value="trunc">truncado</option>
+                            <option value="loa" selected>LOA (parte baixa com OR)</option>
+                            <option value="seg">segmentado (vem um previsto)</option>
+                        </select></label>
+                        <label class="slider" id="kRow">Bits aproximados (k) <input type="range" id="kAdd" min="0" max="8" value="4" /> <output id="kAddV">4</output></label>
+                        <div id="segRow" class="hidden">
+                            <label class="slider">Tamanho do bloco (L) <input type="range" id="segL" min="1" max="8" value="4" /> <output id="segLV">4</output></label>
+                            <label class="slider">Bits de previsão (P) <input type="range" id="segP" min="0" max="8" value="2" /> <output id="segPV">2</output></label>
+                        </div>
+                    </div>
+                    <label>Entradas <select id="dist">
+                        <option value="uniform">uniformes</option>
+                        <option value="normal">normais (centradas no meio da faixa)</option>
+                        <option value="exp">exponenciais (valores pequenos mais comuns)</option>
+                    </select></label>
+                    <p class="note" id="evalNote"></p>
+                    <div class="row" style="margin-top:8px">
+                        <button type="button" class="btn primary" id="addCmp">Adicionar à comparação</button>
+                    </div>
+                </section>
+                <section style="margin-top:16px">
+                    <h2 id="sumTitle">Resumo</h2>
+                    <div id="summary"></div>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <div class="tabs" id="tabs">
+                        <button type="button" class="btn" data-tab="struct">Estrutura</button>
+                        <button type="button" class="btn" data-tab="error">Erro</button>
+                        <button type="button" class="btn" data-tab="cmp">Comparação</button>
+                        <button type="button" class="btn" data-tab="app">Aplicação</button>
+                    </div>
+
+                    <div class="pane" id="pane-struct">
+                        <p class="note" id="structNote"></p>
+                        <div class="fig-box" id="structFig"></div>
+                        <div class="graph-pair">
+                            <div id="stagesBox"><h3>Altura das colunas a cada estágio de redução</h3><div class="scroll-box"><table id="stagesTable" class="mono"></table></div></div>
+                            <div id="compBox"><h3>Compressor 4:2 aproximado</h3><p class="note">soma = (x1 ⊕ x2) + (x3 ⊕ x4), vai um = x1·x2 + x3·x4. As linhas em destaque são as que erram.</p><div class="scroll-box"><table id="compTable" class="mono"></table></div></div>
+                        </div>
+                    </div>
+
+                    <div class="pane" id="pane-error">
+                        <div class="error-pair">
+                            <div>
+                                <h3>Mapa do erro (|aproximado − exato|)</h3>
+                                <p class="note" id="heatNote"></p>
+                                <div class="heat-wrap"><span class="axis-l">a →</span><canvas id="heat"></canvas><span class="axis-t">b →</span></div>
+                                <div id="heatLegend"></div>
+                                <p class="note mono" id="heatHover">&nbsp;</p>
+                            </div>
+                            <div>
+                                <h3>Histograma do erro</h3>
+                                <label class="check"><input type="checkbox" id="histLog" checked /> escala logarítmica</label>
+                                <div class="fig-box" id="histFig"></div>
+                                <p class="note" id="histNote"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pane" id="pane-cmp">
+                        <p class="note">Cada configuração adicionada vira um ponto. Os pontos não dominados (nenhum outro tem custo e erro menores ou iguais, com um deles estritamente menor) formam a fronteira de Pareto, ligada em degraus.</p>
+                        <div class="row">
+                            <label style="margin:0">Custo <select id="cmpX"><option value="gates">área (portas)</option><option value="delay">atraso (níveis de porta)</option><option value="adp">área × atraso</option></select></label>
+                            <label style="margin:0">Erro <select id="cmpY"><option value="NMED">NMED</option><option value="MRED" selected>MRED</option><option value="MED">MED</option><option value="WCE">WCE</option><option value="MSE">MSE</option><option value="EP">EP</option><option value="imgMSE">MSE da imagem filtrada</option></select></label>
+                            <label class="check" style="margin:0"><input type="checkbox" id="cmpLog" checked /> erro em escala log</label>
+                        </div>
+                        <div class="row" style="margin-top:8px">
+                            <button type="button" class="btn outline" id="sweepBtn">Varrer o parâmetro principal</button>
+                            <button type="button" class="btn outline" id="cmpClear">Limpar</button>
+                            <button type="button" class="btn outline" id="cmpCsv">CSV</button>
+                            <button type="button" class="btn outline" id="cmpSvg">Figura (SVG)</button>
+                            <span class="note" id="sweepNote"></span>
+                        </div>
+                        <div class="fig-box" id="paretoFig"></div>
+                        <div class="scroll-box"><table id="cmpTable"></table></div>
+                    </div>
+
+                    <div class="pane" id="pane-app">
+                        <div class="row">
+                            <label style="margin:0">Filtro <select id="filter">
+                                <option value="gauss">gaussiano 3 × 3 (σ = 1, pesos 19, 32, 52)</option>
+                                <option value="gauss2">gaussiano 3 × 3 (pesos 1 2 1, potências de 2)</option>
+                                <option value="gain">ganho de brilho (pixel × 180 / 128)</option>
+                                <option value="pairs">média com o vizinho (somador de 8 bits)</option>
+                            </select></label>
+                            <label class="btn outline file-btn">Usar uma imagem sua <input type="file" id="imgFile" accept="image/*" /></label>
+                            <button type="button" class="btn outline" id="imgSynth">Imagem de teste</button>
+                        </div>
+                        <p class="note" id="appNote"></p>
+                        <div class="img-row">
+                            <figure><canvas id="imgExact"></canvas><figcaption>exata</figcaption></figure>
+                            <figure><canvas id="imgApprox"></canvas><figcaption>com a unidade aproximada</figcaption></figure>
+                            <figure><canvas id="imgDiff"></canvas><figcaption id="diffCap">diferença</figcaption></figure>
+                        </div>
+                        <div id="appMetrics"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        <script type="module" src="js/app.js"></script>
+    </body>
+</html>
