@@ -20,7 +20,8 @@ test('o Verilog exportado tem uma atribuição por porta e um + por cadeia de va
 
 test('o Verilog exportado confere com o simulador no Icarus Verilog', { skip: !has('iverilog') && 'iverilog não instalado' }, () => {
     const dir = mkdtempSync(join(tmpdir(), 'axc-'));
-    for (const cfg of [{ kind: 'mul', width: 8, kTrunc: 2, kApprox: 7 }, { kind: 'mul', width: 16, kApprox: 12 }, { kind: 'add', width: 16, adder: 'loa', k: 5 }, { kind: 'add', width: 8, adder: 'seg', L: 3, P: 2 }]) {
+    for (const cfg of [{ kind: 'mul', width: 8, kTrunc: 2, kApprox: 7 }, { kind: 'mul', width: 16, kApprox: 12 }, { kind: 'add', width: 16, adder: 'loa', k: 5 }, { kind: 'add', width: 8, adder: 'seg', L: 3, P: 2 },
+        { kind: 'mul', width: 8, method: 'booth', kTrunc: 3, comp: true }, { kind: 'mul', width: 8, method: 'mitchell', comp: true }, { kind: 'mul', width: 16, method: 'drum', k: 6 }, { kind: 'mul', width: 8, method: 'kulkarni', kBlock: 8 }]) {
         const u = buildUnit(cfg), name = moduleName(cfg);
         const inp = testInputs(cfg.width, 'uniform', 3000, 4);
         const f = (x) => join(dir, x);

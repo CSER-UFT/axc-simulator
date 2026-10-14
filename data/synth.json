@@ -404,6 +404,364 @@
    }
   },
   {
+   "name": "MUL8 T4 +C",
+   "module": "mul8_t4_c",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 4,
+    "kApprox": 0,
+    "approxCarry": true,
+    "comp": true
+   },
+   "vectors": 65536,
+   "luts": 86,
+   "carry4": 3,
+   "depth": 8,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 13,
+    "LUT3": 7,
+    "LUT4": 26,
+    "LUT5": 21,
+    "LUT6": 19
+   },
+   "gates": 280,
+   "gateDepth": 26,
+   "err": {
+    "MED": 7.8515625,
+    "WCE": 37,
+    "MSE": 98.25,
+    "NMED": 0.00012074682814302192,
+    "MRED": 0.0039186989552450185,
+    "EP": 0.90625
+   }
+  },
+  {
+   "name": "MUL8 T6 +C",
+   "module": "mul8_t6_c",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 6,
+    "kApprox": 0,
+    "approxCarry": true,
+    "comp": true
+   },
+   "vectors": 65536,
+   "luts": 72,
+   "carry4": 6,
+   "depth": 9,
+   "cells": {
+    "CARRY4": 6,
+    "LUT2": 11,
+    "LUT3": 6,
+    "LUT4": 14,
+    "LUT5": 29,
+    "LUT6": 12
+   },
+   "gates": 251,
+   "gateDepth": 25,
+   "err": {
+    "MED": 41.77099609375,
+    "WCE": 241,
+    "MSE": 2718.25,
+    "NMED": 0.0006423836385044214,
+    "MRED": 0.02737438048151597,
+    "EP": 0.98046875
+   }
+  },
+  {
+   "name": "MUL8 BOOTH",
+   "module": "mul8_booth",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "method": "booth"
+   },
+   "vectors": 65536,
+   "luts": 83,
+   "carry4": 4,
+   "depth": 7,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 13,
+    "LUT3": 8,
+    "LUT4": 13,
+    "LUT5": 37,
+    "LUT6": 12
+   },
+   "gates": 375,
+   "gateDepth": 34,
+   "err": {
+    "MED": 0,
+    "WCE": 0,
+    "MSE": 0,
+    "NMED": 0,
+    "MRED": 0,
+    "EP": 0
+   }
+  },
+  {
+   "name": "MUL8 BOOTH T4",
+   "module": "mul8_booth_t4",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "method": "booth",
+    "kTrunc": 4
+   },
+   "vectors": 65536,
+   "luts": 70,
+   "carry4": 3,
+   "depth": 7,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 9,
+    "LUT3": 9,
+    "LUT4": 9,
+    "LUT5": 31,
+    "LUT6": 12
+   },
+   "gates": 351,
+   "gateDepth": 31,
+   "err": {
+    "MED": 14.25,
+    "WCE": 32,
+    "MSE": 272.25,
+    "NMED": 0.0008697509765625,
+    "MRED": 0.027174847759273053,
+    "EP": 0.9140625
+   }
+  },
+  {
+   "name": "MUL8 BOOTH T4 +C",
+   "module": "mul8_booth_t4_c",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "method": "booth",
+    "kTrunc": 4,
+    "comp": true
+   },
+   "vectors": 65536,
+   "luts": 70,
+   "carry4": 3,
+   "depth": 7,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 9,
+    "LUT3": 9,
+    "LUT4": 9,
+    "LUT5": 31,
+    "LUT6": 12
+   },
+   "gates": 351,
+   "gateDepth": 31,
+   "err": {
+    "MED": 6.8359375,
+    "WCE": 18,
+    "MSE": 69.25,
+    "NMED": 0.0004172325134277344,
+    "MRED": 0.012582975224472754,
+    "EP": 0.953125
+   }
+  },
+  {
+   "name": "MUL8 KUL",
+   "module": "mul8_kul",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "method": "kulkarni"
+   },
+   "vectors": 65536,
+   "luts": 79,
+   "carry4": 4,
+   "depth": 8,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 17,
+    "LUT3": 4,
+    "LUT4": 18,
+    "LUT5": 17,
+    "LUT6": 23
+   },
+   "gates": 262,
+   "gateDepth": 28,
+   "err": {
+    "MED": 903.125,
+    "WCE": 14450,
+    "MSE": 6459222.25,
+    "NMED": 0.013888888888888888,
+    "MRED": 0.03280490920201418,
+    "EP": 0.4673004150390625
+   }
+  },
+  {
+   "name": "MUL8 KUL8",
+   "module": "mul8_kul8",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "method": "kulkarni",
+    "kBlock": 8
+   },
+   "vectors": 65536,
+   "luts": 89,
+   "carry4": 4,
+   "depth": 8,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 14,
+    "LUT3": 7,
+    "LUT4": 20,
+    "LUT5": 23,
+    "LUT6": 25
+   },
+   "gates": 309,
+   "gateDepth": 29,
+   "err": {
+    "MED": 39.125,
+    "WCE": 626,
+    "MSE": 6270.25,
+    "NMED": 0.0006016916570549789,
+    "MRED": 0.005080609690530708,
+    "EP": 0.3671875
+   }
+  },
+  {
+   "name": "MUL8 DRUM3",
+   "module": "mul8_drum3",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "method": "drum",
+    "k": 3
+   },
+   "vectors": 65536,
+   "luts": 90,
+   "carry4": 2,
+   "depth": 9,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 15,
+    "LUT3": 10,
+    "LUT4": 18,
+    "LUT5": 18,
+    "LUT6": 29
+   },
+   "gates": 325,
+   "gateDepth": 31,
+   "err": {
+    "MED": 1847.0498046875,
+    "WCE": 14849,
+    "MSE": 8448719.482177734,
+    "NMED": 0.028405225754517493,
+    "MRED": 0.12095099046954996,
+    "EP": 0.98779296875
+   }
+  },
+  {
+   "name": "MUL8 DRUM4",
+   "module": "mul8_drum4",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "method": "drum",
+    "k": 4
+   },
+   "vectors": 65536,
+   "luts": 101,
+   "carry4": 2,
+   "depth": 10,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 14,
+    "LUT3": 9,
+    "LUT4": 23,
+    "LUT5": 26,
+    "LUT6": 29,
+    "MUXF7": 2,
+    "MUXF8": 1
+   },
+   "gates": 358,
+   "gateDepth": 33,
+   "err": {
+    "MED": 925.8582763671875,
+    "WCE": 7425,
+    "MSE": 2129979.2724609375,
+    "NMED": 0.014238497137519223,
+    "MRED": 0.058867890691103014,
+    "EP": 0.9771728515625
+   }
+  },
+  {
+   "name": "MUL8 DRUM6",
+   "module": "mul8_drum6",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "method": "drum",
+    "k": 6
+   },
+   "vectors": 65536,
+   "luts": 103,
+   "carry4": 3,
+   "depth": 11,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 27,
+    "LUT3": 6,
+    "LUT4": 17,
+    "LUT5": 32,
+    "LUT6": 21,
+    "MUXF7": 2,
+    "MUXF8": 1
+   },
+   "gates": 400,
+   "gateDepth": 35,
+   "err": {
+    "MED": 232.83050537109375,
+    "WCE": 2000,
+    "MSE": 142924.609375,
+    "NMED": 0.0035806306093209344,
+    "MRED": 0.013013432255458373,
+    "EP": 0.85430908203125
+   }
+  },
+  {
+   "name": "MUL8 MITCHELL",
+   "module": "mul8_mitchell",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "method": "mitchell"
+   },
+   "vectors": 65536,
+   "luts": 70,
+   "carry4": 3,
+   "depth": 7,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 5,
+    "LUT3": 11,
+    "LUT4": 12,
+    "LUT5": 12,
+    "LUT6": 30
+   },
+   "gates": 338,
+   "gateDepth": 28,
+   "err": {
+    "MED": 606.3981475830078,
+    "WCE": 4096,
+    "MSE": 974069.7667388916,
+    "NMED": 0.009325615495317305,
+    "MRED": 0.03787828380037507,
+    "EP": 0.9309234619140625
+   }
+  },
+  {
    "name": "MUL16 exato",
    "module": "mul16_exact",
    "cfg": {
@@ -599,6 +957,203 @@
     "NMED": 0.000020928561692710414,
     "MRED": 0.0006337746462371854,
     "EP": 0.996685
+   }
+  },
+  {
+   "name": "MUL16 BOOTH",
+   "module": "mul16_booth",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "method": "booth"
+   },
+   "vectors": 20000,
+   "luts": 383,
+   "carry4": 8,
+   "depth": 11,
+   "cells": {
+    "CARRY4": 8,
+    "LUT2": 60,
+    "LUT3": 80,
+    "LUT4": 49,
+    "LUT5": 165,
+    "LUT6": 29
+   },
+   "gates": 1491,
+   "gateDepth": 66,
+   "err": {
+    "MED": 0,
+    "WCE": 0,
+    "MSE": 0,
+    "NMED": 0,
+    "MRED": 0,
+    "EP": 0
+   }
+  },
+  {
+   "name": "MUL16 BOOTH T12 +C",
+   "module": "mul16_booth_t12_c",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "method": "booth",
+    "kTrunc": 12,
+    "comp": true
+   },
+   "vectors": 20000,
+   "luts": 263,
+   "carry4": 10,
+   "depth": 13,
+   "cells": {
+    "CARRY4": 10,
+    "INV": 1,
+    "LUT2": 18,
+    "LUT3": 60,
+    "LUT4": 43,
+    "LUT5": 114,
+    "LUT6": 28
+   },
+   "gates": 1297,
+   "gateDepth": 51,
+   "err": {
+    "MED": 3084.559035,
+    "WCE": 12785,
+    "MSE": 14624015.644365,
+    "NMED": 0.000002872719462029636,
+    "MRED": 0.00026820927551899287,
+    "EP": 0.999955
+   }
+  },
+  {
+   "name": "MUL16 KUL",
+   "module": "mul16_kul",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "method": "kulkarni"
+   },
+   "vectors": 20000,
+   "luts": 372,
+   "carry4": 8,
+   "depth": 12,
+   "cells": {
+    "CARRY4": 8,
+    "LUT2": 59,
+    "LUT3": 36,
+    "LUT4": 101,
+    "LUT5": 119,
+    "LUT6": 57
+   },
+   "gates": 1158,
+   "gateDepth": 60,
+   "err": {
+    "MED": 59684636.0321,
+    "WCE": 946995200,
+    "MSE": 27927570173040010,
+    "NMED": 0.013896836318153203,
+    "MRED": 0.033135309359356616,
+    "EP": 0.80881
+   }
+  },
+  {
+   "name": "MUL16 DRUM6",
+   "module": "mul16_drum6",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "method": "drum",
+    "k": 6
+   },
+   "vectors": 20000,
+   "luts": 403,
+   "carry4": 3,
+   "depth": 15,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 73,
+    "LUT3": 22,
+    "LUT4": 67,
+    "LUT5": 101,
+    "LUT6": 140,
+    "MUXF7": 11,
+    "MUXF8": 5
+   },
+   "gates": 1224,
+   "gateDepth": 52,
+   "err": {
+    "MED": 15185594.455235,
+    "WCE": 128993487,
+    "MSE": 574559943199765,
+    "NMED": 0.003535779633886971,
+    "MRED": 0.014707438343815,
+    "EP": 0.99995
+   }
+  },
+  {
+   "name": "MUL16 DRUM8",
+   "module": "mul16_drum8",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "method": "drum",
+    "k": 8
+   },
+   "vectors": 20000,
+   "luts": 448,
+   "carry4": 4,
+   "depth": 16,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 84,
+    "LUT3": 26,
+    "LUT4": 70,
+    "LUT5": 123,
+    "LUT6": 145,
+    "MUXF7": 2,
+    "MUXF8": 1
+   },
+   "gates": 1362,
+   "gateDepth": 57,
+   "err": {
+    "MED": 3783656.70435,
+    "WCE": 31855746,
+    "MSE": 35785631652931.39,
+    "NMED": 0.0008809781109522983,
+    "MRED": 0.003658295617059667,
+    "EP": 0.999825
+   }
+  },
+  {
+   "name": "MUL16 MITCHELL",
+   "module": "mul16_mitchell",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "method": "mitchell"
+   },
+   "vectors": 20000,
+   "luts": 280,
+   "carry4": 6,
+   "depth": 14,
+   "cells": {
+    "CARRY4": 6,
+    "LUT2": 34,
+    "LUT3": 37,
+    "LUT4": 37,
+    "LUT5": 68,
+    "LUT6": 104,
+    "MUXF7": 8,
+    "MUXF8": 4
+   },
+   "gates": 1011,
+   "gateDepth": 46,
+   "err": {
+    "MED": 39688080.62673,
+    "WCE": 268106652,
+    "MSE": 4171706855006623,
+    "NMED": 0.009240883364936692,
+    "MRED": 0.038355223404458606,
+    "EP": 0.99945
    }
   },
   {

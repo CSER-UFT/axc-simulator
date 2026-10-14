@@ -3,9 +3,9 @@
  * (fronteira de Pareto) e aplicação em imagem.
  */
 import { buildUnit, unitName, compressorTable } from './axc/units.js';
-import { testInputs, errorMetrics, histogram, errorGrid, paretoFront } from './axc/metrics.js';
+import { testInputs, errorMetrics, histogram, errorGrid, paretoFront, rng } from './axc/metrics.js';
 import { testImage, fromRgba, applyFilter, psnr, ssim } from './axc/image.js';
-import { dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, scatterSvg, drawGray, drawDiff, esc } from './ui/plots.js';
+import { stagesSvg, dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, scatterSvg, drawGray, drawDiff, esc } from './ui/plots.js';
 import { toVerilog, testbench, vectors, moduleName } from './axc/verilog.js';
 import { Help } from './ui/help.js';
 
@@ -33,7 +33,14 @@ try { cmp = JSON.parse(store.get('axc.cmp') ?? '[]'); } catch { cmp = []; }
 function readCfg() {
     const width = +$('width').value;
     if ($('kind').value === 'mul') {
-        return { kind: 'mul', width, kTrunc: +$('kTrunc').value, kApprox: +$('kApprox').value, approxCarry: $('approxCarry').checked };
+        const method = $('mulMethod').value;
+        const cfg = { kind: 'mul', width, method };
+        if (method === 'array') Object.assign(cfg, { kTrunc: +$('kTrunc').value, kApprox: +$('kApprox').value, approxCarry: $('approxCarry').checked });
+        if (method === 'booth') cfg.kTrunc = +$('kTrunc').value;
+        if (method === 'kulkarni') cfg.kBlock = +$('kBlock').value;
+        if (method === 'drum') cfg.k = +$('drumK').value;
+        if ($('comp').checked) cfg.comp = true;
+        return cfg;
     }
     const adder = $('adder').value;
     const cfg = { kind: 'add', width, adder };
@@ -47,8 +54,15 @@ function syncControls() {
     const N = +$('width').value, mul = $('kind').value === 'mul';
     $('mulCfg').classList.toggle('hidden', !mul);
     $('addCfg').classList.toggle('hidden', mul);
+    const method = $('mulMethod').value;
+    $('rowTrunc').classList.toggle('hidden', !['array', 'booth'].includes(method));
+    $('rowApprox').classList.toggle('hidden', method !== 'array');
+    $('rowKul').classList.toggle('hidden', method !== 'kulkarni');
+    $('rowDrum').classList.toggle('hidden', method !== 'drum');
     $('kTrunc').max = 2 * N;
     $('kApprox').max = 2 * N;
+    $('kBlock').max = 2 * N;
+    $('drumK').max = N - 1;
     if (+$('kTrunc').value + +$('kApprox').value > 2 * N) $('kApprox').value = 2 * N - +$('kTrunc').value;
     $('kAdd').max = N;
     $('segL').max = N;
@@ -56,7 +70,8 @@ function syncControls() {
     const adder = $('adder').value;
     $('kRow').classList.toggle('hidden', !(adder === 'trunc' || adder === 'loa'));
     $('segRow').classList.toggle('hidden', adder !== 'seg');
-    for (const id of ['kTrunc', 'kApprox', 'kAdd', 'segL', 'segP']) $(`${id}V`).textContent = $(id).value;
+    for (const id of ['kTrunc', 'kApprox', 'kAdd', 'segL', 'segP', 'kBlock', 'drumK']) $(`${id}V`).textContent = $(id).value;
+    $('kBlockV').textContent = +$('kBlock').value >= 2 * N ? 'todos' : $('kBlock').value;
 }
 
 const distName = { uniform: 'uniformes', normal: 'normais', exp: 'exponenciais' };
@@ -69,7 +84,7 @@ function evaluateCurrent() {
     const inp = testInputs(cfg.width, dist);
     const m = errorMetrics(unit, inp);
     const exact = exactUnit(cfg);
-    cur = { cfg, unit, m, inp, exact, dist, appCache: null };
+    cur = { cfg, unit, m, inp, exact, dist, appCache: null, activity: activityOf(unit), exactActivity: activityOf(exact) };
     $('evalNote').textContent = inp.exhaustive
         ? `Avaliação exaustiva: todos os ${nf(inp.a.length)} pares de operandos.`
         : `Avaliação por amostragem: ${nf(inp.a.length)} pares com entradas ${distName[dist]} (semente fixa).`;
@@ -77,6 +92,18 @@ function evaluateCurrent() {
     // Só a aba visível é desenhada agora; as outras, quando forem abertas.
     for (const k of Object.keys(dirty)) dirty[k] = true;
     renderTab(tab);
+}
+
+/** Atividade de chaveamento com 4096 pares uniformes em sequência aleatória (semente fixa), guardada na unidade. */
+function activityOf(unit) {
+    if (unit.activity === undefined) unit.activity = unit.net.activity(...randomPairs(unit.cfg.width, 4096, 31));
+    return unit.activity;
+}
+function randomPairs(N, n, seed) {
+    const r = rng(seed);
+    const a = new Uint32Array(n), b = new Uint32Array(n);
+    for (let k = 0; k < n; k++) { a[k] = Math.floor(r() * 2 ** N); b[k] = Math.floor(r() * 2 ** N); }
+    return [a, b];
 }
 
 /** Abas que precisam ser redesenhadas depois de uma mudança na unidade. */
@@ -91,8 +118,10 @@ function renderTab(name) {
 /** Unidade exata de referência, guardada por tipo e largura (a de 16 bits demora a montar). */
 const exactCache = new Map();
 function exactUnit(cfg) {
-    const key = `${cfg.kind}${cfg.width}`;
-    if (!exactCache.has(key)) exactCache.set(key, buildUnit(cfg.kind === 'mul' ? { kind: 'mul', width: cfg.width } : { kind: 'add', width: cfg.width, adder: 'exact' }));
+    // A referência do Booth é o Booth exato (com sinal); a das outras técnicas, o multiplicador exato por colunas.
+    const booth = cfg.kind === 'mul' && cfg.method === 'booth';
+    const key = `${cfg.kind}${cfg.width}${booth ? 'b' : ''}`;
+    if (!exactCache.has(key)) exactCache.set(key, buildUnit(cfg.kind === 'mul' ? (booth ? { kind: 'mul', width: cfg.width, method: 'booth' } : { kind: 'mul', width: cfg.width }) : { kind: 'add', width: cfg.width, adder: 'exact' }));
     return exactCache.get(key);
 }
 
@@ -108,6 +137,7 @@ function renderSummary() {
     h += `<tr><th>Área</th><td class="mono">${nf(g)} portas${rel(g, g0)}</td></tr>`;
     h += `<tr><th>Atraso</th><td class="mono">${d} níveis${rel(d, d0)}</td></tr>`;
     h += `<tr><th>Células</th><td class="mono">${esc(cells)}</td></tr>`;
+    h += `<tr><th title="média de saídas de porta que mudam de valor entre uma operação e a seguinte">Atividade</th><td class="mono">${nf(cur.activity, 1)} transições/op.${rel(cur.activity, cur.exactActivity)}</td></tr>`;
     const sy = synthOf(unitName(cfg));
     if (sy) {
         const sx = synthOf(unitName(exact.cfg));
@@ -126,7 +156,7 @@ function renderSummary() {
     ];
     for (const [k, t, v] of rows) h += `<tr><th title="${t}">${k}</th><td class="mono">${v}</td><td class="note">${t}</td></tr>`;
     h += '</table>';
-    h += '<p class="note">Área e atraso vêm de um modelo didático (portas de duas entradas e profundidade lógica), não de uma síntese. Entre parênteses, a diferença para a unidade exata de mesma largura.</p>';
+    h += '<p class="note">Área e atraso vêm de um modelo didático (portas de duas entradas e profundidade lógica), não de uma síntese. Entre parênteses, a diferença para a unidade exata de mesma largura (para o Booth, o Booth exato).</p>';
     $('summary').innerHTML = h;
 }
 
@@ -135,13 +165,19 @@ function renderSummary() {
 function renderStruct() {
     const { unit, cfg } = cur;
     const mul = cfg.kind === 'mul';
-    $('structFig').innerHTML = mul ? dotDiagram(unit) : adderDiagram(unit);
-    $('structNote').textContent = mul
-        ? `Cada ponto é um produto parcial aᵢ·bⱼ, na coluna i + j (a coluna 0 é a menos significativa, à direita). As colunas são reduzidas por estágios de somadores completos e meios somadores, no estilo de Dadda, até sobrarem dois bits; uma soma com propagação de vai um dá o produto de ${2 * cfg.width} bits.`
+    $('structFig').innerHTML = (mul ? (unit.dots ? dotDiagram(unit) : '') : adderDiagram(unit)) + (mul ? stagesSvg(unit) : '');
+    const notes = {
+        array: `Cada ponto é um produto parcial aᵢ·bⱼ, na coluna i + j (a coluna 0 é a menos significativa, à direita). As colunas são reduzidas por estágios de somadores completos e meios somadores, no estilo de Dadda, até sobrarem dois bits; uma soma com propagação de vai um dá o produto de ${2 * cfg.width} bits.`,
+        booth: `Booth radix 4: cada par de bits de b (com o bit anterior) escolhe 0, ±a ou ±2a, e são ${cfg.width / 2} produtos parciais em vez de ${cfg.width}. Os operandos e o produto são com sinal (complemento de 2). Os pontos claros estendem o sinal até a coluna ${2 * cfg.width - 1}; a última linha é o +1 dos produtos negativos.`,
+        kulkarni: 'Cada bloco multiplica 2 bits de a por 2 bits de b. O bloco aproximado (laranja) tem só três saídas e dá 7 em vez de 9 para 3 × 3; os produtos dos blocos são somados de forma exata. As linhas alternam para os blocos vizinhos não se sobreporem.',
+        drum: `DRUM: de cada operando, só ${cfg.k} bits a partir do 1 mais significativo entram num multiplicador exato ${cfg.k} × ${cfg.k}; o bit mais baixo do trecho vira 1, o que tira o viés do truncamento, e o produto é deslocado de volta.`,
+        mitchell: 'Mitchell: log₂(x) ≈ p + f, com p a posição do 1 mais alto e f os bits abaixo dele como fração. O produto vira uma soma de logaritmos, e o antilogaritmo é um deslocamento. Não há multiplicação nenhuma no circuito.',
+    };
+    $('structNote').textContent = mul ? notes[unit.method] + (unit.compConst !== undefined ? ` Compensação: constante ${unit.compConst} somada ao resultado.` : '')
         : 'Cada coluna soma um bit de a e um de b. A zona colorida mostra onde a soma é aproximada.';
-    $('stagesBox').classList.toggle('hidden', !mul);
-    $('compBox').classList.toggle('hidden', !mul || !cfg.kApprox);
-    if (mul) {
+    $('stagesBox').classList.toggle('hidden', !mul || !unit.heights);
+    $('compBox').classList.toggle('hidden', !mul || unit.method !== 'array' || !cfg.kApprox);
+    if (mul && unit.heights) {
         const C = 2 * cfg.width;
         const head = `<tr><th>estágio</th>${Array.from({ length: C }, (_, k) => `<th class="z-${unit.zones[C - 1 - k]}">${C - 1 - k}</th>`).join('')}</tr>`;
         $('stagesTable').innerHTML = head + unit.heights.map((hs, s) => `<tr><th>${s === 0 ? 'produtos' : s}</th>${Array.from({ length: C }, (_, k) => `<td>${hs[C - 1 - k] || ''}</td>`).join('')}</tr>`).join('');
@@ -165,7 +201,7 @@ function renderError() {
         ? 'Cada pixel é um par (a, b): 256 × 256, todos os pares. Cinza é erro zero; a cor segue |erro| em escala logarítmica.'
         : `Cada pixel é uma faixa de ${2 ** N / G} × ${2 ** N / G} valores de (a, b), com a média de |erro| em pares sorteados.`;
     const h = histogram(m.signed);
-    $('histFig').innerHTML = histogramSvg(h, { log: $('histLog').checked });
+    $('histFig').innerHTML = histogramSvg(h, { log: $('histLog').checked, width: 520 });
     $('histNote').textContent = `${pct(1 - m.EP)} dos pares sem erro. Erro médio com sinal (viés): ${nf(m.ME)}. `
         + (Math.abs(m.ME) > 0.5 * m.MED && m.MED > 0 ? 'O erro é quase todo de um lado só: uma constante de compensação somada ao resultado reduziria o MED.' : 'O erro se distribui dos dois lados do zero.');
 }
@@ -177,18 +213,20 @@ $('heat').addEventListener('mousemove', (e) => {
     const i = Math.min(G - 1, Math.max(0, Math.floor(((e.clientY - r.top) / r.height) * G)));
     const j = Math.min(G - 1, Math.max(0, Math.floor(((e.clientX - r.left) / r.width) * G)));
     const N = cur.cfg.width, span = 2 ** N / G;
+    const off = cur.unit.signed ? 2 ** (N - 1) : 0;   // com sinal, o eixo começa em -2^(N-1)
     if (span === 1) {
-        const y = cur.unit.net.evaluateOne(i, j), ex = cur.unit.exact(i, j);
-        $('heatHover').textContent = `a = ${i}, b = ${j}: exato ${ex}, aproximado ${y}, erro ${y - ex}`;
+        const ra = (i - off + 2 ** N) % 2 ** N, rb = (j - off + 2 ** N) % 2 ** N;
+        const raw = cur.unit.net.evaluateOne(ra, rb), y = cur.unit.decode ? cur.unit.decode(raw) : raw, ex = cur.unit.exact(ra, rb);
+        $('heatHover').textContent = `a = ${i - off}, b = ${j - off}: exato ${ex}, aproximado ${y}, erro ${y - ex}`;
     } else {
-        $('heatHover').textContent = `a em [${i * span}, ${(i + 1) * span}), b em [${j * span}, ${(j + 1) * span}): |erro| médio ${nf(heatGrid.grid[i * G + j])}`;
+        $('heatHover').textContent = `a em [${i * span - off}, ${(i + 1) * span - off}), b em [${j * span - off}, ${(j + 1) * span - off}): |erro| médio ${nf(heatGrid.grid[i * G + j])}`;
     }
 });
 
 // Comparação ------------------------------------------------------------------------------------------------
 
 const Y_NAMES = { NMED: 'NMED', MRED: 'MRED', MED: 'MED', WCE: 'WCE', MSE: 'MSE', EP: 'EP', imgMSE: 'MSE da imagem filtrada' };
-const X_NAMES = { gates: 'área (portas)', delay: 'atraso (níveis de porta)', adp: 'área × atraso' };
+const X_NAMES = { gates: 'área (portas)', delay: 'atraso (níveis de porta)', adp: 'área × atraso', luts: 'LUTs (Yosys)', lutsCarry: 'LUTs + CARRY4 (Yosys)', depth: 'profundidade em células (Yosys)', activity: 'atividade (transições por operação)', aap: 'área × atividade' };
 
 /** Entrada da comparação para uma configuração (com o MSE da imagem no filtro escolhido). */
 function cmpEntry(cfg, dist) {
@@ -203,9 +241,34 @@ function cmpEntry(cfg, dist) {
         imgMSE = s / ex.data.length;
     }
     const gates = unit.net.gates, delay = unit.net.delay();
-    return { name: unitName(cfg), cfg, dist, gates, delay, adp: gates * delay, NMED: m.NMED, MRED: m.MRED, MED: m.MED, WCE: m.WCE, MSE: m.MSE, EP: m.EP, imgMSE, filter };
+    const activity = activityOf(unit);
+    return { name: unitName(cfg), cfg, dist, gates, delay, adp: gates * delay, activity, aap: gates * activity, NMED: m.NMED, MRED: m.MRED, MED: m.MED, WCE: m.WCE, MSE: m.MSE, EP: m.EP, imgMSE, filter };
 }
 function saveCmp() { store.set('axc.cmp', JSON.stringify(cmp)); }
+
+/**
+ * Ponto de joelho da fronteira: o mais distante da reta entre os seus extremos, com custo e erro normalizados
+ * entre 0 e 1 (o erro em log quando o gráfico está em log).
+ */
+function kneePoint(pts, front, logY) {
+    // Em log, pontos sem erro (exatos) ficariam infinitamente abaixo: ficam fora da conta.
+    const f = front.filter((i) => !logY || pts[i].y > 0).sort((i, j) => pts[i].x - pts[j].x);
+    if (f.length < 3) return null;
+    const ty = (v) => (logY ? Math.log10(Math.max(v, 1e-12)) : v);
+    const xs = f.map((i) => pts[i].x), ys = f.map((i) => ty(pts[i].y));
+    const nx = (v) => (v - Math.min(...xs)) / ((Math.max(...xs) - Math.min(...xs)) || 1);
+    const ny = (v) => (v - Math.min(...ys)) / ((Math.max(...ys) - Math.min(...ys)) || 1);
+    const P = f.map((i, k) => [nx(xs[k]), ny(ys[k])]);
+    const [x0, y0] = P[0], [x1, y1] = P[P.length - 1];
+    const L = Math.hypot(x1 - x0, y1 - y0) || 1;
+    let best = null, bd = -1;
+    P.forEach(([x, y], k) => {
+        if (k === 0 || k === P.length - 1) return;
+        const d = Math.abs((y1 - y0) * x - (x1 - x0) * y + x1 * y0 - y1 * x0) / L;
+        if (d > bd) { bd = d; best = f[k]; }
+    });
+    return best;
+}
 
 function renderCmp() {
     const xk = $('cmpX').value, yk = $('cmpY').value;
@@ -222,10 +285,15 @@ function renderCmp() {
     const missing = cmp.length - usable.length;
     $('sweepNote').textContent = missing && ['luts', 'lutsCarry', 'depth'].includes(xk) ? `${missing} configuração(ões) fora do gráfico: não fazem parte das sintetizadas.` : $('sweepNote').textContent;
     const front = paretoFront(pts);
-    $('paretoFig').innerHTML = paretoSvg(pts, front, { xLabel: X_NAMES[xk], yLabel: Y_NAMES[yk], logY: $('cmpLog').checked });
+    const logY = $('cmpLog').checked;
+    const knee = kneePoint(pts, front, logY);
+    $('paretoFig').innerHTML = paretoSvg(pts, front, { xLabel: X_NAMES[xk], yLabel: Y_NAMES[yk], logY, knee });
     const frontNames = new Set(front.map((i) => pts[i].label));
-    $('cmpTable').innerHTML = '<tr><th>configuração</th><th>entradas</th><th>portas</th><th>atraso</th><th>LUTs</th><th>MED</th><th>WCE</th><th>NMED</th><th>MRED</th><th>EP</th><th>MSE imagem</th><th></th></tr>'
-        + cmp.map((e, k) => `<tr class="${frontNames.has(e.name) ? 'front' : ''}${e.name === curName ? ' cur' : ''}"><td class="mono left">${esc(e.name)}</td><td>${distName[e.dist]}</td><td>${e.gates}</td><td>${e.delay}</td><td>${synthOf(e.name)?.luts ?? '-'}</td>`
+    // Quantas configurações dominam cada uma (0 na fronteira).
+    const domBy = new Map(pts.map((p) => [p.label, pts.filter((q) => q !== p && q.x <= p.x && q.y <= p.y && (q.x < p.x || q.y < p.y)).length]));
+    $('kneeNote').textContent = knee !== null ? `Ponto de joelho: ${pts[knee].label}. É o ponto da fronteira mais distante da reta entre os extremos dela, com os dois eixos normalizados${logY ? ' (o erro em escala log, sem os pontos de erro zero)' : ''}: a partir dele, cada redução de custo passa a custar bem mais erro.` : 'O ponto de joelho aparece quando a fronteira tem pelo menos três pontos.';
+    $('cmpTable').innerHTML = '<tr><th>configuração</th><th>entradas</th><th>portas</th><th>atraso</th><th>LUTs</th><th>atividade</th><th title="quantas configurações da comparação dominam esta (com o custo e o erro escolhidos)">dominada por</th><th>MED</th><th>WCE</th><th>NMED</th><th>MRED</th><th>EP</th><th>MSE imagem</th><th></th></tr>'
+        + cmp.map((e, k) => `<tr class="${frontNames.has(e.name) ? 'front' : ''}${e.name === curName ? ' cur' : ''}"><td class="mono left">${esc(e.name)}</td><td>${distName[e.dist]}</td><td>${e.gates}</td><td>${e.delay}</td><td>${synthOf(e.name)?.luts ?? '-'}</td><td>${e.activity === undefined ? '-' : nf(e.activity, 1)}</td><td>${domBy.has(e.name) ? domBy.get(e.name) : '-'}</td>`
             + `<td>${nf(e.MED)}</td><td>${nf(e.WCE)}</td><td>${sci(e.NMED)}</td><td>${pct(e.MRED)}</td><td>${pct(e.EP)}</td><td>${e.imgMSE === null ? '-' : nf(e.imgMSE, 3)}</td>`
             + `<td><button type="button" class="btn small-btn" data-del="${k}" title="Remover">×</button></td></tr>`).join('');
 }
@@ -253,7 +321,20 @@ $('sweepBtn').onclick = () => {
     if (!cur) return;
     const base = cur.cfg, N = base.width;
     const list = [];
-    if (base.kind === 'mul') {
+    const method = base.method ?? 'array';
+    if (base.kind === 'mul' && method === 'booth') {
+        for (let v = 0; v <= 2 * N - 2; v += N <= 8 ? 1 : 2) list.push({ ...base, kTrunc: v });
+        $('sweepNote').textContent = `Varrendo as colunas truncadas (${list.length} pontos).`;
+    } else if (base.kind === 'mul' && method === 'kulkarni') {
+        for (let v = 0; v <= 2 * N; v += 2) list.push({ ...base, kBlock: v });
+        $('sweepNote').textContent = `Varrendo a coluna até onde os blocos são aproximados (${list.length} pontos).`;
+    } else if (base.kind === 'mul' && method === 'drum') {
+        for (let v = 2; v < N; v++) list.push({ ...base, k: v });
+        $('sweepNote').textContent = `Varrendo k (${list.length} pontos).`;
+    } else if (base.kind === 'mul' && method === 'mitchell') {
+        list.push({ ...base, comp: false }, { ...base, comp: true });
+        $('sweepNote').textContent = 'O Mitchell não tem parâmetro: entram as versões sem e com compensação.';
+    } else if (base.kind === 'mul') {
         const p = lastParam === 'kTrunc' ? 'kTrunc' : 'kApprox';
         const other = p === 'kTrunc' ? base.kApprox : base.kTrunc;
         const step = N <= 8 ? 1 : 2;
@@ -350,9 +431,14 @@ function loadCfg(cfg) {
     $('width').value = String(cfg.width);
     syncControls();
     if (cfg.kind === 'mul') {
+        $('mulMethod').value = cfg.method ?? 'array';
+        syncControls();
         $('kTrunc').value = cfg.kTrunc ?? 0;
         $('kApprox').value = cfg.kApprox ?? 0;
         $('approxCarry').checked = cfg.approxCarry !== false;
+        if (cfg.kBlock !== undefined) $('kBlock').value = cfg.kBlock;
+        if (cfg.k !== undefined) $('drumK').value = cfg.k;
+        $('comp').checked = !!cfg.comp;
     } else {
         $('adder').value = cfg.adder;
         if (cfg.k !== undefined) $('kAdd').value = cfg.k;
@@ -379,6 +465,8 @@ $('dlHex').onclick = () => {
 /** Filtro escolhido, se fizer sentido para a unidade (null quando não faz). */
 function filterFor(cfg) {
     const f = $('filter').value;
+    // Com sinal e 8 bits, os pixels (até 255) não cabem no operando.
+    if (cfg.kind === 'mul' && cfg.method === 'booth' && cfg.width === 8) return null;
     if (cfg.kind === 'mul') return f === 'pairs' ? 'gauss' : f;
     if (cfg.width === 8) return 'pairs';
     return f === 'pairs' || f === 'gain' ? 'gauss' : f;
@@ -387,6 +475,12 @@ function filterFor(cfg) {
 function renderApp() {
     if (!cur) return;
     const filter = filterFor(cur.cfg);
+    if (!filter) {
+        $('appNote').textContent = 'O Booth de 8 bits é com sinal: os operandos vão de -128 a 127, e os pixels (0 a 255) não cabem. Use o Booth de 16 bits.';
+        for (const id of ['imgExact', 'imgApprox', 'imgDiff']) { const c = $(id); c.getContext('2d').clearRect(0, 0, c.width, c.height); }
+        $('appMetrics').innerHTML = '';
+        return;
+    }
     const key = `${unitName(cur.cfg)}|${filter}|${image.w}x${image.h}|${image.data[0]}`;
     if (cur.appCache?.key !== key) {
         const ex = applyFilter(image, filter, null);
@@ -444,10 +538,10 @@ $('tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-t
 
 let timer = null;
 const schedule = () => { clearTimeout(timer); timer = setTimeout(evaluateCurrent, 120); };
-for (const id of ['kTrunc', 'kApprox', 'kAdd', 'segL', 'segP']) {
+for (const id of ['kTrunc', 'kApprox', 'kAdd', 'segL', 'segP', 'kBlock', 'drumK']) {
     $(id).addEventListener('input', () => { if (id === 'kTrunc' || id === 'kApprox') lastParam = id; syncControls(); schedule(); });
 }
-for (const id of ['kind', 'width', 'adder', 'dist', 'approxCarry']) $(id).addEventListener('change', () => { syncControls(); evaluateCurrent(); });
+for (const id of ['kind', 'width', 'adder', 'dist', 'approxCarry', 'mulMethod', 'comp']) $(id).addEventListener('change', () => { syncControls(); evaluateCurrent(); });
 
 // Tema e ajuda ----------------------------------------------------------------------------------------------
 

@@ -37,9 +37,21 @@
                         <label>Largura <select id="width"><option value="8">8 bits</option><option value="16">16 bits</option></select></label>
                     </div>
                     <div id="mulCfg">
-                        <label class="slider">Colunas truncadas <input type="range" id="kTrunc" min="0" max="16" value="0" /> <output id="kTruncV">0</output></label>
-                        <label class="slider">Colunas aproximadas <input type="range" id="kApprox" min="0" max="16" value="6" /> <output id="kApproxV">6</output></label>
-                        <label class="check"><input type="checkbox" id="approxCarry" checked /> vem um previsto (AND) na primeira coluna exata</label>
+                        <label>Técnica <select id="mulMethod">
+                            <option value="array">por colunas (truncar e aproximar)</option>
+                            <option value="booth">Booth radix 4, com sinal</option>
+                            <option value="kulkarni">blocos 2 × 2 de Kulkarni</option>
+                            <option value="drum">DRUM (k bits a partir do 1 mais alto)</option>
+                            <option value="mitchell">logarítmico de Mitchell</option>
+                        </select></label>
+                        <div id="rowTrunc"><label class="slider">Colunas truncadas <input type="range" id="kTrunc" min="0" max="16" value="0" /> <output id="kTruncV">0</output></label></div>
+                        <div id="rowApprox">
+                            <label class="slider">Colunas aproximadas <input type="range" id="kApprox" min="0" max="16" value="6" /> <output id="kApproxV">6</output></label>
+                            <label class="check"><input type="checkbox" id="approxCarry" checked /> vem um previsto (AND) na primeira coluna exata</label>
+                        </div>
+                        <div id="rowKul"><label class="slider">Blocos aproximados abaixo da coluna <input type="range" id="kBlock" min="0" max="16" step="2" value="16" /> <output id="kBlockV">16</output></label></div>
+                        <div id="rowDrum"><label class="slider">Bits mantidos (k) <input type="range" id="drumK" min="2" max="7" value="4" /> <output id="drumKV">4</output></label></div>
+                        <label class="check" title="Soma ao resultado uma constante igual ao erro médio medido com entradas uniformes"><input type="checkbox" id="comp" /> compensar o viés (constante somada ao resultado)</label>
                     </div>
                     <div id="addCfg" class="hidden">
                         <label>Técnica <select id="adder">
@@ -109,7 +121,7 @@
                     <div class="pane" id="pane-cmp">
                         <p class="note">Cada configuração adicionada vira um ponto. Os pontos não dominados (nenhum outro tem custo e erro menores ou iguais, com um deles estritamente menor) formam a fronteira de Pareto, ligada em degraus.</p>
                         <div class="row">
-                            <label style="margin:0">Custo <select id="cmpX"><option value="gates">área (portas, modelo)</option><option value="delay">atraso (níveis de porta, modelo)</option><option value="adp">área × atraso (modelo)</option><option value="luts">LUTs (Yosys)</option><option value="lutsCarry">LUTs + CARRY4 (Yosys)</option><option value="depth">profundidade em células (Yosys)</option></select></label>
+                            <label style="margin:0">Custo <select id="cmpX"><option value="gates">área (portas, modelo)</option><option value="delay">atraso (níveis de porta, modelo)</option><option value="adp">área × atraso (modelo)</option><option value="luts">LUTs (Yosys)</option><option value="lutsCarry">LUTs + CARRY4 (Yosys)</option><option value="depth">profundidade em células (Yosys)</option><option value="activity">atividade (transições por operação)</option><option value="aap">área × atividade (modelo)</option></select></label>
                             <label style="margin:0">Erro <select id="cmpY"><option value="NMED">NMED</option><option value="MRED" selected>MRED</option><option value="MED">MED</option><option value="WCE">WCE</option><option value="MSE">MSE</option><option value="EP">EP</option><option value="imgMSE">MSE da imagem filtrada</option></select></label>
                             <label class="check" style="margin:0"><input type="checkbox" id="cmpLog" checked /> erro em escala log</label>
                         </div>
@@ -121,6 +133,7 @@
                             <span class="note" id="sweepNote"></span>
                         </div>
                         <div class="fig-box" id="paretoFig"></div>
+                        <p class="note" id="kneeNote"></p>
                         <div class="scroll-box"><table id="cmpTable"></table></div>
                     </div>
 

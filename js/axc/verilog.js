@@ -23,6 +23,7 @@ export function toVerilog(unit, name = moduleName(unit.cfg)) {
     const A = net.inputs.a, B = net.inputs.b;
     const wire = (w) => {
         if (w === 0) return "1'b0";
+        if (w === 1) return "1'b1";
         const ia = A.indexOf(w);
         if (ia >= 0) return `a[${ia}]`;
         const ib = B.indexOf(w);
@@ -30,6 +31,7 @@ export function toVerilog(unit, name = moduleName(unit.cfg)) {
         return `n${w}`;
     };
     const sym = { [OP.AND]: '&', [OP.OR]: '|', [OP.XOR]: '^' };
+    const expr = (p) => (ops[p] === OP.NOT ? `~${wire(ops[p + 2])}` : `${wire(ops[p + 2])} ${sym[ops[p]]} ${wire(ops[p + 3])}`);
     const lines = [];
     lines.push(`// ${unitName(unit.cfg)}: gerado pelo Simulador de Computação Aproximada (axc-simulator).`);
     lines.push(`// ${net.gates} portas de duas entradas, profundidade lógica ${net.delay()}.`);
@@ -58,7 +60,7 @@ export function toVerilog(unit, name = moduleName(unit.cfg)) {
     });
     for (let p = 0; p < ops.length; p += 4) {
         if (inChain[p / 4]) continue;
-        lines.push(`    assign n${ops[p + 1]} = ${wire(ops[p + 2])} ${sym[ops[p]]} ${wire(ops[p + 3])};`);
+        lines.push(`    assign n${ops[p + 1]} = ${expr(p)};`);
     }
     net.outputs.forEach((w, j) => lines.push(`    assign y[${j}] = ${wire(w)};`));
     lines.push('endmodule');

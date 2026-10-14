@@ -67,3 +67,12 @@ table.metrics td.note { text-align: left; }
 #synthTable tr[data-k] { cursor: pointer; }
 #synthTable tr.cur td { background: var(--focus-soft); }
 #synthTable td { text-align: right; }
+
+.fig-svg .dot.ext { fill-opacity: .35; }
+.fig-svg .dot.neg { fill: var(--z-approx); }
+.fig-svg .stage { fill: var(--panel-2); stroke: var(--line-strong); }
+.fig-svg .stage-bar { fill: var(--accent); fill-opacity: .7; }
+.fig-svg .arrow { stroke: var(--line-strong); stroke-width: 1.5; fill: none; }
+.fig-svg .arrowhead { fill: var(--line-strong); }
+.fig-svg .knee { fill: none; stroke: var(--focus); stroke-width: 2.5; stroke-dasharray: 4 3; }
+.fig-svg .dot.z-trunc.neg, .fig-svg .dot.z-trunc.ext { fill: none; fill-opacity: 1; }

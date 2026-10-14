@@ -8,13 +8,13 @@ Somadores e multiplicadores aproximados são construídos porta a porta, avaliad
 
 ## O que faz
 
-* **Multiplicador** N × N (8 ou 16 bits) com redução de Dadda e três zonas de colunas: truncadas (sem produto parcial), aproximadas (compressor 4:2 aproximado e soma final com OR, com vem um previsto opcional) e exatas.
+* **Multiplicador** N × N (8 ou 16 bits): por colunas, com redução de Dadda e três zonas (truncadas, aproximadas com compressor 4:2 aproximado e OR, e exatas); Booth radix 4 com sinal, truncado; blocos 2 × 2 de Kulkarni; DRUM; logarítmico de Mitchell; e compensação do viés por uma constante, para qualquer técnica.
 * **Somador** exato (ripple carry), truncado, LOA e segmentado com previsão de vem um (no estilo GeAr e ACA).
 * **Estrutura**: diagrama de pontos dos produtos parciais com as zonas, altura das colunas a cada estágio de redução e tabela verdade do compressor aproximado.
 * **Erro**: ME, MED, WCE (com o par que o produz), MSE, NMED, MRED e EP; avaliação exaustiva para 8 bits com entradas uniformes e por amostragem nos outros casos (entradas uniformes, normais ou exponenciais); mapa do erro sobre o plano (a, b) e histograma do erro com sinal.
-* **Custo**: área em portas de duas entradas e atraso em níveis de porta (modelo didático) e, para as configurações pré-definidas, LUTs, CARRY4 e profundidade de uma síntese real com o Yosys para FPGA Xilinx 7 series.
+* **Custo**: área em portas de duas entradas, atraso em níveis de porta e atividade de chaveamento (indicador de energia dinâmica), todos do modelo didático, e, para as configurações pré-definidas, LUTs, CARRY4 e profundidade de uma síntese real com o Yosys para FPGA Xilinx 7 series.
 * **Síntese**: exportação de qualquer configuração em Verilog com testbench autoverificável; a cada publicação, uma action exporta as configurações pré-definidas, confere o Verilog no Icarus Verilog contra o simulador e sintetiza com o Yosys (`scripts/synth.mjs`, resultado em `data/synth.json`).
-* **Comparação**: configurações guardadas, varredura do parâmetro principal, fronteira de Pareto com custo e métrica de erro à escolha, exportação em CSV e SVG.
+* **Comparação**: configurações guardadas, varredura do parâmetro principal, fronteira de Pareto com custo e métrica de erro à escolha, contagem de dominância, ponto de joelho, exportação em CSV e SVG.
 * **Aplicação**: filtro gaussiano 3 × 3, ganho de brilho ou média de pares sobre uma imagem de teste sintética ou do usuário, com a imagem exata, a aproximada, a diferença, PSNR e SSIM.
 
 ## Executar
@@ -42,8 +42,7 @@ Os testes conferem as unidades exatas contra a aritmética (8 bits exaustivo), o
 
 ## Próximas etapas possíveis
 
-* Mais técnicas (Booth radix 4 aproximado, DRUM, Mitchell).
-* Ponto de joelho e produto de área e potência.
+* Mais técnicas (codificador de Booth aproximado, outros somadores).
 * Computação estocástica; memória aproximada e escalonamento de tensão.
 * Inglês e ajuda completa; integração com o riscv-cc-simulator.
 

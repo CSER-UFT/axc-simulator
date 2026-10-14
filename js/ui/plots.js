@@ -10,33 +10,63 @@ const fmt = (v) => (Number.isInteger(v) ? String(v) : Math.abs(v) >= 100 ? v.toF
 /** Diagrama de pontos do multiplicador: um ponto por produto parcial a_i b_j, na coluna i + j. */
 export function dotDiagram(unit) {
     const N = unit.cfg.width, C = 2 * N;
+    const rows = unit.rows ?? Array.from({ length: N }, (_, j) => `b${j}`);
+    const NR = rows.length;
     const D = N <= 8 ? 22 : 13, R = N <= 8 ? 7 : 4.2;
-    const left = 46, top = 34;
-    const width = Math.max(left + C * D + 20, 560), height = top + N * D + 40;
+    const left = 52, top = 34;
+    const width = Math.max(left + C * D + 20, 580), height = top + NR * D + 40;
     const x = (c) => left + (C - 1 - c) * D + D / 2;
     let s = `<svg class="fig-svg dots" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img">`;
     // Faixas das zonas.
-    unit.zones.forEach((z, c) => {
-        if (z !== 'exact') s += `<rect class="band z-${z}" x="${x(c) - D / 2}" y="${top - 6}" width="${D}" height="${N * D + 8}"/>`;
+    (unit.zones ?? []).forEach((z, c) => {
+        if (z !== 'exact') s += `<rect class="band z-${z}" x="${x(c) - D / 2}" y="${top - 6}" width="${D}" height="${NR * D + 8}"/>`;
     });
     for (let c = 0; c < C; c++) {
         if (N <= 8 || c % 2 === 0) s += `<text class="small muted mono" x="${x(c)}" y="${top - 12}" text-anchor="middle">${c}</text>`;
     }
     s += `<text class="small muted" x="4" y="${top - 12}">coluna</text>`;
-    for (let j = 0; j < N; j++) {
-        s += `<text class="small muted mono" x="${left - 8}" y="${top + j * D + D / 2 + 4}" text-anchor="end">b${j}</text>`;
-    }
+    rows.forEach((label, j) => {
+        s += `<text class="small muted mono" x="${left - 8}" y="${top + j * D + D / 2 + 4}" text-anchor="end">${esc(label)}</text>`;
+    });
     for (const d of unit.dots) {
-        const cx = x(d.c), cy = top + d.j * D + D / 2;
-        s += `<circle class="dot z-${d.zone}" cx="${cx}" cy="${cy}" r="${R}"><title>a${d.i} · b${d.j} (coluna ${d.c})</title></circle>`;
+        const cx = x(d.c), cy = top + d.row * D + D / 2;
+        s += `<circle class="dot z-${d.zone}${d.cls ? ` ${d.cls}` : ''}" cx="${cx}" cy="${cy}" r="${R}"><title>coluna ${d.c}</title></circle>`;
     }
-    const ly = top + N * D + 22;
-    const lg = [['exact', 'exata'], ['approx', 'compressor aproximado e OR'], ['trunc', 'truncada (sem porta)']];
+    const ly = top + NR * D + 22;
+    const lg = unit.method === 'kulkarni' ? [['exact', 'bloco exato'], ['approx', 'bloco aproximado']]
+        : unit.method === 'booth' ? [['exact', 'produto parcial'], ['exact ext', 'extensão de sinal'], ['trunc', 'truncada (sem porta)']]
+            : [['exact', 'exata'], ['approx', 'compressor aproximado e OR'], ['trunc', 'truncada (sem porta)']];
     let lx = left;
     for (const [z, t] of lg) {
         s += `<circle class="dot z-${z}" cx="${lx + 6}" cy="${ly - 4}" r="6"/><text class="small" x="${lx + 16}" y="${ly}">${t}</text>`;
         lx += 30 + t.length * 6.4;
     }
+    return `${s}</svg>`;
+}
+
+/** Custo de cada etapa do circuito, em portas, como uma cadeia de caixas. */
+export function stagesSvg(unit) {
+    const st = unit.stages ?? [];
+    if (!st.length) return '';
+    const total = st.reduce((s2, x) => s2 + x.gates, 0) || 1;
+    const W = 150, H = 70, gap = 26, top = 30;
+    const width = Math.max(580, 20 + st.length * (W + gap)), height = top + H + 24;
+    let s = `<svg class="fig-svg stages" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img">`;
+    s += `<text class="small muted" x="10" y="18">custo de cada etapa (portas)</text>`;
+    st.forEach((x, k) => {
+        const x0 = 10 + k * (W + gap);
+        const frac = x.gates / total;
+        s += `<rect class="stage" x="${x0}" y="${top}" width="${W}" height="${H}" rx="6"/>`;
+        s += `<rect class="stage-bar" x="${x0}" y="${top + H - 8}" width="${Math.max(2, W * frac)}" height="8" rx="2"/>`;
+        const words = x.label.split(' ');
+        const lines = [];
+        let cur = '';
+        for (const w of words) { if ((cur + ' ' + w).trim().length > 22) { lines.push(cur.trim()); cur = w; } else cur += ` ${w}`; }
+        if (cur.trim()) lines.push(cur.trim());
+        lines.slice(0, 3).forEach((l, i) => { s += `<text class="small" x="${x0 + 8}" y="${top + 16 + i * 13}">${esc(l)}</text>`; });
+        s += `<text class="small mono bold" x="${x0 + W - 8}" y="${top + H - 14}" text-anchor="end">${x.gates}</text>`;
+        if (k < st.length - 1) s += `<path class="arrow" d="M${x0 + W + 4},${top + H / 2} h${gap - 10}"/><polygon class="arrowhead" points="${x0 + W + gap - 6},${top + H / 2 - 4} ${x0 + W + gap - 1},${top + H / 2} ${x0 + W + gap - 6},${top + H / 2 + 4}"/>`;
+    });
     return `${s}</svg>`;
 }
 
@@ -151,7 +181,7 @@ export function rampLegend(max) {
  * @param {Array<{x: number, y: number, label: string, current?: boolean}>} pts
  * @param {number[]} front índices dos pontos não dominados
  */
-export function paretoSvg(pts, front, { xLabel, yLabel, logY = false, width = 620, height = 360 } = {}) {
+export function paretoSvg(pts, front, { xLabel, yLabel, logY = false, knee = null, width = 620, height = 360 } = {}) {
     const L = 84, B = 44, T = 14, R = 90;
     const W = width - L - R, H = height - T - B;
     let s = `<svg class="fig-svg pareto" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img">`;
@@ -191,6 +221,7 @@ export function paretoSvg(pts, front, { xLabel, yLabel, logY = false, width = 62
         placed.push({ x: lx, y: ly, w: lw });
         labelled.add(i);
     }
+    if (knee !== null) s += `<circle class="knee" cx="${X(pts[knee].x)}" cy="${Y(pts[knee].y)}" r="11"/><text class="small bold" x="${X(pts[knee].x) - 12}" y="${Y(pts[knee].y) + 22}" text-anchor="end">joelho</text>`;
     pts.forEach((p, i) => {
         s += `<g><circle class="pt${onFront.has(i) ? ' front' : ''}${p.current ? ' cur' : ''}" cx="${X(p.x)}" cy="${Y(p.y)}" r="${p.current ? 7 : 5}"><title>${esc(p.label)}: ${fmt(p.x)}, ${fmt(p.y)}</title></circle>`;
         if (labelled.has(i)) s += `<text class="small mono" x="${X(p.x) + 8}" y="${Y(p.y) - 6}">${esc(p.label)}</text>`;

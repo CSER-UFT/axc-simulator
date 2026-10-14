@@ -65,12 +65,13 @@ export function testInputs(N, dist = 'uniform', samples = 200000, seed = 12345) 
  */
 export function errorMetrics(unit, inp) {
     const approx = unit.net.evaluate(inp.a, inp.b);
+    const value = unit.decode ? Float64Array.from(approx, unit.decode) : approx;
     const n = inp.a.length;
     let sum = 0, sumAbs = 0, sumSq = 0, wce = 0, wcA = 0, wcB = 0, errs = 0, red = 0, redN = 0;
     const signed = new Float64Array(n);
     for (let k = 0; k < n; k++) {
         const e = unit.exact(inp.a[k], inp.b[k]);
-        const d = approx[k] - e;
+        const d = value[k] - e;
         signed[k] = d;
         const ad = Math.abs(d);
         sum += d;
@@ -78,11 +79,11 @@ export function errorMetrics(unit, inp) {
         sumSq += ad * ad;
         if (ad > wce) { wce = ad; wcA = inp.a[k]; wcB = inp.b[k]; }
         if (ad > 0) errs++;
-        if (e !== 0) { red += ad / e; redN++; }
+        if (e !== 0) { red += ad / Math.abs(e); redN++; }
     }
     return {
         n, ME: sum / n, MED: sumAbs / n, WCE: wce, worst: { a: wcA, b: wcB }, MSE: sumSq / n,
-        NMED: sumAbs / n / unit.maxOut, MRED: redN ? red / redN : 0, EP: errs / n, signed, approx,
+        NMED: sumAbs / n / unit.maxOut, MRED: redN ? red / redN : 0, EP: errs / n, signed, approx, value,
     };
 }
 
@@ -122,13 +123,18 @@ export function errorGrid(unit, G = 256, perCell = 1, seed = 7) {
             }
         }
     }
+    // Com sinal, os eixos vão de -2^(N-1) a 2^(N-1) - 1: o índice vira o valor e o valor, a codificação.
+    if (unit.signed) {
+        const half = 2 ** (N - 1), M = 2 ** N;
+        for (let q = 0; q < total; q++) { a[q] = (a[q] + half) % M; b[q] = (b[q] + half) % M; }
+    }
     const y = unit.net.evaluate(a, b);
     const grid = new Float64Array(G * G);
     for (let p = 0; p < G * G; p++) {
         let s = 0;
         for (let r = 0; r < perCell; r++) {
             const q = p * perCell + r;
-            s += Math.abs(y[q] - unit.exact(a[q], b[q]));
+            s += Math.abs((unit.decode ? unit.decode(y[q]) : y[q]) - unit.exact(a[q], b[q]));
         }
         grid[p] = s / perCell;
     }
