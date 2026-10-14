@@ -225,3 +225,34 @@ export function drawGray(canvas, img) {
     for (let k = 0; k < img.data.length; k++) out.data.set([img.data[k], img.data[k], img.data[k], 255], 4 * k);
     ctx.putImageData(out, 0, 0);
 }
+
+/**
+ * Dispersão simples com grupos (cada grupo com a sua classe de cor) e o ponto atual em destaque.
+ * @param {Array<{x: number, y: number, label: string, group: string, current?: boolean}>} pts
+ */
+export function scatterSvg(pts, { xLabel, yLabel, width = 520, height = 340, logX = true, logY = true } = {}) {
+    const L = 64, B = 44, T = 14, R = 24;
+    const W = width - L - R, H = height - T - B;
+    let s = `<svg class="fig-svg scatter" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img">`;
+    if (!pts.length) return `${s}<text class="small muted" x="${width / 2}" y="${height / 2}" text-anchor="middle">Sem dados de síntese.</text></svg>`;
+    const tx = (v) => (logX ? Math.log10(Math.max(v, 1)) : v), ty = (v) => (logY ? Math.log10(Math.max(v, 1)) : v);
+    const xs = pts.map((p) => tx(p.x)), ys = pts.map((p) => ty(p.y));
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const X = (v) => L + (x1 === x0 ? W / 2 : ((tx(v) - x0) / (x1 - x0)) * W * 0.92 + W * 0.04);
+    const Y = (v) => T + H - (y1 === y0 ? H / 2 : ((ty(v) - y0) / (y1 - y0)) * H * 0.9 + H * 0.05);
+    s += `<line class="axis" x1="${L}" y1="${T + H}" x2="${L + W}" y2="${T + H}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${T + H}"/>`;
+    const ticks = (a, b, lg) => (lg ? [10 ** a, 10 ** ((a + b) / 2), 10 ** b] : [a, (a + b) / 2, b]);
+    for (const v of ticks(x0, x1, logX)) s += `<text class="small muted mono" x="${X(v)}" y="${T + H + 16}" text-anchor="middle">${fmt(Math.round(v))}</text>`;
+    for (const v of ticks(y0, y1, logY)) s += `<text class="small muted mono" x="${L - 6}" y="${Y(v) + 4}" text-anchor="end">${fmt(Math.round(v))}</text>`;
+    s += `<text class="small muted" x="${L + W / 2}" y="${height - 6}" text-anchor="middle">${esc(xLabel)}${logX ? ' (log)' : ''}</text>`;
+    s += `<text class="small muted" x="14" y="${T + H / 2}" text-anchor="middle" transform="rotate(-90 14 ${T + H / 2})">${esc(yLabel)}${logY ? ' (log)' : ''}</text>`;
+    for (const p of pts) {
+        s += `<circle class="pt g-${p.group}${p.current ? ' cur' : ''}" cx="${X(p.x)}" cy="${Y(p.y)}" r="${p.current ? 7 : 5}"><title>${esc(p.label)}: ${fmt(p.x)}, ${fmt(p.y)}</title></circle>`;
+    }
+    const groups = [...new Set(pts.map((p) => p.group))];
+    groups.forEach((g, k) => {
+        const lx = L + 12 + (k % 2) * 190, ly = T + 6 + Math.floor(k / 2) * 15;
+        s += `<circle class="pt g-${g}" cx="${lx}" cy="${ly}" r="5"/><text class="small" x="${lx + 10}" y="${ly + 4}">${esc(g.replace(/(\d+)/, ' $1 bits').replace('mul', 'multiplicador').replace('add', 'somador'))}</text>`;
+    });
+    return `${s}</svg>`;
+}

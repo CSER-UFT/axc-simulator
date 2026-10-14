@@ -19,6 +19,7 @@ export class Netlist {
         this.inputs = {};        // nome -> lista de fios (bit 0 primeiro)
         this.outputs = [];       // fios da saída (bit 0 primeiro)
         this.cells = { AND: 0, OR: 0, XOR: 0, FA: 0, HA: 0, AC: 0 };
+        this.chains = [];        // somas com propagação de vai um (viram + no Verilog, para a síntese usar CARRY4)
         this.gates = 0;
     }
 
@@ -77,6 +78,29 @@ export class Netlist {
         const s = this.gate(OP.OR, this.gate(OP.XOR, x1, x2), this.gate(OP.XOR, x3, x4));
         const c = this.gate(OP.OR, this.gate(OP.AND, x1, x2), this.gate(OP.AND, x3, x4));
         return [s, c];
+    }
+
+    /**
+     * Soma com propagação de vai um de dois vetores de fios (bit 0 primeiro) e um vem um.
+     * Com carryOnly, só a cadeia de vai um (para prever o vem um de um bloco).
+     * @returns {{sums: number[], cout: number}}
+     */
+    rippleAdd(xs, ys, cin = 0, { carryOnly = false } = {}) {
+        const op0 = this.ops.length;
+        const sums = [];
+        let c = cin;
+        for (let i = 0; i < xs.length; i++) {
+            if (carryOnly) {
+                c = this.or(this.and(xs[i], ys[i]), this.and(this.xor(xs[i], ys[i]), c));
+                continue;
+            }
+            const bits = [xs[i], ys[i], c].filter((w) => w !== 0);
+            if (bits.length === 3) { const [s, cy] = this.fa(...bits); sums.push(s); c = cy; }
+            else if (bits.length === 2) { const [s, cy] = this.ha(...bits); sums.push(s); c = cy; }
+            else { sums.push(bits[0] ?? 0); c = 0; }
+        }
+        this.chains.push({ xs: [...xs], ys: [...ys], cin, sums, cout: c, op0, op1: this.ops.length, carryOnly });
+        return { sums, cout: c };
     }
 
     /** Atraso do circuito: maior profundidade entre as saídas. */

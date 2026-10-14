@@ -88,22 +88,24 @@ export function buildMultiplier(cfg) {
     const out = [];
     let carry = 0;
     let lastApprox = null;
+    let c0 = 2 * N;
     cols.forEach((bits, c) => {
+        if (c >= c0) return;
         if (zones[c] === 'trunc') { out.push(0); return; }
         if (zones[c] === 'approx') {
             out.push(bits.length === 2 ? net.or(bits[0], bits[1]) : bits[0] ?? 0);
             lastApprox = bits;
             return;
         }
+        // Primeira coluna exata: daqui até o fim, uma soma de duas linhas com propagação de vai um.
         if (lastApprox && cfg.approxCarry !== false) {
             // Como no LOA: o vem um da primeira coluna exata é o AND dos dois bits da última coluna aproximada.
             carry = lastApprox.length === 2 ? net.and(lastApprox[0], lastApprox[1]) : 0;
         }
-        lastApprox = null;
-        const xs = [...bits, carry].filter((w) => w !== 0);
-        if (xs.length === 3) { const [s, cy] = net.fa(xs[0], xs[1], xs[2]); out.push(s); carry = cy; }
-        else if (xs.length === 2) { const [s, cy] = net.ha(xs[0], xs[1]); out.push(s); carry = cy; }
-        else { out.push(xs[0] ?? 0); carry = 0; }
+        c0 = c;
+        const rest = cols.slice(c);
+        const { sums } = net.rippleAdd(rest.map((x) => x[0] ?? 0), rest.map((x) => x[1] ?? 0), carry);
+        out.push(...sums);
     });
     net.outputs = out;
     return { kind: 'mul', cfg, net, zones, dots, heights, exact: (x, y) => x * y, outBits: 2 * N, maxOut: (2 ** N - 1) ** 2 };
@@ -111,9 +113,7 @@ export function buildMultiplier(cfg) {
 
 /** Cadeia só de vai um sobre os bits [lo, hi), com vem um 0 (previsão dos somadores segmentados). */
 function carryChain(net, a, b, lo, hi) {
-    let c = 0;
-    for (let i = lo; i < hi; i++) c = net.or(net.and(a[i], b[i]), net.and(net.xor(a[i], b[i]), c));
-    return c;
+    return net.rippleAdd(a.slice(lo, hi), b.slice(lo, hi), 0, { carryOnly: true }).cout;
 }
 
 /**
@@ -127,13 +127,10 @@ export function buildAdder(cfg) {
     const zones = Array.from({ length: N }, () => 'exact');
     const blocks = Array.from({ length: N }, () => 0);
     const ripple = (lo, hi, cin) => {
-        let c = cin;
-        for (let i = lo; i < hi; i++) {
-            const [s, cy] = c === 0 ? net.ha(a[i], b[i]) : net.fa(a[i], b[i], c);
-            out[i] = s;
-            c = cy;
-        }
-        return c;
+        if (lo >= hi) return cin;
+        const { sums, cout } = net.rippleAdd(a.slice(lo, hi), b.slice(lo, hi), cin);
+        sums.forEach((w, k) => { out[lo + k] = w; });
+        return cout;
     };
     let cout;
     if (cfg.adder === 'trunc' || cfg.adder === 'loa') {

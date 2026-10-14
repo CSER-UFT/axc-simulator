@@ -60,3 +60,10 @@ table.metrics td.note { text-align: left; }
 .file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
 @media (max-width: 1100px) { .error-pair { grid-template-columns: 1fr; } }
+.fig-svg .pt.g-mul8 { fill: var(--z-exact); }
+.fig-svg .pt.g-mul16 { fill: #7a3fb8; }
+.fig-svg .pt.g-add8 { fill: var(--z-approx); }
+.fig-svg .pt.g-add16 { fill: #2b9a66; }
+#synthTable tr[data-k] { cursor: pointer; }
+#synthTable tr.cur td { background: var(--focus-soft); }
+#synthTable td { text-align: right; }

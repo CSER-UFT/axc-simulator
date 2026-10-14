@@ -67,7 +67,21 @@ export default {
             title: 'Área e atraso',
             html: `
 <p>O custo vem de um <strong>modelo didático</strong>: a área é o número de portas de duas entradas (AND, OR, XOR) do circuito gerado, e o atraso é a profundidade lógica, uma unidade por porta. Um somador completo conta 5 portas e um meio somador, 2.</p>
-<p>Esse modelo serve para comparar as técnicas entre si e entender de onde vem a economia, mas não substitui uma síntese. Em FPGA, por exemplo, o custo real depende de como a ferramenta empacota a lógica em LUTs de 6 entradas e usa a cadeia de carry dedicada; em ASIC, das células da biblioteca. Uma etapa futura pode trazer uma estimativa em LUTs e uma tabela com resultados reais de síntese.</p>`,
+<p>Esse modelo serve para comparar as técnicas entre si e entender de onde vem a economia, mas não substitui uma síntese. Em FPGA, o custo real depende de como a ferramenta empacota a lógica em LUTs de 6 entradas e usa a cadeia de carry dedicada; em ASIC, das células da biblioteca. As configurações pré-definidas têm também os números de uma síntese real para FPGA (veja <a href="#h-synth">Síntese em FPGA</a>).</p>`,
+        },
+        {
+            id: 'synth',
+            title: 'Síntese em FPGA',
+            html: `
+<p>A cada publicação do site, uma action do GitHub roda <code>scripts/synth.mjs</code> sobre as configurações pré-definidas:</p>
+<ol>
+    <li>exporta cada unidade em Verilog: o mesmo circuito que o simulador avalia, uma atribuição por porta, com as somas de propagação de vai um escritas como <code>+</code> para a síntese usar a cadeia de carry (CARRY4), como num somador escrito à mão;</li>
+    <li>simula o Verilog no Icarus Verilog com vetores calculados pelo simulador (todos os pares em 8 bits, 20 mil em 16 bits); se houver qualquer diferença, a publicação para;</li>
+    <li>sintetiza com o Yosys para FPGA Xilinx 7 series (<code>synth_xilinx -abc9</code>, sem DSP) e guarda as LUTs, as CARRY4 e o caminho mais longo, em células.</li>
+</ol>
+<p>A aba <strong>Síntese</strong> mostra a tabela, a comparação entre o modelo de portas e a síntese, e os botões para baixar o Verilog e o testbench da unidade atual (qualquer configuração), para levar ao Vivado ou ao Quartus. Na Comparação, o custo pode ser as LUTs da síntese; as configurações que não estão entre as sintetizadas ficam fora do gráfico.</p>
+<p>O exemplo mais instrutivo é o LOA: no modelo de portas, o LOA de 8 bits com k = 4 gasta 25 portas contra 37 do exato; no FPGA, gasta 9 LUTs contra 8. A parte baixa com OR troca a cadeia de carry, que soma quase de graça, por LUTs comuns. Muitas técnicas pensadas para ASIC não economizam nada em FPGA, e é por isso que existem multiplicadores aproximados projetados para LUTs e CARRY4.</p>
+<p>O Yosys é uma ferramenta livre e roda na action sem licença; o Vivado costuma dar menos LUTs para o mesmo circuito. Os números servem para comparar as configurações entre si, não para comparar com tabelas de artigos sintetizados em outra ferramenta.</p>`,
         },
         {
             id: 'cmp',
@@ -97,7 +111,6 @@ export default {
 <p>Esta é a primeira etapa, para avaliar a ideia. Etapas possíveis:</p>
 <ul>
     <li>mais técnicas: Booth radix 4 aproximado, DRUM, multiplicador logarítmico de Mitchell, somadores com outras previsões de vai um;</li>
-    <li>estimativa em LUTs e cadeias de carry de FPGA e uma tabela de referência com resultados reais de síntese;</li>
     <li>ponto de joelho e produto de área e potência na fronteira;</li>
     <li>computação estocástica (LFSR, multiplicação por AND, correlação entre fluxos);</li>
     <li>memória aproximada e escalonamento de tensão, com inversões de bit aplicadas à mesma imagem;</li>

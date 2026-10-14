@@ -1,4 +1,6 @@
 # Publica o simulador no GitHub Pages a cada push no branch principal, depois que os testes passam.
+# Antes de publicar, as configurações pré-definidas são exportadas em Verilog, conferidas no Icarus Verilog e
+# sintetizadas com o Yosys (scripts/synth.mjs); o resultado vai junto com o site em data/synth.json.
 # Em Settings > Pages, selecione "GitHub Actions" como fonte.
 name: GitHub Pages
 
@@ -18,7 +20,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -27,11 +29,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Instalar Icarus Verilog e Yosys
+        run: sudo apt-get update && sudo apt-get install -y iverilog yosys
       - run: npm test
+      - name: Verilog, simulação e síntese
+        run: npm run synth
       - name: Preparar site
         run: |
           mkdir _site
-          cp -r index.html js css svg _site/
+          cp -r index.html js css svg data _site/
       - uses: actions/upload-pages-artifact@v3
       - id: deployment
         uses: actions/deploy-pages@v4

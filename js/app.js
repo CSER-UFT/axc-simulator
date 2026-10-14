@@ -5,7 +5,8 @@
 import { buildUnit, unitName, compressorTable } from './axc/units.js';
 import { testInputs, errorMetrics, histogram, errorGrid, paretoFront } from './axc/metrics.js';
 import { testImage, fromRgba, applyFilter, psnr, ssim } from './axc/image.js';
-import { dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, drawGray, drawDiff, esc } from './ui/plots.js';
+import { dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, scatterSvg, drawGray, drawDiff, esc } from './ui/plots.js';
+import { toVerilog, testbench, vectors, moduleName } from './axc/verilog.js';
 import { Help } from './ui/help.js';
 
 const $ = (id) => document.getElementById(id);
@@ -15,12 +16,15 @@ const store = {
 };
 const nf = (v, d = 2) => (Number.isInteger(v) ? v.toLocaleString('pt-BR') : v.toLocaleString('pt-BR', { maximumFractionDigits: d }));
 const sci = (v) => (v === 0 ? '0' : v >= 0.01 && v < 1e5 ? nf(v, 4) : v.toExponential(2).replace('.', ','));
-const pct = (v) => `${(100 * v).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}%`;
+const pct = (v) => (v > 0 && v < 1e-4 ? `${(100 * v).toExponential(1).replace('.', ',')}%` : `${(100 * v).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}%`);
 
 let tab = store.get('axc.tab') || 'struct';
 let cur = null;            // {cfg, unit, m, inp}
 let lastParam = 'kApprox'; // parâmetro varrido pelo botão Varrer
 let image = testImage();
+// Resultados da síntese das configurações pré-definidas (data/synth.json, gerado na publicação do site).
+let synth = null;
+const synthOf = (name) => synth?.designs.find((d) => d.name === name) ?? null;
 let cmp = [];
 try { cmp = JSON.parse(store.get('axc.cmp') ?? '[]'); } catch { cmp = []; }
 
@@ -74,6 +78,7 @@ function evaluateCurrent() {
     renderError();
     renderCmp();
     if (tab === 'app') renderApp();
+    if (tab === 'synth') renderSynth();
 }
 
 // Resumo ----------------------------------------------------------------------------------------------------
@@ -88,6 +93,11 @@ function renderSummary() {
     h += `<tr><th>Área</th><td class="mono">${nf(g)} portas${rel(g, g0)}</td></tr>`;
     h += `<tr><th>Atraso</th><td class="mono">${d} níveis${rel(d, d0)}</td></tr>`;
     h += `<tr><th>Células</th><td class="mono">${esc(cells)}</td></tr>`;
+    const sy = synthOf(unitName(cfg));
+    if (sy) {
+        const sx = synthOf(unitName(exact.cfg));
+        h += `<tr><th>FPGA (Yosys)</th><td class="mono">${sy.luts} LUTs${sx ? rel(sy.luts, sx.luts) : ''}, ${sy.carry4} CARRY4, profundidade ${sy.depth}</td></tr>`;
+    } else if (synth) h += '<tr><th>FPGA (Yosys)</th><td class="note">não sintetizada: só as configurações pré-definidas (aba Síntese)</td></tr>';
     h += '</table>';
     h += '<table class="kv metrics" style="margin-top:10px">';
     const rows = [
@@ -185,12 +195,22 @@ function saveCmp() { store.set('axc.cmp', JSON.stringify(cmp)); }
 function renderCmp() {
     const xk = $('cmpX').value, yk = $('cmpY').value;
     const curName = cur ? unitName(cur.cfg) : null;
-    const pts = cmp.filter((e) => e[yk] !== null && e[yk] !== undefined).map((e) => ({ x: e[xk], y: e[yk], label: e.name, current: e.name === curName }));
+    const cost = (e) => {
+        const sy = synthOf(e.name);
+        if (xk === 'luts') return sy?.luts;
+        if (xk === 'lutsCarry') return sy ? sy.luts + sy.carry4 : undefined;
+        if (xk === 'depth') return sy?.depth;
+        return e[xk];
+    };
+    const usable = cmp.filter((e) => e[yk] !== null && e[yk] !== undefined && cost(e) !== undefined);
+    const pts = usable.map((e) => ({ x: cost(e), y: e[yk], label: e.name, current: e.name === curName }));
+    const missing = cmp.length - usable.length;
+    $('sweepNote').textContent = missing && ['luts', 'lutsCarry', 'depth'].includes(xk) ? `${missing} configuração(ões) fora do gráfico: não fazem parte das sintetizadas.` : $('sweepNote').textContent;
     const front = paretoFront(pts);
     $('paretoFig').innerHTML = paretoSvg(pts, front, { xLabel: X_NAMES[xk], yLabel: Y_NAMES[yk], logY: $('cmpLog').checked });
     const frontNames = new Set(front.map((i) => pts[i].label));
-    $('cmpTable').innerHTML = '<tr><th>configuração</th><th>entradas</th><th>portas</th><th>atraso</th><th>MED</th><th>WCE</th><th>NMED</th><th>MRED</th><th>EP</th><th>MSE imagem</th><th></th></tr>'
-        + cmp.map((e, k) => `<tr class="${frontNames.has(e.name) ? 'front' : ''}${e.name === curName ? ' cur' : ''}"><td class="mono left">${esc(e.name)}</td><td>${distName[e.dist]}</td><td>${e.gates}</td><td>${e.delay}</td>`
+    $('cmpTable').innerHTML = '<tr><th>configuração</th><th>entradas</th><th>portas</th><th>atraso</th><th>LUTs</th><th>MED</th><th>WCE</th><th>NMED</th><th>MRED</th><th>EP</th><th>MSE imagem</th><th></th></tr>'
+        + cmp.map((e, k) => `<tr class="${frontNames.has(e.name) ? 'front' : ''}${e.name === curName ? ' cur' : ''}"><td class="mono left">${esc(e.name)}</td><td>${distName[e.dist]}</td><td>${e.gates}</td><td>${e.delay}</td><td>${synthOf(e.name)?.luts ?? '-'}</td>`
             + `<td>${nf(e.MED)}</td><td>${nf(e.WCE)}</td><td>${sci(e.NMED)}</td><td>${pct(e.MRED)}</td><td>${pct(e.EP)}</td><td>${e.imgMSE === null ? '-' : nf(e.imgMSE, 3)}</td>`
             + `<td><button type="button" class="btn small-btn" data-del="${k}" title="Remover">×</button></td></tr>`).join('');
 }
@@ -262,6 +282,83 @@ $('cmpSvg').onclick = () => {
     download('pareto.svg', clone.outerHTML, 'image/svg+xml');
 };
 
+// Síntese ---------------------------------------------------------------------------------------------------
+
+/** Métricas de erro das configurações sintetizadas (calculadas uma vez, com entradas uniformes). */
+const synthErr = new Map();
+function renderSynth() {
+    if (!synth) {
+        $('synthNote').textContent = 'Os resultados da síntese (data/synth.json) não foram encontrados. Eles são gerados na publicação do site, ou localmente com npm run synth (precisa de iverilog e yosys).';
+        $('synthTable').innerHTML = '';
+        $('synthFig').innerHTML = '';
+        return;
+    }
+    $('synthNote').innerHTML = `Cada configuração pré-definida é exportada em Verilog, conferida no Icarus Verilog com vetores do simulador e sintetizada com o Yosys para FPGA Xilinx 7 series, a cada publicação do site (${esc(synth.generated)}, ${esc(synth.tools.yosys.replace(/ \(.*/, ''))}, <code>${esc(synth.flow.replace('read_verilog; ', ''))}</code>). O Vivado costuma dar menos LUTs: compare as configurações entre si, não com números de outra ferramenta.`;
+    const curName = cur ? unitName(cur.cfg) : null;
+    for (const d of synth.designs) if (!synthErr.has(d.name)) synthErr.set(d.name, null);
+    $('synthTable').innerHTML = '<tr><th>configuração</th><th>portas</th><th>LUTs</th><th>CARRY4</th><th>prof.</th><th>MRED</th></tr>'
+        + synth.designs.map((d, k) => {
+            const e = synthErr.get(d.name);
+            return `<tr data-k="${k}" class="${d.name === curName ? 'cur' : ''}"><td class="mono left">${esc(d.name)}</td><td>${d.gates}</td><td>${d.luts}</td><td>${d.carry4}</td><td>${d.depth}</td><td>${e === null ? '…' : pct(e)}</td></tr>`;
+        }).join('');
+    const group = (d) => `${d.cfg.kind}${d.cfg.width}`;
+    $('synthFig').innerHTML = scatterSvg(synth.designs.map((d) => ({ x: d.gates, y: d.luts + d.carry4, label: d.name, group: group(d), current: d.name === curName })),
+        { xLabel: 'portas de duas entradas (modelo)', yLabel: 'LUTs + CARRY4 (Yosys)' });
+    // Concordância de ordem entre modelo e síntese, dentro de cada grupo (pares de configurações).
+    let agree = 0, total = 0;
+    const ds = synth.designs;
+    for (let i = 0; i < ds.length; i++) for (let j = i + 1; j < ds.length; j++) {
+        if (group(ds[i]) !== group(ds[j]) || ds[i].gates === ds[j].gates) continue;
+        total++;
+        if (Math.sign(ds[i].gates - ds[j].gates) === Math.sign(ds[i].luts + ds[i].carry4 - ds[j].luts - ds[j].carry4)) agree++;
+    }
+    $('synthCorr').textContent = total ? `Em ${pct(agree / total)} dos pares de configurações do mesmo grupo, o modelo de portas e a síntese concordam sobre qual é a menor. Onde discordam, o modelo erra: no FPGA, uma LUT de 6 entradas absorve várias portas, e a cadeia de carry faz a soma quase de graça.` : '';
+    // Métricas de erro, aos poucos, para não travar a página.
+    const pending = ds.find((d) => synthErr.get(d.name) === null);
+    if (pending) {
+        setTimeout(() => {
+            const u = buildUnit(pending.cfg);
+            synthErr.set(pending.name, errorMetrics(u, testInputs(pending.cfg.width, 'uniform', 50000)).MRED);
+            if (tab === 'synth') renderSynth();
+        }, 0);
+    }
+}
+$('synthTable').addEventListener('click', (e) => {
+    const tr = e.target.closest('tr[data-k]');
+    if (!tr) return;
+    loadCfg(synth.designs[+tr.dataset.k].cfg);
+});
+
+/** Põe uma configuração nos controles e recalcula. */
+function loadCfg(cfg) {
+    $('kind').value = cfg.kind;
+    $('width').value = String(cfg.width);
+    syncControls();
+    if (cfg.kind === 'mul') {
+        $('kTrunc').value = cfg.kTrunc ?? 0;
+        $('kApprox').value = cfg.kApprox ?? 0;
+        $('approxCarry').checked = cfg.approxCarry !== false;
+    } else {
+        $('adder').value = cfg.adder;
+        if (cfg.k !== undefined) $('kAdd').value = cfg.k;
+        if (cfg.L !== undefined) $('segL').value = cfg.L;
+        if (cfg.P !== undefined) $('segP').value = cfg.P;
+    }
+    evaluateCurrent();
+}
+
+$('dlVerilog').onclick = () => {
+    if (!cur) return;
+    const name = moduleName(cur.cfg);
+    const inp = testInputs(cur.cfg.width, 'uniform', 20000, 2026);
+    download(`${name}.v`, `${toVerilog(cur.unit, name)}\n${testbench(cur.unit, inp.a.length, `${name}.hex`, name)}`, 'text/plain');
+};
+$('dlHex').onclick = () => {
+    if (!cur) return;
+    const name = moduleName(cur.cfg);
+    download(`${name}.hex`, vectors(cur.unit, testInputs(cur.cfg.width, 'uniform', 20000, 2026)), 'text/plain');
+};
+
 // Aplicação -------------------------------------------------------------------------------------------------
 
 /** Filtro escolhido, se fizer sentido para a unidade (null quando não faz). */
@@ -327,6 +424,7 @@ function showTab(name) {
     for (const b of $('tabs').querySelectorAll('[data-tab]')) b.classList.toggle('sel', b.dataset.tab === name);
     for (const p of document.querySelectorAll('.pane')) p.classList.toggle('hidden', p.id !== `pane-${name}`);
     if (name === 'app') renderApp();
+    if (name === 'synth') renderSynth();
 }
 $('tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 
@@ -358,3 +456,8 @@ $('open-ajuda').addEventListener('click', () => (help.isOverlay() ? help.close()
 syncControls();
 evaluateCurrent();
 showTab(tab);
+fetch('data/synth.json').then((r) => (r.ok ? r.json() : null)).catch(() => null).then((d) => {
+    synth = d;
+    if (cur) { renderSummary(); renderCmp(); }
+    if (tab === 'synth') renderSynth();
+});

@@ -76,6 +76,7 @@
                         <button type="button" class="btn" data-tab="error">Erro</button>
                         <button type="button" class="btn" data-tab="cmp">Comparação</button>
                         <button type="button" class="btn" data-tab="app">Aplicação</button>
+                        <button type="button" class="btn" data-tab="synth">Síntese</button>
                     </div>
 
                     <div class="pane" id="pane-struct">
@@ -108,7 +109,7 @@
                     <div class="pane" id="pane-cmp">
                         <p class="note">Cada configuração adicionada vira um ponto. Os pontos não dominados (nenhum outro tem custo e erro menores ou iguais, com um deles estritamente menor) formam a fronteira de Pareto, ligada em degraus.</p>
                         <div class="row">
-                            <label style="margin:0">Custo <select id="cmpX"><option value="gates">área (portas)</option><option value="delay">atraso (níveis de porta)</option><option value="adp">área × atraso</option></select></label>
+                            <label style="margin:0">Custo <select id="cmpX"><option value="gates">área (portas, modelo)</option><option value="delay">atraso (níveis de porta, modelo)</option><option value="adp">área × atraso (modelo)</option><option value="luts">LUTs (Yosys)</option><option value="lutsCarry">LUTs + CARRY4 (Yosys)</option><option value="depth">profundidade em células (Yosys)</option></select></label>
                             <label style="margin:0">Erro <select id="cmpY"><option value="NMED">NMED</option><option value="MRED" selected>MRED</option><option value="MED">MED</option><option value="WCE">WCE</option><option value="MSE">MSE</option><option value="EP">EP</option><option value="imgMSE">MSE da imagem filtrada</option></select></label>
                             <label class="check" style="margin:0"><input type="checkbox" id="cmpLog" checked /> erro em escala log</label>
                         </div>
@@ -121,6 +122,18 @@
                         </div>
                         <div class="fig-box" id="paretoFig"></div>
                         <div class="scroll-box"><table id="cmpTable"></table></div>
+                    </div>
+
+                    <div class="pane" id="pane-synth">
+                        <p class="note" id="synthNote"></p>
+                        <div class="row">
+                            <button type="button" class="btn outline" id="dlVerilog">Verilog da unidade atual (módulo e testbench)</button>
+                            <button type="button" class="btn outline" id="dlHex">Vetores de teste (.hex)</button>
+                        </div>
+                        <div class="graph-pair">
+                            <div><h3>Modelo de portas contra a síntese</h3><div class="fig-box" id="synthFig"></div><p class="note" id="synthCorr"></p></div>
+                            <div><h3>Configurações sintetizadas</h3><p class="note">Clique numa linha para carregar a configuração.</p><div class="scroll-box"><table id="synthTable"></table></div></div>
+                        </div>
                     </div>
 
                     <div class="pane" id="pane-app">

@@ -1,0 +1,745 @@
+{
+ "generated": "2026-10-14",
+ "tools": {
+  "yosys": "Yosys 0.33 (git sha1 2584903a060)",
+  "iverilog": "Icarus Verilog version 12.0 (stable) ()"
+ },
+ "flow": "read_verilog; synth_xilinx -family xc7 -flatten -nodsp -abc9 -noiopad",
+ "designs": [
+  {
+   "name": "MUL8 exato",
+   "module": "mul8_exact",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 0,
+    "kApprox": 0,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 101,
+   "carry4": 4,
+   "depth": 8,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 17,
+    "LUT3": 8,
+    "LUT4": 27,
+    "LUT5": 29,
+    "LUT6": 20
+   },
+   "gates": 320,
+   "gateDepth": 29
+  },
+  {
+   "name": "MUL8 T2",
+   "module": "mul8_t2",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 2,
+    "kApprox": 0,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 98,
+   "carry4": 4,
+   "depth": 8,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 13,
+    "LUT3": 10,
+    "LUT4": 29,
+    "LUT5": 25,
+    "LUT6": 21
+   },
+   "gates": 312,
+   "gateDepth": 28
+  },
+  {
+   "name": "MUL8 T4",
+   "module": "mul8_t4",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 4,
+    "kApprox": 0,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 86,
+   "carry4": 3,
+   "depth": 8,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 13,
+    "LUT3": 7,
+    "LUT4": 26,
+    "LUT5": 21,
+    "LUT6": 19
+   },
+   "gates": 280,
+   "gateDepth": 26
+  },
+  {
+   "name": "MUL8 T6",
+   "module": "mul8_t6",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 6,
+    "kApprox": 0,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 72,
+   "carry4": 3,
+   "depth": 8,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 13,
+    "LUT3": 3,
+    "LUT4": 19,
+    "LUT5": 23,
+    "LUT6": 14
+   },
+   "gates": 222,
+   "gateDepth": 23
+  },
+  {
+   "name": "MUL8 T8",
+   "module": "mul8_t8",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 8,
+    "kApprox": 0,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 46,
+   "carry4": 2,
+   "depth": 6,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 14,
+    "LUT3": 3,
+    "LUT4": 9,
+    "LUT5": 8,
+    "LUT6": 12
+   },
+   "gates": 140,
+   "gateDepth": 19
+  },
+  {
+   "name": "MUL8 A4c",
+   "module": "mul8_a4c",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 0,
+    "kApprox": 4,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 97,
+   "carry4": 3,
+   "depth": 8,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 14,
+    "LUT3": 8,
+    "LUT4": 27,
+    "LUT5": 27,
+    "LUT6": 21
+   },
+   "gates": 310,
+   "gateDepth": 27
+  },
+  {
+   "name": "MUL8 A6c",
+   "module": "mul8_a6c",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 0,
+    "kApprox": 6,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 96,
+   "carry4": 3,
+   "depth": 7,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 18,
+    "LUT3": 9,
+    "LUT4": 20,
+    "LUT5": 23,
+    "LUT6": 26
+   },
+   "gates": 290,
+   "gateDepth": 24
+  },
+  {
+   "name": "MUL8 A8c",
+   "module": "mul8_a8c",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 0,
+    "kApprox": 8,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 90,
+   "carry4": 2,
+   "depth": 7,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 12,
+    "LUT3": 8,
+    "LUT4": 25,
+    "LUT5": 25,
+    "LUT6": 20
+   },
+   "gates": 260,
+   "gateDepth": 21
+  },
+  {
+   "name": "MUL8 A10c",
+   "module": "mul8_a10c",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 0,
+    "kApprox": 10,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 81,
+   "carry4": 2,
+   "depth": 6,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 14,
+    "LUT3": 4,
+    "LUT4": 22,
+    "LUT5": 22,
+    "LUT6": 19,
+    "MUXF7": 1
+   },
+   "gates": 234,
+   "gateDepth": 17
+  },
+  {
+   "name": "MUL8 A12c",
+   "module": "mul8_a12c",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 0,
+    "kApprox": 12,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 74,
+   "carry4": 1,
+   "depth": 4,
+   "cells": {
+    "CARRY4": 1,
+    "LUT2": 9,
+    "LUT3": 5,
+    "LUT4": 21,
+    "LUT5": 27,
+    "LUT6": 12
+   },
+   "gates": 214,
+   "gateDepth": 12
+  },
+  {
+   "name": "MUL8 T2 A6c",
+   "module": "mul8_t2_a6c",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 2,
+    "kApprox": 6,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 82,
+   "carry4": 2,
+   "depth": 7,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 11,
+    "LUT3": 6,
+    "LUT4": 19,
+    "LUT5": 27,
+    "LUT6": 19
+   },
+   "gates": 256,
+   "gateDepth": 21
+  },
+  {
+   "name": "MUL8 T4 A4c",
+   "module": "mul8_t4_a4c",
+   "cfg": {
+    "kind": "mul",
+    "width": 8,
+    "kTrunc": 4,
+    "kApprox": 4,
+    "approxCarry": true
+   },
+   "vectors": 65536,
+   "luts": 79,
+   "carry4": 2,
+   "depth": 7,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 11,
+    "LUT3": 5,
+    "LUT4": 22,
+    "LUT5": 25,
+    "LUT6": 16
+   },
+   "gates": 238,
+   "gateDepth": 21
+  },
+  {
+   "name": "MUL16 exato",
+   "module": "mul16_exact",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "kTrunc": 0,
+    "kApprox": 0,
+    "approxCarry": true
+   },
+   "vectors": 20000,
+   "luts": 470,
+   "carry4": 8,
+   "depth": 12,
+   "cells": {
+    "CARRY4": 8,
+    "LUT2": 99,
+    "LUT3": 53,
+    "LUT4": 90,
+    "LUT5": 152,
+    "LUT6": 76
+   },
+   "gates": 1408,
+   "gateDepth": 61
+  },
+  {
+   "name": "MUL16 T8",
+   "module": "mul16_t8",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "kTrunc": 8,
+    "kApprox": 0,
+    "approxCarry": true
+   },
+   "vectors": 20000,
+   "luts": 419,
+   "carry4": 6,
+   "depth": 12,
+   "cells": {
+    "CARRY4": 6,
+    "LUT2": 94,
+    "LUT3": 49,
+    "LUT4": 76,
+    "LUT5": 133,
+    "LUT6": 67
+   },
+   "gates": 1228,
+   "gateDepth": 52
+  },
+  {
+   "name": "MUL16 T12",
+   "module": "mul16_t12",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "kTrunc": 12,
+    "kApprox": 0,
+    "approxCarry": true
+   },
+   "vectors": 20000,
+   "luts": 341,
+   "carry4": 5,
+   "depth": 11,
+   "cells": {
+    "CARRY4": 5,
+    "LUT2": 77,
+    "LUT3": 37,
+    "LUT4": 58,
+    "LUT5": 109,
+    "LUT6": 60
+   },
+   "gates": 990,
+   "gateDepth": 45
+  },
+  {
+   "name": "MUL16 A12c",
+   "module": "mul16_a12c",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "kTrunc": 0,
+    "kApprox": 12,
+    "approxCarry": true
+   },
+   "vectors": 20000,
+   "luts": 450,
+   "carry4": 5,
+   "depth": 12,
+   "cells": {
+    "CARRY4": 5,
+    "LUT2": 83,
+    "LUT3": 48,
+    "LUT4": 101,
+    "LUT5": 161,
+    "LUT6": 57
+   },
+   "gates": 1270,
+   "gateDepth": 47
+  },
+  {
+   "name": "MUL16 A16c",
+   "module": "mul16_a16c",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "kTrunc": 0,
+    "kApprox": 16,
+    "approxCarry": true
+   },
+   "vectors": 20000,
+   "luts": 416,
+   "carry4": 4,
+   "depth": 11,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 73,
+    "LUT3": 37,
+    "LUT4": 94,
+    "LUT5": 159,
+    "LUT6": 53
+   },
+   "gates": 1156,
+   "gateDepth": 40
+  },
+  {
+   "name": "MUL16 T8 A8c",
+   "module": "mul16_t8_a8c",
+   "cfg": {
+    "kind": "mul",
+    "width": 16,
+    "kTrunc": 8,
+    "kApprox": 8,
+    "approxCarry": true
+   },
+   "vectors": 20000,
+   "luts": 375,
+   "carry4": 4,
+   "depth": 11,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 70,
+    "LUT3": 32,
+    "LUT4": 86,
+    "LUT5": 137,
+    "LUT6": 50
+   },
+   "gates": 1046,
+   "gateDepth": 40
+  },
+  {
+   "name": "ADD8 exato",
+   "module": "add8_exact",
+   "cfg": {
+    "kind": "add",
+    "width": 8,
+    "adder": "exact"
+   },
+   "vectors": 65536,
+   "luts": 8,
+   "carry4": 3,
+   "depth": 4,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 8
+   },
+   "gates": 37,
+   "gateDepth": 15
+  },
+  {
+   "name": "ADD8 TRUNC2",
+   "module": "add8_trunc2",
+   "cfg": {
+    "kind": "add",
+    "width": 8,
+    "adder": "trunc",
+    "k": 2
+   },
+   "vectors": 65536,
+   "luts": 6,
+   "carry4": 2,
+   "depth": 3,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 6
+   },
+   "gates": 27,
+   "gateDepth": 11
+  },
+  {
+   "name": "ADD8 TRUNC4",
+   "module": "add8_trunc4",
+   "cfg": {
+    "kind": "add",
+    "width": 8,
+    "adder": "trunc",
+    "k": 4
+   },
+   "vectors": 65536,
+   "luts": 4,
+   "carry4": 2,
+   "depth": 3,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 4
+   },
+   "gates": 17,
+   "gateDepth": 7
+  },
+  {
+   "name": "ADD8 LOA2",
+   "module": "add8_loa2",
+   "cfg": {
+    "kind": "add",
+    "width": 8,
+    "adder": "loa",
+    "k": 2
+   },
+   "vectors": 65536,
+   "luts": 9,
+   "carry4": 2,
+   "depth": 3,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 9
+   },
+   "gates": 33,
+   "gateDepth": 13
+  },
+  {
+   "name": "ADD8 LOA4",
+   "module": "add8_loa4",
+   "cfg": {
+    "kind": "add",
+    "width": 8,
+    "adder": "loa",
+    "k": 4
+   },
+   "vectors": 65536,
+   "luts": 9,
+   "carry4": 2,
+   "depth": 3,
+   "cells": {
+    "CARRY4": 2,
+    "LUT2": 9
+   },
+   "gates": 25,
+   "gateDepth": 9
+  },
+  {
+   "name": "ADD8 LOA6",
+   "module": "add8_loa6",
+   "cfg": {
+    "kind": "add",
+    "width": 8,
+    "adder": "loa",
+    "k": 6
+   },
+   "vectors": 65536,
+   "luts": 9,
+   "carry4": 1,
+   "depth": 2,
+   "cells": {
+    "CARRY4": 1,
+    "LUT2": 9
+   },
+   "gates": 17,
+   "gateDepth": 5
+  },
+  {
+   "name": "ADD8 SEG L4 P0",
+   "module": "add8_seg_l4_p0",
+   "cfg": {
+    "kind": "add",
+    "width": 8,
+    "adder": "seg",
+    "L": 4,
+    "P": 0
+   },
+   "vectors": 65536,
+   "luts": 8,
+   "carry4": 3,
+   "depth": 3,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 8
+   },
+   "gates": 34,
+   "gateDepth": 7
+  },
+  {
+   "name": "ADD8 SEG L4 P2",
+   "module": "add8_seg_l4_p2",
+   "cfg": {
+    "kind": "add",
+    "width": 8,
+    "adder": "seg",
+    "L": 4,
+    "P": 2
+   },
+   "vectors": 65536,
+   "luts": 8,
+   "carry4": 4,
+   "depth": 4,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 8
+   },
+   "gates": 43,
+   "gateDepth": 11
+  },
+  {
+   "name": "ADD8 SEG L2 P2",
+   "module": "add8_seg_l2_p2",
+   "cfg": {
+    "kind": "add",
+    "width": 8,
+    "adder": "seg",
+    "L": 2,
+    "P": 2
+   },
+   "vectors": 65536,
+   "luts": 12,
+   "carry4": 4,
+   "depth": 3,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 10,
+    "LUT3": 2
+   },
+   "gates": 55,
+   "gateDepth": 7
+  },
+  {
+   "name": "ADD16 exato",
+   "module": "add16_exact",
+   "cfg": {
+    "kind": "add",
+    "width": 16,
+    "adder": "exact"
+   },
+   "vectors": 20000,
+   "luts": 16,
+   "carry4": 5,
+   "depth": 6,
+   "cells": {
+    "CARRY4": 5,
+    "LUT2": 16
+   },
+   "gates": 77,
+   "gateDepth": 31
+  },
+  {
+   "name": "ADD16 LOA4",
+   "module": "add16_loa4",
+   "cfg": {
+    "kind": "add",
+    "width": 16,
+    "adder": "loa",
+    "k": 4
+   },
+   "vectors": 20000,
+   "luts": 17,
+   "carry4": 4,
+   "depth": 5,
+   "cells": {
+    "CARRY4": 4,
+    "LUT2": 17
+   },
+   "gates": 65,
+   "gateDepth": 25
+  },
+  {
+   "name": "ADD16 LOA8",
+   "module": "add16_loa8",
+   "cfg": {
+    "kind": "add",
+    "width": 16,
+    "adder": "loa",
+    "k": 8
+   },
+   "vectors": 20000,
+   "luts": 17,
+   "carry4": 3,
+   "depth": 4,
+   "cells": {
+    "CARRY4": 3,
+    "LUT2": 17
+   },
+   "gates": 49,
+   "gateDepth": 17
+  },
+  {
+   "name": "ADD16 SEG L4 P4",
+   "module": "add16_seg_l4_p4",
+   "cfg": {
+    "kind": "add",
+    "width": 16,
+    "adder": "seg",
+    "L": 4,
+    "P": 4
+   },
+   "vectors": 20000,
+   "luts": 18,
+   "carry4": 10,
+   "depth": 5,
+   "cells": {
+    "CARRY4": 10,
+    "LUT2": 18
+   },
+   "gates": 119,
+   "gateDepth": 15
+  },
+  {
+   "name": "ADD16 SEG L8 P4",
+   "module": "add16_seg_l8_p4",
+   "cfg": {
+    "kind": "add",
+    "width": 16,
+    "adder": "seg",
+    "L": 8,
+    "P": 4
+   },
+   "vectors": 20000,
+   "luts": 16,
+   "carry4": 7,
+   "depth": 6,
+   "cells": {
+    "CARRY4": 7,
+    "LUT2": 16
+   },
+   "gates": 91,
+   "gateDepth": 23
+  }
+ ]
+}
