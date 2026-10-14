@@ -5,9 +5,10 @@
 import { buildUnit, unitName, compressorTable } from './axc/units.js';
 import { testInputs, errorMetrics, histogram, errorGrid, paretoFront, rng } from './axc/metrics.js';
 import { testImage, fromRgba, applyFilter, psnr, ssim } from './axc/image.js';
-import { stagesSvg, dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, scatterSvg, drawGray, drawDiff, esc } from './ui/plots.js';
+import { lineChartSvg, stagesSvg, dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, scatterSvg, drawGray, drawDiff, esc } from './ui/plots.js';
 import { toVerilog, testbench, vectors, moduleName } from './axc/verilog.js';
 import { Help } from './ui/help.js';
+import { timingTrace, capturedOutputs, vosCurve, randomSequence, outputDepths, delayFactor, corruptImage, expectedMemoryMSE } from './axc/vos.js';
 
 const $ = (id) => document.getElementById(id);
 const store = {
@@ -107,9 +108,10 @@ function randomPairs(N, n, seed) {
 }
 
 /** Abas que precisam ser redesenhadas depois de uma mudança na unidade. */
-const dirty = { struct: true, error: true, cmp: true, app: true, synth: true };
-const RENDER = { struct: () => renderStruct(), error: () => renderError(), cmp: () => renderCmp(), app: () => renderApp(), synth: () => renderSynth() };
+const dirty = { struct: true, error: true, cmp: true, app: true, synth: true, vos: true };
+const RENDER = { struct: () => renderStruct(), error: () => renderError(), cmp: () => renderCmp(), app: () => renderApp(), synth: () => renderSynth(), vos: () => renderVos() };
 function renderTab(name) {
+    if (name === 'vos') renderMem();
     if (!cur || !dirty[name]) return;
     dirty[name] = false;
     RENDER[name]();
@@ -378,6 +380,114 @@ $('cmpSvg').onclick = () => {
     download('pareto.svg', clone.outerHTML, 'image/svg+xml');
 };
 
+// Tensão e memória ------------------------------------------------------------------------------------------
+
+/** Rastros de tempo (independentes da tensão), guardados por unidade. */
+const traceCache = new Map();
+function traceOf(unit) {
+    const key = unitName(unit.cfg);
+    if (!traceCache.has(key)) {
+        const seq = randomSequence(unit.cfg.width, 4096);
+        traceCache.set(key, { seq, trace: timingTrace(unit, seq.a, seq.b), curves: new Map() });
+    }
+    return traceCache.get(key);
+}
+const maxDepth = (unit) => Math.max(...outputDepths(unit));
+
+/** Imagem menor (no máximo 128 de lado) para a simulação de tempo, que avalia porta a porta. */
+function smallImage() {
+    if (image.w <= 128 && image.h <= 128) return image;
+    const f = Math.ceil(Math.max(image.w, image.h) / 128);
+    const w = Math.floor(image.w / f), h = Math.floor(image.h / f);
+    const data = new Uint8ClampedArray(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) data[y * w + x] = image.data[y * f * image.w + x * f];
+    return { w, h, data };
+}
+let vosImgCache = null;
+
+function renderVos() {
+    if (!cur) return;
+    const unit = cur.unit, exact = cur.exact;
+    const V = +$('vosV').value;
+    $('vosVV').textContent = V.toFixed(2).replace('.', ',');
+    const dU = maxDepth(unit), dE = maxDepth(exact);
+    const period = $('vosClock').value === 'exact' ? dE : dU;
+    const tu = traceOf(unit), te = traceOf(exact);
+    const curveOf = (t, u, per) => {
+        if (!t.curves.has(per)) t.curves.set(per, vosCurve(u, t.trace, t.seq, per));
+        return t.curves.get(per);
+    };
+    const cu = curveOf(tu, unit, period), ce = curveOf(te, exact, dE);
+    $('vosFig').innerHTML = lineChartSvg([
+        { name: unitName(cur.cfg), cls: 's-unit', pts: cu.map((p) => ({ x: p.V, y: 100 * p.MRED })) },
+        { name: `exata (${unitName(exact.cfg)})`, cls: 's-exact', pts: ce.map((p) => ({ x: p.V, y: 100 * p.MRED })) },
+    ], { xLabel: 'tensão (V / Vnom), diminuindo para a direita', yLabel: 'MRED (%)', marker: V, xReverse: true });
+    const at = (c) => c.find((p) => Math.abs(p.V - V) < 1e-6) ?? c[c.length - 1];
+    const pu = at(cu), pe = at(ce);
+    const s = delayFactor(V);
+    let note = `Relógio de ${period} níveis de porta (o caminho mais longo ${$('vosClock').value === 'exact' ? 'da unidade exata' : 'da própria unidade'}). Em V = ${V.toFixed(2).replace('.', ',')}, cada porta fica ${nf(s, 2)} vezes mais lenta: só cabem ${nf(period / s, 1)} níveis no período.`;
+    if ($('vosClock').value === 'exact' && dU > dE) note += ` Esta unidade é mais profunda que a exata (${dU} contra ${dE} níveis): com o relógio da exata, ela pode errar já na tensão nominal.`;
+    else if ($('vosClock').value === 'exact' && dU < dE) note += ` Pela profundidade estática, esta unidade é mais rasa que a exata (${dU} contra ${dE} níveis) e teria folga no relógio. Mas o erro de tempo depende dos caminhos que os dados de fato sensibilizam: compare onde as duas curvas começam a subir.`;
+    $('vosNote').textContent = note;
+    const row = (label, a, b) => `<tr><th>${label}</th><td class="mono">${a}</td><td class="mono">${b}</td></tr>`;
+    $('vosTable').innerHTML = `<table class="kv"><tr><th></th><td class="note">esta unidade</td><td class="note">exata</td></tr>`
+        + row('energia dinâmica', pct(pu.energy), pct(pe.energy))
+        + row('bits atrasados', pct(pu.lateBits), pct(pe.lateBits))
+        + row('MRED', pct(pu.MRED), pct(pe.MRED))
+        + row('EP', pct(pu.EP), pct(pe.EP))
+        + row('MED', nf(pu.MED), nf(pe.MED)) + '</table>'
+        + `<p class="note">Sequência de 4096 operações com entradas uniformes. A energia é relativa à nominal (V²); o erro inclui a aproximação da unidade e os erros de tempo.</p>`;
+    // Imagem: ganho de brilho (multiplicador) ou média com o vizinho (somador), em sequência, pixel a pixel.
+    const signed8 = unit.signed && unit.cfg.width === 8;
+    if (signed8) {
+        $('vosImgCap').textContent = 'o Booth de 8 bits é com sinal: os pixels não cabem';
+        return;
+    }
+    const img = smallImage();
+    const key = `${unitName(cur.cfg)}|${img.w}x${img.h}|${img.data[0]}|${img.data[img.data.length - 1]}`;
+    if (vosImgCache?.key !== key) {
+        const n = img.w * img.h;
+        const as = new Uint32Array(n), bs = new Uint32Array(n);
+        for (let k = 0; k < n; k++) {
+            as[k] = img.data[k];
+            bs[k] = cur.cfg.kind === 'mul' ? 180 : img.data[k % img.w === img.w - 1 ? k : k + 1];
+        }
+        vosImgCache = { key, img, trace: timingTrace(unit, as, bs) };
+    }
+    const fin = (v) => (cur.cfg.kind === 'mul' ? Math.min(255, Math.floor(v / 128)) : Math.floor(v / 2));
+    const { cap } = capturedOutputs(vosImgCache.trace, period, V);
+    const exImg = { w: img.w, h: img.h, data: Uint8ClampedArray.from(vosImgCache.trace.out, (v) => fin(unit.decode ? unit.decode(v) : v)) };
+    const ref = { w: img.w, h: img.h, data: Uint8ClampedArray.from(img.data, (p, k) => fin(cur.cfg.kind === 'mul' ? p * 180 : p + img.data[k % img.w === img.w - 1 ? k : k + 1])) };
+    const vi = { w: img.w, h: img.h, data: Uint8ClampedArray.from(cap, (v) => fin(unit.decode ? unit.decode(v) : v)) };
+    drawGray($('vosExact'), ref);
+    drawGray($('vosImg'), vi);
+    const pAp = psnr(ref, exImg), pV = psnr(ref, vi);
+    const f = (x) => (x === Infinity ? '∞' : `${nf(x, 1)} dB`);
+    $('vosExactCap').textContent = `exata, nominal (${cur.cfg.kind === 'mul' ? 'pixel × 180 / 128' : 'média com o vizinho'})`;
+    $('vosImgCap').textContent = `esta unidade em ${V.toFixed(2).replace('.', ',')}: PSNR ${f(pV)} (só a aproximação: ${f(pAp)})`;
+}
+
+function renderMem() {
+    const ber = 10 ** +$('memBer').value, prot = +$('memProt').value;
+    $('memBerV').textContent = ber.toExponential(1).replace('.', ',');
+    $('memProtV').textContent = String(prot);
+    const { img, flips } = corruptImage(image, ber, prot);
+    drawGray($('memOrig'), image);
+    drawGray($('memImg'), img);
+    drawDiff($('memDiff'), image, img);
+    let mse = 0;
+    for (let k = 0; k < img.data.length; k++) mse += (img.data[k] - image.data[k]) ** 2;
+    mse /= img.data.length;
+    const exp = expectedMemoryMSE(ber, prot);
+    const p = psnr(image, img);
+    $('memTable').innerHTML = `<table class="kv">`
+        + `<tr><th>bits invertidos</th><td class="mono">${nf(flips)} de ${nf(img.data.length * (8 - prot))} não protegidos</td></tr>`
+        + `<tr><th>MSE</th><td class="mono">${nf(mse, 2)} (esperado ${nf(exp, 2)})</td></tr>`
+        + `<tr><th>PSNR</th><td class="mono">${p === Infinity ? '∞' : `${nf(p, 1)} dB`}</td></tr>`
+        + `<tr><th>memória confiável</th><td class="mono">${prot} de 8 bits por pixel (${pct(prot / 8)})</td></tr></table>`
+        + `<p class="note">O MSE esperado é a taxa de erro vezes a soma de 4<sup>b</sup> nos bits b não protegidos: inverter o bit b muda o pixel em 2<sup>b</sup>. Por isso proteger só os 2 ou 3 bits mais altos já resolve quase tudo.</p>`;
+}
+
 // Síntese ---------------------------------------------------------------------------------------------------
 
 /** Métricas de erro das configurações sintetizadas (calculadas uma vez, com entradas uniformes). */
@@ -506,7 +616,10 @@ function renderApp() {
         + `<tr><th>MRED da unidade</th><td class="mono">${pct(cur.m.MRED)}</td><td class="note">a mesma unidade, avaliada isolada</td></tr></table>`;
 }
 $('filter').onchange = () => { renderApp(); };
-$('imgSynth').onclick = () => { image = testImage(); renderApp(); };
+$('vosV').addEventListener('input', () => renderVos());
+$('vosClock').addEventListener('change', () => renderVos());
+for (const id of ['memBer', 'memProt']) $(id).addEventListener('input', () => renderMem());
+$('imgSynth').onclick = () => { image = testImage(); renderApp(); dirty.vos = true; };
 $('imgFile').onchange = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -519,6 +632,7 @@ $('imgFile').onchange = (e) => {
         const ctx = c.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
         image = fromRgba(ctx.getImageData(0, 0, w, h).data, w, h);
+        dirty.vos = true;
         URL.revokeObjectURL(img.src);
         renderApp();
     };

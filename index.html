@@ -88,6 +88,7 @@
                         <button type="button" class="btn" data-tab="error">Erro</button>
                         <button type="button" class="btn" data-tab="cmp">Comparação</button>
                         <button type="button" class="btn" data-tab="app">Aplicação</button>
+                        <button type="button" class="btn" data-tab="vos">Tensão e memória</button>
                         <button type="button" class="btn" data-tab="synth">Síntese</button>
                     </div>
 
@@ -135,6 +136,36 @@
                         <div class="fig-box" id="paretoFig"></div>
                         <p class="note" id="kneeNote"></p>
                         <div class="scroll-box"><table id="cmpTable"></table></div>
+                    </div>
+
+                    <div class="pane" id="pane-vos">
+                        <h3>Escalonamento de tensão além da margem</h3>
+                        <p class="note">O relógio fica fixo e a tensão cai: as portas ficam mais lentas (lei de potência alfa, V<sub>t</sub> = 0,3 e α = 1,3, com tensões normalizadas pela nominal) e os bits de saída que chegam depois da borda do relógio ficam com o valor da operação anterior. A energia dinâmica cai com V².</p>
+                        <div class="row">
+                            <label class="slider wide">Tensão (V/Vnom) <input type="range" id="vosV" min="0.5" max="1" step="0.01" value="0.8" /> <output id="vosVV">0,80</output></label>
+                            <label style="margin:0">Relógio <select id="vosClock"><option value="exact">o da unidade exata</option><option value="own">o da própria unidade</option></select></label>
+                        </div>
+                        <div class="graph-pair">
+                            <div><div class="fig-box" id="vosFig"></div><p class="note" id="vosNote"></p></div>
+                            <div><div id="vosTable"></div>
+                                <div class="img-row">
+                                    <figure><canvas id="vosExact"></canvas><figcaption id="vosExactCap">exata, na tensão nominal</figcaption></figure>
+                                    <figure><canvas id="vosImg"></canvas><figcaption id="vosImgCap">com a tensão escolhida</figcaption></figure>
+                                </div>
+                            </div>
+                        </div>
+                        <h3 style="margin-top:16px">Memória aproximada</h3>
+                        <p class="note">A imagem é guardada numa memória que inverte cada bit com a probabilidade escolhida, como uma DRAM com intervalo de refresh maior que o seguro (Flikker, Liu e colegas, 2011). Os bits mais significativos de cada pixel podem ficar numa parte confiável da memória: é a divisão por significância.</p>
+                        <div class="row">
+                            <label class="slider wide">Taxa de erro por bit <input type="range" id="memBer" min="-6" max="-0.5" step="0.25" value="-2" /> <output id="memBerV">1e-2</output></label>
+                            <label class="slider wide">Bits protegidos <input type="range" id="memProt" min="0" max="8" step="1" value="0" /> <output id="memProtV">0</output></label>
+                        </div>
+                        <div class="img-row">
+                            <figure><canvas id="memOrig"></canvas><figcaption>original</figcaption></figure>
+                            <figure><canvas id="memImg"></canvas><figcaption>lida da memória aproximada</figcaption></figure>
+                            <figure><canvas id="memDiff"></canvas><figcaption>|diferença| em cor (log)</figcaption></figure>
+                        </div>
+                        <div id="memTable"></div>
                     </div>
 
                     <div class="pane" id="pane-synth">

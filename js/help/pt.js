@@ -87,6 +87,17 @@ export default {
 <p>Esse modelo serve para comparar as técnicas entre si e entender de onde vem a economia, mas não substitui uma síntese. Em FPGA, o custo real depende de como a ferramenta empacota a lógica em LUTs de 6 entradas e usa a cadeia de carry dedicada; em ASIC, das células da biblioteca. As configurações pré-definidas têm também os números de uma síntese real para FPGA (veja <a href="#h-synth">Síntese em FPGA</a>).</p>`,
         },
         {
+            id: 'vos',
+            title: 'Tensão e memória',
+            html: `
+<h3>Escalonamento de tensão além da margem</h3>
+<p>Abaixar a tensão reduz a energia dinâmica com V², mas deixa as portas mais lentas. O atraso de cada porta segue a lei de potência alfa, d ~ V / (V − V<sub>t</sub>)<sup>α</sup>, com V<sub>t</sub> = 0,3 e α = 1,3 em tensões normalizadas pela nominal: em 0,8 a porta fica 1,24 vez mais lenta; em 0,6, 1,81 vez. O relógio fica fixo. Um bit de saída que chega depois da borda é capturado com o valor da operação anterior.</p>
+<p>O instante em que cada bit chega depende dos dados: numa sequência de 4096 operações, um fio que não muda de valor está pronto no instante 0, e um fio que muda fica pronto uma porta depois da última entrada que mudou. Só os caminhos que os dados de fato sensibilizam contam, e por isso o somador exato de 16 bits, com caminho estático de 31 portas, não passou de 17 na sequência de teste. O modelo ignora os pulsos espúrios (glitches) e o valor controlador das portas.</p>
+<p>O relógio pode ser o da unidade exata (o mesmo sistema, trocando só a unidade) ou o da própria unidade. Com o relógio da exata aparece a sinergia entre as duas técnicas: o multiplicador com 8 colunas truncadas tem caminhos mais curtos e só começa a errar por tempo perto de 0,64, contra 0,78 do exato. O Mitchell e o DRUM, com caminhos mais longos que o exato, erram por tempo já perto de 0,9. A imagem usa o ganho de brilho (multiplicador) ou a média com o vizinho (somador), pixel a pixel, na mesma sequência.</p>
+<h3>Memória aproximada</h3>
+<p>A imagem é guardada numa memória que inverte cada bit com a probabilidade escolhida, como uma DRAM com refresh mais espaçado que o seguro (Flikker, Liu e colegas, 2011), uma SRAM com tensão baixa ou uma memória não volátil com escrita mais fraca. Inverter o bit b muda o pixel em 2<sup>b</sup>, e o MSE esperado é a taxa de erro vezes a soma de 4<sup>b</sup> nos bits não protegidos. Os bits altos dominam a soma: guardar os 2 ou 3 bits mais significativos numa parte confiável da memória resolve quase todo o erro, e o resto pode ficar na parte barata. A economia de energia depende da tecnologia e não é estimada aqui.</p>`,
+        },
+        {
             id: 'synth',
             title: 'Síntese em FPGA',
             html: `
@@ -132,7 +143,6 @@ export default {
 <ul>
     <li>mais técnicas: codificador de Booth aproximado, somadores com outras previsões de vai um;</li>
     <li>computação estocástica (LFSR, multiplicação por AND, correlação entre fluxos);</li>
-    <li>memória aproximada e escalonamento de tensão, com inversões de bit aplicadas à mesma imagem;</li>
     <li>exportar a unidade para o simulador de compilador, como operação aproximada no DFG e no escalonamento.</li>
 </ul>`,
         },

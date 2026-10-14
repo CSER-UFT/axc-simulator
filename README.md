@@ -13,6 +13,7 @@ Somadores e multiplicadores aproximados são construídos porta a porta, avaliad
 * **Estrutura**: diagrama de pontos dos produtos parciais com as zonas, altura das colunas a cada estágio de redução e tabela verdade do compressor aproximado.
 * **Erro**: ME, MED, WCE (com o par que o produz), MSE, NMED, MRED e EP; avaliação exaustiva para 8 bits com entradas uniformes e por amostragem nos outros casos (entradas uniformes, normais ou exponenciais); mapa do erro sobre o plano (a, b) e histograma do erro com sinal.
 * **Custo**: área em portas de duas entradas, atraso em níveis de porta e atividade de chaveamento (indicador de energia dinâmica), todos do modelo didático, e, para as configurações pré-definidas, LUTs, CARRY4 e profundidade de uma síntese real com o Yosys para FPGA Xilinx 7 series.
+* **Tensão e memória**: escalonamento de tensão além da margem, com atraso pela lei de potência alfa, tempo de chegada de cada bit dependente dos dados e captura do valor antigo quando o bit atrasa; curva de erro contra tensão da unidade e da exata, energia relativa e a imagem degradando; memória aproximada com inversão de bits e proteção dos bits mais significativos, com o MSE medido e o esperado.
 * **Síntese**: exportação de qualquer configuração em Verilog com testbench autoverificável; a cada publicação, uma action exporta as configurações pré-definidas, confere o Verilog no Icarus Verilog contra o simulador e sintetiza com o Yosys (`scripts/synth.mjs`, resultado em `data/synth.json`).
 * **Comparação**: configurações guardadas, varredura do parâmetro principal, fronteira de Pareto com custo e métrica de erro à escolha, contagem de dominância, ponto de joelho, exportação em CSV e SVG.
 * **Aplicação**: filtro gaussiano 3 × 3, ganho de brilho ou média de pares sobre uma imagem de teste sintética ou do usuário, com a imagem exata, a aproximada, a diferença, PSNR e SSIM.
@@ -33,6 +34,7 @@ npm run synth  # exporta, confere e sintetiza as configurações pré-definidas 
 | `js/axc/units.js` | geradores de multiplicadores e somadores exatos e aproximados |
 | `js/axc/metrics.js` | entradas de teste, métricas de erro, histograma, mapa de erro, fronteira de Pareto |
 | `js/axc/image.js` | imagem de teste, filtros, PSNR e SSIM |
+| `js/axc/vos.js` | escalonamento de tensão (atraso, tempo de chegada, captura) e memória aproximada |
 | `js/axc/verilog.js` | exportação em Verilog, testbench e vetores de teste |
 | `js/axc/presets.js` | configurações pré-definidas, sintetizadas na publicação |
 | `scripts/synth.mjs` | fluxo de verificação (Icarus Verilog) e síntese (Yosys) |
@@ -43,7 +45,7 @@ Os testes conferem as unidades exatas contra a aritmética (8 bits exaustivo), o
 ## Próximas etapas possíveis
 
 * Mais técnicas (codificador de Booth aproximado, outros somadores).
-* Computação estocástica; memória aproximada e escalonamento de tensão.
+* Computação estocástica.
 * Inglês e ajuda completa; integração com o riscv-cc-simulator.
 
 ## Licença

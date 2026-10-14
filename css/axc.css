@@ -76,3 +76,9 @@ table.metrics td.note { text-align: left; }
 .fig-svg .arrowhead { fill: var(--line-strong); }
 .fig-svg .knee { fill: none; stroke: var(--focus); stroke-width: 2.5; stroke-dasharray: 4 3; }
 .fig-svg .dot.z-trunc.neg, .fig-svg .dot.z-trunc.ext { fill: none; fill-opacity: 1; }
+.fig-svg .series { fill: none; stroke-width: 2; }
+.fig-svg .series.s-unit { stroke: var(--z-approx); }
+.fig-svg .series.s-exact { stroke: var(--z-exact); stroke-dasharray: 5 3; }
+.fig-svg .series.s-energy { stroke: var(--ok); }
+.fig-svg .marker { stroke: var(--focus); stroke-width: 2; stroke-dasharray: 4 3; }
+.slider.wide { grid-template-columns: auto 180px 64px; min-width: 380px; margin: 0 !important; }

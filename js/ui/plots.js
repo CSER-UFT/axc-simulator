@@ -287,3 +287,34 @@ export function scatterSvg(pts, { xLabel, yLabel, width = 520, height = 340, log
     });
     return `${s}</svg>`;
 }
+
+/**
+ * Gráfico de linhas: x contínuo, várias séries (cada uma com a sua classe de cor), uma linha vertical opcional.
+ * @param {Array<{name: string, cls: string, pts: Array<{x: number, y: number}>}>} series
+ */
+export function lineChartSvg(series, { xLabel, yLabel, marker = null, logY = false, width = 560, height = 300, xReverse = false } = {}) {
+    const L = 64, B = 44, T = 26, R = 20;
+    const W = width - L - R, H = height - T - B;
+    const all = series.flatMap((s2) => s2.pts);
+    let s = `<svg class="fig-svg line" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img">`;
+    if (!all.length) return `${s}</svg>`;
+    const ty = (v) => (logY ? Math.log10(Math.max(v, 1e-6)) : v);
+    const xs = all.map((p) => p.x), ys = all.map((p) => ty(p.y));
+    const x0 = Math.min(...xs), x1 = Math.max(...xs);
+    const y0 = logY ? Math.min(...ys) : 0, y1 = Math.max(...ys, logY ? -5 : 1e-9);
+    const X = (v) => L + ((xReverse ? x1 - v : v - x0) / ((x1 - x0) || 1)) * W;
+    const Y = (v) => T + H - ((ty(v) - y0) / ((y1 - y0) || 1)) * H;
+    s += `<line class="axis" x1="${L}" y1="${T + H}" x2="${L + W}" y2="${T + H}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${T + H}"/>`;
+    for (const v of [x0, (x0 + x1) / 2, x1]) s += `<text class="small muted mono" x="${X(v)}" y="${T + H + 16}" text-anchor="middle">${fmt(+v.toFixed(2))}</text>`;
+    const yt = logY ? [10 ** y0, 10 ** ((y0 + y1) / 2), 10 ** y1] : [0, y1 / 2, y1];
+    for (const v of yt) s += `<text class="small muted mono" x="${L - 6}" y="${Y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+    s += `<text class="small muted" x="${L + W / 2}" y="${height - 6}" text-anchor="middle">${esc(xLabel)}</text>`;
+    s += `<text class="small muted" x="14" y="${T + H / 2}" text-anchor="middle" transform="rotate(-90 14 ${T + H / 2})">${esc(yLabel)}${logY ? ' (log)' : ''}</text>`;
+    if (marker !== null) s += `<line class="marker" x1="${X(marker)}" y1="${T}" x2="${X(marker)}" y2="${T + H}"/>`;
+    series.forEach((sr, k) => {
+        const d = sr.pts.map((p, i) => `${i ? 'L' : 'M'}${X(p.x).toFixed(1)},${Y(p.y).toFixed(1)}`).join(' ');
+        s += `<path class="series ${sr.cls}" d="${d}"/>`;
+        s += `<line class="series ${sr.cls}" x1="${L + 8 + k * 200}" y1="${T - 12}" x2="${L + 30 + k * 200}" y2="${T - 12}"/><text class="small" x="${L + 36 + k * 200}" y="${T - 8}">${esc(sr.name)}</text>`;
+    });
+    return `${s}</svg>`;
+}
