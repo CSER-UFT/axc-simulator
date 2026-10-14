@@ -2,7 +2,7 @@
 
 Simulador didático de **computação aproximada** (AxC), desenvolvido para o curso de **Ciência da Computação** da **Universidade Federal do Tocantins**, na família de simuladores do grupo CSER ([riscv-cpu-simulator](https://github.com/CSER-UFT/riscv-cpu-simulator), [riscv-dlp-simulator](https://github.com/CSER-UFT/riscv-dlp-simulator), [riscv-mp-simulator](https://github.com/CSER-UFT/riscv-mp-simulator), [riscv-fp-simulator](https://github.com/CSER-UFT/riscv-fp-simulator) e [riscv-cc-simulator](https://github.com/CSER-UFT/riscv-cc-simulator)).
 
-Somadores e multiplicadores aproximados são construídos porta a porta, avaliados contra a versão exata com as métricas de erro da literatura, comparados pelo custo na fronteira de Pareto e aplicados a um filtro de imagem. Roda inteiramente no navegador (HTML e JavaScript, sem dependências).
+Somadores e multiplicadores aproximados são construídos porta a porta, avaliados contra a versão exata com as métricas de erro da literatura, comparados pelo custo na fronteira de Pareto e aplicados a um filtro de imagem. Roda inteiramente no navegador (HTML e JavaScript, sem dependências) e é publicado no GitHub Pages (em Settings > Pages, fonte "GitHub Actions").
 
 **Estado: protótipo (etapa 1)**, só em português.
 
