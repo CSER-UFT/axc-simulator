@@ -1,5 +1,5 @@
 {
-  "name": "riscv-axc-simulator",
+  "name": "axc-simulator",
   "version": "0.1.0",
   "private": true,
   "description": "Simulador didático de computação aproximada: unidades aritméticas aproximadas, métricas de erro, custo e aplicação",
