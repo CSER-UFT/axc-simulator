@@ -45,6 +45,91 @@ export function fromRgba(rgba, w, h) {
     return { w, h, data };
 }
 
+/**
+ * Lê uma imagem Netpbm (PBM, PGM ou PPM; texto P1, P2, P3 ou binário P4, P5, P6), com comentários e até 16 bits
+ * por canal. Os navegadores não abrem esses formatos, então a leitura é feita aqui.
+ * @param {Uint8Array} bytes conteúdo do arquivo
+ * @returns {{w: number, h: number, data: Uint8ClampedArray}} em tons de cinza, 8 bits
+ */
+export function parseNetpbm(bytes) {
+    let pos = 0;
+    const isSpace = (c) => c === 32 || c === 9 || c === 10 || c === 13 || c === 11 || c === 12;
+    const token = () => {
+        for (;;) {
+            while (pos < bytes.length && isSpace(bytes[pos])) pos++;
+            if (bytes[pos] !== 35) break;                                   // # comentário até o fim da linha
+            while (pos < bytes.length && bytes[pos] !== 10 && bytes[pos] !== 13) pos++;
+        }
+        const start = pos;
+        while (pos < bytes.length && !isSpace(bytes[pos]) && bytes[pos] !== 35) pos++;
+        if (start === pos) throw new Error('arquivo Netpbm incompleto');
+        return String.fromCharCode(...bytes.subarray(start, pos));
+    };
+    const magic = token();
+    const kind = /^P([1-6])$/.exec(magic)?.[1];
+    if (!kind) throw new Error('não é um arquivo PBM, PGM ou PPM (cabeçalho P1 a P6)');
+    const t = +kind;
+    const w = +token(), h = +token();
+    const bitmap = t === 1 || t === 4;
+    const maxval = bitmap ? 1 : +token();
+    if (!(w > 0 && h > 0 && maxval > 0 && maxval < 65536)) throw new Error('cabeçalho Netpbm inválido');
+    const ch = t === 3 || t === 6 ? 3 : 1;
+    const n = w * h;
+    const raw = new Float64Array(n * ch);
+    if (t <= 3) {
+        if (t === 1) {
+            // P1: dígitos 0 e 1, que podem vir colados.
+            for (let k = 0; k < n; k++) {
+                while (pos < bytes.length && bytes[pos] !== 48 && bytes[pos] !== 49) {
+                    if (bytes[pos] === 35) while (pos < bytes.length && bytes[pos] !== 10) pos++;
+                    else pos++;
+                }
+                if (pos >= bytes.length) throw new Error('arquivo Netpbm incompleto');
+                raw[k] = bytes[pos++] - 48;
+            }
+        } else {
+            for (let k = 0; k < n * ch; k++) raw[k] = +token();
+        }
+    } else {
+        pos++;                                                              // um espaço depois do cabeçalho
+        if (t === 4) {
+            const rowBytes = Math.ceil(w / 8);
+            if (pos + rowBytes * h > bytes.length) throw new Error('arquivo Netpbm incompleto');
+            for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) raw[y * w + x] = (bytes[pos + y * rowBytes + (x >> 3)] >> (7 - (x & 7))) & 1;
+        } else {
+            const two = maxval > 255;
+            if (pos + n * ch * (two ? 2 : 1) > bytes.length) throw new Error('arquivo Netpbm incompleto');
+            for (let k = 0; k < n * ch; k++) raw[k] = two ? (bytes[pos + 2 * k] << 8) | bytes[pos + 2 * k + 1] : bytes[pos + k];
+        }
+    }
+    // No PBM, 1 é preto.
+    const level = (v) => (bitmap ? (1 - v) * 255 : (Math.min(v, maxval) / maxval) * 255);
+    const data = new Uint8ClampedArray(n);
+    for (let k = 0; k < n; k++) {
+        data[k] = ch === 1 ? Math.round(level(raw[k]))
+            : Math.round(0.299 * level(raw[3 * k]) + 0.587 * level(raw[3 * k + 1]) + 0.114 * level(raw[3 * k + 2]));
+    }
+    return { w, h, data };
+}
+
+/** Reduz uma imagem em tons de cinza para caber em max x max, pela média de área (sem mudar se já couber). */
+export function fitImage(img, max = 256) {
+    const s = Math.min(1, max / Math.max(img.w, img.h));
+    if (s === 1) return img;
+    const w = Math.max(8, Math.round(img.w * s)), h = Math.max(8, Math.round(img.h * s));
+    const data = new Uint8ClampedArray(w * h);
+    for (let y = 0; y < h; y++) {
+        const y0 = Math.floor((y * img.h) / h), y1 = Math.max(y0 + 1, Math.floor(((y + 1) * img.h) / h));
+        for (let x = 0; x < w; x++) {
+            const x0 = Math.floor((x * img.w) / w), x1 = Math.max(x0 + 1, Math.floor(((x + 1) * img.w) / w));
+            let sum = 0;
+            for (let j = y0; j < y1; j++) for (let i = x0; i < x1; i++) sum += img.data[j * img.w + i];
+            data[y * w + x] = Math.round(sum / ((y1 - y0) * (x1 - x0)));
+        }
+    }
+    return { w, h, data };
+}
+
 /** Pesos do filtro gaussiano 3 x 3 em 8 bits, somando 256 (o resultado é dividido por 256). */
 export const KERNELS = {
     gauss: [19, 32, 19, 32, 52, 32, 19, 32, 19],     // gaussiana com sigma 1

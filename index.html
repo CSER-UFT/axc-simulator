@@ -89,6 +89,7 @@
                         <button type="button" class="btn" data-tab="cmp">Comparação</button>
                         <button type="button" class="btn" data-tab="app">Aplicação</button>
                         <button type="button" class="btn" data-tab="vos">Tensão e memória</button>
+                        <button type="button" class="btn" data-tab="sc">Estocástica</button>
                         <button type="button" class="btn" data-tab="synth">Síntese</button>
                     </div>
 
@@ -168,6 +169,51 @@
                         <div id="memTable"></div>
                     </div>
 
+                    <div class="pane" id="pane-sc">
+                        <p class="note">Na computação estocástica, um valor p entre 0 e 1 é um fluxo de N bits com uma fração p de uns. Multiplicar vira uma porta AND, e somar vira um MUX. Esta aba não usa a unidade da esquerda: compara os geradores de fluxo entre si e com um circuito binário de 8 bits.</p>
+                        <div class="sc-controls">
+                            <label>Operação <select id="scOp">
+                                <option value="mul">multiplicação unipolar (AND)</option>
+                                <option value="bmul">multiplicação bipolar (XNOR)</option>
+                                <option value="add">soma escalada (MUX)</option>
+                            </select></label>
+                            <label>Gerador <select id="scGen">
+                                <option value="random">aleatório ideal (independente)</option>
+                                <option value="lfsrSame">um LFSR para todos os fluxos</option>
+                                <option value="lfsr" selected>LFSRs diferentes</option>
+                                <option value="sobol">baixa discrepância (Sobol)</option>
+                            </select></label>
+                            <label class="slider wide">Comprimento N <input type="range" id="scN" min="4" max="12" step="1" value="8" /> <output id="scNV">256</output></label>
+                        </div>
+                        <div class="sc-controls">
+                            <label class="slider wide">Entrada a (x / 256) <input type="range" id="scX" min="0" max="255" step="1" value="192" /> <output id="scXV">192</output></label>
+                            <label class="slider wide">Entrada b (y / 256) <input type="range" id="scY" min="0" max="255" step="1" value="96" /> <output id="scYV">96</output></label>
+                        </div>
+                        <h3>Os fluxos de bits</h3>
+                        <div class="fig-box scroll-x" id="scStreams"></div>
+                        <p class="note" id="scDemoNote"></p>
+                        <div class="graph-pair">
+                            <div><h3>Erro contra o comprimento do fluxo</h3><div class="fig-box" id="scFig"></div></div>
+                            <div><h3>No comprimento escolhido</h3><div id="scTable"></div><p class="note" id="scNote"></p></div>
+                        </div>
+                        <h3>Custo de uma operação</h3>
+                        <div id="scCost"></div>
+                        <p class="note" id="scCostNote"></p>
+                        <h3>Tolerância a bits errados</h3>
+                        <p class="note">Cada bit do resultado é invertido com a probabilidade escolhida: os N bits do fluxo estocástico ou os 8 bits do resultado binário. No fluxo todos os bits pesam 1/N; no binário, o bit mais significativo pesa metade da faixa.</p>
+                        <div class="sc-controls">
+                            <label class="slider wide">Taxa de erro por bit <input type="range" id="scBer" min="-4" max="-0.5" step="0.25" value="-2" /> <output id="scBerV">1e-2</output></label>
+                        </div>
+                        <div id="scFault"></div>
+                        <p class="note" id="scImgNote"></p>
+                        <div class="img-row">
+                            <figure><canvas id="scExact"></canvas><figcaption>exata (binário, sem erros)</figcaption></figure>
+                            <figure><canvas id="scImg"></canvas><figcaption id="scImgCap">estocástica</figcaption></figure>
+                            <figure><canvas id="scBin"></canvas><figcaption id="scBinCap">binária com bits errados</figcaption></figure>
+                        </div>
+                        <div id="scImgTable"></div>
+                    </div>
+
                     <div class="pane" id="pane-synth">
                         <p class="note" id="synthNote"></p>
                         <div class="row">
@@ -188,7 +234,7 @@
                                 <option value="gain">ganho de brilho (pixel × 180 / 128)</option>
                                 <option value="pairs">média com o vizinho (somador de 8 bits)</option>
                             </select></label>
-                            <label class="btn outline file-btn">Usar uma imagem sua <input type="file" id="imgFile" accept="image/*" /></label>
+                            <label class="btn outline file-btn">Usar uma imagem sua <input type="file" id="imgFile" accept="image/*,.ppm,.pgm,.pbm,.pnm" /></label>
                             <button type="button" class="btn outline" id="imgSynth">Imagem de teste</button>
                         </div>
                         <p class="note" id="appNote"></p>

@@ -98,6 +98,27 @@ export default {
 <p>A imagem é guardada numa memória que inverte cada bit com a probabilidade escolhida, como uma DRAM com refresh mais espaçado que o seguro (Flikker, Liu e colegas, 2011), uma SRAM com tensão baixa ou uma memória não volátil com escrita mais fraca. Inverter o bit b muda o pixel em 2<sup>b</sup>, e o MSE esperado é a taxa de erro vezes a soma de 4<sup>b</sup> nos bits não protegidos. Os bits altos dominam a soma: guardar os 2 ou 3 bits mais significativos numa parte confiável da memória resolve quase todo o erro, e o resto pode ficar na parte barata. A economia de energia depende da tecnologia e não é estimada aqui.</p>`,
         },
         {
+            id: 'sc',
+            title: 'Computação estocástica',
+            html: `
+<p>Na computação estocástica (Gaines, 1969; Alaghi e Hayes, 2013), um valor p entre 0 e 1 é representado por um fluxo de N bits em que uma fração p dos bits vale 1. Todos os bits pesam o mesmo, 1/N. A aritmética fica trivial:</p>
+<ul>
+    <li><strong>multiplicação unipolar</strong>: uma porta AND. Se os fluxos forem independentes, P(a e b) = p<sub>a</sub> p<sub>b</sub>;</li>
+    <li><strong>multiplicação bipolar</strong>: o valor é v = 2p − 1, entre −1 e 1, e uma porta XNOR multiplica;</li>
+    <li><strong>soma escalada</strong>: um MUX cuja seleção tem p = 1/2 dá (a + b) / 2. A soma sai dividida por 2 para caber entre 0 e 1.</li>
+</ul>
+<p>Cada fluxo sai de um <strong>gerador</strong> (SNG): a cada ciclo, um número pseudoaleatório r<sub>t</sub> de 8 bits é comparado com o valor binário x, e o bit é 1 quando x &gt; r<sub>t</sub>. Na volta, um contador conta os uns. A aba compara quatro fontes para r<sub>t</sub>:</p>
+<ul>
+    <li><strong>aleatório ideal</strong>: bits independentes, novos a cada operação. O erro cai com 1/√N: dobrar a precisão custa quatro vezes mais ciclos, e para igualar um binário de 8 bits seriam precisos mais de cem mil bits;</li>
+    <li><strong>LFSRs diferentes</strong>: o que se faz no hardware. Com 8 bits o período é 255, e passar de N = 256 não melhora nada (o erro fica perto de 1% na multiplicação);</li>
+    <li><strong>um LFSR para todos os fluxos</strong>: os fluxos ficam correlacionados. Os uns de um caem nas mesmas posições dos uns do outro, e a AND dá min(a, b) em vez de a × b. É o erro mais típico da área, e a razão de os circuitos estocásticos gastarem tanto com geradores independentes;</li>
+    <li><strong>baixa discrepância</strong> (sequência de Sobol): os uns ficam espalhados por igual, e as duas primeiras dimensões cobrem o quadrado de forma uniforme. O erro cai com 1/N, e a multiplicação chega à precisão do binário de 8 bits com cerca de mil bits.</li>
+</ul>
+<p>O <strong>custo</strong> mostra a outra face: a operação é uma porta, mas cada fluxo precisa de um LFSR e de um comparador, e a saída de um contador. Mesmo assim o circuito estocástico ocupa menos que o multiplicador binário exato (no modelo de portas, 105 portas e 25 flip-flops contra 320 portas), só que trabalha N ciclos: com N = 256, a energia estimada fica cerca de 100 vezes a do binário. A computação estocástica faz sentido quando os geradores são compartilhados entre muitas operações, quando os dados já chegam como fluxos (sensores, redes neurais em hardware) ou quando a tolerância a falhas importa mais que a energia.</p>
+<p>A <strong>tolerância a bits errados</strong> é a grande vantagem: um bit errado no fluxo muda o valor em 1/N, enquanto no binário o bit mais significativo muda metade da faixa. Com uma taxa de erro de 1% por bit, o erro do fluxo quase não muda, e o do binário cresce várias vezes. Na imagem, o gaussiano 1 2 1 é feito sem nenhuma multiplicação: um MUX de 9 entradas sorteia a cada ciclo um vizinho com probabilidade igual ao seu peso, e a fração de uns da saída é a média ponderada. Com bits errados, a imagem estocástica fica um pouco mais ruidosa por igual; a binária ganha pixels brancos e pretos espalhados.</p>
+<p>O modelo de custo usa as mesmas portas de duas entradas das outras abas, com o comparador do SNG construído como uma cadeia de vai um. A energia considera todos os elementos ativos em todo ciclo, o que é pessimista para o estocástico (a atividade de um LFSR é alta, mas a da porta AND não) e otimista para o binário (que tem pulsos espúrios). A ordem de grandeza da diferença, porém, é a mesma relatada na literatura.</p>`,
+        },
+        {
             id: 'synth',
             title: 'Síntese em FPGA',
             html: `
@@ -126,7 +147,7 @@ export default {
             id: 'app',
             title: 'Aplicação em imagem',
             html: `
-<p>O filtro é calculado duas vezes, com a unidade exata e com a aproximada, sobre uma imagem de teste sintética (ou uma imagem sua, reduzida para no máximo 256 pixels de lado e convertida para tons de cinza).</p>
+<p>O filtro é calculado duas vezes, com a unidade exata e com a aproximada, sobre uma imagem de teste sintética (ou uma imagem sua, em PNG, JPEG ou outro formato que o navegador abra, ou ainda PPM, PGM ou PBM, reduzida para no máximo 256 pixels de lado e convertida para tons de cinza).</p>
 <ul>
     <li><strong>gaussiano σ = 1</strong>: nove produtos pixel × peso por pixel (pesos 19, 32, 52), divididos por 256. Com um multiplicador, só os produtos são aproximados; com um somador de 16 bits, só a acumulação.</li>
     <li><strong>gaussiano 1 2 1</strong>: pesos que são potências de 2. Cada produto tem um único produto parcial por linha, e truncar colunas baixas pode não errar nada: o erro depende dos dados que a unidade recebe.</li>

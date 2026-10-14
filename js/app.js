@@ -4,10 +4,11 @@
  */
 import { buildUnit, unitName, compressorTable } from './axc/units.js';
 import { testInputs, errorMetrics, histogram, errorGrid, paretoFront, rng } from './axc/metrics.js';
-import { testImage, fromRgba, applyFilter, psnr, ssim } from './axc/image.js';
+import { testImage, fromRgba, parseNetpbm, fitImage, applyFilter, psnr, ssim } from './axc/image.js';
 import { lineChartSvg, stagesSvg, dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, scatterSvg, drawGray, drawDiff, esc } from './ui/plots.js';
 import { toVerilog, testbench, vectors, moduleName } from './axc/verilog.js';
 import { Help } from './ui/help.js';
+import { SC_OPS, SC_GENERATORS, scCurve, binaryError, streamDemo, scCost, faultError, scFilter, flipPixelBits } from './axc/stochastic.js';
 import { timingTrace, capturedOutputs, vosCurve, randomSequence, outputDepths, delayFactor, corruptImage, expectedMemoryMSE } from './axc/vos.js';
 
 const $ = (id) => document.getElementById(id);
@@ -112,6 +113,7 @@ const dirty = { struct: true, error: true, cmp: true, app: true, synth: true, vo
 const RENDER = { struct: () => renderStruct(), error: () => renderError(), cmp: () => renderCmp(), app: () => renderApp(), synth: () => renderSynth(), vos: () => renderVos() };
 function renderTab(name) {
     if (name === 'vos') renderMem();
+    if (name === 'sc') { if (dirty.sc !== false) { dirty.sc = false; renderSc(); } return; }
     if (!cur || !dirty[name]) return;
     dirty[name] = false;
     RENDER[name]();
@@ -615,14 +617,158 @@ function renderApp() {
         + `<tr><th>SSIM</th><td class="mono">${nf(cur.appCache.ssim, 4)}</td><td class="note">1 é igual; mede estrutura, contraste e brilho em janelas 8 × 8</td></tr>`
         + `<tr><th>MRED da unidade</th><td class="mono">${pct(cur.m.MRED)}</td><td class="note">a mesma unidade, avaliada isolada</td></tr></table>`;
 }
+// Computação estocástica -------------------------------------------------------------------------------------
+
+const scCurves = new Map();          // operação -> {gerador: curva}
+const SC_NS = [16, 32, 64, 128, 256, 512, 1024, 2048, 4096];
+const scSel = () => ({ op: $('scOp').value, gen: $('scGen').value, N: 2 ** +$('scN').value, x: +$('scX').value, y: +$('scY').value, ber: 10 ** +$('scBer').value });
+const scVal = (op, v) => (op === 'bmul' ? nf(v, 3) : nf(v, 4));
+function scCurvesOf(op) {
+    if (!scCurves.has(op)) scCurves.set(op, Object.fromEntries(Object.keys(SC_GENERATORS).map((g) => [g, scCurve(op, g, SC_NS)])));
+    return scCurves.get(op);
+}
+
+/** Os primeiros bits dos fluxos, como quadradinhos. */
+function streamsSvg(demo, op, N) {
+    const n = Math.min(N, 64), cell = 10, L = 150, rowH = 18;
+    const rows = [['a', demo.a, ''], ['b', demo.b, '']];
+    if (op === 'add') rows.push(['seleção', demo.s, 'sel']);
+    rows.push(['saída', demo.out, 'out']);
+    const w = L + n * cell + 10, h = rows.length * rowH + 20;
+    let s = `<svg class="fig-svg" xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img">`;
+    rows.forEach(([name, bits, cls], r) => {
+        const ones = bits.reduce((c, v) => c + v, 0);
+        const y = 6 + r * rowH;
+        s += `<text class="small mono" x="0" y="${y + 10}">${esc(name)}</text><text class="small muted mono" x="${L - 8}" y="${y + 10}" text-anchor="end">${ones}/${N}</text>`;
+        for (let t = 0; t < n; t++) s += `<rect class="bit${bits[t] ? ` one ${cls}` : ''}" x="${L + t * cell}" y="${y}" width="${cell - 2}" height="${cell + 2}" rx="1"/>`;
+    });
+    s += `<text class="small muted" x="${L}" y="${h - 2}">${n < N ? `primeiros ${n} de ${N} bits` : `${N} bits`}</text>`;
+    return `${s}</svg>`;
+}
+
+function renderScDemo() {
+    const { op, gen, N, x, y } = scSel();
+    $('scNV').textContent = String(N);
+    $('scXV').textContent = String(x);
+    $('scYV').textContent = String(y);
+    const d = streamDemo(op, gen, N, x, y);
+    $('scStreams').innerHTML = streamsSvg(d, op, N);
+    const pa = x / 256, pb = y / 256;
+    const vin = op === 'bmul' ? `a = 2p − 1 = ${nf(2 * pa - 1, 3)} e b = ${nf(2 * pb - 1, 3)}` : `a = ${nf(pa, 4)} e b = ${nf(pb, 4)}`;
+    const rule = op === 'mul' ? 'a saída é a AND bit a bit, e a fração de uns estima a × b'
+        : op === 'bmul' ? 'a saída é a XNOR bit a bit; no formato bipolar (v = 2p − 1) isso estima a × b'
+            : 'o MUX copia o bit de a quando a seleção vale 1 e o de b quando vale 0; com seleção p = 1/2, a saída estima (a + b) / 2';
+    let extra = '';
+    if (gen === 'lfsrSame' && op === 'mul') extra = ` Com o mesmo LFSR nos dois fluxos, os uns de b ficam dentro dos uns de a (ou o contrário): a AND dá min(a, b) = ${nf(Math.min(pa, pb), 4)}, não o produto. É o erro de correlação.`;
+    if (gen === 'lfsrSame' && op === 'bmul') extra = ' Com o mesmo LFSR nos dois fluxos, a XNOR mede o quanto os fluxos coincidem, 1 − |pa − pb|, não o produto. É o erro de correlação.';
+    if (gen === 'lfsrSame' && op === 'add') extra = ' Com a seleção vinda do mesmo LFSR dos dados, ela também fica correlacionada com eles e a soma sai enviesada.';
+    $('scDemoNote').innerHTML = `Entradas ${vin}; ${rule}. Estimativa ${scVal(op, d.value)}, exato ${scVal(op, d.exact)}, erro ${scVal(op, d.value - d.exact)}.${extra}`;
+}
+
+function renderScCurve() {
+    const { op, gen, N } = scSel();
+    const curves = scCurvesOf(op);
+    const bin = binaryError(op);
+    const series = Object.entries(SC_GENERATORS).map(([g, name]) => ({ name, cls: `s-${g}`, dots: true, pts: curves[g].filter((p) => p.nrmse > 0).map((p) => ({ x: p.N, y: p.nrmse })) }));
+    series.push({ name: 'binário de 8 bits', cls: 's-bin', pts: [{ x: SC_NS[0], y: bin.nrmse }, { x: SC_NS.at(-1), y: bin.nrmse }] });
+    $('scFig').innerHTML = lineChartSvg(series, { xLabel: 'comprimento do fluxo N (bits, ciclos)', yLabel: 'NRMSE', logX: true, logY: true, marker: N, xTicks: [16, 64, 256, 1024, 4096], height: 330 });
+    const at = (g) => curves[g].find((p) => p.N === N);
+    let h = '<table class="kv"><tr><th></th><td class="note">NRMSE</td><td class="note">bits efetivos</td><td class="note">viés</td></tr>';
+    for (const [g, name] of Object.entries(SC_GENERATORS)) {
+        const p = at(g);
+        h += `<tr><th>${g === gen ? `<b>${esc(name)}</b>` : esc(name)}</th><td class="mono">${pct(p.nrmse)}</td><td class="mono">${p.bits === Infinity ? '∞' : nf(p.bits, 1)}</td><td class="mono">${scVal(op, p.bias)}</td></tr>`;
+    }
+    h += `<tr><th>binário de 8 bits, 1 ciclo</th><td class="mono">${pct(bin.nrmse)}</td><td class="mono">${bin.bits === Infinity ? '∞' : nf(bin.bits, 1)}</td><td class="mono">0</td></tr></table>`;
+    $('scTable').innerHTML = h;
+    // Quantos bits o aleatório ideal precisaria para igualar o binário: o erro cai com 1 / raiz(N).
+    const r = curves.random.at(-1);
+    const nEq = (r.nrmse * Math.sqrt(r.N) / bin.nrmse) ** 2;
+    const sob = curves.sobol.find((p) => p.nrmse <= bin.nrmse);
+    $('scNote').innerHTML = `NRMSE é a raiz do erro quadrático médio dividida pela faixa da saída, em 512 pares de entradas uniformes. Bits efetivos: os de um conversor ideal com o mesmo erro. Com bits aleatórios o erro cai com 1/√N: dobrar a precisão custa 4 vezes mais ciclos, e igualar o binário de 8 bits pediria uns ${nf(Math.round(nEq / 1000) * 1000)} bits. A sequência de Sobol espalha os uns por igual e o erro cai com 1/N${sob ? `: chega ao binário em N = ${nf(sob.N)}` : ''}. Os LFSRs têm período 255 e param de melhorar em N = 256; um LFSR só para todos os fluxos erra muito em qualquer N, porque os fluxos ficam correlacionados.`;
+}
+
+function renderScCost() {
+    const { op, N } = scSel();
+    const c = scCost(op, N);
+    let h = '<table class="kv"><tr><th></th><td class="note">portas</td><td class="note">flip-flops</td></tr>';
+    for (const p of c.parts) h += `<tr><th>${esc(p.name)}</th><td class="mono">${nf(p.gates)}</td><td class="mono">${nf(p.ff)}</td></tr>`;
+    h += `<tr><th><b>estocástico, total</b></th><td class="mono"><b>${nf(c.gates)}</b></td><td class="mono"><b>${nf(c.ff)}</b></td></tr>`;
+    h += `<tr><th><b>${esc(c.bin.name)}</b></th><td class="mono"><b>${nf(c.bin.gates)}</b></td><td class="mono">0</td></tr></table>`;
+    h += '<table class="kv" style="margin-top:10px"><tr><th></th><td class="note">ciclos</td><td class="note">período (níveis de porta)</td><td class="note">latência (níveis)</td><td class="note">energia (elementos × ciclos)</td></tr>';
+    const eSc = c.gateCycles, eBin = c.bin.gates;
+    h += `<tr><th>estocástico, N = ${N}</th><td class="mono">${nf(N)}</td><td class="mono">${c.depth}</td><td class="mono">${nf(N * c.depth)}</td><td class="mono">${nf(eSc)}</td></tr>`;
+    h += `<tr><th>binário</th><td class="mono">1</td><td class="mono">${c.bin.depth}</td><td class="mono">${c.bin.depth}</td><td class="mono">${nf(eBin)}</td></tr></table>`;
+    $('scCost').innerHTML = h;
+    const ratio = eSc / eBin;
+    $('scCostNote').innerHTML = `A operação em si é minúscula (${c.parts[0].gates === 1 ? 'uma porta' : `${c.parts[0].gates} portas`}), mas cada fluxo precisa de um gerador (LFSR mais comparador) e a saída de um contador: são eles que dominam a área. O circuito estocástico tem ${nf(c.gates + c.ff)} elementos (portas e flip-flops) contra ${nf(c.bin.gates)} portas do binário, mas trabalha ${nf(N)} ciclos: a energia estimada (cada elemento ativo em todo ciclo) fica ${nf(ratio, 0)} vezes a do binário. A computação estocástica compensa quando os geradores são compartilhados, os valores já chegam como fluxos (de sensores, por exemplo) ou a tolerância a falhas importa mais que a energia.`;
+}
+
+let scImgTimer = null;
+function renderScFault() {
+    const { op, gen, N, ber } = scSel();
+    $('scBerV').textContent = ber.toExponential(1).replace('.', ',');
+    const bers = [...new Set([1e-4, 1e-3, 1e-2, 0.05, 0.1, ber])].sort((a, b) => a - b);
+    let h = `<table class="kv"><tr><th>taxa de erro por bit</th><td class="note">NRMSE estocástico (${esc(SC_GENERATORS[gen])}, N = ${N})</td><td class="note">NRMSE binário de 8 bits</td></tr>`;
+    for (const b of bers) {
+        const f = faultError(op, gen, N, b);
+        const tag = b === ber ? '<b>' : '';
+        h += `<tr><th>${tag}${b.toExponential(0).replace('.', ',')}${tag ? '</b>' : ''}</th><td class="mono">${pct(f.sc)}</td><td class="mono">${pct(f.bin)}</td></tr>`;
+    }
+    $('scFault').innerHTML = `${h}</table>`;
+    clearTimeout(scImgTimer);
+    scImgTimer = setTimeout(renderScImage, 60);
+}
+
+function renderScImage() {
+    const { gen, N, ber } = scSel();
+    const img = smallImage();
+    const exact = applyFilter(img, 'gauss2', null);
+    const sc0 = scFilter(img, gen, N, 0);
+    const sc = ber > 0 ? scFilter(img, gen, N, ber) : sc0;
+    const bin = flipPixelBits(exact, ber);
+    drawGray($('scExact'), exact);
+    drawGray($('scImg'), sc);
+    drawGray($('scBin'), bin);
+    $('scImgCap').textContent = `estocástica, N = ${N}, com bits errados`;
+    $('scImgNote').innerHTML = 'Aplicação: o gaussiano 3 × 3 com pesos 1 2 1 sem nenhuma multiplicação. Um MUX de 9 entradas sorteia, a cada ciclo, um vizinho com probabilidade igual ao seu peso (soma 16); a fração de uns da saída é a média ponderada. Os pixels compartilham o gerador dos dados, e a seleção vem de outro gerador (ou do mesmo, com um LFSR só). No binário, os bits errados caem nos 8 bits de cada pixel do resultado.';
+    const row = (name, x) => { const p = psnr(exact, x); return `<tr><th>${name}</th><td class="mono">${p === Infinity ? '∞' : `${nf(p, 1)} dB`}</td><td class="mono">${nf(ssim(exact, x), 4)}</td></tr>`; };
+    $('scImgTable').innerHTML = '<table class="kv"><tr><th></th><td class="note">PSNR</td><td class="note">SSIM</td></tr>'
+        + row(`estocástica sem bits errados (N = ${N})`, sc0) + row('estocástica com bits errados', sc) + row('binária com bits errados', bin) + '</table>';
+}
+
+function renderSc() {
+    renderScDemo();
+    renderScCurve();
+    renderScCost();
+    renderScFault();
+}
+$('scOp').addEventListener('change', () => renderSc());
+$('scGen').addEventListener('change', () => { renderScDemo(); renderScCurve(); renderScFault(); });
+$('scN').addEventListener('input', () => renderSc());
+for (const id of ['scX', 'scY']) $(id).addEventListener('input', () => renderScDemo());
+$('scBer').addEventListener('input', () => renderScFault());
 $('filter').onchange = () => { renderApp(); };
 $('vosV').addEventListener('input', () => renderVos());
 $('vosClock').addEventListener('change', () => renderVos());
 for (const id of ['memBer', 'memProt']) $(id).addEventListener('input', () => renderMem());
-$('imgSynth').onclick = () => { image = testImage(); renderApp(); dirty.vos = true; };
+$('imgSynth').onclick = () => { image = testImage(); renderApp(); dirty.vos = true; dirty.sc = true; };
 $('imgFile').onchange = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
+    const useImage = (im) => {
+        image = fitImage(im, 256);
+        dirty.vos = true;
+        dirty.sc = true;
+        renderApp();
+    };
+    if (/\.(ppm|pgm|pbm|pnm)$/i.test(f.name)) {
+        // Netpbm: os navegadores não abrem, então o arquivo é lido aqui.
+        f.arrayBuffer().then((buf) => {
+            try { useImage(parseNetpbm(new Uint8Array(buf))); } catch (err) { $('appNote').textContent = `Não foi possível ler ${f.name}: ${err.message}.`; }
+        });
+        e.target.value = '';
+        return;
+    }
     const img = new Image();
     img.onload = () => {
         const s = Math.min(1, 256 / Math.max(img.width, img.height));
@@ -631,12 +777,12 @@ $('imgFile').onchange = (e) => {
         c.width = w; c.height = h;
         const ctx = c.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        image = fromRgba(ctx.getImageData(0, 0, w, h).data, w, h);
-        dirty.vos = true;
         URL.revokeObjectURL(img.src);
-        renderApp();
+        useImage(fromRgba(ctx.getImageData(0, 0, w, h).data, w, h));
     };
+    img.onerror = () => { URL.revokeObjectURL(img.src); $('appNote').textContent = `O navegador não abriu ${f.name} como imagem.`; };
     img.src = URL.createObjectURL(f);
+    e.target.value = '';
 };
 
 // Abas e controles ------------------------------------------------------------------------------------------

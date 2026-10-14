@@ -82,3 +82,24 @@ table.metrics td.note { text-align: left; }
 .fig-svg .series.s-energy { stroke: var(--ok); }
 .fig-svg .marker { stroke: var(--focus); stroke-width: 2; stroke-dasharray: 4 3; }
 .slider.wide { grid-template-columns: auto 180px 64px; min-width: 380px; margin: 0 !important; }
+
+/* Computação estocástica */
+:root { --g-same: #c0392b; --g-lfsr: #8e44ad; }
+:root[data-theme="dark"] { --g-same: #ff6b6b; --g-lfsr: #c792ea; }
+.fig-svg .series.s-random { stroke: var(--z-approx); }
+.fig-svg .series.s-lfsrSame { stroke: var(--g-same); }
+.fig-svg .series.s-lfsr { stroke: var(--g-lfsr); }
+.fig-svg .series.s-sobol { stroke: var(--z-exact); }
+.fig-svg .series.s-bin { stroke: var(--z-trunc); stroke-dasharray: 6 4; }
+.fig-svg .series-dot.s-random { fill: var(--z-approx); }
+.fig-svg .series-dot.s-lfsrSame { fill: var(--g-same); }
+.fig-svg .series-dot.s-lfsr { fill: var(--g-lfsr); }
+.fig-svg .series-dot.s-sobol { fill: var(--z-exact); }
+.fig-svg .series-dot.s-bin { fill: var(--z-trunc); }
+.fig-svg .bit { stroke: var(--line-strong); stroke-width: 0.8; fill: none; }
+.fig-svg .bit.one { fill: var(--z-exact); stroke: var(--z-exact); }
+.fig-svg .bit.one.out { fill: var(--z-approx); stroke: var(--z-approx); }
+.fig-svg .bit.one.sel { fill: var(--z-trunc); stroke: var(--z-trunc); }
+.sc-controls { display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; }
+.sc-controls .slider { margin: 0 !important; }
+.scroll-x { overflow-x: auto; }
