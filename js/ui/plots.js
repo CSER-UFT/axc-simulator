@@ -346,3 +346,64 @@ export function lineChartSvg(series, { xLabel, yLabel, marker = null, logY = fal
     });
     return `${s}</svg>`;
 }
+
+/** Técnicas do espaço de projeto, na ordem da legenda (a classe de cor de cada uma é t-<técnica>). */
+export const TECHNIQUES = ['exact', 'array', 'booth', 'kulkarni', 'drum', 'mitchell', 'trunc', 'loa', 'seg', 'evo'];
+
+/**
+ * Espaço de projeto: custo no eixo x, erro no eixo y (log), cor pela técnica, fronteira de Pareto em degraus. Os
+ * pontos de referência externa (técnica evo) são losangos vazados.
+ * @param {Array<{x: number, y: number, label: string, tech: string, current?: boolean}>} pts
+ * @param {number[]} front índices dos pontos não dominados
+ */
+export function designSpaceSvg(pts, front, { xLabel, yLabel, logX = false, width = 680, height = 400 } = {}) {
+    const L = 70, B = 44, R = 16;
+    const techs = TECHNIQUES.filter((k) => pts.some((p) => p.tech === k));
+    const T = 18 + 16 * Math.ceil(techs.length / 5);
+    const W = width - L - R, H = height - T - B;
+    let s = `<svg class="fig-svg dspace" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img">`;
+    if (!pts.length) return `${s}<text class="small muted" x="${width / 2}" y="${height / 2}" text-anchor="middle">${t('plot.noSynth')}</text></svg>`;
+    const pos = pts.map((p) => p.y).filter((v) => v > 0);
+    const ymin = pos.length ? Math.min(...pos) : 1e-6, ymax = Math.max(...pts.map((p) => p.y), ymin * 10);
+    const y0 = Math.floor(Math.log10(ymin)), y1 = Math.ceil(Math.log10(ymax));
+    const tx = (v) => (logX ? Math.log10(Math.max(v, 1e-9)) : v);
+    const xs = pts.map((p) => tx(p.x));
+    const x0 = Math.min(...xs), x1 = Math.max(...xs);
+    const X = (v) => L + (x1 === x0 ? W / 2 : ((tx(v) - x0) / (x1 - x0)) * W * 0.94 + W * 0.03);
+    // Erro zero (unidade exata) fica numa faixa abaixo do eixo log.
+    const Y = (v) => (v <= 0 ? T + H - 4 : T + (H - 16) - ((Math.log10(v) - y0) / ((y1 - y0) || 1)) * (H - 22));
+    s += `<line class="axis" x1="${L}" y1="${T + H}" x2="${L + W}" y2="${T + H}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${T + H}"/>`;
+    for (let e = y0; e <= y1; e++) {
+        s += `<line class="grid" x1="${L}" y1="${Y(10 ** e)}" x2="${L + W}" y2="${Y(10 ** e)}"/><text class="small muted mono" x="${L - 6}" y="${Y(10 ** e) + 4}" text-anchor="end">1e${e}</text>`;
+    }
+    s += `<text class="small muted mono" x="${L - 6}" y="${T + H - 1}" text-anchor="end">0</text>`;
+    const xt = logX ? [10 ** x0, 10 ** ((x0 + x1) / 2), 10 ** x1] : [x0, (x0 + x1) / 2, x1];
+    for (const v of xt) s += `<text class="small muted mono" x="${X(v)}" y="${T + H + 16}" text-anchor="middle">${fmt(v)}</text>`;
+    s += `<text class="small muted" x="${L + W / 2}" y="${height - 6}" text-anchor="middle">${esc(xLabel)}${logX ? ' (log)' : ''}</text>`;
+    s += `<text class="small muted" x="14" y="${T + H / 2}" text-anchor="middle" transform="rotate(-90 14 ${T + H / 2})">${esc(yLabel)} (log)</text>`;
+    const f = [...front].sort((i, j) => pts[i].x - pts[j].x);
+    if (f.length > 1) {
+        let d = `M${X(pts[f[0]].x)},${Y(pts[f[0]].y)}`;
+        for (let k = 1; k < f.length; k++) d += ` H${X(pts[f[k]].x)} V${Y(pts[f[k]].y)}`;
+        s += `<path class="front" d="${d}"/>`;
+    }
+    const onFront = new Set(front);
+    // Fora da fronteira primeiro, para a fronteira ficar por cima.
+    const order = pts.map((_, i) => i).sort((i, j) => (onFront.has(i) ? 1 : 0) - (onFront.has(j) ? 1 : 0) || (pts[i].current ? 1 : 0) - (pts[j].current ? 1 : 0));
+    for (const i of order) {
+        const p = pts[i], cx = X(p.x), cy = Y(p.y);
+        const cls = `pt t-${p.tech}${onFront.has(i) ? ' on' : ''}${p.current ? ' cur' : ''}`;
+        const title = `<title>${esc(p.label)}: ${fmt(p.x)}, ${fmt(p.y)}</title>`;
+        s += p.tech === 'evo'
+            ? `<path class="${cls}" d="M${cx},${cy - 5} L${cx + 5},${cy} L${cx},${cy + 5} L${cx - 5},${cy} Z">${title}</path>`
+            : `<circle class="${cls}" cx="${cx}" cy="${cy}" r="${p.current ? 6 : 4}">${title}</circle>`;
+    }
+    techs.forEach((k, i) => {
+        const lx = L + 8 + (i % 5) * 122, ly = 10 + Math.floor(i / 5) * 16;
+        s += k === 'evo'
+            ? `<path class="pt t-evo" d="M${lx},${ly - 5} L${lx + 5},${ly} L${lx},${ly + 5} L${lx - 5},${ly} Z"/>`
+            : `<circle class="pt t-${k}" cx="${lx}" cy="${ly}" r="4"/>`;
+        s += `<text class="small" x="${lx + 9}" y="${ly + 4}">${esc(t(`ds.tech.${k}`))}</text>`;
+    });
+    return `${s}</svg>`;
+}

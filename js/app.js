@@ -4,9 +4,9 @@
  * Os textos vêm de js/i18n (português e inglês).
  */
 import { buildUnit, unitName, compressorTable } from './axc/units.js';
-import { testInputs, errorMetrics, histogram, errorGrid, paretoFront, rng } from './axc/metrics.js';
+import { testInputs, errorMetrics, histogram, errorGrid, paretoFront, rng, loadOperands, operandsLoaded, APP_DISTRIBUTIONS } from './axc/metrics.js';
 import { testImage, fromRgba, parseNetpbm, fitImage, applyFilter, psnr, ssim } from './axc/image.js';
-import { lineChartSvg, stagesSvg, dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, scatterSvg, drawGray, drawDiff, esc } from './ui/plots.js';
+import { lineChartSvg, stagesSvg, dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, scatterSvg, drawGray, drawDiff, esc, designSpaceSvg } from './ui/plots.js';
 import { toVerilog, testbench, vectors, moduleName } from './axc/verilog.js';
 import { Help } from './ui/help.js';
 import { SC_GENERATORS, scCurve, binaryError, streamDemo, scCost, faultError, scFilter, flipPixelBits } from './axc/stochastic.js';
@@ -86,12 +86,26 @@ function syncControls() {
 
 const distName = (d) => t(`dist.${d}`);
 
+/** Pares reais das aplicações (data/operands.*), baixados só quando uma dessas distribuições é escolhida. */
+let operandsPromise = null;
+function ensureOperands() {
+    operandsPromise ??= Promise.all([fetch('data/operands.json').then((r) => r.json()), fetch('data/operands.bin').then((r) => r.arrayBuffer())])
+        .then(([index, buf]) => { loadOperands(index, buf); return true; })
+        .catch(() => { operandsPromise = null; return false; });
+    return operandsPromise;
+}
+
 function evaluateCurrent() {
     syncControls();
     const cfg = readCfg();
     const unit = buildUnit(cfg);
-    const dist = $('dist').value;
-    const inp = testInputs(cfg.width, dist);
+    let dist = $('dist').value;
+    if (APP_DISTRIBUTIONS.includes(dist) && !operandsLoaded()) {
+        // Enquanto os pares reais chegam, mostra o resultado com entradas uniformes e recalcula depois.
+        ensureOperands().then((ok) => { if (ok) evaluateCurrent(); else $('evalNote').textContent = t('eval.opsMissing'); });
+        dist = 'uniform';
+    }
+    const inp = testInputs(cfg.width, dist, undefined, undefined, cfg.kind);
     const m = errorMetrics(unit, inp);
     const exact = exactUnit(cfg);
     cur = { cfg, unit, m, inp, exact, dist, appCache: null, activity: activityOf(unit), exactActivity: activityOf(exact) };
@@ -102,6 +116,7 @@ function evaluateCurrent() {
     renderTab(tab);
 }
 function renderEvalNote() {
+    if (cur.inp.app) { $('evalNote').textContent = t(`eval.app.${cur.inp.app}.${cur.cfg.kind}`, { n: nf(cur.inp.a.length), N: cur.cfg.width }); return; }
     $('evalNote').textContent = cur.inp.exhaustive
         ? t('eval.exhaustive', { n: nf(cur.inp.a.length) })
         : t('eval.sampled', { n: nf(cur.inp.a.length), dist: distName(cur.dist) });
@@ -176,20 +191,23 @@ function renderSummary() {
     if (sy) {
         const sx = synthOf(unitName(exact.cfg));
         h += `<tr><th>FPGA (Yosys)</th><td class="mono">${sy.luts} LUTs${sx ? rel(sy.luts, sx.luts) : ''}, ${sy.carry4} CARRY4, ${t('sum.depth', { n: sy.depth })}</td></tr>`;
-        if (sy.asic) h += `<tr><th>ASIC (sky130)</th><td class="mono">${nf(sy.asic.area, 0)} µm²${sx?.asic ? rel(sy.asic.area, sx.asic.area) : ''}, ${nf(sy.asic.delay, 0)} ps${sx?.asic ? rel(sy.asic.delay, sx.asic.delay) : ''}</td></tr>`;
+        if (sy.asic) h += `<tr><th>ASIC (sky130)</th><td class="mono">${nf(sy.asic.area, 0)} µm²${sx?.asic ? rel(sy.asic.area, sx.asic.area) : ''}, ${nf(sy.asic.delay, 0)} ps${sx?.asic ? rel(sy.asic.delay, sx.asic.delay) : ''}`
+            + `${sy.asic.energy ? `, ${nf(sy.asic.energy, 0)} fJ${sx?.asic?.energy ? rel(sy.asic.energy, sx.asic.energy) : ''}` : ''}</td></tr>`;
     } else if (synth) h += `<tr><th>${t('sum.synth')}</th><td class="note">${t('sum.notSynth')}</td></tr>`;
     const refs = techRefs(cfg);
     if (refs.length) h += `<tr><th>${t('sum.refs')}</th><td>${refs.map(refLink).join('; ')} <a href="#" data-help="refs" class="note">(${t('sum.allRefs')})</a></td></tr>`;
     h += '</table>';
     h += '<table class="kv metrics" style="margin-top:10px">';
+    // Com amostragem, o intervalo de confiança de 95% de cada média.
+    const ci = (k, f) => (m.ci && m.ci[k] > 0 ? ` <span class="note">± ${f(m.ci[k])}</span>` : '');
     const rows = [
         ['ME', t('met.ME'), nf(m.ME)],
-        ['MED', t('met.MED'), nf(m.MED)],
-        ['WCE', t('met.WCE'), `${nf(m.WCE)} <span class="note">(a = ${m.worst.a}, b = ${m.worst.b})</span>`],
-        ['MSE', t('met.MSE'), sci(m.MSE)],
-        ['NMED', t('met.NMED'), sci(m.NMED)],
-        ['MRED', t('met.MRED'), pct(m.MRED)],
-        ['EP', t('met.EP'), pct(m.EP)],
+        ['MED', t('met.MED'), nf(m.MED) + ci('MED', nf)],
+        ['WCE', t('met.WCE'), `${nf(m.WCE)} <span class="note">(a = ${m.worst.a}, b = ${m.worst.b})${m.ci ? ` ${t('sum.wceSampled')}` : ''}</span>`],
+        ['MSE', t('met.MSE'), sci(m.MSE) + ci('MSE', sci)],
+        ['NMED', t('met.NMED'), sci(m.NMED) + ci('NMED', sci)],
+        ['MRED', t('met.MRED'), pct(m.MRED) + ci('MRED', pct)],
+        ['EP', t('met.EP'), pct(m.EP) + ci('EP', pct)],
     ];
     for (const [k, tt, v] of rows) h += `<tr><th title="${esc(tt)}">${k}</th><td class="mono">${v}</td><td class="note">${tt}</td></tr>`;
     h += '</table>';
@@ -267,7 +285,7 @@ const xName = (k) => t(`x.${k}`);
 /** Entrada da comparação para uma configuração (com o MSE da imagem no filtro escolhido). */
 function cmpEntry(cfg, dist) {
     const unit = buildUnit(cfg);
-    const m = errorMetrics(unit, testInputs(cfg.width, dist));
+    const m = errorMetrics(unit, testInputs(cfg.width, APP_DISTRIBUTIONS.includes(dist) && !operandsLoaded() ? 'uniform' : dist, undefined, undefined, cfg.kind));
     const filter = filterFor(cfg);
     let imgMSE = null;
     if (filter) {
@@ -306,7 +324,7 @@ function kneePoint(pts, front, logY) {
     return best;
 }
 
-const SYNTH_COSTS = ['luts', 'lutsCarry', 'depth', 'asicArea', 'asicDelay', 'asicAdp'];
+const SYNTH_COSTS = ['luts', 'lutsCarry', 'depth', 'asicArea', 'asicDelay', 'asicAdp', 'asicEnergy'];
 function renderCmp() {
     const xk = $('cmpX').value, yk = $('cmpY').value;
     const curName = cur ? unitName(cur.cfg) : null;
@@ -318,6 +336,7 @@ function renderCmp() {
         if (xk === 'asicArea') return sy?.asic?.area;
         if (xk === 'asicDelay') return sy?.asic?.delay ?? undefined;
         if (xk === 'asicAdp') return sy?.asic ? (sy.asic.area * sy.asic.delay) / 1000 : undefined;
+        if (xk === 'asicEnergy') return sy?.asic?.energy ?? undefined;
         return e[xk];
     };
     const usable = cmp.filter((e) => e[yk] !== null && e[yk] !== undefined && cost(e) !== undefined);
@@ -595,10 +614,10 @@ function renderSynth() {
     $('synthNote').innerHTML = t('synth.note', { date: esc(synth.generated), yosys: esc(synth.tools.yosys.replace(/ \(.*/, '')), flow: esc(synth.flow.replace('read_verilog; ', '')) }) + asicInfo;
     const curName = cur ? unitName(cur.cfg) : null;
     for (const d of synth.designs) if (!d.err && !synthErr.has(d.name)) synthErr.set(d.name, null);
-    $('synthTable').innerHTML = `<tr><th>${t('th.config')}</th><th>${t('th.gates')}</th><th>LUTs</th><th>CARRY4</th><th>${t('th.depthShort')}</th><th title="${esc(t('x.asicArea'))}">µm²</th><th title="${esc(t('x.asicDelay'))}">ps</th><th>MRED</th></tr>`
+    $('synthTable').innerHTML = `<tr><th>${t('th.config')}</th><th>${t('th.gates')}</th><th>LUTs</th><th>CARRY4</th><th>${t('th.depthShort')}</th><th title="${esc(t('x.asicArea'))}">µm²</th><th title="${esc(t('x.asicDelay'))}">ps</th><th title="${esc(t('x.asicEnergy'))}">fJ</th><th>MRED</th></tr>`
         + synth.designs.map((d, k) => {
             const e = d.err ? d.err.MRED : synthErr.get(d.name);
-            return `<tr data-k="${k}" class="${d.name === curName ? 'cur' : ''}"><td class="mono left">${esc(dn(d.name))}</td><td>${d.gates}</td><td>${d.luts}</td><td>${d.carry4}</td><td>${d.depth}</td><td>${d.asic ? nf(d.asic.area, 0) : '-'}</td><td>${d.asic?.delay ? nf(d.asic.delay, 0) : '-'}</td><td>${e === null ? '…' : pct(e)}</td></tr>`;
+            return `<tr data-k="${k}" class="${d.name === curName ? 'cur' : ''}"><td class="mono left">${esc(dn(d.name))}</td><td>${d.gates}</td><td>${d.luts}</td><td>${d.carry4}</td><td>${d.depth}</td><td>${d.asic ? nf(d.asic.area, 0) : '-'}</td><td>${d.asic?.delay ? nf(d.asic.delay, 0) : '-'}</td><td>${d.asic?.energy ? nf(d.asic.energy, 0) : '-'}</td><td>${e === null ? '…' : pct(e)}</td></tr>`;
         }).join('');
     const group = (d) => `${d.cfg.kind}${d.cfg.width}`;
     const target = synth.designs.some((d) => d.asic) ? $('synthTarget').value : 'fpga';
@@ -618,6 +637,7 @@ function renderSynth() {
         if (Math.sign(T.x(ds[i]) - T.x(ds[j])) === Math.sign(T.y(ds[i]) - T.y(ds[j]))) agree++;
     }
     $('synthCorr').textContent = total ? t('synth.agree', { p: pct(agree / total), which: t(target === 'asicDelay' ? 'synth.faster' : 'synth.smaller') }) + t(`synth.why.${target}`) : '';
+    renderDesignSpace();
     // Métricas de erro, aos poucos, para não travar a página.
     const pending = ds.find((d) => !d.err && synthErr.get(d.name) === null);
     if (pending) {
@@ -628,6 +648,118 @@ function renderSynth() {
         }, 0);
     }
 }
+
+// Espaço de projeto (pesquisa): todas as configurações sintetizadas de um grupo, com custo e erro à escolha, a
+// fronteira de Pareto e, como referência, a EvoApprox8b sintetizada com o mesmo fluxo (data/evoapprox.json).
+let evo = null, evoState = 'idle';
+const isExactCfg = (c) => (c.kind === 'add' ? c.adder === 'exact' : (c.method ?? 'array') === 'array' && !c.kTrunc && !c.kApprox && !c.comp);
+const techOf = (d) => (d.cfg.kind === 'add' ? d.cfg.adder : isExactCfg(d.cfg) ? 'exact' : d.cfg.method ?? 'array');
+function dsCost(d, key, flow) {
+    const f = d.asic?.flows?.[flow];
+    if (!f) return undefined;
+    switch (key) {
+        case 'area': return f.area;
+        case 'delay': return f.delay;
+        case 'energy': return f.energy;
+        case 'leakage': return f.leakage;
+        case 'adp': return (f.area * f.delay) / 1000;
+        case 'edp': return (f.energy * f.delay) / 1000;
+        case 'energy.lenet': case 'energy.image': return flow === 'delay' ? d.asic.energyApp?.[key.slice(7)] : undefined;
+        case 'luts': return d.luts === undefined ? undefined : d.luts + d.carry4;
+        default: return undefined;
+    }
+}
+const dsErrOf = (d, key) => (key.includes('.') ? d.errApp?.[key.split('.')[0]]?.[key.split('.')[1]] : d.err?.[key]);
+const dsCiOf = (d, key) => (key.includes('.') ? d.errApp?.[key.split('.')[0]]?.ci?.[key.split('.')[1]] : d.err?.ci?.[key]);
+function dsData() {
+    const g = $('dsGroup').value, flow = $('dsFlow').value, ck = $('dsCost').value, ek = $('dsErr').value;
+    const own = synth.designs.filter((d) => `${d.cfg.kind}${d.cfg.width}` === g).map((d) => ({ d, name: d.name, tech: techOf(d), cfg: d.cfg }));
+    const ext = $('dsEvo').checked && evo ? evo.designs.filter((d) => `${d.kind}${d.width}` === g).map((d) => ({ d, name: `EvoApprox ${d.name}`, tech: 'evo' })) : [];
+    // A EvoApprox não tem a LUT (só ASIC): fica de fora quando o custo é de FPGA.
+    const rows = [...own, ...ext].map((r) => ({ ...r, x: r.tech === 'evo' && ck === 'luts' ? undefined : dsCost(r.d, ck, flow), y: dsErrOf(r.d, ek), ci: dsCiOf(r.d, ek) }));
+    // Limite de erro (nas métricas relativas): tira do gráfico as configurações degeneradas, como as que truncam tudo.
+    const max = $('dsMax').value === '' || ek.endsWith('WCE') ? Infinity : +$('dsMax').value;
+    return { g, flow, ck, ek, max, rows, ok: rows.filter((r) => r.x !== undefined && r.x !== null && r.y !== undefined && r.y !== null && r.y <= max) };
+}
+const fmtErr = (key, v) => (v === undefined || v === null ? '-' : key.endsWith('WCE') ? nf(v, 0) : key.endsWith('NMED') ? sci(v) : pct(v));
+function renderDesignSpace() {
+    if (!synth?.asic?.flows) { $('dsNote').textContent = t('ds.old'); $('dsFig').innerHTML = ''; $('dsTable').innerHTML = ''; return; }
+    if ($('dsEvo').checked && evoState === 'idle') {
+        evoState = 'loading';
+        fetch('data/evoapprox.json').then((r) => (r.ok ? r.json() : null)).catch(() => null).then((j) => {
+            evo = j;
+            evoState = j ? 'ok' : 'missing';
+            if (tab === 'synth') renderDesignSpace();
+        });
+    }
+    const D = dsData();
+    const curName = cur ? unitName(cur.cfg) : null;
+    const pts = D.ok.map((r) => ({ x: r.x, y: r.y, label: dn(r.name), tech: r.tech, current: r.name === curName }));
+    const front = paretoFront(pts);
+    const costName = t(`ds.c.${D.ck.replace('.l', 'L').replace('.i', 'I')}`), errName = $('dsErr').selectedOptions[0].textContent;
+    $('dsFig').innerHTML = designSpaceSvg(pts, front, { xLabel: costName, yLabel: errName, logX: $('dsLogX').checked });
+    const nOwn = D.ok.filter((r) => r.tech !== 'evo').length, nEvo = D.ok.length - nOwn;
+    const missing = D.rows.length - D.ok.length;
+    $('dsNote').innerHTML = t('ds.note', { n: nOwn, flow: t(`ds.flow.${D.flow}`), target: synth.asic.targets?.[D.g] ?? '-' })
+        + (nEvo ? t('ds.evoNote', { n: nEvo }) : $('dsEvo').checked && evoState === 'missing' ? t('ds.evoMissing') : '')
+        + (missing ? t('ds.missing', { n: missing }) : '')
+        + (D.max < Infinity ? t('ds.maxNote', { p: pct(D.max) }) : '')
+        + (D.ck.startsWith('energy.') ? t('ds.energyAppNote') : '');
+    const fr = [...front].sort((i, j) => pts[i].x - pts[j].x).map((i) => D.ok[i]);
+    $('dsFrontTitle').textContent = t('ds.frontTitle', { n: fr.length, of: D.ok.length });
+    $('dsTable').innerHTML = `<tr><th>${t('th.config')}</th><th>${esc(costName)}</th><th>${esc(errName)}</th><th title="${esc(t('ds.ciHelp'))}">± IC 95%</th><th>µm²</th><th>ps</th><th>fJ</th></tr>`
+        + fr.map((r) => {
+            const f = r.d.asic.flows[D.flow];
+            return `<tr ${r.cfg ? `data-name="${esc(r.name)}"` : ''} class="${r.name === curName ? 'cur' : ''}"><td class="mono left">${esc(dn(r.name))}</td><td>${nf(r.x, 1)}</td><td>${fmtErr(D.ek, r.y)}</td><td>${r.ci === undefined || r.ci === null ? '-' : fmtErr(D.ek, r.ci)}</td><td>${nf(f.area, 0)}</td><td>${nf(f.delay, 0)}</td><td>${nf(f.energy, 0)}</td></tr>`;
+        }).join('');
+}
+for (const id of ['dsGroup', 'dsFlow', 'dsCost', 'dsErr', 'dsMax', 'dsEvo', 'dsLogX']) $(id).addEventListener('change', () => renderDesignSpace());
+$('dsTable').addEventListener('click', (e) => {
+    const tr = e.target.closest('tr[data-name]');
+    const d = tr && synth.designs.find((x) => x.name === tr.dataset.name);
+    if (d) loadCfg(d.cfg);
+});
+/** Todas as configurações do grupo (e a referência, se marcada), com todos os custos e erros, e se estão na fronteira. */
+function dsExport() {
+    const D = dsData();
+    const pts = D.ok.map((r) => ({ x: r.x, y: r.y }));
+    const onFront = new Set(paretoFront(pts).map((i) => D.ok[i]));
+    const flows = ['delay', 'area', 'iso'];
+    return D.rows.map((r) => {
+        const o = { source: r.tech === 'evo' ? 'EvoApprox8b' : 'axc-simulator', name: r.name, group: D.g, technique: r.tech, cfg: r.cfg ?? null };
+        for (const fl of flows) { const f = r.d.asic?.flows?.[fl]; if (f) Object.assign(o, { [`${fl}_area_um2`]: f.area, [`${fl}_delay_ps`]: f.delay, [`${fl}_energy_fJ`]: f.energy, [`${fl}_leakage_nW`]: f.leakage }); }
+        o.energy_lenet_fJ = r.d.asic?.energyApp?.lenet ?? null;
+        o.energy_image_fJ = r.d.asic?.energyApp?.image ?? null;
+        o.luts_carry4 = r.tech === 'evo' ? null : r.d.luts + r.d.carry4;
+        for (const k of ['MED', 'WCE', 'MSE', 'NMED', 'MRED', 'EP']) { o[k] = r.d.err?.[k] ?? null; o[`${k}_ci95`] = r.d.err?.ci?.[k] ?? null; }
+        for (const app of ['lenet', 'image']) for (const k of ['NMED', 'MRED', 'EP']) { o[`${app}_${k}`] = r.d.errApp?.[app]?.[k] ?? null; o[`${app}_${k}_ci95`] = r.d.errApp?.[app]?.ci?.[k] ?? null; }
+        o.pareto = onFront.has(r);
+        o.pareto_axes = `${D.ck} x ${D.ek} (${D.flow}${D.max < Infinity ? `, ${D.ek} <= ${D.max}` : ''})`;
+        return o;
+    });
+}
+$('dsCsv').onclick = () => {
+    if (!synth?.asic?.flows) return;
+    const rows = dsExport();
+    const cols = Object.keys(rows[0] ?? {}).filter((k) => k !== 'cfg');
+    const cell = (v) => (v === null || v === undefined ? '' : typeof v === 'string' && /[",]/.test(v) ? `"${v.replace(/"/g, '""')}"` : String(v));
+    download(`axc-${$('dsGroup').value}.csv`, `${cols.join(',')}\n${rows.map((r) => cols.map((k) => cell(r[k])).join(',')).join('\n')}\n`, 'text/csv');
+};
+$('dsJson').onclick = () => {
+    if (!synth?.asic?.flows) return;
+    const meta = { generated: synth.generated, tools: synth.tools, asic: synth.asic, evoapprox: evo ? evo.source : null };
+    download(`axc-${$('dsGroup').value}.json`, `${JSON.stringify({ meta, designs: dsExport() }, null, 1)}\n`, 'application/json');
+};
+$('dsSvg').onclick = () => {
+    const svg = $('dsFig').querySelector('svg');
+    if (!svg) return;
+    const clone = svg.cloneNode(true);
+    const colors = { exact: '#222', array: '#2f6fdf', booth: '#7a3fb8', kulkarni: '#c2410c', drum: '#0f8b8d', mitchell: '#b8860b', trunc: '#c03060', loa: '#2b9a66', seg: '#8a6d3b' };
+    const css = '.axis{stroke:#555}.grid{stroke:#ddd}.small{font:11px sans-serif}.mono{font-family:monospace}.muted{fill:#555}.front{fill:none;stroke:#111;stroke-width:1.2;stroke-dasharray:4 3}.pt{stroke:#fff;stroke-width:1;fill-opacity:.55}.pt.on{fill-opacity:1;stroke:#111}'
+        + Object.entries(colors).map(([k, c]) => `.t-${k}{fill:${c}}`).join('') + '.pt.t-evo{fill:none;fill-opacity:1;stroke:#e0457b;stroke-width:1.6}';
+    clone.insertAdjacentHTML('afterbegin', `<style>${css}</style>`);
+    download(`axc-${$('dsGroup').value}.svg`, clone.outerHTML, 'image/svg+xml');
+};
 $('synthTarget').addEventListener('change', () => renderSynth());
 $('synthTable').addEventListener('click', (e) => {
     const tr = e.target.closest('tr[data-k]');

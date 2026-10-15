@@ -1,7 +1,7 @@
 # Publica o simulador no GitHub Pages a cada push no branch principal, depois que os testes passam.
-# Antes de publicar, as configurações pré-definidas são exportadas em Verilog, conferidas no Icarus Verilog e
-# sintetizadas com o Yosys para FPGA e para ASIC sky130 (scripts/synth.mjs); o resultado vai junto com o site em
-# data/synth.json.
+# Os resultados da síntese (data/synth.json e data/evoapprox.json) vêm do repositório: são gerados localmente com
+# npm run synth e npm run evoapprox (horas de Yosys, Icarus Verilog e OpenSTA para o espaço de projeto inteiro),
+# não a cada publicação.
 # Em Settings > Pages, selecione "GitHub Actions" como fonte.
 name: GitHub Pages
 
@@ -30,16 +30,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Instalar Icarus Verilog e Yosys
-        run: sudo apt-get update && sudo apt-get install -y iverilog yosys
+      - name: Instalar Icarus Verilog
+        run: sudo apt-get update && sudo apt-get install -y iverilog
       - run: npm test
-      - name: Biblioteca de células sky130 (cache)
-        uses: actions/cache@v4
-        with:
-          path: build/pdk/sky130_fd_sc_hd__tt_025C_1v80.lib
-          key: sky130hd-tt-08ddc64f89c6
-      - name: Verilog, simulação e síntese
-        run: npm run synth
+      - name: Conferir os resultados da síntese
+        run: test -s data/synth.json && node -e "const s=require('./data/synth.json'); if (!s.asic?.flows) process.exit(1); console.log(s.designs.length + ' configurações sintetizadas em ' + s.generated)"
       - name: Preparar site
         run: |
           mkdir _site

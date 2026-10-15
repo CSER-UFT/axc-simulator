@@ -13,11 +13,18 @@ Interface e ajuda em **português e inglês** (seletor no cabeçalho). O botão 
 * **Multiplicador** N × N (8 ou 16 bits): por colunas, com redução de Dadda e três zonas (truncadas, como em Schulte e Swartzlander, 1993; aproximadas com compressor 4:2 aproximado, uma simplificação do de Venkatachalam e Ko, 2017, e OR como no LOA; e exatas); Booth radix 4 com sinal, truncado (Booth, 1951; MacSorley, 1961); blocos 2 × 2 de Kulkarni (Kulkarni, Gupta e Ercegovac, 2011); DRUM (Hashemi, Bahar e Reda, 2015); logarítmico de Mitchell (1962); e compensação do viés por uma constante, para qualquer técnica.
 * **Somador** exato (ripple carry), truncado, LOA (Mahdiani e colegas, 2010) e segmentado com previsão de vem um (no estilo do ACA, Kahng e Kang, 2012, e do GeAr, Shafique e colegas, 2015).
 * **Estrutura**: diagrama de pontos dos produtos parciais com as zonas, altura das colunas a cada estágio de redução e tabela verdade do compressor aproximado.
-* **Erro**: ME, MED, WCE (com o par que o produz), MSE, NMED, MRED e EP; avaliação exaustiva para 8 bits com entradas uniformes e por amostragem nos outros casos (entradas uniformes, normais ou exponenciais); mapa do erro sobre o plano (a, b) e histograma do erro com sinal.
-* **Custo**: área em portas de duas entradas, atraso em níveis de porta e atividade de chaveamento (indicador de energia dinâmica), todos do modelo didático, e, para as configurações pré-definidas, LUTs, CARRY4 e profundidade de uma síntese real com o Yosys para FPGA Xilinx 7 series, e área (µm²) e atraso (ps) de uma síntese para ASIC com a biblioteca de células do PDK aberto SkyWater 130 nm.
+* **Erro**: ME, MED, WCE (com o par que o produz), MSE, NMED, MRED e EP; avaliação exaustiva para 8 bits com entradas uniformes e por amostragem nos outros casos (entradas uniformes, normais, exponenciais ou **operandos reais das aplicações**: os pares da LeNet-5 nas 1000 imagens de teste e os do filtro gaussiano, gerados por `scripts/operands.mjs` em `data/operands.bin`), com o intervalo de confiança de 95% das médias quando há amostragem; mapa do erro sobre o plano (a, b) e histograma do erro com sinal.
+* **Custo**: área em portas de duas entradas, atraso em níveis de porta e atividade de chaveamento (indicador de energia dinâmica), todos do modelo didático, e, para as configurações do espaço de projeto, LUTs, CARRY4 e profundidade de uma síntese real com o Yosys para FPGA Xilinx 7 series, e área (µm²), atraso (ps) e energia por operação (fJ) de uma síntese para ASIC com a biblioteca de células do PDK aberto SkyWater 130 nm.
 * **Tensão e memória**: escalonamento de tensão além da margem, com atraso pela lei de potência alfa, tempo de chegada de cada bit dependente dos dados e captura do valor antigo quando o bit atrasa; curva de erro contra tensão da unidade e da exata, energia relativa e a imagem degradando; memória aproximada com inversão de bits e proteção dos bits mais significativos, com o MSE medido e o esperado. O modelo de atraso pode ser o genérico ou o ajustado às células do sky130 no canto lento a −40 °C (de 1,28 a 1,76 V), lido das tabelas da biblioteca pelo script `scripts/sky130/voltage.py` (resultado em `data/sky130-voltage.json`).
 * **Estocástica**: valores como fluxos de bits, multiplicação por AND ou XNOR e soma escalada por MUX; quatro geradores (aleatório ideal, LFSRs diferentes, um LFSR só, sequência de Sobol) com o erro contra o comprimento do fluxo, o efeito da correlação, o custo dos geradores e do contador contra o binário, a tolerância a bits errados e um filtro gaussiano feito só com um MUX.
-* **Síntese**: exportação de qualquer configuração em Verilog com testbench autoverificável; a cada publicação, uma action exporta as configurações pré-definidas, confere o Verilog no Icarus Verilog contra o simulador e sintetiza com o Yosys para FPGA (Xilinx 7 series) e para ASIC (sky130_fd_sc_hd, canto típico; a biblioteca é baixada de uma versão fixa do OpenROAD-flow-scripts e conferida pelo SHA-256), com o script `scripts/synth.mjs` e o resultado em `data/synth.json`.
+* **Síntese**: exportação de qualquer configuração em Verilog com testbench autoverificável e síntese de um **espaço de projeto** de cerca de 560 configurações (`js/axc/designspace.js`: Booth, Kulkarni, DRUM e Mitchell completos, com e sem compensação; multiplicador por colunas e somador segmentado numa grade regular de passo 2, cerca de 25% de cada; truncado e LOA completos) com o script `scripts/synth.mjs`, rodado localmente (horas de CPU) e com o resultado em `data/synth.json`:
+  * o Verilog de cada configuração é conferido no Icarus Verilog contra o simulador;
+  * FPGA Xilinx 7 series com o Yosys (`synth_xilinx -abc9`, sem DSP);
+  * ASIC com a biblioteca sky130_fd_sc_hd (canto típico, 25 °C, 1,8 V; baixada de uma versão fixa do OpenROAD-flow-scripts e conferida pelo SHA-256) em três fluxos do ABC: **atraso mínimo**, **área mínima** e **iso atraso** (área mínima sob o atraso da unidade exata de mesma largura);
+  * cada netlist mapeada é conferida de novo no Icarus Verilog (com os modelos funcionais das células lidos da biblioteca) e medida com o **OpenSTA**: atraso do caminho crítico (modelo de fio da biblioteca, buf_2 nas entradas, 5 fF nas saídas) e energia por operação a partir da atividade de uma simulação da própria netlist, com entradas uniformes e com os operandos reais da LeNet-5 e do filtro. A simulação é de atraso zero, então os glitches ficam de fora e a energia é um limite inferior;
+  * cache por etapa em `build/synth-cache`: rodar de novo só sintetiza o que mudou;
+  * as netlists (o Verilog do simulador e as três mapeadas de cada configuração) vão para `build/axc-netlists.tar.gz`, para anexar a uma release; o `data/synth.json` guarda o SHA-256 de cada uma.
+* **Espaço de projeto e referência externa**: na aba Síntese, todas as configurações de um grupo com o custo (área, atraso, energia com entradas uniformes ou com os operandos reais, fuga, LUTs) e o erro (inclusive sob os operandos reais) à escolha, a fronteira de Pareto com o intervalo de confiança e a exportação em CSV, JSON e SVG. Como referência, os multiplicadores e somadores sem sinal de 8 e 16 bits da **EvoApproxLib** (licença MIT; Mrázek e colegas, DATE 2017), sintetizados com exatamente o mesmo fluxo e com o erro calculado sobre os mesmos pares (`scripts/evoapprox.mjs`, resultado em `data/evoapprox.json`). As métricas calculadas aqui conferem com as publicadas pela biblioteca.
 * **Ligação com o simulador de compilador**: o botão *Usar no simulador de compilador* abre o [riscv-cc-simulator](https://github.com/CSER-UFT/riscv-cc-simulator) com a unidade escolhida (multiplicador ou somador); lá, a latência e a área da multiplicação ou da soma no grafo de fluxo de dados e no escalonamento vêm desta unidade. O simulador de compilador também lê a lista de configurações sintetizadas (`data/synth.json`) e permite escolher um multiplicador e um somador aproximados lá mesmo.
 * **Comparação**: configurações guardadas, varredura do parâmetro principal, fronteira de Pareto com custo e métrica de erro à escolha, contagem de dominância, ponto de joelho, exportação em CSV e SVG.
 * **Rede neural**: LeNet-5 treinada no MNIST e quantizada em 8 bits, com os produtos das camadas escolhidas feitos pela unidade aproximada; acurácia contra a rede exata, sensibilidade por camada, matriz de confusão e os dígitos que passaram a errar. A rede é treinada uma vez com `scripts/lenet5/train.py` (só NumPy): `python3 scripts/lenet5/train.py <pasta com os 4 .gz do MNIST> --epochs 8`. O subconjunto de teste incluído (1000 imagens, `data/mnist1000.bin`) é do MNIST, sob a licença CC BY-SA 3.0.
@@ -26,10 +33,33 @@ Interface e ajuda em **português e inglês** (seletor no cabeçalho). O botão 
 ## Executar
 
 ```
-npm start      # servidor local sem cache em http://localhost:8005
-npm test       # testes (Node 20 ou mais novo; o teste do Verilog roda se houver iverilog)
-npm run synth  # exporta, confere e sintetiza as configurações pré-definidas (precisa de iverilog e yosys)
+npm start          # servidor local sem cache em http://localhost:8005
+npm test           # testes (Node 20 ou mais novo; o teste do Verilog roda se houver iverilog)
+npm run operands   # operandos reais da LeNet-5 e do filtro (data/operands.*)
+npm run synth      # espaço de projeto: confere e sintetiza (iverilog, yosys e sta do OpenSTA); --jobs N
+npm run evoapprox  # referência EvoApproxLib com o mesmo fluxo (depois do synth)
 ```
+
+O OpenSTA não tem pacote no Ubuntu; compila do código, com o CUDD (o `Dockerfile.ubuntu24.04` do repositório do OpenSTA mostra os passos), e o executável `sta` precisa estar no PATH.
+
+### Linha de comando
+
+Os mesmos modelos da página rodam sem o navegador, para experimentos em script (`node bin/axc.mjs`, ou `npm run axc -- <comando>`):
+
+```
+node bin/axc.mjs list --group mul8                        # configurações do espaço de projeto
+node bin/axc.mjs metrics "MUL8 DRUM4" --dist lenet        # métricas de erro, com o intervalo de confiança
+node bin/axc.mjs sweep --group add16 --dist image > a.csv # todas as configurações de um grupo, em CSV
+node bin/axc.mjs synth "ADD16 LOA8"                       # números da síntese (três fluxos, energia)
+node bin/axc.mjs verilog "MUL16 T8" --tb --out m.v        # Verilog e testbench
+node bin/axc.mjs lenet "MUL8 MITCHELL" --add "ADD16 LOA8" # acurácia da LeNet-5 com as unidades
+```
+
+A unidade é o nome mostrado na página ou uma configuração em JSON (`{"kind":"mul","width":8,"method":"drum","k":4}`); todos os comandos aceitam `--json`.
+
+### Como citar
+
+O arquivo `CITATION.cff` traz os metadados (o GitHub mostra "Cite this repository"). Para um DOI permanente, ative a integração do repositório com o Zenodo e publique uma release: o Zenodo lê o `CITATION.cff` e atribui o DOI a cada versão. Anexe à release o `build/axc-netlists.tar.gz` gerado pelo `npm run synth`.
 
 ## Arquivos
 
@@ -45,8 +75,12 @@ npm run synth  # exporta, confere e sintetiza as configurações pré-definidas 
 | `scripts/sky130/voltage.py` | atraso e energia das células sky130 por canto de tensão e ajuste da lei de potência alfa |
 | `js/axc/stochastic.js` | computação estocástica: geradores (LFSR, Sobol), fluxos, operações, erro, custo, falhas e o filtro com MUX |
 | `js/axc/verilog.js` | exportação em Verilog, testbench e vetores de teste |
-| `js/axc/presets.js` | configurações pré-definidas, sintetizadas na publicação |
-| `scripts/synth.mjs` | fluxo de verificação (Icarus Verilog) e síntese para FPGA e ASIC sky130 (Yosys e ABC) |
+| `js/axc/presets.js` | configurações pré-definidas (as de sempre, todas dentro do espaço de projeto) |
+| `js/axc/designspace.js` | espaço de projeto sintetizado, estratificado por técnica |
+| `scripts/synth.mjs` e `scripts/lib/asic.mjs` | verificação (Icarus Verilog), síntese para FPGA e ASIC sky130 (Yosys e ABC), atraso e energia (OpenSTA), cache |
+| `scripts/evoapprox.mjs` | referência EvoApproxLib com o mesmo fluxo (`data/evoapprox.json`) |
+| `scripts/operands.mjs` | operandos reais da LeNet-5 e do filtro gaussiano (`data/operands.json` e `data/operands.bin`) |
+| `bin/axc.mjs` | interface de linha de comando |
 | `js/ui/plots.js` | figuras (diagramas, histograma, mapa de calor, Pareto) |
 | `js/refs.js` | referências com DOI, usadas na ajuda, no Resumo e nesta lista |
 | `js/i18n/` e `js/help/` | textos da interface e ajuda em português e inglês |
@@ -85,6 +119,7 @@ As técnicas e os modelos do simulador vêm destes trabalhos (a mesma lista est�
 * Z. Wang, A. C. Bovik, H. R. Sheikh e E. P. Simoncelli. "Image quality assessment: from error visibility to structural similarity". *IEEE Transactions on Image Processing, vol. 13, n. 4*, 2004. DOI: [10.1109/TIP.2003.819861](https://doi.org/10.1109/TIP.2003.819861).
 * V. Satopää, J. Albrecht, D. Irwin e B. Raghavan. "Finding a "Kneedle" in a haystack: detecting knee points in system behavior". *ICDCS Workshops*, 2011. DOI: [10.1109/ICDCSW.2011.20](https://doi.org/10.1109/ICDCSW.2011.20).
 * A. P. Chandrakasan, S. Sheng e R. W. Brodersen. "Low-power CMOS digital design". *IEEE Journal of Solid-State Circuits, vol. 27, n. 4*, 1992. DOI: [10.1109/4.126534](https://doi.org/10.1109/4.126534).
+* V. Mrázek, R. Hrbáček, Z. Vašíček e L. Sekanina. "EvoApprox8b: library of approximate adders and multipliers for circuit design and benchmarking of approximation methods". *Design, Automation and Test in Europe (DATE)*, 2017. DOI: [10.23919/DATE.2017.7926993](https://doi.org/10.23919/DATE.2017.7926993).
 
 ### Tensão e memória
 
@@ -114,6 +149,7 @@ As técnicas e os modelos do simulador vêm destes trabalhos (a mesma lista est�
 * C. Wolf. "Yosys Open SYnthesis Suite". <https://yosyshq.net/yosys/>.
 * R. Brayton e A. Mishchenko. "ABC: an academic industrial-strength verification tool". *Computer Aided Verification (CAV), Springer*, 2010. DOI: [10.1007/978-3-642-14295-6_5](https://doi.org/10.1007/978-3-642-14295-6_5).
 * SkyWater Technology e Google. "SkyWater SKY130 open source PDK". <https://github.com/google/skywater-pdk>.
+* Parallax Software e The OpenROAD Project. "OpenSTA: static timing analyzer". <https://github.com/The-OpenROAD-Project/OpenSTA>.
 
 ## Licença
 

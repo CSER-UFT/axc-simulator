@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "Se usar este simulador ou os dados de síntese dele em um trabalho, cite-o com os metadados abaixo."
+title: "axc-simulator: Simulador de Computação Aproximada"
+abstract: >-
+  Simulador didático e de pesquisa de computação aproximada: multiplicadores e somadores aproximados (por colunas,
+  Booth radix 4, Kulkarni, DRUM, Mitchell, truncado, LOA e segmentado) avaliados bit a bit, com métricas de erro sob
+  entradas uniformes e sob operandos reais de aplicações (LeNet-5 int8 no MNIST e filtro gaussiano), síntese para
+  FPGA (Yosys) e para ASIC com a biblioteca SkyWater 130 nm (Yosys, ABC e OpenSTA: área, atraso e energia em três
+  fluxos), aplicações em imagem e rede neural, sobretensão reduzida (VOS) e computação estocástica.
+type: software
+authors:
+  - family-names: Almeida
+    given-names: Tiago
+    affiliation: "Universidade Federal do Tocantins (UFT)"
+repository-code: "https://github.com/CSER-UFT/axc-simulator"
+url: "https://cser-uft.github.io/axc-simulator/"
+license: GPL-3.0-only
+keywords:
+  - approximate computing
+  - approximate arithmetic
+  - approximate multipliers
+  - approximate adders
+  - design space exploration
+  - SkyWater 130 nm
+  - education
+references:
+  - type: conference-paper
+    title: "EvoApprox8b: Library of approximate adders and multipliers for circuit design and benchmarking of approximation methods"
+    authors:
+      - family-names: Mrazek
+        given-names: Vojtech
+      - family-names: Hrbacek
+        given-names: Radek
+      - family-names: Vasicek
+        given-names: Zdenek
+      - family-names: Sekanina
+        given-names: Lukas
+    collection-title: "Design, Automation & Test in Europe Conference & Exhibition (DATE)"
+    year: 2017
+    start: 258
+    end: 261
+    doi: "10.23919/DATE.2017.7926993"

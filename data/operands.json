@@ -1,0 +1,35 @@
+{
+ "generated": "2026-10-15",
+ "format": "Int32 little endian, pares (a, b) intercalados; offset em bytes",
+ "description": {
+  "lenet": "LeNet-5 int8, 1000 imagens de teste do MNIST: mul = (ativação, |peso|) sorteados pelo histograma exato; add = (acumulador, produto) por amostragem de reservatório",
+  "image": "filtro gaussiano 3 x 3 na imagem de teste 192 x 192: mul = (pixel, peso); add = (acumulador, produto)"
+ },
+ "n": 32768,
+ "sets": {
+  "lenet": {
+   "mul": {
+    "offset": 0,
+    "count": 32768,
+    "population": 416520000
+   },
+   "add": {
+    "offset": 262144,
+    "count": 32768,
+    "population": 416520000
+   }
+  },
+  "image": {
+   "mul": {
+    "offset": 524288,
+    "count": 32768,
+    "population": 331776
+   },
+   "add": {
+    "offset": 786432,
+    "count": 32768,
+    "population": 294912
+   }
+  }
+ }
+}

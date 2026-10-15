@@ -118,3 +118,23 @@ table.metrics td.note { text-align: left; }
 .digit-grid figcaption { font-size: 12px; font-family: var(--mono, monospace); margin-top: 2px; }
 #nnLayers > span { font-size: 13px; color: var(--muted); }
 #vosCalTable th, #vosCalTable td { white-space: nowrap; }
+
+/* Espaço de projeto (aba Síntese) */
+.fig-svg.dspace .pt { stroke: var(--panel); stroke-width: 1; fill-opacity: .55; }
+.fig-svg.dspace .pt.on { fill-opacity: 1; stroke: var(--ink); stroke-width: 1.2; }
+.fig-svg.dspace .pt.cur { stroke: var(--focus); stroke-width: 3; fill-opacity: 1; }
+.fig-svg.dspace .front { fill: none; stroke: var(--ink); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.fig-svg .t-exact { fill: #222; }
+.fig-svg .t-array { fill: #2f6fdf; }
+.fig-svg .t-booth { fill: #7a3fb8; }
+.fig-svg .t-kulkarni { fill: #c2410c; }
+.fig-svg .t-drum { fill: #0f8b8d; }
+.fig-svg .t-mitchell { fill: #b8860b; }
+.fig-svg .t-trunc { fill: #c03060; }
+.fig-svg .t-loa { fill: #2b9a66; }
+.fig-svg .t-seg { fill: #8a6d3b; }
+.fig-svg.dspace .pt.t-evo { fill: none; fill-opacity: 1; stroke: #e0457b; stroke-width: 1.6; }
+.fig-svg.dspace .pt.t-evo.on { stroke: #e0457b; stroke-width: 2.4; }
+[data-theme="dark"] .fig-svg .t-exact { fill: #ddd; }
+#dsTable td { text-align: right; }
+#dsTable tr[data-name] { cursor: pointer; }

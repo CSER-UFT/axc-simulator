@@ -25,6 +25,26 @@ export function rng(seed = 12345) {
 }
 
 export const DISTRIBUTIONS = ['uniform', 'normal', 'exp'];
+/** Distribuições tiradas das aplicações (data/operands.json e data/operands.bin, gerados por scripts/operands.mjs). */
+export const APP_DISTRIBUTIONS = ['lenet', 'image'];
+const OPERANDS = new Map();
+
+/**
+ * Registra os pares reais das aplicações.
+ * @param {object} index conteúdo de data/operands.json
+ * @param {ArrayBuffer} buffer conteúdo de data/operands.bin
+ */
+export function loadOperands(index, buffer) {
+    for (const [app, kinds] of Object.entries(index.sets)) {
+        for (const [kind, s] of Object.entries(kinds)) {
+            const v = new Int32Array(buffer, s.offset, 2 * s.count);
+            const a = new Int32Array(s.count), b = new Int32Array(s.count);
+            for (let i = 0; i < s.count; i++) { a[i] = v[2 * i]; b[i] = v[2 * i + 1]; }
+            OPERANDS.set(`${app}.${kind}`, { a, b, population: s.population });
+        }
+    }
+}
+export const operandsLoaded = () => OPERANDS.size > 0;
 
 /** Um operando de N bits na distribuição escolhida. */
 function draw(rand, N, dist) {
@@ -45,7 +65,14 @@ function draw(rand, N, dist) {
  * Pares de operandos para a avaliação.
  * @returns {{a: Uint32Array, b: Uint32Array, exhaustive: boolean}}
  */
-export function testInputs(N, dist = 'uniform', samples = 200000, seed = 12345) {
+export function testInputs(N, dist = 'uniform', samples = 200000, seed = 12345, kind = 'mul') {
+    if (APP_DISTRIBUTIONS.includes(dist)) {
+        // Pares reais da aplicação: a unidade de N bits recebe os N bits baixos de cada operando.
+        const s = OPERANDS.get(`${dist}.${kind}`);
+        if (!s) throw new Error(`operandos de ${dist} não carregados`);
+        const mask = 2 ** N - 1;
+        return { a: Uint32Array.from(s.a, (x) => x & mask), b: Uint32Array.from(s.b, (x) => x & mask), exhaustive: false, app: dist, population: s.population };
+    }
     if (N <= 8 && dist === 'uniform') {
         const n = 2 ** (2 * N);
         const a = new Uint32Array(n), b = new Uint32Array(n);
@@ -67,7 +94,7 @@ export function errorMetrics(unit, inp) {
     const approx = unit.net.evaluate(inp.a, inp.b);
     const value = unit.decode ? Float64Array.from(approx, unit.decode) : approx;
     const n = inp.a.length;
-    let sum = 0, sumAbs = 0, sumSq = 0, wce = 0, wcA = 0, wcB = 0, errs = 0, red = 0, redN = 0;
+    let sum = 0, sumAbs = 0, sumSq = 0, sumQ = 0, wce = 0, wcA = 0, wcB = 0, errs = 0, red = 0, red2 = 0, redN = 0;
     const signed = new Float64Array(n);
     for (let k = 0; k < n; k++) {
         const e = unit.exact(inp.a[k], inp.b[k]);
@@ -77,13 +104,22 @@ export function errorMetrics(unit, inp) {
         sum += d;
         sumAbs += ad;
         sumSq += ad * ad;
+        sumQ += ad * ad * ad * ad;
         if (ad > wce) { wce = ad; wcA = inp.a[k]; wcB = inp.b[k]; }
         if (ad > 0) errs++;
-        if (e !== 0) { red += ad / Math.abs(e); redN++; }
+        if (e !== 0) { const re = ad / Math.abs(e); red += re; red2 += re * re; redN++; }
     }
+    const MED = sumAbs / n, MSE = sumSq / n, MRED = redN ? red / redN : 0, EP = errs / n;
+    // Intervalo de confiança de 95% (aproximação normal) das médias, quando os pares são uma amostra. O WCE de uma
+    // amostra é só um limite inferior do pior caso.
+    const half = (variance, m) => (m > 1 ? 1.96 * Math.sqrt(Math.max(0, variance) / m) : 0);
+    const ci = inp.exhaustive ? null : {
+        MED: half(MSE - MED * MED, n), MSE: half(sumQ / n - MSE * MSE, n), NMED: half(MSE - MED * MED, n) / unit.maxOut,
+        MRED: redN ? half(red2 / redN - MRED * MRED, redN) : 0, EP: half(EP * (1 - EP), n),
+    };
     return {
-        n, ME: sum / n, MED: sumAbs / n, WCE: wce, worst: { a: wcA, b: wcB }, MSE: sumSq / n,
-        NMED: sumAbs / n / unit.maxOut, MRED: redN ? red / redN : 0, EP: errs / n, signed, approx, value,
+        n, ME: sum / n, MED, WCE: wce, worst: { a: wcA, b: wcB }, MSE,
+        NMED: MED / unit.maxOut, MRED, EP, ci, signed, approx, value,
     };
 }
 

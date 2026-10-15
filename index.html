@@ -72,6 +72,8 @@
                         <option value="uniform" data-i18n="dist.uniformLong">uniformes</option>
                         <option value="normal" data-i18n="dist.normalLong">normais (centradas no meio da faixa)</option>
                         <option value="exp" data-i18n="dist.expLong">exponenciais (valores pequenos mais comuns)</option>
+                        <option value="lenet" data-i18n="dist.lenetLong">reais da LeNet-5 (MNIST)</option>
+                        <option value="image" data-i18n="dist.imageLong">reais do filtro gaussiano</option>
                     </select></label>
                     <p class="note" id="evalNote"></p>
                     <div class="row" style="margin-top:8px">
@@ -127,7 +129,7 @@
                     <div class="pane" id="pane-cmp">
                         <p class="note" data-i18n="cmp.intro">Cada configuração adicionada vira um ponto. Os pontos não dominados (nenhum outro tem custo e erro menores ou iguais, com um deles estritamente menor) formam a fronteira de Pareto, ligada em degraus.</p>
                         <div class="row">
-                            <label style="margin:0"><span data-i18n="cmp.cost">Custo</span> <select id="cmpX"><option value="gates" data-i18n="x.gatesM">área (portas, modelo)</option><option value="delay" data-i18n="x.delayM">atraso (níveis de porta, modelo)</option><option value="adp" data-i18n="x.adpM">área × atraso (modelo)</option><option value="luts" data-i18n="x.luts">LUTs (Yosys)</option><option value="lutsCarry" data-i18n="x.lutsCarry">LUTs + CARRY4 (Yosys)</option><option value="depth" data-i18n="x.depth">profundidade em células (Yosys)</option><option value="asicArea" data-i18n="x.asicArea">área ASIC (µm², sky130)</option><option value="asicDelay" data-i18n="x.asicDelay">atraso ASIC (ps, sky130)</option><option value="asicAdp" data-i18n="x.asicAdpM">área × atraso ASIC (sky130)</option><option value="activity" data-i18n="x.activity">atividade (transições por operação)</option><option value="aap" data-i18n="x.aapM">área × atividade (modelo)</option></select></label>
+                            <label style="margin:0"><span data-i18n="cmp.cost">Custo</span> <select id="cmpX"><option value="gates" data-i18n="x.gatesM">área (portas, modelo)</option><option value="delay" data-i18n="x.delayM">atraso (níveis de porta, modelo)</option><option value="adp" data-i18n="x.adpM">área × atraso (modelo)</option><option value="luts" data-i18n="x.luts">LUTs (Yosys)</option><option value="lutsCarry" data-i18n="x.lutsCarry">LUTs + CARRY4 (Yosys)</option><option value="depth" data-i18n="x.depth">profundidade em células (Yosys)</option><option value="asicArea" data-i18n="x.asicArea">área ASIC (µm², sky130)</option><option value="asicDelay" data-i18n="x.asicDelay">atraso ASIC (ps, sky130)</option><option value="asicAdp" data-i18n="x.asicAdpM">área × atraso ASIC (sky130)</option><option value="asicEnergy" data-i18n="x.asicEnergy">energia ASIC (fJ por operação, sky130)</option><option value="activity" data-i18n="x.activity">atividade (transições por operação)</option><option value="aap" data-i18n="x.aapM">área × atividade (modelo)</option></select></label>
                             <label style="margin:0"><span data-i18n="cmp.error">Erro</span> <select id="cmpY"><option value="NMED">NMED</option><option value="MRED" selected>MRED</option><option value="MED">MED</option><option value="WCE">WCE</option><option value="MSE">MSE</option><option value="EP">EP</option><option value="imgMSE" data-i18n="y.imgMSE">MSE da imagem filtrada</option></select></label>
                             <label class="check" style="margin:0"><input type="checkbox" id="cmpLog" checked /> <span data-i18n="cmp.log">erro em escala log</span></label>
                         </div>
@@ -235,6 +237,26 @@
                                 <label style="margin:0 0 6px"><span data-i18n="synth.target">Alvo</span> <select id="synthTarget"><option value="fpga" data-i18n="synth.t.fpga">FPGA: LUTs + CARRY4</option><option value="asic" data-i18n="synth.t.asic">ASIC sky130: área (µm²)</option><option value="asicDelay" data-i18n="synth.t.asicDelay">ASIC sky130: atraso (ps)</option></select></label>
                                 <div class="fig-box" id="synthFig"></div><p class="note" id="synthCorr"></p></div>
                             <div><h3 data-i18n="synth.list">Configurações sintetizadas</h3><p class="note" data-i18n="synth.click">Clique numa linha para carregar a configuração.</p><div class="scroll-box"><table id="synthTable"></table></div></div>
+                        </div>
+                        <h3 data-i18n="ds.title">Espaço de projeto</h3>
+                        <p class="note" id="dsNote"></p>
+                        <div class="row">
+                            <label style="margin:0"><span data-i18n="ds.group">Grupo</span> <select id="dsGroup"><option value="mul8">MUL8</option><option value="mul16">MUL16</option><option value="add8">ADD8</option><option value="add16">ADD16</option></select></label>
+                            <label style="margin:0"><span data-i18n="ds.flow">Síntese ASIC</span> <select id="dsFlow"><option value="delay" data-i18n="ds.flow.delay">atraso mínimo</option><option value="area" data-i18n="ds.flow.area">área mínima</option><option value="iso" data-i18n="ds.flow.iso">iso atraso (o da exata)</option></select></label>
+                            <label style="margin:0"><span data-i18n="ds.cost">Custo</span> <select id="dsCost"><option value="area" data-i18n="ds.c.area">área (µm²)</option><option value="delay" data-i18n="ds.c.delay">atraso (ps)</option><option value="energy" data-i18n="ds.c.energy">energia, entradas uniformes (fJ)</option><option value="energy.lenet" data-i18n="ds.c.energyLenet">energia, operandos da LeNet-5 (fJ)</option><option value="energy.image" data-i18n="ds.c.energyImage">energia, operandos do filtro (fJ)</option><option value="adp" data-i18n="ds.c.adp">área × atraso (µm²·ns)</option><option value="edp" data-i18n="ds.c.edp">energia × atraso (fJ·ns)</option><option value="leakage" data-i18n="ds.c.leakage">fuga (nW)</option><option value="luts" data-i18n="ds.c.luts">LUTs + CARRY4 (FPGA)</option></select></label>
+                            <label style="margin:0"><span data-i18n="ds.err">Erro</span> <select id="dsErr"><option value="MRED">MRED</option><option value="NMED">NMED</option><option value="EP">EP</option><option value="WCE">WCE</option><option value="lenet.MRED" data-i18n="ds.e.lenetMRED">MRED, operandos da LeNet-5</option><option value="lenet.NMED" data-i18n="ds.e.lenetNMED">NMED, operandos da LeNet-5</option><option value="image.MRED" data-i18n="ds.e.imageMRED">MRED, operandos do filtro</option><option value="image.NMED" data-i18n="ds.e.imageNMED">NMED, operandos do filtro</option></select></label>
+                        </div>
+                        <div class="row">
+                            <label style="margin:0"><span data-i18n="ds.max">Erro até</span> <select id="dsMax"><option value="" data-i18n="ds.noMax">sem limite</option><option value="0.5">50%</option><option value="0.2" selected>20%</option><option value="0.1">10%</option><option value="0.05">5%</option><option value="0.01">1%</option></select></label>
+                            <label class="check"><input type="checkbox" id="dsEvo" checked /> <span data-i18n="ds.evo">EvoApprox8b como referência (mesmo fluxo de síntese)</span></label>
+                            <label class="check"><input type="checkbox" id="dsLogX" /> <span data-i18n="ds.logX">custo em escala log</span></label>
+                            <button type="button" class="btn outline" id="dsCsv" data-i18n="ds.csv">Exportar CSV</button>
+                            <button type="button" class="btn outline" id="dsJson" data-i18n="ds.json">Exportar JSON</button>
+                            <button type="button" class="btn outline" id="dsSvg" data-i18n="cmp.svg">Figura (SVG)</button>
+                        </div>
+                        <div class="graph-pair">
+                            <div class="fig-box" id="dsFig"></div>
+                            <div><h3 id="dsFrontTitle"></h3><p class="note" data-i18n="synth.click">Clique numa linha para carregar a configuração.</p><div class="scroll-box"><table id="dsTable"></table></div></div>
                         </div>
                     </div>
 

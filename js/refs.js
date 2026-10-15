@@ -34,12 +34,14 @@ export const REFS = {
     jiang2020: { authors: ['H. Jiang', 'F. J. H. Santiago', 'H. Mo', 'L. Liu', 'J. Han'], year: 2020, title: 'Approximate arithmetic circuits: a survey, characterization, and recent applications', venue: 'Proceedings of the IEEE, vol. 108, n. 12', doi: '10.1109/JPROC.2020.3006451' },
     lecun1998: { authors: ['Y. LeCun', 'L. Bottou', 'Y. Bengio', 'P. Haffner'], year: 1998, title: 'Gradient-based learning applied to document recognition', venue: 'Proceedings of the IEEE, vol. 86, n. 11', doi: '10.1109/5.726791' },
     venkataramani2014: { authors: ['S. Venkataramani', 'A. Ranjan', 'K. Roy', 'A. Raghunathan'], year: 2014, title: 'AxNN: energy-efficient neuromorphic systems using approximate computing', venue: 'International Symposium on Low Power Electronics and Design (ISLPED)', doi: '10.1145/2627369.2627613' },
+    mrazek2017: { authors: ['V. Mrázek', 'R. Hrbáček', 'Z. Vašíček', 'L. Sekanina'], year: 2017, title: 'EvoApprox8b: library of approximate adders and multipliers for circuit design and benchmarking of approximation methods', venue: 'Design, Automation and Test in Europe (DATE)', doi: '10.23919/DATE.2017.7926993' },
     mrazek2016: { authors: ['V. Mrázek', 'S. S. Sarwar', 'L. Sekanina', 'Z. Vašíček', 'K. Roy'], year: 2016, title: 'Design of power-efficient approximate multipliers for approximate artificial neural networks', venue: 'IEEE/ACM International Conference on Computer-Aided Design (ICCAD)', doi: '10.1145/2966986.2967021' },
     jacob2018: { authors: ['B. Jacob', 'S. Kligys', 'B. Chen', 'M. Zhu', 'M. Tang', 'A. Howard', 'H. Adam', 'D. Kalenichenko'], year: 2018, title: 'Quantization and training of neural networks for efficient integer-arithmetic-only inference', venue: 'IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)', doi: '10.1109/CVPR.2018.00286' },
     mnist: { authors: ['Y. LeCun', 'C. Cortes', 'C. J. C. Burges'], title: 'The MNIST database of handwritten digits (licença CC BY-SA 3.0)', venue: 'software', url: 'http://yann.lecun.com/exdb/mnist/' },
     yosys: { authors: ['C. Wolf'], title: 'Yosys Open SYnthesis Suite', venue: 'software', url: 'https://yosyshq.net/yosys/' },
     iverilog: { authors: ['S. Williams'], title: 'Icarus Verilog', venue: 'software', url: 'https://steveicarus.github.io/iverilog/' },
     sky130: { authors: ['SkyWater Technology', 'Google'], title: 'SkyWater SKY130 open source PDK', venue: 'software', url: 'https://github.com/google/skywater-pdk' },
+    opensta: { authors: ['Parallax Software', 'The OpenROAD Project'], title: 'OpenSTA: static timing analyzer', venue: 'software', url: 'https://github.com/The-OpenROAD-Project/OpenSTA' },
 };
 
 /** Referências de cada técnica (chave tipo.técnica). */
@@ -60,11 +62,11 @@ export const TECH_REFS = {
 /** Grupos da lista completa, na ordem em que aparecem. */
 export const REF_GROUPS = [
     { key: 'arith', keys: ['booth1951', 'macsorley1961', 'mitchell1962', 'wallace1964', 'dadda1965', 'schulte1993', 'mahdiani2010', 'kulkarni2011', 'kahng2012', 'momeni2015', 'hashemi2015', 'shafique2015', 'venkatachalam2017', 'jiang2020'] },
-    { key: 'eval', keys: ['liang2013', 'wang2004', 'satopaa2011', 'chandrakasan1992'] },
+    { key: 'eval', keys: ['liang2013', 'wang2004', 'satopaa2011', 'chandrakasan1992', 'mrazek2017'] },
     { key: 'vos', keys: ['sakurai1990', 'liu2011'] },
     { key: 'nn', keys: ['lecun1998', 'mnist', 'jacob2018', 'venkataramani2014', 'mrazek2016'] },
     { key: 'sc', keys: ['gaines1969', 'alaghi2013', 'alaghi2013corr', 'alaghi2014', 'sobol1967', 'joe2008'] },
-    { key: 'tools', keys: ['iverilog', 'yosys', 'brayton2010', 'sky130'] },
+    { key: 'tools', keys: ['iverilog', 'yosys', 'brayton2010', 'sky130', 'opensta'] },
 ];
 
 const lastNames = (r) => r.authors.map((a) => a.replace(/^([A-Z][a-z]?\.(-[A-Z]\.)? ?)+/, ''));
