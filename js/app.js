@@ -62,6 +62,7 @@ function readCfg() {
 function syncControls() {
     const N = +$('width').value, mul = $('kind').value === 'mul';
     $('mulCfg').classList.toggle('hidden', !mul);
+    $('toCC').classList.toggle('hidden', !mul);
     $('addCfg').classList.toggle('hidden', mul);
     const method = $('mulMethod').value;
     $('rowTrunc').classList.toggle('hidden', !['array', 'booth'].includes(method));
@@ -349,6 +350,27 @@ function addToCmp(cfg, dist) {
     const entry = cmpEntry(cfg, dist);
     if (k >= 0) cmp[k] = entry; else cmp.push(entry);
 }
+// Ligação com o Simulador de Compilador: abre o fluxo de dados de lá com este multiplicador (#axc=perfil).
+const CC_URL = 'https://cser-uft.github.io/riscv-cc-simulator/';
+function encodeProfile(obj) {
+    const bytes = new TextEncoder().encode(JSON.stringify(obj));
+    let bin = '';
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+/** Perfil da unidade atual para o simulador de compilador: custo dela e da exata de mesma largura, e o erro. */
+function ccProfile() {
+    const { unit, exact, cfg, m } = cur;
+    const sy = synthOf(unitName(cfg)), sx = synthOf(unitName(exact.cfg));
+    const p = { name: unitName(cfg), cfg, width: cfg.width, gates: unit.net.gates, gatesExact: exact.net.gates, depth: unit.net.delay(), depthExact: exact.net.delay(), MRED: m.MRED, NMED: m.NMED, EP: m.EP };
+    if (sy?.asic && sx?.asic) p.asic = { area: sy.asic.area, areaExact: sx.asic.area, delay: sy.asic.delay, delayExact: sx.asic.delay };
+    return p;
+}
+$('toCC').onclick = () => {
+    if (!cur || cur.cfg.kind !== 'mul') return;
+    window.open(`${CC_URL}#axc=${encodeProfile(ccProfile())}`, '_blank', 'noopener');
+};
+
 $('addCmp').onclick = () => {
     if (!cur) return;
     addToCmp(cur.cfg, cur.dist);

@@ -33,6 +33,8 @@ export default {
     'unit.segP': 'Prediction bits (P)',
     'unit.dist': 'Inputs',
     'unit.addCmp': 'Add to comparison',
+    'unit.toCC': 'Use in the compiler simulator',
+    'unit.toCCHelp': 'Opens the RISC-V Compiler Simulator with this multiplier in the data flow graph and in scheduling: latency and area come from this unit',
     'unit.all': 'all',
     'm.array': 'column based (truncate and approximate)',
     'm.booth': 'radix 4 Booth, signed',

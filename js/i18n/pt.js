@@ -33,6 +33,8 @@ export default {
     'unit.segP': 'Bits de previsão (P)',
     'unit.dist': 'Entradas',
     'unit.addCmp': 'Adicionar à comparação',
+    'unit.toCC': 'Usar no simulador de compilador',
+    'unit.toCCHelp': 'Abre o Simulador de Compilador RISC-V com este multiplicador no grafo de fluxo de dados e no escalonamento: a latência e a área vêm desta unidade',
     'unit.all': 'todos',
     'm.array': 'por colunas (truncar e aproximar)',
     'm.booth': 'Booth radix 4, com sinal',
