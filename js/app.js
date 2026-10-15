@@ -1,6 +1,7 @@
 /**
  * Interface do simulador de computação aproximada: configuração da unidade, estrutura, erro, comparação
- * (fronteira de Pareto) e aplicação em imagem.
+ * (fronteira de Pareto), aplicação em imagem, tensão e memória, computação estocástica e síntese.
+ * Os textos vêm de js/i18n (português e inglês).
  */
 import { buildUnit, unitName, compressorTable } from './axc/units.js';
 import { testInputs, errorMetrics, histogram, errorGrid, paretoFront, rng } from './axc/metrics.js';
@@ -8,17 +9,22 @@ import { testImage, fromRgba, parseNetpbm, fitImage, applyFilter, psnr, ssim } f
 import { lineChartSvg, stagesSvg, dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, scatterSvg, drawGray, drawDiff, esc } from './ui/plots.js';
 import { toVerilog, testbench, vectors, moduleName } from './axc/verilog.js';
 import { Help } from './ui/help.js';
-import { SC_OPS, SC_GENERATORS, scCurve, binaryError, streamDemo, scCost, faultError, scFilter, flipPixelBits } from './axc/stochastic.js';
+import { SC_GENERATORS, scCurve, binaryError, streamDemo, scCost, faultError, scFilter, flipPixelBits } from './axc/stochastic.js';
 import { timingTrace, capturedOutputs, vosCurve, randomSequence, outputDepths, delayFactor, corruptImage, expectedMemoryMSE } from './axc/vos.js';
+import { LANGUAGES, getLanguage, setLanguage, t, locale, dec } from './i18n/index.js';
+import { REFS, TECH_REFS, cite } from './refs.js';
 
 const $ = (id) => document.getElementById(id);
 const store = {
     get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
     set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* só nesta visita */ } },
 };
-const nf = (v, d = 2) => (Number.isInteger(v) ? v.toLocaleString('pt-BR') : v.toLocaleString('pt-BR', { maximumFractionDigits: d }));
-const sci = (v) => (v === 0 ? '0' : v >= 0.01 && v < 1e5 ? nf(v, 4) : v.toExponential(2).replace('.', ','));
-const pct = (v) => (v > 0 && v < 1e-4 ? `${(100 * v).toExponential(1).replace('.', ',')}%` : `${(100 * v).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}%`);
+const nf = (v, d = 2) => (Number.isInteger(v) ? v.toLocaleString(locale()) : v.toLocaleString(locale(), { maximumFractionDigits: d }));
+const sci = (v) => (v === 0 ? '0' : v >= 0.01 && v < 1e5 ? nf(v, 4) : dec(v.toExponential(2)));
+const pct = (v) => (v > 0 && v < 1e-4 ? `${dec((100 * v).toExponential(1))}%` : `${(100 * v).toLocaleString(locale(), { maximumFractionDigits: 2 })}%`);
+const fx = (v, d) => dec(v.toFixed(d));
+/** Nome da configuração para mostrar: o nome interno (chave da síntese) é em português. */
+const dn = (name) => (getLanguage() === 'en' ? name.replace(/ exato$/, ' exact') : name);
 
 let tab = store.get('axc.tab') || 'struct';
 let cur = null;            // {cfg, unit, m, inp}
@@ -73,10 +79,10 @@ function syncControls() {
     $('kRow').classList.toggle('hidden', !(adder === 'trunc' || adder === 'loa'));
     $('segRow').classList.toggle('hidden', adder !== 'seg');
     for (const id of ['kTrunc', 'kApprox', 'kAdd', 'segL', 'segP', 'kBlock', 'drumK']) $(`${id}V`).textContent = $(id).value;
-    $('kBlockV').textContent = +$('kBlock').value >= 2 * N ? 'todos' : $('kBlock').value;
+    $('kBlockV').textContent = +$('kBlock').value >= 2 * N ? t('unit.all') : $('kBlock').value;
 }
 
-const distName = { uniform: 'uniformes', normal: 'normais', exp: 'exponenciais' };
+const distName = (d) => t(`dist.${d}`);
 
 function evaluateCurrent() {
     syncControls();
@@ -87,13 +93,16 @@ function evaluateCurrent() {
     const m = errorMetrics(unit, inp);
     const exact = exactUnit(cfg);
     cur = { cfg, unit, m, inp, exact, dist, appCache: null, activity: activityOf(unit), exactActivity: activityOf(exact) };
-    $('evalNote').textContent = inp.exhaustive
-        ? `Avaliação exaustiva: todos os ${nf(inp.a.length)} pares de operandos.`
-        : `Avaliação por amostragem: ${nf(inp.a.length)} pares com entradas ${distName[dist]} (semente fixa).`;
+    renderEvalNote();
     renderSummary();
     // Só a aba visível é desenhada agora; as outras, quando forem abertas.
     for (const k of Object.keys(dirty)) dirty[k] = true;
     renderTab(tab);
+}
+function renderEvalNote() {
+    $('evalNote').textContent = cur.inp.exhaustive
+        ? t('eval.exhaustive', { n: nf(cur.inp.a.length) })
+        : t('eval.sampled', { n: nf(cur.inp.a.length), dist: distName(cur.dist) });
 }
 
 /** Atividade de chaveamento com 4096 pares uniformes em sequência aleatória (semente fixa), guardada na unidade. */
@@ -108,12 +117,12 @@ function randomPairs(N, n, seed) {
     return [a, b];
 }
 
-/** Abas que precisam ser redesenhadas depois de uma mudança na unidade. */
-const dirty = { struct: true, error: true, cmp: true, app: true, synth: true, vos: true };
+/** Abas que precisam ser redesenhadas depois de uma mudança na unidade (ou no idioma). */
+const dirty = { struct: true, error: true, cmp: true, app: true, synth: true, vos: true, sc: true };
 const RENDER = { struct: () => renderStruct(), error: () => renderError(), cmp: () => renderCmp(), app: () => renderApp(), synth: () => renderSynth(), vos: () => renderVos() };
 function renderTab(name) {
     if (name === 'vos') renderMem();
-    if (name === 'sc') { if (dirty.sc !== false) { dirty.sc = false; renderSc(); } return; }
+    if (name === 'sc') { if (dirty.sc) { dirty.sc = false; renderSc(); } return; }
     if (!cur || !dirty[name]) return;
     dirty[name] = false;
     RENDER[name]();
@@ -131,36 +140,58 @@ function exactUnit(cfg) {
 
 // Resumo ----------------------------------------------------------------------------------------------------
 
+/** Referências da técnica atual (chaves de js/refs.js). */
+function techRefs(cfg) {
+    const keys = [];
+    const add = (k) => { for (const r of TECH_REFS[k] ?? []) if (!keys.includes(r)) keys.push(r); };
+    if (cfg.kind === 'mul') {
+        const method = cfg.method ?? 'array';
+        add(`mul.${method}`);
+        if ((method === 'array' || method === 'booth') && cfg.kTrunc) add('mul.trunc');
+        if (method === 'array' && cfg.kApprox) add('mul.approx');
+        if (cfg.comp) add('mul.comp');
+    } else add(`add.${cfg.adder}`);
+    return keys;
+}
+const refLink = (k) => {
+    const r = REFS[k];
+    const c = esc(cite(k, getLanguage()));
+    return r.doi ? `<a href="https://doi.org/${esc(r.doi)}" target="_blank" rel="noopener" title="${esc(r.title)}">${c}</a>` : `<span title="${esc(r.title)}">${c}</span>`;
+};
+
 function renderSummary() {
     const { unit, m, exact, cfg } = cur;
     const g = unit.net.gates, d = unit.net.delay(), g0 = exact.net.gates, d0 = exact.net.delay();
     const rel = (v, v0) => (v0 ? ` <span class="note">(${v <= v0 ? '−' : '+'}${pct(Math.abs(v - v0) / v0)})</span>` : '');
     const cells = Object.entries(unit.net.cells).filter(([, v]) => v).map(([k, v]) => `${v} ${k}`).join(', ');
-    $('sumTitle').textContent = `Resumo: ${unitName(cfg)}`;
+    $('sumTitle').textContent = t('sum.title', { name: dn(unitName(cfg)) });
     let h = '<table class="kv">';
-    h += `<tr><th>Área</th><td class="mono">${nf(g)} portas${rel(g, g0)}</td></tr>`;
-    h += `<tr><th>Atraso</th><td class="mono">${d} níveis${rel(d, d0)}</td></tr>`;
-    h += `<tr><th>Células</th><td class="mono">${esc(cells)}</td></tr>`;
-    h += `<tr><th title="média de saídas de porta que mudam de valor entre uma operação e a seguinte">Atividade</th><td class="mono">${nf(cur.activity, 1)} transições/op.${rel(cur.activity, cur.exactActivity)}</td></tr>`;
+    h += `<tr><th>${t('sum.area')}</th><td class="mono">${t('sum.gates', { n: nf(g) })}${rel(g, g0)}</td></tr>`;
+    h += `<tr><th>${t('sum.delay')}</th><td class="mono">${t('sum.levels', { n: d })}${rel(d, d0)}</td></tr>`;
+    h += `<tr><th>${t('sum.cells')}</th><td class="mono">${esc(cells)}</td></tr>`;
+    h += `<tr><th title="${esc(t('sum.activityHelp'))}">${t('sum.activity')}</th><td class="mono">${t('sum.toggles', { n: nf(cur.activity, 1) })}${rel(cur.activity, cur.exactActivity)}</td></tr>`;
     const sy = synthOf(unitName(cfg));
     if (sy) {
         const sx = synthOf(unitName(exact.cfg));
-        h += `<tr><th>FPGA (Yosys)</th><td class="mono">${sy.luts} LUTs${sx ? rel(sy.luts, sx.luts) : ''}, ${sy.carry4} CARRY4, profundidade ${sy.depth}</td></tr>`;
-    } else if (synth) h += '<tr><th>FPGA (Yosys)</th><td class="note">não sintetizada: só as configurações pré-definidas (aba Síntese)</td></tr>';
+        h += `<tr><th>FPGA (Yosys)</th><td class="mono">${sy.luts} LUTs${sx ? rel(sy.luts, sx.luts) : ''}, ${sy.carry4} CARRY4, ${t('sum.depth', { n: sy.depth })}</td></tr>`;
+        if (sy.asic) h += `<tr><th>ASIC (sky130)</th><td class="mono">${nf(sy.asic.area, 0)} µm²${sx?.asic ? rel(sy.asic.area, sx.asic.area) : ''}, ${nf(sy.asic.delay, 0)} ps${sx?.asic ? rel(sy.asic.delay, sx.asic.delay) : ''}</td></tr>`;
+    } else if (synth) h += `<tr><th>${t('sum.synth')}</th><td class="note">${t('sum.notSynth')}</td></tr>`;
+    const refs = techRefs(cfg);
+    if (refs.length) h += `<tr><th>${t('sum.refs')}</th><td>${refs.map(refLink).join('; ')} <a href="#" data-help="refs" class="note">(${t('sum.allRefs')})</a></td></tr>`;
     h += '</table>';
     h += '<table class="kv metrics" style="margin-top:10px">';
     const rows = [
-        ['ME', 'erro médio, com sinal (viés)', nf(m.ME)],
-        ['MED', 'média de |erro|', nf(m.MED)],
-        ['WCE', 'pior caso', `${nf(m.WCE)} <span class="note">(a = ${m.worst.a}, b = ${m.worst.b})</span>`],
-        ['MSE', 'média de erro²', sci(m.MSE)],
-        ['NMED', 'MED / maior saída', sci(m.NMED)],
-        ['MRED', 'média de |erro| / exato', pct(m.MRED)],
-        ['EP', 'fração com erro', pct(m.EP)],
+        ['ME', t('met.ME'), nf(m.ME)],
+        ['MED', t('met.MED'), nf(m.MED)],
+        ['WCE', t('met.WCE'), `${nf(m.WCE)} <span class="note">(a = ${m.worst.a}, b = ${m.worst.b})</span>`],
+        ['MSE', t('met.MSE'), sci(m.MSE)],
+        ['NMED', t('met.NMED'), sci(m.NMED)],
+        ['MRED', t('met.MRED'), pct(m.MRED)],
+        ['EP', t('met.EP'), pct(m.EP)],
     ];
-    for (const [k, t, v] of rows) h += `<tr><th title="${t}">${k}</th><td class="mono">${v}</td><td class="note">${t}</td></tr>`;
+    for (const [k, tt, v] of rows) h += `<tr><th title="${esc(tt)}">${k}</th><td class="mono">${v}</td><td class="note">${tt}</td></tr>`;
     h += '</table>';
-    h += '<p class="note">Área e atraso vêm de um modelo didático (portas de duas entradas e profundidade lógica), não de uma síntese. Entre parênteses, a diferença para a unidade exata de mesma largura (para o Booth, o Booth exato).</p>';
+    h += `<p class="note">${t('sum.note')}</p>`;
     $('summary').innerHTML = h;
 }
 
@@ -170,22 +201,23 @@ function renderStruct() {
     const { unit, cfg } = cur;
     const mul = cfg.kind === 'mul';
     $('structFig').innerHTML = (mul ? (unit.dots ? dotDiagram(unit) : '') : adderDiagram(unit)) + (mul ? stagesSvg(unit) : '');
+    const N = cfg.width;
     const notes = {
-        array: `Cada ponto é um produto parcial aᵢ·bⱼ, na coluna i + j (a coluna 0 é a menos significativa, à direita). As colunas são reduzidas por estágios de somadores completos e meios somadores, no estilo de Dadda, até sobrarem dois bits; uma soma com propagação de vai um dá o produto de ${2 * cfg.width} bits.`,
-        booth: `Booth radix 4: cada par de bits de b (com o bit anterior) escolhe 0, ±a ou ±2a, e são ${cfg.width / 2} produtos parciais em vez de ${cfg.width}. Os operandos e o produto são com sinal (complemento de 2). Os pontos claros estendem o sinal até a coluna ${2 * cfg.width - 1}; a última linha é o +1 dos produtos negativos.`,
-        kulkarni: 'Cada bloco multiplica 2 bits de a por 2 bits de b. O bloco aproximado (laranja) tem só três saídas e dá 7 em vez de 9 para 3 × 3; os produtos dos blocos são somados de forma exata. As linhas alternam para os blocos vizinhos não se sobreporem.',
-        drum: `DRUM: de cada operando, só ${cfg.k} bits a partir do 1 mais significativo entram num multiplicador exato ${cfg.k} × ${cfg.k}; o bit mais baixo do trecho vira 1, o que tira o viés do truncamento, e o produto é deslocado de volta.`,
-        mitchell: 'Mitchell: log₂(x) ≈ p + f, com p a posição do 1 mais alto e f os bits abaixo dele como fração. O produto vira uma soma de logaritmos, e o antilogaritmo é um deslocamento. Não há multiplicação nenhuma no circuito.',
+        array: () => t('struct.array', { bits: 2 * N }),
+        booth: () => t('struct.booth', { half: N / 2, n: N, top: 2 * N - 1 }),
+        kulkarni: () => t('struct.kulkarni'),
+        drum: () => t('struct.drum', { k: cfg.k }),
+        mitchell: () => t('struct.mitchell'),
     };
-    $('structNote').textContent = mul ? notes[unit.method] + (unit.compConst !== undefined ? ` Compensação: constante ${unit.compConst} somada ao resultado.` : '')
-        : 'Cada coluna soma um bit de a e um de b. A zona colorida mostra onde a soma é aproximada.';
+    $('structNote').textContent = mul ? notes[unit.method]() + (unit.compConst !== undefined ? t('struct.comp', { c: unit.compConst }) : '')
+        : t('struct.adder');
     $('stagesBox').classList.toggle('hidden', !mul || !unit.heights);
     $('compBox').classList.toggle('hidden', !mul || unit.method !== 'array' || !cfg.kApprox);
     if (mul && unit.heights) {
-        const C = 2 * cfg.width;
-        const head = `<tr><th>estágio</th>${Array.from({ length: C }, (_, k) => `<th class="z-${unit.zones[C - 1 - k]}">${C - 1 - k}</th>`).join('')}</tr>`;
-        $('stagesTable').innerHTML = head + unit.heights.map((hs, s) => `<tr><th>${s === 0 ? 'produtos' : s}</th>${Array.from({ length: C }, (_, k) => `<td>${hs[C - 1 - k] || ''}</td>`).join('')}</tr>`).join('');
-        $('compTable').innerHTML = '<tr><th>x1 x2 x3 x4</th><th>exato</th><th>vai um, soma</th><th>aprox.</th><th>erro</th></tr>'
+        const C = 2 * N;
+        const head = `<tr><th>${t('struct.stage')}</th>${Array.from({ length: C }, (_, k) => `<th class="z-${unit.zones[C - 1 - k]}">${C - 1 - k}</th>`).join('')}</tr>`;
+        $('stagesTable').innerHTML = head + unit.heights.map((hs, s) => `<tr><th>${s === 0 ? t('struct.products') : s}</th>${Array.from({ length: C }, (_, k) => `<td>${hs[C - 1 - k] || ''}</td>`).join('')}</tr>`).join('');
+        $('compTable').innerHTML = `<tr><th>x1 x2 x3 x4</th><th>${t('struct.exact')}</th><th>${t('struct.carrySum')}</th><th>${t('struct.approx')}</th><th>${t('struct.err')}</th></tr>`
             + compressorTable().map((r) => `<tr class="${r.err ? 'bad' : ''}"><td>${r.x.join(' ')}</td><td>${r.exact}</td><td>${r.carry}, ${r.sum}</td><td>${r.approx}</td><td>${r.err > 0 ? '+' : ''}${r.err}</td></tr>`).join('');
     }
 }
@@ -200,14 +232,12 @@ function renderError() {
     heatGrid = errorGrid(unit, G, N <= 8 ? 1 : 2);
     const dark = document.documentElement.dataset.theme === 'dark';
     const max = drawHeatmap($('heat'), heatGrid, { zeroColor: dark ? [26, 30, 39] : [242, 244, 248] });
-    $('heatLegend').innerHTML = max ? rampLegend(max) : '<p class="note">Nenhum erro: a unidade é exata.</p>';
-    $('heatNote').textContent = N <= 8
-        ? 'Cada pixel é um par (a, b): 256 × 256, todos os pares. Cinza é erro zero; a cor segue |erro| em escala logarítmica.'
-        : `Cada pixel é uma faixa de ${2 ** N / G} × ${2 ** N / G} valores de (a, b), com a média de |erro| em pares sorteados.`;
+    $('heatLegend').innerHTML = max ? rampLegend(max) : `<p class="note">${t('err.none')}</p>`;
+    $('heatNote').textContent = N <= 8 ? t('err.heat8') : t('err.heat16', { s: 2 ** N / G });
     const h = histogram(m.signed);
     $('histFig').innerHTML = histogramSvg(h, { log: $('histLog').checked, width: 520 });
-    $('histNote').textContent = `${pct(1 - m.EP)} dos pares sem erro. Erro médio com sinal (viés): ${nf(m.ME)}. `
-        + (Math.abs(m.ME) > 0.5 * m.MED && m.MED > 0 ? 'O erro é quase todo de um lado só: uma constante de compensação somada ao resultado reduziria o MED.' : 'O erro se distribui dos dois lados do zero.');
+    $('histNote').textContent = t('err.hist1', { p: pct(1 - m.EP), me: nf(m.ME) })
+        + (Math.abs(m.ME) > 0.5 * m.MED && m.MED > 0 ? t('err.oneSided') : t('err.twoSided'));
 }
 $('histLog').onchange = () => cur && renderError();
 $('heat').addEventListener('mousemove', (e) => {
@@ -221,16 +251,16 @@ $('heat').addEventListener('mousemove', (e) => {
     if (span === 1) {
         const ra = (i - off + 2 ** N) % 2 ** N, rb = (j - off + 2 ** N) % 2 ** N;
         const raw = cur.unit.net.evaluateOne(ra, rb), y = cur.unit.decode ? cur.unit.decode(raw) : raw, ex = cur.unit.exact(ra, rb);
-        $('heatHover').textContent = `a = ${i - off}, b = ${j - off}: exato ${ex}, aproximado ${y}, erro ${y - ex}`;
+        $('heatHover').textContent = t('err.hover1', { a: i - off, b: j - off, ex, y, e: y - ex });
     } else {
-        $('heatHover').textContent = `a em [${i * span - off}, ${(i + 1) * span - off}), b em [${j * span - off}, ${(j + 1) * span - off}): |erro| médio ${nf(heatGrid.grid[i * G + j])}`;
+        $('heatHover').textContent = t('err.hoverN', { a0: i * span - off, a1: (i + 1) * span - off, b0: j * span - off, b1: (j + 1) * span - off, e: nf(heatGrid.grid[i * G + j]) });
     }
 });
 
 // Comparação ------------------------------------------------------------------------------------------------
 
-const Y_NAMES = { NMED: 'NMED', MRED: 'MRED', MED: 'MED', WCE: 'WCE', MSE: 'MSE', EP: 'EP', imgMSE: 'MSE da imagem filtrada' };
-const X_NAMES = { gates: 'área (portas)', delay: 'atraso (níveis de porta)', adp: 'área × atraso', luts: 'LUTs (Yosys)', lutsCarry: 'LUTs + CARRY4 (Yosys)', depth: 'profundidade em células (Yosys)', activity: 'atividade (transições por operação)', aap: 'área × atividade' };
+const yName = (k) => (k === 'imgMSE' ? t('y.imgMSE') : k);
+const xName = (k) => t(`x.${k}`);
 
 /** Entrada da comparação para uma configuração (com o MSE da imagem no filtro escolhido). */
 function cmpEntry(cfg, dist) {
@@ -274,6 +304,7 @@ function kneePoint(pts, front, logY) {
     return best;
 }
 
+const SYNTH_COSTS = ['luts', 'lutsCarry', 'depth', 'asicArea', 'asicDelay', 'asicAdp'];
 function renderCmp() {
     const xk = $('cmpX').value, yk = $('cmpY').value;
     const curName = cur ? unitName(cur.cfg) : null;
@@ -282,24 +313,27 @@ function renderCmp() {
         if (xk === 'luts') return sy?.luts;
         if (xk === 'lutsCarry') return sy ? sy.luts + sy.carry4 : undefined;
         if (xk === 'depth') return sy?.depth;
+        if (xk === 'asicArea') return sy?.asic?.area;
+        if (xk === 'asicDelay') return sy?.asic?.delay ?? undefined;
+        if (xk === 'asicAdp') return sy?.asic ? (sy.asic.area * sy.asic.delay) / 1000 : undefined;
         return e[xk];
     };
     const usable = cmp.filter((e) => e[yk] !== null && e[yk] !== undefined && cost(e) !== undefined);
-    const pts = usable.map((e) => ({ x: cost(e), y: e[yk], label: e.name, current: e.name === curName }));
+    const pts = usable.map((e) => ({ x: cost(e), y: e[yk], label: dn(e.name), current: e.name === curName }));
     const missing = cmp.length - usable.length;
-    $('sweepNote').textContent = missing && ['luts', 'lutsCarry', 'depth'].includes(xk) ? `${missing} configuração(ões) fora do gráfico: não fazem parte das sintetizadas.` : $('sweepNote').textContent;
+    if (missing && SYNTH_COSTS.includes(xk)) $('sweepNote').textContent = t('cmp.missing', { n: missing });
     const front = paretoFront(pts);
     const logY = $('cmpLog').checked;
     const knee = kneePoint(pts, front, logY);
-    $('paretoFig').innerHTML = paretoSvg(pts, front, { xLabel: X_NAMES[xk], yLabel: Y_NAMES[yk], logY, knee });
+    $('paretoFig').innerHTML = paretoSvg(pts, front, { xLabel: xName(xk), yLabel: yName(yk), logY, knee });
     const frontNames = new Set(front.map((i) => pts[i].label));
     // Quantas configurações dominam cada uma (0 na fronteira).
     const domBy = new Map(pts.map((p) => [p.label, pts.filter((q) => q !== p && q.x <= p.x && q.y <= p.y && (q.x < p.x || q.y < p.y)).length]));
-    $('kneeNote').textContent = knee !== null ? `Ponto de joelho: ${pts[knee].label}. É o ponto da fronteira mais distante da reta entre os extremos dela, com os dois eixos normalizados${logY ? ' (o erro em escala log, sem os pontos de erro zero)' : ''}: a partir dele, cada redução de custo passa a custar bem mais erro.` : 'O ponto de joelho aparece quando a fronteira tem pelo menos três pontos.';
-    $('cmpTable').innerHTML = '<tr><th>configuração</th><th>entradas</th><th>portas</th><th>atraso</th><th>LUTs</th><th>atividade</th><th title="quantas configurações da comparação dominam esta (com o custo e o erro escolhidos)">dominada por</th><th>MED</th><th>WCE</th><th>NMED</th><th>MRED</th><th>EP</th><th>MSE imagem</th><th></th></tr>'
-        + cmp.map((e, k) => `<tr class="${frontNames.has(e.name) ? 'front' : ''}${e.name === curName ? ' cur' : ''}"><td class="mono left">${esc(e.name)}</td><td>${distName[e.dist]}</td><td>${e.gates}</td><td>${e.delay}</td><td>${synthOf(e.name)?.luts ?? '-'}</td><td>${e.activity === undefined ? '-' : nf(e.activity, 1)}</td><td>${domBy.has(e.name) ? domBy.get(e.name) : '-'}</td>`
+    $('kneeNote').textContent = knee !== null ? t('cmp.knee', { name: pts[knee].label, log: logY ? t('cmp.kneeLog') : '' }) : t('cmp.noKnee');
+    $('cmpTable').innerHTML = `<tr><th>${t('th.config')}</th><th>${t('th.inputs')}</th><th>${t('th.gates')}</th><th>${t('th.delay')}</th><th>LUTs</th><th>${t('th.activity')}</th><th title="${esc(t('th.domByHelp'))}">${t('th.domBy')}</th><th>MED</th><th>WCE</th><th>NMED</th><th>MRED</th><th>EP</th><th>${t('th.imgMSE')}</th><th></th></tr>`
+        + cmp.map((e, k) => `<tr class="${frontNames.has(dn(e.name)) ? 'front' : ''}${e.name === curName ? ' cur' : ''}"><td class="mono left">${esc(dn(e.name))}</td><td>${distName(e.dist)}</td><td>${e.gates}</td><td>${e.delay}</td><td>${synthOf(e.name)?.luts ?? '-'}</td><td>${e.activity === undefined ? '-' : nf(e.activity, 1)}</td><td>${domBy.has(dn(e.name)) ? domBy.get(dn(e.name)) : '-'}</td>`
             + `<td>${nf(e.MED)}</td><td>${nf(e.WCE)}</td><td>${sci(e.NMED)}</td><td>${pct(e.MRED)}</td><td>${pct(e.EP)}</td><td>${e.imgMSE === null ? '-' : nf(e.imgMSE, 3)}</td>`
-            + `<td><button type="button" class="btn small-btn" data-del="${k}" title="Remover">×</button></td></tr>`).join('');
+            + `<td><button type="button" class="btn small-btn" data-del="${k}" title="${esc(t('cmp.remove'))}">×</button></td></tr>`).join('');
 }
 $('cmpTable').addEventListener('click', (e) => {
     const b = e.target.closest('[data-del]');
@@ -326,32 +360,34 @@ $('sweepBtn').onclick = () => {
     const base = cur.cfg, N = base.width;
     const list = [];
     const method = base.method ?? 'array';
+    let note;
     if (base.kind === 'mul' && method === 'booth') {
         for (let v = 0; v <= 2 * N - 2; v += N <= 8 ? 1 : 2) list.push({ ...base, kTrunc: v });
-        $('sweepNote').textContent = `Varrendo as colunas truncadas (${list.length} pontos).`;
+        note = 'cmp.sweepTrunc';
     } else if (base.kind === 'mul' && method === 'kulkarni') {
         for (let v = 0; v <= 2 * N; v += 2) list.push({ ...base, kBlock: v });
-        $('sweepNote').textContent = `Varrendo a coluna até onde os blocos são aproximados (${list.length} pontos).`;
+        note = 'cmp.sweepKul';
     } else if (base.kind === 'mul' && method === 'drum') {
         for (let v = 2; v < N; v++) list.push({ ...base, k: v });
-        $('sweepNote').textContent = `Varrendo k (${list.length} pontos).`;
+        note = 'cmp.sweepK';
     } else if (base.kind === 'mul' && method === 'mitchell') {
         list.push({ ...base, comp: false }, { ...base, comp: true });
-        $('sweepNote').textContent = 'O Mitchell não tem parâmetro: entram as versões sem e com compensação.';
+        note = 'cmp.sweepMitchell';
     } else if (base.kind === 'mul') {
         const p = lastParam === 'kTrunc' ? 'kTrunc' : 'kApprox';
         const other = p === 'kTrunc' ? base.kApprox : base.kTrunc;
         const step = N <= 8 ? 1 : 2;
         for (let v = 0; v + other <= 2 * N - 2; v += step) list.push({ ...base, [p]: v });
-        $('sweepNote').textContent = `Varrendo ${p === 'kTrunc' ? 'as colunas truncadas' : 'as colunas aproximadas'} (${list.length} pontos).`;
+        note = p === 'kTrunc' ? 'cmp.sweepTrunc' : 'cmp.sweepApprox';
     } else if (base.adder === 'seg') {
         for (let P = 0; P <= N; P++) list.push({ ...base, P });
-        $('sweepNote').textContent = `Varrendo os bits de previsão P (${list.length} pontos).`;
+        note = 'cmp.sweepP';
     } else {
         const adder = base.adder === 'exact' ? 'loa' : base.adder;
         for (let k = 0; k <= N; k++) list.push({ ...base, adder, k });
-        $('sweepNote').textContent = `Varrendo k (${list.length} pontos).`;
+        note = 'cmp.sweepK';
     }
+    $('sweepNote').textContent = t(note, { n: list.length });
     setTimeout(() => {
         for (const c of list) addToCmp(c, cur.dist);
         saveCmp();
@@ -369,9 +405,9 @@ function download(name, text, type) {
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 $('cmpCsv').onclick = () => {
-    const rows = [['config', 'inputs', 'gates', 'delay', 'ME_abs_MED', 'WCE', 'MSE', 'NMED', 'MRED', 'EP', 'filter', 'image_MSE']];
+    const rows = [['config', 'inputs', 'gates', 'delay', 'MED', 'WCE', 'MSE', 'NMED', 'MRED', 'EP', 'filter', 'image_MSE']];
     for (const e of cmp) rows.push([e.name, e.dist, e.gates, e.delay, e.MED, e.WCE, e.MSE, e.NMED, e.MRED, e.EP, e.filter ?? '', e.imgMSE ?? '']);
-    download('comparacao.csv', rows.map((r) => r.join(',')).join('\n') + '\n', 'text/csv');
+    download(t('cmp.csvName'), rows.map((r) => r.join(',')).join('\n') + '\n', 'text/csv');
 };
 $('cmpSvg').onclick = () => {
     const svg = $('paretoFig').querySelector('svg');
@@ -411,38 +447,40 @@ function renderVos() {
     if (!cur) return;
     const unit = cur.unit, exact = cur.exact;
     const V = +$('vosV').value;
-    $('vosVV').textContent = V.toFixed(2).replace('.', ',');
+    $('vosVV').textContent = fx(V, 2);
     const dU = maxDepth(unit), dE = maxDepth(exact);
-    const period = $('vosClock').value === 'exact' ? dE : dU;
+    const exactClock = $('vosClock').value === 'exact';
+    const period = exactClock ? dE : dU;
     const tu = traceOf(unit), te = traceOf(exact);
-    const curveOf = (t, u, per) => {
-        if (!t.curves.has(per)) t.curves.set(per, vosCurve(u, t.trace, t.seq, per));
-        return t.curves.get(per);
+    const curveOf = (tr, u, per) => {
+        if (!tr.curves.has(per)) tr.curves.set(per, vosCurve(u, tr.trace, tr.seq, per));
+        return tr.curves.get(per);
     };
     const cu = curveOf(tu, unit, period), ce = curveOf(te, exact, dE);
     $('vosFig').innerHTML = lineChartSvg([
-        { name: unitName(cur.cfg), cls: 's-unit', pts: cu.map((p) => ({ x: p.V, y: 100 * p.MRED })) },
-        { name: `exata (${unitName(exact.cfg)})`, cls: 's-exact', pts: ce.map((p) => ({ x: p.V, y: 100 * p.MRED })) },
-    ], { xLabel: 'tensão (V / Vnom), diminuindo para a direita', yLabel: 'MRED (%)', marker: V, xReverse: true });
+        { name: dn(unitName(cur.cfg)), cls: 's-unit', pts: cu.map((p) => ({ x: p.V, y: 100 * p.MRED })) },
+        { name: t('vos.exactSeries', { name: dn(unitName(exact.cfg)) }), cls: 's-exact', pts: ce.map((p) => ({ x: p.V, y: 100 * p.MRED })) },
+    ], { xLabel: t('vos.xLabel'), yLabel: 'MRED (%)', marker: V, xReverse: true });
     const at = (c) => c.find((p) => Math.abs(p.V - V) < 1e-6) ?? c[c.length - 1];
     const pu = at(cu), pe = at(ce);
     const s = delayFactor(V);
-    let note = `Relógio de ${period} níveis de porta (o caminho mais longo ${$('vosClock').value === 'exact' ? 'da unidade exata' : 'da própria unidade'}). Em V = ${V.toFixed(2).replace('.', ',')}, cada porta fica ${nf(s, 2)} vezes mais lenta: só cabem ${nf(period / s, 1)} níveis no período.`;
-    if ($('vosClock').value === 'exact' && dU > dE) note += ` Esta unidade é mais profunda que a exata (${dU} contra ${dE} níveis): com o relógio da exata, ela pode errar já na tensão nominal.`;
-    else if ($('vosClock').value === 'exact' && dU < dE) note += ` Pela profundidade estática, esta unidade é mais rasa que a exata (${dU} contra ${dE} níveis) e teria folga no relógio. Mas o erro de tempo depende dos caminhos que os dados de fato sensibilizam: compare onde as duas curvas começam a subir.`;
+    let note = t('vos.note', { period, which: t(exactClock ? 'vos.ofExact' : 'vos.ofOwn'), V: fx(V, 2), s: nf(s, 2), fit: nf(period / s, 1) });
+    if (exactClock && dU > dE) note += t('vos.deeper', { dU, dE });
+    else if (exactClock && dU < dE) note += t('vos.shallower', { dU, dE });
     $('vosNote').textContent = note;
     const row = (label, a, b) => `<tr><th>${label}</th><td class="mono">${a}</td><td class="mono">${b}</td></tr>`;
-    $('vosTable').innerHTML = `<table class="kv"><tr><th></th><td class="note">esta unidade</td><td class="note">exata</td></tr>`
-        + row('energia dinâmica', pct(pu.energy), pct(pe.energy))
-        + row('bits atrasados', pct(pu.lateBits), pct(pe.lateBits))
+    $('vosTable').innerHTML = `<table class="kv"><tr><th></th><td class="note">${t('vos.thisUnit')}</td><td class="note">${t('vos.exact')}</td></tr>`
+        + row(t('vos.energy'), pct(pu.energy), pct(pe.energy))
+        + row(t('vos.late'), pct(pu.lateBits), pct(pe.lateBits))
         + row('MRED', pct(pu.MRED), pct(pe.MRED))
         + row('EP', pct(pu.EP), pct(pe.EP))
         + row('MED', nf(pu.MED), nf(pe.MED)) + '</table>'
-        + `<p class="note">Sequência de 4096 operações com entradas uniformes. A energia é relativa à nominal (V²); o erro inclui a aproximação da unidade e os erros de tempo.</p>`;
+        + `<p class="note">${t('vos.tableNote')}</p>`;
     // Imagem: ganho de brilho (multiplicador) ou média com o vizinho (somador), em sequência, pixel a pixel.
     const signed8 = unit.signed && unit.cfg.width === 8;
     if (signed8) {
-        $('vosImgCap').textContent = 'o Booth de 8 bits é com sinal: os pixels não cabem';
+        $('vosExactCap').textContent = '';
+        $('vosImgCap').textContent = t('vos.booth8');
         return;
     }
     const img = smallImage();
@@ -465,13 +503,13 @@ function renderVos() {
     drawGray($('vosImg'), vi);
     const pAp = psnr(ref, exImg), pV = psnr(ref, vi);
     const f = (x) => (x === Infinity ? '∞' : `${nf(x, 1)} dB`);
-    $('vosExactCap').textContent = `exata, nominal (${cur.cfg.kind === 'mul' ? 'pixel × 180 / 128' : 'média com o vizinho'})`;
-    $('vosImgCap').textContent = `esta unidade em ${V.toFixed(2).replace('.', ',')}: PSNR ${f(pV)} (só a aproximação: ${f(pAp)})`;
+    $('vosExactCap').textContent = t('vos.capExact', { f: cur.cfg.kind === 'mul' ? 'pixel × 180 / 128' : t('vos.pairs') });
+    $('vosImgCap').textContent = t('vos.capV', { V: fx(V, 2), p: f(pV), pa: f(pAp) });
 }
 
 function renderMem() {
     const ber = 10 ** +$('memBer').value, prot = +$('memProt').value;
-    $('memBerV').textContent = ber.toExponential(1).replace('.', ',');
+    $('memBerV').textContent = dec(ber.toExponential(1));
     $('memProtV').textContent = String(prot);
     const { img, flips } = corruptImage(image, ber, prot);
     drawGray($('memOrig'), image);
@@ -483,11 +521,11 @@ function renderMem() {
     const exp = expectedMemoryMSE(ber, prot);
     const p = psnr(image, img);
     $('memTable').innerHTML = `<table class="kv">`
-        + `<tr><th>bits invertidos</th><td class="mono">${nf(flips)} de ${nf(img.data.length * (8 - prot))} não protegidos</td></tr>`
-        + `<tr><th>MSE</th><td class="mono">${nf(mse, 2)} (esperado ${nf(exp, 2)})</td></tr>`
+        + `<tr><th>${t('mem.flipped')}</th><td class="mono">${t('mem.flippedV', { n: nf(flips), of: nf(img.data.length * (8 - prot)) })}</td></tr>`
+        + `<tr><th>MSE</th><td class="mono">${t('mem.mseV', { mse: nf(mse, 2), exp: nf(exp, 2) })}</td></tr>`
         + `<tr><th>PSNR</th><td class="mono">${p === Infinity ? '∞' : `${nf(p, 1)} dB`}</td></tr>`
-        + `<tr><th>memória confiável</th><td class="mono">${prot} de 8 bits por pixel (${pct(prot / 8)})</td></tr></table>`
-        + `<p class="note">O MSE esperado é a taxa de erro vezes a soma de 4<sup>b</sup> nos bits b não protegidos: inverter o bit b muda o pixel em 2<sup>b</sup>. Por isso proteger só os 2 ou 3 bits mais altos já resolve quase tudo.</p>`;
+        + `<tr><th>${t('mem.reliable')}</th><td class="mono">${t('mem.reliableV', { n: prot, p: pct(prot / 8) })}</td></tr></table>`
+        + `<p class="note">${t('mem.note')}</p>`;
 }
 
 // Síntese ---------------------------------------------------------------------------------------------------
@@ -496,31 +534,38 @@ function renderMem() {
 const synthErr = new Map();
 function renderSynth() {
     if (!synth) {
-        $('synthNote').textContent = 'Os resultados da síntese (data/synth.json) não foram encontrados. Eles são gerados na publicação do site, ou localmente com npm run synth (precisa de iverilog e yosys).';
+        $('synthNote').textContent = t('synth.missing');
         $('synthTable').innerHTML = '';
         $('synthFig').innerHTML = '';
         return;
     }
-    $('synthNote').innerHTML = `Cada configuração pré-definida é exportada em Verilog, conferida no Icarus Verilog com vetores do simulador e sintetizada com o Yosys para FPGA Xilinx 7 series, a cada publicação do site (${esc(synth.generated)}, ${esc(synth.tools.yosys.replace(/ \(.*/, ''))}, <code>${esc(synth.flow.replace('read_verilog; ', ''))}</code>). O Vivado costuma dar menos LUTs: compare as configurações entre si, não com números de outra ferramenta.`;
+    const asicInfo = synth.asic ? t('synth.asicInfo', { lib: esc(synth.asic.library), cells: synth.asic.cells }) : '';
+    $('synthNote').innerHTML = t('synth.note', { date: esc(synth.generated), yosys: esc(synth.tools.yosys.replace(/ \(.*/, '')), flow: esc(synth.flow.replace('read_verilog; ', '')) }) + asicInfo;
     const curName = cur ? unitName(cur.cfg) : null;
     for (const d of synth.designs) if (!d.err && !synthErr.has(d.name)) synthErr.set(d.name, null);
-    $('synthTable').innerHTML = '<tr><th>configuração</th><th>portas</th><th>LUTs</th><th>CARRY4</th><th>prof.</th><th>MRED</th></tr>'
+    $('synthTable').innerHTML = `<tr><th>${t('th.config')}</th><th>${t('th.gates')}</th><th>LUTs</th><th>CARRY4</th><th>${t('th.depthShort')}</th><th title="${esc(t('x.asicArea'))}">µm²</th><th title="${esc(t('x.asicDelay'))}">ps</th><th>MRED</th></tr>`
         + synth.designs.map((d, k) => {
             const e = d.err ? d.err.MRED : synthErr.get(d.name);
-            return `<tr data-k="${k}" class="${d.name === curName ? 'cur' : ''}"><td class="mono left">${esc(d.name)}</td><td>${d.gates}</td><td>${d.luts}</td><td>${d.carry4}</td><td>${d.depth}</td><td>${e === null ? '…' : pct(e)}</td></tr>`;
+            return `<tr data-k="${k}" class="${d.name === curName ? 'cur' : ''}"><td class="mono left">${esc(dn(d.name))}</td><td>${d.gates}</td><td>${d.luts}</td><td>${d.carry4}</td><td>${d.depth}</td><td>${d.asic ? nf(d.asic.area, 0) : '-'}</td><td>${d.asic?.delay ? nf(d.asic.delay, 0) : '-'}</td><td>${e === null ? '…' : pct(e)}</td></tr>`;
         }).join('');
     const group = (d) => `${d.cfg.kind}${d.cfg.width}`;
-    $('synthFig').innerHTML = scatterSvg(synth.designs.map((d) => ({ x: d.gates, y: d.luts + d.carry4, label: d.name, group: group(d), current: d.name === curName })),
-        { xLabel: 'portas de duas entradas (modelo)', yLabel: 'LUTs + CARRY4 (Yosys)' });
+    const target = synth.designs.some((d) => d.asic) ? $('synthTarget').value : 'fpga';
+    const T = {
+        fpga: { x: (d) => d.gates, y: (d) => d.luts + d.carry4, xl: t('synth.xGates'), yl: 'LUTs + CARRY4 (Yosys)' },
+        asic: { x: (d) => d.gates, y: (d) => d.asic?.area, xl: t('synth.xGates'), yl: t('x.asicArea') },
+        asicDelay: { x: (d) => d.gateDepth, y: (d) => d.asic?.delay, xl: t('synth.xDepth'), yl: t('x.asicDelay') },
+    }[target];
+    const ds = synth.designs.filter((d) => T.y(d) !== undefined && T.y(d) !== null);
+    $('synthFig').innerHTML = scatterSvg(ds.map((d) => ({ x: T.x(d), y: T.y(d), label: dn(d.name), group: group(d), current: d.name === curName })),
+        { xLabel: T.xl, yLabel: T.yl });
     // Concordância de ordem entre modelo e síntese, dentro de cada grupo (pares de configurações).
     let agree = 0, total = 0;
-    const ds = synth.designs;
     for (let i = 0; i < ds.length; i++) for (let j = i + 1; j < ds.length; j++) {
-        if (group(ds[i]) !== group(ds[j]) || ds[i].gates === ds[j].gates) continue;
+        if (group(ds[i]) !== group(ds[j]) || T.x(ds[i]) === T.x(ds[j])) continue;
         total++;
-        if (Math.sign(ds[i].gates - ds[j].gates) === Math.sign(ds[i].luts + ds[i].carry4 - ds[j].luts - ds[j].carry4)) agree++;
+        if (Math.sign(T.x(ds[i]) - T.x(ds[j])) === Math.sign(T.y(ds[i]) - T.y(ds[j]))) agree++;
     }
-    $('synthCorr').textContent = total ? `Em ${pct(agree / total)} dos pares de configurações do mesmo grupo, o modelo de portas e a síntese concordam sobre qual é a menor. Onde discordam, o modelo erra: no FPGA, uma LUT de 6 entradas absorve várias portas, e a cadeia de carry faz a soma quase de graça.` : '';
+    $('synthCorr').textContent = total ? t('synth.agree', { p: pct(agree / total), which: t(target === 'asicDelay' ? 'synth.faster' : 'synth.smaller') }) + t(`synth.why.${target}`) : '';
     // Métricas de erro, aos poucos, para não travar a página.
     const pending = ds.find((d) => !d.err && synthErr.get(d.name) === null);
     if (pending) {
@@ -531,6 +576,7 @@ function renderSynth() {
         }, 0);
     }
 }
+$('synthTarget').addEventListener('change', () => renderSynth());
 $('synthTable').addEventListener('click', (e) => {
     const tr = e.target.closest('tr[data-k]');
     if (!tr) return;
@@ -584,13 +630,15 @@ function filterFor(cfg) {
     return f === 'pairs' || f === 'gain' ? 'gauss' : f;
 }
 
+let imgMessage = null;   // aviso sobre o último arquivo de imagem (erro de leitura)
 function renderApp() {
     if (!cur) return;
     const filter = filterFor(cur.cfg);
     if (!filter) {
-        $('appNote').textContent = 'O Booth de 8 bits é com sinal: os operandos vão de -128 a 127, e os pixels (0 a 255) não cabem. Use o Booth de 16 bits.';
+        $('appNote').textContent = t('app.booth8');
         for (const id of ['imgExact', 'imgApprox', 'imgDiff']) { const c = $(id); c.getContext('2d').clearRect(0, 0, c.width, c.height); }
         $('appMetrics').innerHTML = '';
+        $('diffCap').textContent = '';
         return;
     }
     const key = `${unitName(cur.cfg)}|${filter}|${image.w}x${image.h}|${image.data[0]}`;
@@ -603,26 +651,22 @@ function renderApp() {
     drawGray($('imgExact'), ex);
     drawGray($('imgApprox'), ap);
     const dmax = drawDiff($('imgDiff'), ex, ap);
-    $('diffCap').textContent = dmax ? `|diferença| em cor (log), até ${dmax} níveis de cinza` : 'nenhuma diferença';
+    $('diffCap').textContent = dmax ? t('app.diff', { n: dmax }) : t('app.noDiff');
     const chosen = $('filter').value;
-    const notes = {
-        gauss: 'Nove produtos pixel × peso por pixel; as somas são exatas com um multiplicador, e aproximadas com um somador.',
-        gauss2: 'Com pesos potências de 2, cada produto tem um só produto parcial em 1 por linha: truncar colunas baixas pode não errar nada. O erro depende dos dados, não só da unidade.',
-        gain: 'Um produto por pixel: pixel × 180, dividido por 128.',
-        pairs: 'Uma soma de 8 bits por pixel: (pixel + vizinho) / 2.',
-    };
-    $('appNote').textContent = (filter !== chosen ? `Para este tipo de unidade o filtro usado é outro. ` : '') + notes[filter];
+    $('appNote').textContent = (imgMessage ? `${imgMessage} ` : '') + (filter !== chosen ? t('app.otherFilter') : '') + t(`app.note.${filter}`);
     const p = cur.appCache.psnr;
-    $('appMetrics').innerHTML = `<table class="kv"><tr><th>PSNR</th><td class="mono">${p === Infinity ? '∞ (imagens iguais)' : `${nf(p)} dB`}</td><td class="note">acima de uns 40 dB a diferença costuma ser invisível</td></tr>`
-        + `<tr><th>SSIM</th><td class="mono">${nf(cur.appCache.ssim, 4)}</td><td class="note">1 é igual; mede estrutura, contraste e brilho em janelas 8 × 8</td></tr>`
-        + `<tr><th>MRED da unidade</th><td class="mono">${pct(cur.m.MRED)}</td><td class="note">a mesma unidade, avaliada isolada</td></tr></table>`;
+    $('appMetrics').innerHTML = `<table class="kv"><tr><th>PSNR</th><td class="mono">${p === Infinity ? t('app.same') : `${nf(p)} dB`}</td><td class="note">${t('app.psnrNote')}</td></tr>`
+        + `<tr><th>SSIM</th><td class="mono">${nf(cur.appCache.ssim, 4)}</td><td class="note">${t('app.ssimNote')}</td></tr>`
+        + `<tr><th>${t('app.mredUnit')}</th><td class="mono">${pct(cur.m.MRED)}</td><td class="note">${t('app.mredNote')}</td></tr></table>`;
 }
+
 // Computação estocástica -------------------------------------------------------------------------------------
 
 const scCurves = new Map();          // operação -> {gerador: curva}
 const SC_NS = [16, 32, 64, 128, 256, 512, 1024, 2048, 4096];
 const scSel = () => ({ op: $('scOp').value, gen: $('scGen').value, N: 2 ** +$('scN').value, x: +$('scX').value, y: +$('scY').value, ber: 10 ** +$('scBer').value });
 const scVal = (op, v) => (op === 'bmul' ? nf(v, 3) : nf(v, 4));
+const genName = (g) => t(`sc.gen.${g}`);
 function scCurvesOf(op) {
     if (!scCurves.has(op)) scCurves.set(op, Object.fromEntries(Object.keys(SC_GENERATORS).map((g) => [g, scCurve(op, g, SC_NS)])));
     return scCurves.get(op);
@@ -632,17 +676,17 @@ function scCurvesOf(op) {
 function streamsSvg(demo, op, N) {
     const n = Math.min(N, 64), cell = 10, L = 150, rowH = 18;
     const rows = [['a', demo.a, ''], ['b', demo.b, '']];
-    if (op === 'add') rows.push(['seleção', demo.s, 'sel']);
-    rows.push(['saída', demo.out, 'out']);
+    if (op === 'add') rows.push([t('sc.select'), demo.s, 'sel']);
+    rows.push([t('sc.output'), demo.out, 'out']);
     const w = L + n * cell + 10, h = rows.length * rowH + 20;
     let s = `<svg class="fig-svg" xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img">`;
     rows.forEach(([name, bits, cls], r) => {
         const ones = bits.reduce((c, v) => c + v, 0);
         const y = 6 + r * rowH;
         s += `<text class="small mono" x="0" y="${y + 10}">${esc(name)}</text><text class="small muted mono" x="${L - 8}" y="${y + 10}" text-anchor="end">${ones}/${N}</text>`;
-        for (let t = 0; t < n; t++) s += `<rect class="bit${bits[t] ? ` one ${cls}` : ''}" x="${L + t * cell}" y="${y}" width="${cell - 2}" height="${cell + 2}" rx="1"/>`;
+        for (let k = 0; k < n; k++) s += `<rect class="bit${bits[k] ? ` one ${cls}` : ''}" x="${L + k * cell}" y="${y}" width="${cell - 2}" height="${cell + 2}" rx="1"/>`;
     });
-    s += `<text class="small muted" x="${L}" y="${h - 2}">${n < N ? `primeiros ${n} de ${N} bits` : `${N} bits`}</text>`;
+    s += `<text class="small muted" x="${L}" y="${h - 2}">${n < N ? t('sc.firstBits', { n, N }) : t('sc.allBits', { N })}</text>`;
     return `${s}</svg>`;
 }
 
@@ -654,65 +698,59 @@ function renderScDemo() {
     const d = streamDemo(op, gen, N, x, y);
     $('scStreams').innerHTML = streamsSvg(d, op, N);
     const pa = x / 256, pb = y / 256;
-    const vin = op === 'bmul' ? `a = 2p − 1 = ${nf(2 * pa - 1, 3)} e b = ${nf(2 * pb - 1, 3)}` : `a = ${nf(pa, 4)} e b = ${nf(pb, 4)}`;
-    const rule = op === 'mul' ? 'a saída é a AND bit a bit, e a fração de uns estima a × b'
-        : op === 'bmul' ? 'a saída é a XNOR bit a bit; no formato bipolar (v = 2p − 1) isso estima a × b'
-            : 'o MUX copia o bit de a quando a seleção vale 1 e o de b quando vale 0; com seleção p = 1/2, a saída estima (a + b) / 2';
+    const vin = op === 'bmul' ? t('sc.vinBip', { a: nf(2 * pa - 1, 3), b: nf(2 * pb - 1, 3) }) : t('sc.vinUni', { a: nf(pa, 4), b: nf(pb, 4) });
     let extra = '';
-    if (gen === 'lfsrSame' && op === 'mul') extra = ` Com o mesmo LFSR nos dois fluxos, os uns de b ficam dentro dos uns de a (ou o contrário): a AND dá min(a, b) = ${nf(Math.min(pa, pb), 4)}, não o produto. É o erro de correlação.`;
-    if (gen === 'lfsrSame' && op === 'bmul') extra = ' Com o mesmo LFSR nos dois fluxos, a XNOR mede o quanto os fluxos coincidem, 1 − |pa − pb|, não o produto. É o erro de correlação.';
-    if (gen === 'lfsrSame' && op === 'add') extra = ' Com a seleção vinda do mesmo LFSR dos dados, ela também fica correlacionada com eles e a soma sai enviesada.';
-    $('scDemoNote').innerHTML = `Entradas ${vin}; ${rule}. Estimativa ${scVal(op, d.value)}, exato ${scVal(op, d.exact)}, erro ${scVal(op, d.value - d.exact)}.${extra}`;
+    if (gen === 'lfsrSame') extra = t(`sc.corr.${op}`, { min: nf(Math.min(pa, pb), 4) });
+    $('scDemoNote').innerHTML = t('sc.demo', { vin, rule: t(`sc.rule.${op}`), v: scVal(op, d.value), ex: scVal(op, d.exact), e: scVal(op, d.value - d.exact) }) + extra;
 }
 
 function renderScCurve() {
     const { op, gen, N } = scSel();
     const curves = scCurvesOf(op);
     const bin = binaryError(op);
-    const series = Object.entries(SC_GENERATORS).map(([g, name]) => ({ name, cls: `s-${g}`, dots: true, pts: curves[g].filter((p) => p.nrmse > 0).map((p) => ({ x: p.N, y: p.nrmse })) }));
-    series.push({ name: 'binário de 8 bits', cls: 's-bin', pts: [{ x: SC_NS[0], y: bin.nrmse }, { x: SC_NS.at(-1), y: bin.nrmse }] });
-    $('scFig').innerHTML = lineChartSvg(series, { xLabel: 'comprimento do fluxo N (bits, ciclos)', yLabel: 'NRMSE', logX: true, logY: true, marker: N, xTicks: [16, 64, 256, 1024, 4096], height: 330 });
+    const series = Object.keys(SC_GENERATORS).map((g) => ({ name: genName(g), cls: `s-${g}`, dots: true, pts: curves[g].filter((p) => p.nrmse > 0).map((p) => ({ x: p.N, y: p.nrmse })) }));
+    series.push({ name: t('sc.bin8'), cls: 's-bin', pts: [{ x: SC_NS[0], y: bin.nrmse }, { x: SC_NS.at(-1), y: bin.nrmse }] });
+    $('scFig').innerHTML = lineChartSvg(series, { xLabel: t('sc.xLabel'), yLabel: 'NRMSE', logX: true, logY: true, marker: N, xTicks: [16, 64, 256, 1024, 4096], height: 330 });
     const at = (g) => curves[g].find((p) => p.N === N);
-    let h = '<table class="kv"><tr><th></th><td class="note">NRMSE</td><td class="note">bits efetivos</td><td class="note">viés</td></tr>';
-    for (const [g, name] of Object.entries(SC_GENERATORS)) {
+    let h = `<table class="kv"><tr><th></th><td class="note">NRMSE</td><td class="note">${t('sc.effBits')}</td><td class="note">${t('sc.bias')}</td></tr>`;
+    for (const g of Object.keys(SC_GENERATORS)) {
         const p = at(g);
-        h += `<tr><th>${g === gen ? `<b>${esc(name)}</b>` : esc(name)}</th><td class="mono">${pct(p.nrmse)}</td><td class="mono">${p.bits === Infinity ? '∞' : nf(p.bits, 1)}</td><td class="mono">${scVal(op, p.bias)}</td></tr>`;
+        h += `<tr><th>${g === gen ? `<b>${esc(genName(g))}</b>` : esc(genName(g))}</th><td class="mono">${pct(p.nrmse)}</td><td class="mono">${p.bits === Infinity ? '∞' : nf(p.bits, 1)}</td><td class="mono">${scVal(op, p.bias)}</td></tr>`;
     }
-    h += `<tr><th>binário de 8 bits, 1 ciclo</th><td class="mono">${pct(bin.nrmse)}</td><td class="mono">${bin.bits === Infinity ? '∞' : nf(bin.bits, 1)}</td><td class="mono">0</td></tr></table>`;
+    h += `<tr><th>${t('sc.bin8cycle')}</th><td class="mono">${pct(bin.nrmse)}</td><td class="mono">${bin.bits === Infinity ? '∞' : nf(bin.bits, 1)}</td><td class="mono">0</td></tr></table>`;
     $('scTable').innerHTML = h;
     // Quantos bits o aleatório ideal precisaria para igualar o binário: o erro cai com 1 / raiz(N).
     const r = curves.random.at(-1);
     const nEq = (r.nrmse * Math.sqrt(r.N) / bin.nrmse) ** 2;
     const sob = curves.sobol.find((p) => p.nrmse <= bin.nrmse);
-    $('scNote').innerHTML = `NRMSE é a raiz do erro quadrático médio dividida pela faixa da saída, em 512 pares de entradas uniformes. Bits efetivos: os de um conversor ideal com o mesmo erro. Com bits aleatórios o erro cai com 1/√N: dobrar a precisão custa 4 vezes mais ciclos, e igualar o binário de 8 bits pediria uns ${nf(Math.round(nEq / 1000) * 1000)} bits. A sequência de Sobol espalha os uns por igual e o erro cai com 1/N${sob ? `: chega ao binário em N = ${nf(sob.N)}` : ''}. Os LFSRs têm período 255 e param de melhorar em N = 256; um LFSR só para todos os fluxos erra muito em qualquer N, porque os fluxos ficam correlacionados.`;
+    $('scNote').innerHTML = t('sc.curveNote', { neq: nf(Math.round(nEq / 1000) * 1000), sob: sob ? t('sc.sobReach', { N: nf(sob.N) }) : '' });
 }
 
 function renderScCost() {
     const { op, N } = scSel();
     const c = scCost(op, N);
-    let h = '<table class="kv"><tr><th></th><td class="note">portas</td><td class="note">flip-flops</td></tr>';
-    for (const p of c.parts) h += `<tr><th>${esc(p.name)}</th><td class="mono">${nf(p.gates)}</td><td class="mono">${nf(p.ff)}</td></tr>`;
-    h += `<tr><th><b>estocástico, total</b></th><td class="mono"><b>${nf(c.gates)}</b></td><td class="mono"><b>${nf(c.ff)}</b></td></tr>`;
-    h += `<tr><th><b>${esc(c.bin.name)}</b></th><td class="mono"><b>${nf(c.bin.gates)}</b></td><td class="mono">0</td></tr></table>`;
-    h += '<table class="kv" style="margin-top:10px"><tr><th></th><td class="note">ciclos</td><td class="note">período (níveis de porta)</td><td class="note">latência (níveis)</td><td class="note">energia (elementos × ciclos)</td></tr>';
+    let h = `<table class="kv"><tr><th></th><td class="note">${t('th.gates')}</td><td class="note">flip-flops</td></tr>`;
+    for (const p of c.parts) h += `<tr><th>${esc(t(p.key, p.params))}</th><td class="mono">${nf(p.gates)}</td><td class="mono">${nf(p.ff)}</td></tr>`;
+    h += `<tr><th><b>${t('sc.costTotal')}</b></th><td class="mono"><b>${nf(c.gates)}</b></td><td class="mono"><b>${nf(c.ff)}</b></td></tr>`;
+    h += `<tr><th><b>${esc(t(c.bin.key))}</b></th><td class="mono"><b>${nf(c.bin.gates)}</b></td><td class="mono">0</td></tr></table>`;
+    h += `<table class="kv" style="margin-top:10px"><tr><th></th><td class="note">${t('sc.cycles')}</td><td class="note">${t('sc.period')}</td><td class="note">${t('sc.latency')}</td><td class="note">${t('sc.energy')}</td></tr>`;
     const eSc = c.gateCycles, eBin = c.bin.gates;
-    h += `<tr><th>estocástico, N = ${N}</th><td class="mono">${nf(N)}</td><td class="mono">${c.depth}</td><td class="mono">${nf(N * c.depth)}</td><td class="mono">${nf(eSc)}</td></tr>`;
-    h += `<tr><th>binário</th><td class="mono">1</td><td class="mono">${c.bin.depth}</td><td class="mono">${c.bin.depth}</td><td class="mono">${nf(eBin)}</td></tr></table>`;
+    h += `<tr><th>${t('sc.costSc', { N })}</th><td class="mono">${nf(N)}</td><td class="mono">${c.depth}</td><td class="mono">${nf(N * c.depth)}</td><td class="mono">${nf(eSc)}</td></tr>`;
+    h += `<tr><th>${t('sc.costBin')}</th><td class="mono">1</td><td class="mono">${c.bin.depth}</td><td class="mono">${c.bin.depth}</td><td class="mono">${nf(eBin)}</td></tr></table>`;
     $('scCost').innerHTML = h;
-    const ratio = eSc / eBin;
-    $('scCostNote').innerHTML = `A operação em si é minúscula (${c.parts[0].gates === 1 ? 'uma porta' : `${c.parts[0].gates} portas`}), mas cada fluxo precisa de um gerador (LFSR mais comparador) e a saída de um contador: são eles que dominam a área. O circuito estocástico tem ${nf(c.gates + c.ff)} elementos (portas e flip-flops) contra ${nf(c.bin.gates)} portas do binário, mas trabalha ${nf(N)} ciclos: a energia estimada (cada elemento ativo em todo ciclo) fica ${nf(ratio, 0)} vezes a do binário. A computação estocástica compensa quando os geradores são compartilhados, os valores já chegam como fluxos (de sensores, por exemplo) ou a tolerância a falhas importa mais que a energia.`;
+    $('scCostNote').innerHTML = t('sc.costNote', { op: c.parts[0].gates === 1 ? t('sc.oneGate') : t('sc.nGates', { n: c.parts[0].gates }), el: nf(c.gates + c.ff), bin: nf(c.bin.gates), N: nf(N), r: nf(eSc / eBin, 0) });
 }
 
 let scImgTimer = null;
 function renderScFault() {
     const { op, gen, N, ber } = scSel();
-    $('scBerV').textContent = ber.toExponential(1).replace('.', ',');
+    $('scBerV').textContent = dec(ber.toExponential(1));
     const bers = [...new Set([1e-4, 1e-3, 1e-2, 0.05, 0.1, ber])].sort((a, b) => a - b);
-    let h = `<table class="kv"><tr><th>taxa de erro por bit</th><td class="note">NRMSE estocástico (${esc(SC_GENERATORS[gen])}, N = ${N})</td><td class="note">NRMSE binário de 8 bits</td></tr>`;
+    let h = `<table class="kv"><tr><th>${t('mem.ber')}</th><td class="note">${t('sc.faultSc', { gen: esc(genName(gen)), N })}</td><td class="note">${t('sc.faultBin')}</td></tr>`;
     for (const b of bers) {
         const f = faultError(op, gen, N, b);
         const tag = b === ber ? '<b>' : '';
-        h += `<tr><th>${tag}${b.toExponential(0).replace('.', ',')}${tag ? '</b>' : ''}</th><td class="mono">${pct(f.sc)}</td><td class="mono">${pct(f.bin)}</td></tr>`;
+        h += `<tr><th>${tag}${dec(b.toExponential(0))}${tag ? '</b>' : ''}</th><td class="mono">${pct(f.sc)}</td><td class="mono">${pct(f.bin)}</td></tr>`;
     }
     $('scFault').innerHTML = `${h}</table>`;
     clearTimeout(scImgTimer);
@@ -729,11 +767,11 @@ function renderScImage() {
     drawGray($('scExact'), exact);
     drawGray($('scImg'), sc);
     drawGray($('scBin'), bin);
-    $('scImgCap').textContent = `estocástica, N = ${N}, com bits errados`;
-    $('scImgNote').innerHTML = 'Aplicação: o gaussiano 3 × 3 com pesos 1 2 1 sem nenhuma multiplicação. Um MUX de 9 entradas sorteia, a cada ciclo, um vizinho com probabilidade igual ao seu peso (soma 16); a fração de uns da saída é a média ponderada. Os pixels compartilham o gerador dos dados, e a seleção vem de outro gerador (ou do mesmo, com um LFSR só). No binário, os bits errados caem nos 8 bits de cada pixel do resultado.';
+    $('scImgCap').textContent = t('sc.imgCap', { N });
+    $('scImgNote').innerHTML = t('sc.imgNote');
     const row = (name, x) => { const p = psnr(exact, x); return `<tr><th>${name}</th><td class="mono">${p === Infinity ? '∞' : `${nf(p, 1)} dB`}</td><td class="mono">${nf(ssim(exact, x), 4)}</td></tr>`; };
     $('scImgTable').innerHTML = '<table class="kv"><tr><th></th><td class="note">PSNR</td><td class="note">SSIM</td></tr>'
-        + row(`estocástica sem bits errados (N = ${N})`, sc0) + row('estocástica com bits errados', sc) + row('binária com bits errados', bin) + '</table>';
+        + row(t('sc.rowSc0', { N }), sc0) + row(t('sc.rowSc'), sc) + row(t('sc.rowBin'), bin) + '</table>';
 }
 
 function renderSc() {
@@ -751,20 +789,22 @@ $('filter').onchange = () => { renderApp(); };
 $('vosV').addEventListener('input', () => renderVos());
 $('vosClock').addEventListener('change', () => renderVos());
 for (const id of ['memBer', 'memProt']) $(id).addEventListener('input', () => renderMem());
-$('imgSynth').onclick = () => { image = testImage(); renderApp(); dirty.vos = true; dirty.sc = true; };
+$('imgSynth').onclick = () => { image = testImage(); imgMessage = null; dirty.vos = true; dirty.sc = true; if (cur) cur.appCache = null; renderApp(); };
 $('imgFile').onchange = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
     const useImage = (im) => {
         image = fitImage(im, 256);
+        imgMessage = null;
         dirty.vos = true;
         dirty.sc = true;
         renderApp();
     };
+    const fail = (msg) => { imgMessage = msg; renderApp(); };
     if (/\.(ppm|pgm|pbm|pnm)$/i.test(f.name)) {
         // Netpbm: os navegadores não abrem, então o arquivo é lido aqui.
         f.arrayBuffer().then((buf) => {
-            try { useImage(parseNetpbm(new Uint8Array(buf))); } catch (err) { $('appNote').textContent = `Não foi possível ler ${f.name}: ${err.message}.`; }
+            try { useImage(parseNetpbm(new Uint8Array(buf))); } catch (err) { fail(t('app.readError', { name: f.name, msg: t(err.message) })); }
         });
         e.target.value = '';
         return;
@@ -780,7 +820,7 @@ $('imgFile').onchange = (e) => {
         URL.revokeObjectURL(img.src);
         useImage(fromRgba(ctx.getImageData(0, 0, w, h).data, w, h));
     };
-    img.onerror = () => { URL.revokeObjectURL(img.src); $('appNote').textContent = `O navegador não abriu ${f.name} como imagem.`; };
+    img.onerror = () => { URL.revokeObjectURL(img.src); fail(t('app.notImage', { name: f.name })); };
     img.src = URL.createObjectURL(f);
     e.target.value = '';
 };
@@ -788,6 +828,7 @@ $('imgFile').onchange = (e) => {
 // Abas e controles ------------------------------------------------------------------------------------------
 
 function showTab(name) {
+    if (!$(`pane-${name}`)) name = 'struct';
     tab = name;
     store.set('axc.tab', name);
     for (const b of $('tabs').querySelectorAll('[data-tab]')) b.classList.toggle('sel', b.dataset.tab === name);
@@ -803,7 +844,66 @@ for (const id of ['kTrunc', 'kApprox', 'kAdd', 'segL', 'segP', 'kBlock', 'drumK'
 }
 for (const id of ['kind', 'width', 'adder', 'dist', 'approxCarry', 'mulMethod', 'comp']) $(id).addEventListener('change', () => { syncControls(); evaluateCurrent(); });
 
-// Tema e ajuda ----------------------------------------------------------------------------------------------
+// Link para compartilhar ------------------------------------------------------------------------------------
+
+/**
+ * Controles guardados no link, na ordem em que são restaurados (a largura e o tipo antes dos que dependem
+ * deles). O estado vai no fragmento do endereço (#kind=mul&width=8&...), legível e sem ir ao servidor.
+ */
+const SHARE_IDS = ['kind', 'width', 'mulMethod', 'kTrunc', 'kApprox', 'approxCarry', 'kBlock', 'drumK', 'comp', 'adder', 'kAdd', 'segL', 'segP', 'dist',
+    'histLog', 'cmpX', 'cmpY', 'cmpLog', 'filter', 'vosV', 'vosClock', 'memBer', 'memProt', 'scOp', 'scGen', 'scN', 'scX', 'scY', 'scBer', 'synthTarget'];
+const DEFAULTS = new Map(SHARE_IDS.map((id) => [id, $(id).type === 'checkbox' ? $(id).checked : $(id).value]));
+const ctrlValue = (id) => ($(id).type === 'checkbox' ? $(id).checked : $(id).value);
+
+function shareUrl() {
+    const p = new URLSearchParams();
+    const mul = $('kind').value === 'mul';
+    for (const id of SHARE_IDS) {
+        // Só o que difere do padrão, e só os controles do tipo de unidade escolhido.
+        if (mul && ['adder', 'kAdd', 'segL', 'segP'].includes(id)) continue;
+        if (!mul && ['mulMethod', 'kTrunc', 'kApprox', 'approxCarry', 'kBlock', 'drumK', 'comp'].includes(id)) continue;
+        const v = ctrlValue(id);
+        if (id === 'kind' || id === 'width' || v !== DEFAULTS.get(id)) p.set(id, typeof v === 'boolean' ? (v ? '1' : '0') : v);
+    }
+    p.set('tab', tab);
+    p.set('lang', getLanguage());
+    return `${location.origin}${location.pathname}#${p.toString()}`;
+}
+
+/** Aplica o estado de um link. Valores fora das opções ou dos limites são ignorados. */
+function applyShared(hash) {
+    const p = new URLSearchParams(hash);
+    if (!p.has('kind') && !p.has('tab')) return false;
+    for (const id of SHARE_IDS) {
+        if (!p.has(id)) continue;
+        const el = $(id), v = p.get(id);
+        if (el.type === 'checkbox') el.checked = v === '1';
+        else if (el.tagName === 'SELECT') { if ([...el.options].some((o) => o.value === v)) el.value = v; }
+        else if (Number.isFinite(+v)) el.value = v;   // o range limita sozinho ao min e max
+        if (id === 'width' || id === 'mulMethod' || id === 'kind') syncControls();
+    }
+    if (p.has('tab')) tab = p.get('tab');
+    return true;
+}
+
+function flash(btn, text) {
+    const old = btn.textContent;
+    btn.textContent = text;
+    setTimeout(() => { btn.textContent = old; }, 1600);
+}
+$('shareLink').onclick = async () => {
+    const url = shareUrl();
+    history.replaceState(null, '', url);
+    try {
+        await navigator.clipboard.writeText(url);
+        flash($('shareLink'), t('ui.linkCopied'));
+    } catch {
+        // Sem acesso à área de transferência (página fora de https, por exemplo): o link fica na barra de endereço.
+        flash($('shareLink'), t('ui.linkInBar'));
+    }
+};
+
+// Tema, ajuda e idioma --------------------------------------------------------------------------------------
 
 const themeButton = $('theme-toggle');
 function updateThemeIcon() {
@@ -820,7 +920,52 @@ themeButton.addEventListener('click', () => {
 updateThemeIcon();
 const help = new Help($('readme'));
 $('open-ajuda').addEventListener('click', () => (help.isOverlay() ? help.close() : help.open()));
+document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[data-help]');
+    if (a) { e.preventDefault(); help.open(a.dataset.help); }
+});
 
+const langSelect = $('lang-select');
+langSelect.innerHTML = Object.entries(LANGUAGES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+function applyDomTranslations() {
+    langSelect.value = getLanguage();
+    document.documentElement.lang = getLanguage() === 'en' ? 'en' : 'pt-BR';
+    document.title = t('ui.docTitle');
+    document.querySelector('meta[name="description"]')?.setAttribute('content', t('ui.description'));
+    for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
+    for (const el of document.querySelectorAll('[data-i18n-html]')) el.innerHTML = t(el.dataset.i18nHtml);
+    for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle);
+    help.render();
+}
+langSelect.addEventListener('change', () => {
+    setLanguage(langSelect.value);
+    applyDomTranslations();
+    syncControls();
+    if (cur) {
+        renderEvalNote();
+        renderSummary();
+        for (const k of Object.keys(dirty)) dirty[k] = true;
+        renderTab(tab);
+    }
+});
+
+// Início -----------------------------------------------------------------------------------------------------
+
+/** Estado vindo do endereço: na abertura e quando um link é colado na mesma aba (só o fragmento muda). */
+function fromHash() {
+    if (location.hash.length <= 1) return false;
+    const p = new URLSearchParams(location.hash.slice(1));
+    if (p.has('lang')) setLanguage(p.get('lang'), { persist: false });
+    return applyShared(location.hash.slice(1));
+}
+window.addEventListener('hashchange', () => {
+    if (!fromHash()) return;
+    applyDomTranslations();
+    evaluateCurrent();
+    showTab(tab);
+});
+fromHash();
+applyDomTranslations();
 syncControls();
 evaluateCurrent();
 showTab(tab);

@@ -1,10 +1,17 @@
 {
- "generated": "2026-10-14",
+ "generated": "2026-10-15",
  "tools": {
   "yosys": "Yosys 0.33 (git sha1 2584903a060)",
   "iverilog": "Icarus Verilog version 12.0 (stable) ()"
  },
  "flow": "read_verilog; synth_xilinx -family xc7 -flatten -nodsp -abc9 -noiopad",
+ "asic": {
+  "library": "sky130_fd_sc_hd, tt_025C_1v80",
+  "source": "https://raw.githubusercontent.com/The-OpenROAD-Project/OpenROAD-flow-scripts/08ddc64f89c66b7e8398587d25bbaf55858d1fe5/flow/platforms/sky130hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib",
+  "sha256": "ec0e1067a35c8bf20b11e58d1e8ac53326067e4dac84a125cc1b917a3518d0d9",
+  "flow": "read_verilog; synth -flatten; abc -liberty <sky130_fd_sc_hd> -script +strash;dch;map;topo;stime,-p; stat -liberty",
+  "cells": 277
+ },
  "designs": [
   {
    "name": "MUL8 exato",
@@ -27,6 +34,11 @@
     "LUT4": 27,
     "LUT5": 29,
     "LUT6": 20
+   },
+   "asic": {
+    "area": 2539.94,
+    "delay": 1979.79,
+    "cells": 521
    },
    "gates": 320,
    "gateDepth": 29,
@@ -61,6 +73,11 @@
     "LUT5": 25,
     "LUT6": 21
    },
+   "asic": {
+    "area": 2260.92,
+    "delay": 1863.03,
+    "cells": 453
+   },
    "gates": 312,
    "gateDepth": 28,
    "err": {
@@ -93,6 +110,11 @@
     "LUT4": 26,
     "LUT5": 21,
     "LUT6": 19
+   },
+   "asic": {
+    "area": 2184.6,
+    "delay": 2028.55,
+    "cells": 443
    },
    "gates": 280,
    "gateDepth": 26,
@@ -127,6 +149,11 @@
     "LUT5": 23,
     "LUT6": 14
    },
+   "asic": {
+    "area": 1685.37,
+    "delay": 1988.48,
+    "cells": 344
+   },
    "gates": 222,
    "gateDepth": 23,
    "err": {
@@ -159,6 +186,11 @@
     "LUT4": 9,
     "LUT5": 8,
     "LUT6": 12
+   },
+   "asic": {
+    "area": 1030.99,
+    "delay": 1725.79,
+    "cells": 207
    },
    "gates": 140,
    "gateDepth": 19,
@@ -193,6 +225,11 @@
     "LUT5": 27,
     "LUT6": 21
    },
+   "asic": {
+    "area": 2305.96,
+    "delay": 1915.99,
+    "cells": 467
+   },
    "gates": 310,
    "gateDepth": 27,
    "err": {
@@ -226,6 +263,11 @@
     "LUT5": 23,
     "LUT6": 26
    },
+   "asic": {
+    "area": 2049.47,
+    "delay": 1888.31,
+    "cells": 419
+   },
    "gates": 290,
    "gateDepth": 24,
    "err": {
@@ -258,6 +300,11 @@
     "LUT4": 25,
     "LUT5": 25,
     "LUT6": 20
+   },
+   "asic": {
+    "area": 1789.22,
+    "delay": 1716.78,
+    "cells": 351
    },
    "gates": 260,
    "gateDepth": 21,
@@ -293,6 +340,11 @@
     "LUT6": 19,
     "MUXF7": 1
    },
+   "asic": {
+    "area": 1332.53,
+    "delay": 1540.52,
+    "cells": 260
+   },
    "gates": 234,
    "gateDepth": 17,
    "err": {
@@ -325,6 +377,11 @@
     "LUT4": 21,
     "LUT5": 27,
     "LUT6": 12
+   },
+   "asic": {
+    "area": 1094.8,
+    "delay": 1075.31,
+    "cells": 208
    },
    "gates": 214,
    "gateDepth": 12,
@@ -359,6 +416,11 @@
     "LUT5": 27,
     "LUT6": 19
    },
+   "asic": {
+    "area": 1777.96,
+    "delay": 1716.78,
+    "cells": 349
+   },
    "gates": 256,
    "gateDepth": 21,
    "err": {
@@ -391,6 +453,11 @@
     "LUT4": 22,
     "LUT5": 25,
     "LUT6": 16
+   },
+   "asic": {
+    "area": 1719.15,
+    "delay": 1721.42,
+    "cells": 342
    },
    "gates": 238,
    "gateDepth": 21,
@@ -426,6 +493,11 @@
     "LUT5": 21,
     "LUT6": 19
    },
+   "asic": {
+    "area": 2184.6,
+    "delay": 2028.55,
+    "cells": 443
+   },
    "gates": 280,
    "gateDepth": 26,
    "err": {
@@ -460,6 +532,11 @@
     "LUT5": 29,
     "LUT6": 12
    },
+   "asic": {
+    "area": 1940.61,
+    "delay": 2315.36,
+    "cells": 388
+   },
    "gates": 251,
    "gateDepth": 25,
    "err": {
@@ -490,6 +567,11 @@
     "LUT4": 13,
     "LUT5": 37,
     "LUT6": 12
+   },
+   "asic": {
+    "area": 2690.08,
+    "delay": 2525.44,
+    "cells": 527
    },
    "gates": 375,
    "gateDepth": 34,
@@ -522,6 +604,11 @@
     "LUT4": 9,
     "LUT5": 31,
     "LUT6": 12
+   },
+   "asic": {
+    "area": 2323.48,
+    "delay": 2398.92,
+    "cells": 450
    },
    "gates": 351,
    "gateDepth": 31,
@@ -556,6 +643,11 @@
     "LUT5": 31,
     "LUT6": 12
    },
+   "asic": {
+    "area": 2323.48,
+    "delay": 2398.92,
+    "cells": 450
+   },
    "gates": 351,
    "gateDepth": 31,
    "err": {
@@ -586,6 +678,11 @@
     "LUT4": 18,
     "LUT5": 17,
     "LUT6": 23
+   },
+   "asic": {
+    "area": 1894.32,
+    "delay": 1794.3,
+    "cells": 379
    },
    "gates": 262,
    "gateDepth": 28,
@@ -619,6 +716,11 @@
     "LUT5": 23,
     "LUT6": 25
    },
+   "asic": {
+    "area": 2207.12,
+    "delay": 1787.49,
+    "cells": 447
+   },
    "gates": 309,
    "gateDepth": 29,
    "err": {
@@ -650,6 +752,11 @@
     "LUT4": 18,
     "LUT5": 18,
     "LUT6": 29
+   },
+   "asic": {
+    "area": 975.94,
+    "delay": 2016.08,
+    "cells": 193
    },
    "gates": 325,
    "gateDepth": 31,
@@ -685,6 +792,11 @@
     "MUXF7": 2,
     "MUXF8": 1
    },
+   "asic": {
+    "area": 1293.74,
+    "delay": 3118.35,
+    "cells": 253
+   },
    "gates": 358,
    "gateDepth": 33,
    "err": {
@@ -719,6 +831,11 @@
     "MUXF7": 2,
     "MUXF8": 1
    },
+   "asic": {
+    "area": 1918.09,
+    "delay": 3019.65,
+    "cells": 388
+   },
    "gates": 400,
    "gateDepth": 35,
    "err": {
@@ -749,6 +866,11 @@
     "LUT4": 12,
     "LUT5": 12,
     "LUT6": 30
+   },
+   "asic": {
+    "area": 1522.71,
+    "delay": 2918.37,
+    "cells": 289
    },
    "gates": 338,
    "gateDepth": 28,
@@ -783,6 +905,11 @@
     "LUT5": 152,
     "LUT6": 76
    },
+   "asic": {
+    "area": 10646.46,
+    "delay": 2935.3,
+    "cells": 2143
+   },
    "gates": 1408,
    "gateDepth": 61,
    "err": {
@@ -815,6 +942,11 @@
     "LUT4": 76,
     "LUT5": 133,
     "LUT6": 67
+   },
+   "asic": {
+    "area": 8979.86,
+    "delay": 2921.36,
+    "cells": 1833
    },
    "gates": 1228,
    "gateDepth": 52,
@@ -849,6 +981,11 @@
     "LUT5": 109,
     "LUT6": 60
    },
+   "asic": {
+    "area": 7248.2,
+    "delay": 3048.09,
+    "cells": 1457
+   },
    "gates": 990,
    "gateDepth": 45,
    "err": {
@@ -881,6 +1018,11 @@
     "LUT4": 101,
     "LUT5": 161,
     "LUT6": 57
+   },
+   "asic": {
+    "area": 8733.38,
+    "delay": 2898.11,
+    "cells": 1748
    },
    "gates": 1270,
    "gateDepth": 47,
@@ -915,6 +1057,11 @@
     "LUT5": 159,
     "LUT6": 53
    },
+   "asic": {
+    "area": 7543.48,
+    "delay": 2883.77,
+    "cells": 1493
+   },
    "gates": 1156,
    "gateDepth": 40,
    "err": {
@@ -948,6 +1095,11 @@
     "LUT5": 137,
     "LUT6": 50
    },
+   "asic": {
+    "area": 7058.02,
+    "delay": 2900.4,
+    "cells": 1392
+   },
    "gates": 1046,
    "gateDepth": 40,
    "err": {
@@ -978,6 +1130,11 @@
     "LUT4": 49,
     "LUT5": 165,
     "LUT6": 29
+   },
+   "asic": {
+    "area": 10920.47,
+    "delay": 3885.09,
+    "cells": 2184
    },
    "gates": 1491,
    "gateDepth": 66,
@@ -1013,6 +1170,11 @@
     "LUT5": 114,
     "LUT6": 28
    },
+   "asic": {
+    "area": 7799.98,
+    "delay": 4270.97,
+    "cells": 1562
+   },
    "gates": 1297,
    "gateDepth": 51,
    "err": {
@@ -1043,6 +1205,11 @@
     "LUT4": 101,
     "LUT5": 119,
     "LUT6": 57
+   },
+   "asic": {
+    "area": 8633.28,
+    "delay": 2915.67,
+    "cells": 1693
    },
    "gates": 1158,
    "gateDepth": 60,
@@ -1078,6 +1245,11 @@
     "MUXF7": 11,
     "MUXF8": 5
    },
+   "asic": {
+    "area": 4708.27,
+    "delay": 5503.41,
+    "cells": 873
+   },
    "gates": 1224,
    "gateDepth": 52,
    "err": {
@@ -1112,6 +1284,11 @@
     "MUXF7": 2,
     "MUXF8": 1
    },
+   "asic": {
+    "area": 6210.96,
+    "delay": 5676.79,
+    "cells": 1165
+   },
    "gates": 1362,
    "gateDepth": 57,
    "err": {
@@ -1145,6 +1322,11 @@
     "MUXF7": 8,
     "MUXF8": 4
    },
+   "asic": {
+    "area": 4463.03,
+    "delay": 5330.41,
+    "cells": 832
+   },
    "gates": 1011,
    "gateDepth": 46,
    "err": {
@@ -1171,6 +1353,11 @@
    "cells": {
     "CARRY4": 3,
     "LUT2": 8
+   },
+   "asic": {
+    "area": 290.28,
+    "delay": 901.36,
+    "cells": 52
    },
    "gates": 37,
    "gateDepth": 15,
@@ -1200,6 +1387,11 @@
     "CARRY4": 2,
     "LUT2": 6
    },
+   "asic": {
+    "area": 208.95,
+    "delay": 818.61,
+    "cells": 36
+   },
    "gates": 27,
    "gateDepth": 11,
    "err": {
@@ -1227,6 +1419,11 @@
    "cells": {
     "CARRY4": 2,
     "LUT2": 4
+   },
+   "asic": {
+    "area": 117.61,
+    "delay": 612.68,
+    "cells": 22
    },
    "gates": 17,
    "gateDepth": 7,
@@ -1256,6 +1453,11 @@
     "CARRY4": 2,
     "LUT2": 9
    },
+   "asic": {
+    "area": 220.21,
+    "delay": 887.61,
+    "cells": 44
+   },
    "gates": 33,
    "gateDepth": 13,
    "err": {
@@ -1284,6 +1486,11 @@
     "CARRY4": 2,
     "LUT2": 9
    },
+   "asic": {
+    "area": 173.92,
+    "delay": 679.48,
+    "cells": 32
+   },
    "gates": 25,
    "gateDepth": 9,
    "err": {
@@ -1311,6 +1518,11 @@
    "cells": {
     "CARRY4": 1,
     "LUT2": 9
+   },
+   "asic": {
+    "area": 127.62,
+    "delay": 393.61,
+    "cells": 25
    },
    "gates": 17,
    "gateDepth": 5,
@@ -1341,6 +1553,11 @@
     "CARRY4": 3,
     "LUT2": 8
    },
+   "asic": {
+    "area": 231.47,
+    "delay": 611.63,
+    "cells": 40
+   },
    "gates": 34,
    "gateDepth": 7,
    "err": {
@@ -1369,6 +1586,11 @@
    "cells": {
     "CARRY4": 4,
     "LUT2": 8
+   },
+   "asic": {
+    "area": 237.73,
+    "delay": 856.5,
+    "cells": 46
    },
    "gates": 43,
    "gateDepth": 11,
@@ -1400,6 +1622,11 @@
     "LUT2": 10,
     "LUT3": 2
    },
+   "asic": {
+    "area": 315.3,
+    "delay": 638.84,
+    "cells": 62
+   },
    "gates": 55,
    "gateDepth": 7,
    "err": {
@@ -1426,6 +1653,11 @@
    "cells": {
     "CARRY4": 5,
     "LUT2": 16
+   },
+   "asic": {
+    "area": 665.64,
+    "delay": 1264.93,
+    "cells": 125
    },
    "gates": 77,
    "gateDepth": 31,
@@ -1455,6 +1687,11 @@
     "CARRY4": 4,
     "LUT2": 17
    },
+   "asic": {
+    "area": 472.95,
+    "delay": 1300.77,
+    "cells": 93
+   },
    "gates": 65,
    "gateDepth": 25,
    "err": {
@@ -1482,6 +1719,11 @@
    "cells": {
     "CARRY4": 3,
     "LUT2": 17
+   },
+   "asic": {
+    "area": 346.58,
+    "delay": 1086.8,
+    "cells": 65
    },
    "gates": 49,
    "gateDepth": 17,
@@ -1512,6 +1754,11 @@
     "CARRY4": 10,
     "LUT2": 18
    },
+   "asic": {
+    "area": 598.07,
+    "delay": 1054.93,
+    "cells": 115
+   },
    "gates": 119,
    "gateDepth": 15,
    "err": {
@@ -1540,6 +1787,11 @@
    "cells": {
     "CARRY4": 7,
     "LUT2": 16
+   },
+   "asic": {
+    "area": 599.32,
+    "delay": 1275.71,
+    "cells": 120
    },
    "gates": 91,
    "gateDepth": 23,

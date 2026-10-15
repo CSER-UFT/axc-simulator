@@ -103,3 +103,5 @@ table.metrics td.note { text-align: left; }
 .sc-controls { display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; }
 .sc-controls .slider { margin: 0 !important; }
 .scroll-x { overflow-x: auto; }
+#synthTable td.left, #cmpTable td.left { white-space: nowrap; }
+.refs li { margin-bottom: 4px; }

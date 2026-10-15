@@ -2,8 +2,10 @@
  * Ajuda: manual com índice lateral, busca e ligações internas. O conteúdo fica em js/help/<idioma>.js.
  */
 import pt from '../help/pt.js';
+import en from '../help/en.js';
+import { getLanguage } from '../i18n/index.js';
 
-
+const CONTENT = { pt, en };
 
 const normalize = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -37,7 +39,7 @@ export class Help {
 
     /** Monta a ajuda no idioma atual. */
     render() {
-        const c = pt;
+        const c = CONTENT[getLanguage()] ?? pt;
         const toc = c.sections.map((s) => `<li><a href="#h-${s.id}" data-sec="${s.id}">${s.title}</a></li>`).join('');
         const body = c.sections.map((s) => `<section class="help-section" id="h-${s.id}"><h2>${s.title}</h2>${s.html}</section>`).join('');
         this.root.innerHTML = `

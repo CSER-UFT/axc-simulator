@@ -21,59 +21,61 @@
     </head>
     <body>
         <header id="header">
-            <div class="brand"><span class="icon i-cpu brand-mark" aria-hidden="true"></span><span class="brand-name">Simulador de Computação <b>Aproximada</b></span></div>
+            <div class="brand"><span class="icon i-cpu brand-mark" aria-hidden="true"></span><span class="brand-name" data-i18n-html="ui.appTitle">Simulador de Computação <b>Aproximada</b></span></div>
             <div class="tools">
-                <button type="button" id="theme-toggle" class="btn icon-btn" title="Alternar contraste"><span class="icon i-moon" aria-hidden="true"></span><span class="sr-only">Alternar contraste</span></button>
-                <button type="button" id="open-ajuda" class="btn">Ajuda</button>
+                <label class="lang"><span class="sr-only" data-i18n="ui.language">Idioma</span><select id="lang-select"></select></label>
+                <button type="button" id="shareLink" class="btn" data-i18n="ui.link" data-i18n-title="ui.linkHelp">Copiar link</button>
+                <button type="button" id="theme-toggle" class="btn icon-btn" data-i18n-title="ui.theme"><span class="icon i-moon" aria-hidden="true"></span><span class="sr-only" data-i18n="ui.theme">Alternar contraste</span></button>
+                <button type="button" id="open-ajuda" class="btn" data-i18n="ui.help">Ajuda</button>
             </div>
         </header>
         <div id="readme" class="readme"></div>
         <main>
             <div>
                 <section>
-                    <h2>Unidade aritmética</h2>
+                    <h2 data-i18n="unit.title">Unidade aritmética</h2>
                     <div class="row">
-                        <label>Tipo <select id="kind"><option value="mul">Multiplicador</option><option value="add">Somador</option></select></label>
-                        <label>Largura <select id="width"><option value="8">8 bits</option><option value="16">16 bits</option></select></label>
+                        <label><span data-i18n="unit.kind">Tipo</span> <select id="kind"><option value="mul" data-i18n="unit.mul">Multiplicador</option><option value="add" data-i18n="unit.add">Somador</option></select></label>
+                        <label><span data-i18n="unit.width">Largura</span> <select id="width"><option value="8">8 bits</option><option value="16">16 bits</option></select></label>
                     </div>
                     <div id="mulCfg">
-                        <label>Técnica <select id="mulMethod">
-                            <option value="array">por colunas (truncar e aproximar)</option>
-                            <option value="booth">Booth radix 4, com sinal</option>
-                            <option value="kulkarni">blocos 2 × 2 de Kulkarni</option>
-                            <option value="drum">DRUM (k bits a partir do 1 mais alto)</option>
-                            <option value="mitchell">logarítmico de Mitchell</option>
+                        <label><span data-i18n="unit.method">Técnica</span> <select id="mulMethod">
+                            <option value="array" data-i18n="m.array">por colunas (truncar e aproximar)</option>
+                            <option value="booth" data-i18n="m.booth">Booth radix 4, com sinal</option>
+                            <option value="kulkarni" data-i18n="m.kulkarni">blocos 2 × 2 de Kulkarni</option>
+                            <option value="drum" data-i18n="m.drum">DRUM (k bits a partir do 1 mais alto)</option>
+                            <option value="mitchell" data-i18n="m.mitchell">logarítmico de Mitchell</option>
                         </select></label>
-                        <div id="rowTrunc"><label class="slider">Colunas truncadas <input type="range" id="kTrunc" min="0" max="16" value="0" /> <output id="kTruncV">0</output></label></div>
+                        <div id="rowTrunc"><label class="slider"><span data-i18n="unit.kTrunc">Colunas truncadas</span> <input type="range" id="kTrunc" min="0" max="16" value="0" /> <output id="kTruncV">0</output></label></div>
                         <div id="rowApprox">
-                            <label class="slider">Colunas aproximadas <input type="range" id="kApprox" min="0" max="16" value="6" /> <output id="kApproxV">6</output></label>
-                            <label class="check"><input type="checkbox" id="approxCarry" checked /> vem um previsto (AND) na primeira coluna exata</label>
+                            <label class="slider"><span data-i18n="unit.kApprox">Colunas aproximadas</span> <input type="range" id="kApprox" min="0" max="16" value="6" /> <output id="kApproxV">6</output></label>
+                            <label class="check"><input type="checkbox" id="approxCarry" checked /> <span data-i18n="unit.approxCarry">vem um previsto (AND) na primeira coluna exata</span></label>
                         </div>
-                        <div id="rowKul"><label class="slider">Blocos aproximados abaixo da coluna <input type="range" id="kBlock" min="0" max="16" step="2" value="16" /> <output id="kBlockV">16</output></label></div>
-                        <div id="rowDrum"><label class="slider">Bits mantidos (k) <input type="range" id="drumK" min="2" max="7" value="4" /> <output id="drumKV">4</output></label></div>
-                        <label class="check" title="Soma ao resultado uma constante igual ao erro médio medido com entradas uniformes"><input type="checkbox" id="comp" /> compensar o viés (constante somada ao resultado)</label>
+                        <div id="rowKul"><label class="slider"><span data-i18n="unit.kBlock">Blocos aproximados abaixo da coluna</span> <input type="range" id="kBlock" min="0" max="16" step="2" value="16" /> <output id="kBlockV">16</output></label></div>
+                        <div id="rowDrum"><label class="slider"><span data-i18n="unit.drumK">Bits mantidos (k)</span> <input type="range" id="drumK" min="2" max="7" value="4" /> <output id="drumKV">4</output></label></div>
+                        <label class="check" data-i18n-title="unit.compHelp"><input type="checkbox" id="comp" /> <span data-i18n="unit.comp">compensar o viés (constante somada ao resultado)</span></label>
                     </div>
                     <div id="addCfg" class="hidden">
-                        <label>Técnica <select id="adder">
-                            <option value="exact">exato (ripple carry)</option>
-                            <option value="trunc">truncado</option>
-                            <option value="loa" selected>LOA (parte baixa com OR)</option>
-                            <option value="seg">segmentado (vem um previsto)</option>
+                        <label><span data-i18n="unit.method">Técnica</span> <select id="adder">
+                            <option value="exact" data-i18n="a.exact">exato (ripple carry)</option>
+                            <option value="trunc" data-i18n="a.trunc">truncado</option>
+                            <option value="loa" selected data-i18n="a.loa">LOA (parte baixa com OR)</option>
+                            <option value="seg" data-i18n="a.seg">segmentado (vem um previsto)</option>
                         </select></label>
-                        <label class="slider" id="kRow">Bits aproximados (k) <input type="range" id="kAdd" min="0" max="8" value="4" /> <output id="kAddV">4</output></label>
+                        <label class="slider" id="kRow"><span data-i18n="unit.kAdd">Bits aproximados (k)</span> <input type="range" id="kAdd" min="0" max="8" value="4" /> <output id="kAddV">4</output></label>
                         <div id="segRow" class="hidden">
-                            <label class="slider">Tamanho do bloco (L) <input type="range" id="segL" min="1" max="8" value="4" /> <output id="segLV">4</output></label>
-                            <label class="slider">Bits de previsão (P) <input type="range" id="segP" min="0" max="8" value="2" /> <output id="segPV">2</output></label>
+                            <label class="slider"><span data-i18n="unit.segL">Tamanho do bloco (L)</span> <input type="range" id="segL" min="1" max="8" value="4" /> <output id="segLV">4</output></label>
+                            <label class="slider"><span data-i18n="unit.segP">Bits de previsão (P)</span> <input type="range" id="segP" min="0" max="8" value="2" /> <output id="segPV">2</output></label>
                         </div>
                     </div>
-                    <label>Entradas <select id="dist">
-                        <option value="uniform">uniformes</option>
-                        <option value="normal">normais (centradas no meio da faixa)</option>
-                        <option value="exp">exponenciais (valores pequenos mais comuns)</option>
+                    <label><span data-i18n="unit.dist">Entradas</span> <select id="dist">
+                        <option value="uniform" data-i18n="dist.uniformLong">uniformes</option>
+                        <option value="normal" data-i18n="dist.normalLong">normais (centradas no meio da faixa)</option>
+                        <option value="exp" data-i18n="dist.expLong">exponenciais (valores pequenos mais comuns)</option>
                     </select></label>
                     <p class="note" id="evalNote"></p>
                     <div class="row" style="margin-top:8px">
-                        <button type="button" class="btn primary" id="addCmp">Adicionar à comparação</button>
+                        <button type="button" class="btn primary" id="addCmp" data-i18n="unit.addCmp">Adicionar à comparação</button>
                     </div>
                 </section>
                 <section style="margin-top:16px">
@@ -84,36 +86,36 @@
             <div>
                 <section>
                     <div class="tabs" id="tabs">
-                        <button type="button" class="btn" data-tab="struct">Estrutura</button>
-                        <button type="button" class="btn" data-tab="error">Erro</button>
-                        <button type="button" class="btn" data-tab="cmp">Comparação</button>
-                        <button type="button" class="btn" data-tab="app">Aplicação</button>
-                        <button type="button" class="btn" data-tab="vos">Tensão e memória</button>
-                        <button type="button" class="btn" data-tab="sc">Estocástica</button>
-                        <button type="button" class="btn" data-tab="synth">Síntese</button>
+                        <button type="button" class="btn" data-tab="struct" data-i18n="tab.struct">Estrutura</button>
+                        <button type="button" class="btn" data-tab="error" data-i18n="tab.error">Erro</button>
+                        <button type="button" class="btn" data-tab="cmp" data-i18n="tab.cmp">Comparação</button>
+                        <button type="button" class="btn" data-tab="app" data-i18n="tab.app">Aplicação</button>
+                        <button type="button" class="btn" data-tab="vos" data-i18n="tab.vos">Tensão e memória</button>
+                        <button type="button" class="btn" data-tab="sc" data-i18n="tab.sc">Estocástica</button>
+                        <button type="button" class="btn" data-tab="synth" data-i18n="tab.synth">Síntese</button>
                     </div>
 
                     <div class="pane" id="pane-struct">
                         <p class="note" id="structNote"></p>
                         <div class="fig-box" id="structFig"></div>
                         <div class="graph-pair">
-                            <div id="stagesBox"><h3>Altura das colunas a cada estágio de redução</h3><div class="scroll-box"><table id="stagesTable" class="mono"></table></div></div>
-                            <div id="compBox"><h3>Compressor 4:2 aproximado</h3><p class="note">soma = (x1 ⊕ x2) + (x3 ⊕ x4), vai um = x1·x2 + x3·x4. As linhas em destaque são as que erram.</p><div class="scroll-box"><table id="compTable" class="mono"></table></div></div>
+                            <div id="stagesBox"><h3 data-i18n="struct.heights">Altura das colunas a cada estágio de redução</h3><div class="scroll-box"><table id="stagesTable" class="mono"></table></div></div>
+                            <div id="compBox"><h3 data-i18n="struct.comp">Compressor 4:2 aproximado</h3><p class="note" data-i18n="struct.compNote">soma = (x1 ⊕ x2) + (x3 ⊕ x4), vai um = x1·x2 + x3·x4. As linhas em destaque são as que erram.</p><div class="scroll-box"><table id="compTable" class="mono"></table></div></div>
                         </div>
                     </div>
 
                     <div class="pane" id="pane-error">
                         <div class="error-pair">
                             <div>
-                                <h3>Mapa do erro (|aproximado − exato|)</h3>
+                                <h3 data-i18n="err.map">Mapa do erro (|aproximado − exato|)</h3>
                                 <p class="note" id="heatNote"></p>
                                 <div class="heat-wrap"><span class="axis-l">a →</span><canvas id="heat"></canvas><span class="axis-t">b →</span></div>
                                 <div id="heatLegend"></div>
                                 <p class="note mono" id="heatHover">&nbsp;</p>
                             </div>
                             <div>
-                                <h3>Histograma do erro</h3>
-                                <label class="check"><input type="checkbox" id="histLog" checked /> escala logarítmica</label>
+                                <h3 data-i18n="err.hist">Histograma do erro</h3>
+                                <label class="check"><input type="checkbox" id="histLog" checked /> <span data-i18n="err.log">escala logarítmica</span></label>
                                 <div class="fig-box" id="histFig"></div>
                                 <p class="note" id="histNote"></p>
                             </div>
@@ -121,17 +123,17 @@
                     </div>
 
                     <div class="pane" id="pane-cmp">
-                        <p class="note">Cada configuração adicionada vira um ponto. Os pontos não dominados (nenhum outro tem custo e erro menores ou iguais, com um deles estritamente menor) formam a fronteira de Pareto, ligada em degraus.</p>
+                        <p class="note" data-i18n="cmp.intro">Cada configuração adicionada vira um ponto. Os pontos não dominados (nenhum outro tem custo e erro menores ou iguais, com um deles estritamente menor) formam a fronteira de Pareto, ligada em degraus.</p>
                         <div class="row">
-                            <label style="margin:0">Custo <select id="cmpX"><option value="gates">área (portas, modelo)</option><option value="delay">atraso (níveis de porta, modelo)</option><option value="adp">área × atraso (modelo)</option><option value="luts">LUTs (Yosys)</option><option value="lutsCarry">LUTs + CARRY4 (Yosys)</option><option value="depth">profundidade em células (Yosys)</option><option value="activity">atividade (transições por operação)</option><option value="aap">área × atividade (modelo)</option></select></label>
-                            <label style="margin:0">Erro <select id="cmpY"><option value="NMED">NMED</option><option value="MRED" selected>MRED</option><option value="MED">MED</option><option value="WCE">WCE</option><option value="MSE">MSE</option><option value="EP">EP</option><option value="imgMSE">MSE da imagem filtrada</option></select></label>
-                            <label class="check" style="margin:0"><input type="checkbox" id="cmpLog" checked /> erro em escala log</label>
+                            <label style="margin:0"><span data-i18n="cmp.cost">Custo</span> <select id="cmpX"><option value="gates" data-i18n="x.gatesM">área (portas, modelo)</option><option value="delay" data-i18n="x.delayM">atraso (níveis de porta, modelo)</option><option value="adp" data-i18n="x.adpM">área × atraso (modelo)</option><option value="luts" data-i18n="x.luts">LUTs (Yosys)</option><option value="lutsCarry" data-i18n="x.lutsCarry">LUTs + CARRY4 (Yosys)</option><option value="depth" data-i18n="x.depth">profundidade em células (Yosys)</option><option value="asicArea" data-i18n="x.asicArea">área ASIC (µm², sky130)</option><option value="asicDelay" data-i18n="x.asicDelay">atraso ASIC (ps, sky130)</option><option value="asicAdp" data-i18n="x.asicAdpM">área × atraso ASIC (sky130)</option><option value="activity" data-i18n="x.activity">atividade (transições por operação)</option><option value="aap" data-i18n="x.aapM">área × atividade (modelo)</option></select></label>
+                            <label style="margin:0"><span data-i18n="cmp.error">Erro</span> <select id="cmpY"><option value="NMED">NMED</option><option value="MRED" selected>MRED</option><option value="MED">MED</option><option value="WCE">WCE</option><option value="MSE">MSE</option><option value="EP">EP</option><option value="imgMSE" data-i18n="y.imgMSE">MSE da imagem filtrada</option></select></label>
+                            <label class="check" style="margin:0"><input type="checkbox" id="cmpLog" checked /> <span data-i18n="cmp.log">erro em escala log</span></label>
                         </div>
                         <div class="row" style="margin-top:8px">
-                            <button type="button" class="btn outline" id="sweepBtn">Varrer o parâmetro principal</button>
-                            <button type="button" class="btn outline" id="cmpClear">Limpar</button>
+                            <button type="button" class="btn outline" id="sweepBtn" data-i18n="cmp.sweep">Varrer o parâmetro principal</button>
+                            <button type="button" class="btn outline" id="cmpClear" data-i18n="cmp.clear">Limpar</button>
                             <button type="button" class="btn outline" id="cmpCsv">CSV</button>
-                            <button type="button" class="btn outline" id="cmpSvg">Figura (SVG)</button>
+                            <button type="button" class="btn outline" id="cmpSvg" data-i18n="cmp.svg">Figura (SVG)</button>
                             <span class="note" id="sweepNote"></span>
                         </div>
                         <div class="fig-box" id="paretoFig"></div>
@@ -140,76 +142,76 @@
                     </div>
 
                     <div class="pane" id="pane-vos">
-                        <h3>Escalonamento de tensão além da margem</h3>
-                        <p class="note">O relógio fica fixo e a tensão cai: as portas ficam mais lentas (lei de potência alfa, V<sub>t</sub> = 0,3 e α = 1,3, com tensões normalizadas pela nominal) e os bits de saída que chegam depois da borda do relógio ficam com o valor da operação anterior. A energia dinâmica cai com V².</p>
+                        <h3 data-i18n="vos.title">Escalonamento de tensão além da margem</h3>
+                        <p class="note" data-i18n-html="vos.intro">O relógio fica fixo e a tensão cai: as portas ficam mais lentas (lei de potência alfa, V<sub>t</sub> = 0,3 e α = 1,3, com tensões normalizadas pela nominal) e os bits de saída que chegam depois da borda do relógio ficam com o valor da operação anterior. A energia dinâmica cai com V².</p>
                         <div class="row">
-                            <label class="slider wide">Tensão (V/Vnom) <input type="range" id="vosV" min="0.5" max="1" step="0.01" value="0.8" /> <output id="vosVV">0,80</output></label>
-                            <label style="margin:0">Relógio <select id="vosClock"><option value="exact">o da unidade exata</option><option value="own">o da própria unidade</option></select></label>
+                            <label class="slider wide"><span data-i18n="vos.V">Tensão (V/Vnom)</span> <input type="range" id="vosV" min="0.5" max="1" step="0.01" value="0.8" /> <output id="vosVV">0,80</output></label>
+                            <label style="margin:0"><span data-i18n="vos.clock">Relógio</span> <select id="vosClock"><option value="exact" data-i18n="vos.clockExact">o da unidade exata</option><option value="own" data-i18n="vos.clockOwn">o da própria unidade</option></select></label>
                         </div>
                         <div class="graph-pair">
                             <div><div class="fig-box" id="vosFig"></div><p class="note" id="vosNote"></p></div>
                             <div><div id="vosTable"></div>
                                 <div class="img-row">
-                                    <figure><canvas id="vosExact"></canvas><figcaption id="vosExactCap">exata, na tensão nominal</figcaption></figure>
-                                    <figure><canvas id="vosImg"></canvas><figcaption id="vosImgCap">com a tensão escolhida</figcaption></figure>
+                                    <figure><canvas id="vosExact"></canvas><figcaption id="vosExactCap"></figcaption></figure>
+                                    <figure><canvas id="vosImg"></canvas><figcaption id="vosImgCap"></figcaption></figure>
                                 </div>
                             </div>
                         </div>
-                        <h3 style="margin-top:16px">Memória aproximada</h3>
-                        <p class="note">A imagem é guardada numa memória que inverte cada bit com a probabilidade escolhida, como uma DRAM com intervalo de refresh maior que o seguro (Flikker, Liu e colegas, 2011). Os bits mais significativos de cada pixel podem ficar numa parte confiável da memória: é a divisão por significância.</p>
+                        <h3 style="margin-top:16px" data-i18n="mem.title">Memória aproximada</h3>
+                        <p class="note" data-i18n="mem.intro">A imagem é guardada numa memória que inverte cada bit com a probabilidade escolhida, como uma DRAM com intervalo de refresh maior que o seguro (Flikker, Liu e colegas, 2011). Os bits mais significativos de cada pixel podem ficar numa parte confiável da memória: é a divisão por significância.</p>
                         <div class="row">
-                            <label class="slider wide">Taxa de erro por bit <input type="range" id="memBer" min="-6" max="-0.5" step="0.25" value="-2" /> <output id="memBerV">1e-2</output></label>
-                            <label class="slider wide">Bits protegidos <input type="range" id="memProt" min="0" max="8" step="1" value="0" /> <output id="memProtV">0</output></label>
+                            <label class="slider wide"><span data-i18n="mem.ber">Taxa de erro por bit</span> <input type="range" id="memBer" min="-6" max="-0.5" step="0.25" value="-2" /> <output id="memBerV">1e-2</output></label>
+                            <label class="slider wide"><span data-i18n="mem.prot">Bits protegidos</span> <input type="range" id="memProt" min="0" max="8" step="1" value="0" /> <output id="memProtV">0</output></label>
                         </div>
                         <div class="img-row">
-                            <figure><canvas id="memOrig"></canvas><figcaption>original</figcaption></figure>
-                            <figure><canvas id="memImg"></canvas><figcaption>lida da memória aproximada</figcaption></figure>
-                            <figure><canvas id="memDiff"></canvas><figcaption>|diferença| em cor (log)</figcaption></figure>
+                            <figure><canvas id="memOrig"></canvas><figcaption data-i18n="mem.orig">original</figcaption></figure>
+                            <figure><canvas id="memImg"></canvas><figcaption data-i18n="mem.read">lida da memória aproximada</figcaption></figure>
+                            <figure><canvas id="memDiff"></canvas><figcaption data-i18n="mem.diff">|diferença| em cor (log)</figcaption></figure>
                         </div>
                         <div id="memTable"></div>
                     </div>
 
                     <div class="pane" id="pane-sc">
-                        <p class="note">Na computação estocástica, um valor p entre 0 e 1 é um fluxo de N bits com uma fração p de uns. Multiplicar vira uma porta AND, e somar vira um MUX. Esta aba não usa a unidade da esquerda: compara os geradores de fluxo entre si e com um circuito binário de 8 bits.</p>
+                        <p class="note" data-i18n="sc.intro">Na computação estocástica, um valor p entre 0 e 1 é um fluxo de N bits com uma fração p de uns. Multiplicar vira uma porta AND, e somar vira um MUX. Esta aba não usa a unidade da esquerda: compara os geradores de fluxo entre si e com um circuito binário de 8 bits.</p>
                         <div class="sc-controls">
-                            <label>Operação <select id="scOp">
-                                <option value="mul">multiplicação unipolar (AND)</option>
-                                <option value="bmul">multiplicação bipolar (XNOR)</option>
-                                <option value="add">soma escalada (MUX)</option>
+                            <label><span data-i18n="sc.op">Operação</span> <select id="scOp">
+                                <option value="mul" data-i18n="sc.op.mul">multiplicação unipolar (AND)</option>
+                                <option value="bmul" data-i18n="sc.op.bmul">multiplicação bipolar (XNOR)</option>
+                                <option value="add" data-i18n="sc.op.add">soma escalada (MUX)</option>
                             </select></label>
-                            <label>Gerador <select id="scGen">
-                                <option value="random">aleatório ideal (independente)</option>
-                                <option value="lfsrSame">um LFSR para todos os fluxos</option>
-                                <option value="lfsr" selected>LFSRs diferentes</option>
-                                <option value="sobol">baixa discrepância (Sobol)</option>
+                            <label><span data-i18n="sc.gen">Gerador</span> <select id="scGen">
+                                <option value="random" data-i18n="sc.gen.random">aleatório ideal (independente)</option>
+                                <option value="lfsrSame" data-i18n="sc.gen.lfsrSame">um LFSR para todos os fluxos</option>
+                                <option value="lfsr" selected data-i18n="sc.gen.lfsr">LFSRs diferentes</option>
+                                <option value="sobol" data-i18n="sc.gen.sobol">baixa discrepância (Sobol)</option>
                             </select></label>
-                            <label class="slider wide">Comprimento N <input type="range" id="scN" min="4" max="12" step="1" value="8" /> <output id="scNV">256</output></label>
+                            <label class="slider wide"><span data-i18n="sc.N">Comprimento N</span> <input type="range" id="scN" min="4" max="12" step="1" value="8" /> <output id="scNV">256</output></label>
                         </div>
                         <div class="sc-controls">
-                            <label class="slider wide">Entrada a (x / 256) <input type="range" id="scX" min="0" max="255" step="1" value="192" /> <output id="scXV">192</output></label>
-                            <label class="slider wide">Entrada b (y / 256) <input type="range" id="scY" min="0" max="255" step="1" value="96" /> <output id="scYV">96</output></label>
+                            <label class="slider wide"><span data-i18n="sc.x">Entrada a (x / 256)</span> <input type="range" id="scX" min="0" max="255" step="1" value="192" /> <output id="scXV">192</output></label>
+                            <label class="slider wide"><span data-i18n="sc.y">Entrada b (y / 256)</span> <input type="range" id="scY" min="0" max="255" step="1" value="96" /> <output id="scYV">96</output></label>
                         </div>
-                        <h3>Os fluxos de bits</h3>
+                        <h3 data-i18n="sc.streams">Os fluxos de bits</h3>
                         <div class="fig-box scroll-x" id="scStreams"></div>
                         <p class="note" id="scDemoNote"></p>
                         <div class="graph-pair">
-                            <div><h3>Erro contra o comprimento do fluxo</h3><div class="fig-box" id="scFig"></div></div>
-                            <div><h3>No comprimento escolhido</h3><div id="scTable"></div><p class="note" id="scNote"></p></div>
+                            <div><h3 data-i18n="sc.curve">Erro contra o comprimento do fluxo</h3><div class="fig-box" id="scFig"></div></div>
+                            <div><h3 data-i18n="sc.atN">No comprimento escolhido</h3><div id="scTable"></div><p class="note" id="scNote"></p></div>
                         </div>
-                        <h3>Custo de uma operação</h3>
+                        <h3 data-i18n="sc.cost">Custo de uma operação</h3>
                         <div id="scCost"></div>
                         <p class="note" id="scCostNote"></p>
-                        <h3>Tolerância a bits errados</h3>
-                        <p class="note">Cada bit do resultado é invertido com a probabilidade escolhida: os N bits do fluxo estocástico ou os 8 bits do resultado binário. No fluxo todos os bits pesam 1/N; no binário, o bit mais significativo pesa metade da faixa.</p>
+                        <h3 data-i18n="sc.fault">Tolerância a bits errados</h3>
+                        <p class="note" data-i18n="sc.faultIntro">Cada bit do resultado é invertido com a probabilidade escolhida: os N bits do fluxo estocástico ou os 8 bits do resultado binário. No fluxo todos os bits pesam 1/N; no binário, o bit mais significativo pesa metade da faixa.</p>
                         <div class="sc-controls">
-                            <label class="slider wide">Taxa de erro por bit <input type="range" id="scBer" min="-4" max="-0.5" step="0.25" value="-2" /> <output id="scBerV">1e-2</output></label>
+                            <label class="slider wide"><span data-i18n="mem.ber">Taxa de erro por bit</span> <input type="range" id="scBer" min="-4" max="-0.5" step="0.25" value="-2" /> <output id="scBerV">1e-2</output></label>
                         </div>
                         <div id="scFault"></div>
                         <p class="note" id="scImgNote"></p>
                         <div class="img-row">
-                            <figure><canvas id="scExact"></canvas><figcaption>exata (binário, sem erros)</figcaption></figure>
-                            <figure><canvas id="scImg"></canvas><figcaption id="scImgCap">estocástica</figcaption></figure>
-                            <figure><canvas id="scBin"></canvas><figcaption id="scBinCap">binária com bits errados</figcaption></figure>
+                            <figure><canvas id="scExact"></canvas><figcaption data-i18n="sc.imgExact">exata (binário, sem erros)</figcaption></figure>
+                            <figure><canvas id="scImg"></canvas><figcaption id="scImgCap"></figcaption></figure>
+                            <figure><canvas id="scBin"></canvas><figcaption data-i18n="sc.imgBin">binária com bits errados</figcaption></figure>
                         </div>
                         <div id="scImgTable"></div>
                     </div>
@@ -217,31 +219,33 @@
                     <div class="pane" id="pane-synth">
                         <p class="note" id="synthNote"></p>
                         <div class="row">
-                            <button type="button" class="btn outline" id="dlVerilog">Verilog da unidade atual (módulo e testbench)</button>
-                            <button type="button" class="btn outline" id="dlHex">Vetores de teste (.hex)</button>
+                            <button type="button" class="btn outline" id="dlVerilog" data-i18n="synth.dlVerilog">Verilog da unidade atual (módulo e testbench)</button>
+                            <button type="button" class="btn outline" id="dlHex" data-i18n="synth.dlHex">Vetores de teste (.hex)</button>
                         </div>
                         <div class="graph-pair">
-                            <div><h3>Modelo de portas contra a síntese</h3><div class="fig-box" id="synthFig"></div><p class="note" id="synthCorr"></p></div>
-                            <div><h3>Configurações sintetizadas</h3><p class="note">Clique numa linha para carregar a configuração.</p><div class="scroll-box"><table id="synthTable"></table></div></div>
+                            <div><h3 data-i18n="synth.vs">Modelo de portas contra a síntese</h3>
+                                <label style="margin:0 0 6px"><span data-i18n="synth.target">Alvo</span> <select id="synthTarget"><option value="fpga" data-i18n="synth.t.fpga">FPGA: LUTs + CARRY4</option><option value="asic" data-i18n="synth.t.asic">ASIC sky130: área (µm²)</option><option value="asicDelay" data-i18n="synth.t.asicDelay">ASIC sky130: atraso (ps)</option></select></label>
+                                <div class="fig-box" id="synthFig"></div><p class="note" id="synthCorr"></p></div>
+                            <div><h3 data-i18n="synth.list">Configurações sintetizadas</h3><p class="note" data-i18n="synth.click">Clique numa linha para carregar a configuração.</p><div class="scroll-box"><table id="synthTable"></table></div></div>
                         </div>
                     </div>
 
                     <div class="pane" id="pane-app">
                         <div class="row">
-                            <label style="margin:0">Filtro <select id="filter">
-                                <option value="gauss">gaussiano 3 × 3 (σ = 1, pesos 19, 32, 52)</option>
-                                <option value="gauss2">gaussiano 3 × 3 (pesos 1 2 1, potências de 2)</option>
-                                <option value="gain">ganho de brilho (pixel × 180 / 128)</option>
-                                <option value="pairs">média com o vizinho (somador de 8 bits)</option>
+                            <label style="margin:0"><span data-i18n="app.filter">Filtro</span> <select id="filter">
+                                <option value="gauss" data-i18n="f.gauss">gaussiano 3 × 3 (σ = 1, pesos 19, 32, 52)</option>
+                                <option value="gauss2" data-i18n="f.gauss2">gaussiano 3 × 3 (pesos 1 2 1, potências de 2)</option>
+                                <option value="gain" data-i18n="f.gain">ganho de brilho (pixel × 180 / 128)</option>
+                                <option value="pairs" data-i18n="f.pairs">média com o vizinho (somador de 8 bits)</option>
                             </select></label>
-                            <label class="btn outline file-btn">Usar uma imagem sua <input type="file" id="imgFile" accept="image/*,.ppm,.pgm,.pbm,.pnm" /></label>
-                            <button type="button" class="btn outline" id="imgSynth">Imagem de teste</button>
+                            <label class="btn outline file-btn"><span data-i18n="app.own">Usar uma imagem sua</span> <input type="file" id="imgFile" accept="image/*,.ppm,.pgm,.pbm,.pnm" /></label>
+                            <button type="button" class="btn outline" id="imgSynth" data-i18n="app.test">Imagem de teste</button>
                         </div>
                         <p class="note" id="appNote"></p>
                         <div class="img-row">
-                            <figure><canvas id="imgExact"></canvas><figcaption>exata</figcaption></figure>
-                            <figure><canvas id="imgApprox"></canvas><figcaption>com a unidade aproximada</figcaption></figure>
-                            <figure><canvas id="imgDiff"></canvas><figcaption id="diffCap">diferença</figcaption></figure>
+                            <figure><canvas id="imgExact"></canvas><figcaption data-i18n="app.exact">exata</figcaption></figure>
+                            <figure><canvas id="imgApprox"></canvas><figcaption data-i18n="app.approx">com a unidade aproximada</figcaption></figure>
+                            <figure><canvas id="imgDiff"></canvas><figcaption id="diffCap"></figcaption></figure>
                         </div>
                         <div id="appMetrics"></div>
                     </div>

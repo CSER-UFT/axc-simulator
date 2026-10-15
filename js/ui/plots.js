@@ -4,6 +4,8 @@
  * acompanharem o tema claro ou escuro.
  */
 
+import { t } from '../i18n/index.js';
+
 export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 const fmt = (v) => (Number.isInteger(v) ? String(v) : Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 1 ? v.toFixed(2) : v.toPrecision(3));
 
@@ -24,24 +26,34 @@ export function dotDiagram(unit) {
     for (let c = 0; c < C; c++) {
         if (N <= 8 || c % 2 === 0) s += `<text class="small muted mono" x="${x(c)}" y="${top - 12}" text-anchor="middle">${c}</text>`;
     }
-    s += `<text class="small muted" x="4" y="${top - 12}">coluna</text>`;
+    s += `<text class="small muted" x="4" y="${top - 12}">${t('plot.column')}</text>`;
     rows.forEach((label, j) => {
         s += `<text class="small muted mono" x="${left - 8}" y="${top + j * D + D / 2 + 4}" text-anchor="end">${esc(label)}</text>`;
     });
     for (const d of unit.dots) {
         const cx = x(d.c), cy = top + d.row * D + D / 2;
-        s += `<circle class="dot z-${d.zone}${d.cls ? ` ${d.cls}` : ''}" cx="${cx}" cy="${cy}" r="${R}"><title>coluna ${d.c}</title></circle>`;
+        s += `<circle class="dot z-${d.zone}${d.cls ? ` ${d.cls}` : ''}" cx="${cx}" cy="${cy}" r="${R}"><title>${t('plot.column')} ${d.c}</title></circle>`;
     }
     const ly = top + NR * D + 22;
     const lg = unit.method === 'kulkarni' ? [['exact', 'bloco exato'], ['approx', 'bloco aproximado']]
         : unit.method === 'booth' ? [['exact', 'produto parcial'], ['exact ext', 'extensão de sinal'], ['trunc', 'truncada (sem porta)']]
             : [['exact', 'exata'], ['approx', 'compressor aproximado e OR'], ['trunc', 'truncada (sem porta)']];
     let lx = left;
-    for (const [z, t] of lg) {
-        s += `<circle class="dot z-${z}" cx="${lx + 6}" cy="${ly - 4}" r="6"/><text class="small" x="${lx + 16}" y="${ly}">${t}</text>`;
-        lx += 30 + t.length * 6.4;
+    for (const [z, label] of lg) {
+        const tl = t(label);
+        s += `<circle class="dot z-${z}" cx="${lx + 6}" cy="${ly - 4}" r="6"/><text class="small" x="${lx + 16}" y="${ly}">${esc(tl)}</text>`;
+        lx += 30 + tl.length * 6.4;
     }
     return `${s}</svg>`;
+}
+
+/** Nome de uma etapa no idioma atual (os nomes vêm em português de units.js). */
+function stageLabel(l) {
+    let m = /^multiplicador exato (\d+) x (\d+)$/.exec(l);
+    if (m) return t('plot.stageExactMul', { k: m[1] });
+    m = /^compensação \((.*)\)$/.exec(l);
+    if (m) return t('plot.stageComp', { c: m[1] });
+    return t(l);
 }
 
 /** Custo de cada etapa do circuito, em portas, como uma cadeia de caixas. */
@@ -52,13 +64,13 @@ export function stagesSvg(unit) {
     const W = 150, H = 70, gap = 26, top = 30;
     const width = Math.max(580, 20 + st.length * (W + gap)), height = top + H + 24;
     let s = `<svg class="fig-svg stages" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img">`;
-    s += `<text class="small muted" x="10" y="18">custo de cada etapa (portas)</text>`;
+    s += `<text class="small muted" x="10" y="18">${t('custo de cada etapa (portas)')}</text>`;
     st.forEach((x, k) => {
         const x0 = 10 + k * (W + gap);
         const frac = x.gates / total;
         s += `<rect class="stage" x="${x0}" y="${top}" width="${W}" height="${H}" rx="6"/>`;
         s += `<rect class="stage-bar" x="${x0}" y="${top + H - 8}" width="${Math.max(2, W * frac)}" height="8" rx="2"/>`;
-        const words = x.label.split(' ');
+        const words = stageLabel(x.label).split(' ');
         const lines = [];
         let cur = '';
         for (const w of words) { if ((cur + ' ' + w).trim().length > 22) { lines.push(cur.trim()); cur = w; } else cur += ` ${w}`; }
@@ -108,7 +120,7 @@ export function adderDiagram(unit) {
     const note = cfg.adder === 'seg' ? 'blocos com vem um previsto pelos P bits anteriores (setas)'
         : cfg.adder === 'loa' ? 'bits baixos: OR (sem vai um); vem um da parte exata: AND do bit k − 1'
             : cfg.adder === 'trunc' ? 'bits baixos da soma em 0, sem vem um para a parte exata' : 'propagação de vai um em todas as colunas';
-    s += `<text class="small" x="${left}" y="${ly}">${esc(note)}</text>`;
+    s += `<text class="small" x="${left}" y="${ly}">${esc(t(note))}</text>`;
     return `${s}</svg>`;
 }
 
@@ -134,9 +146,9 @@ export function histogramSvg(h, { log = true, width = 560, height = 220 } = {}) 
         const px = L + ((v - h.lo) / (h.hi - h.lo || 1)) * W;
         s += `<text class="small muted mono" x="${px}" y="${T + H + 16}" text-anchor="${anchor}">${fmt(v)}</text>`;
     });
-    s += `<text class="small muted" x="${L + W / 2}" y="${height - 4}" text-anchor="middle">erro (aproximado − exato)</text>`;
+    s += `<text class="small muted" x="${L + W / 2}" y="${height - 4}" text-anchor="middle">${t('plot.histX')}</text>`;
     s += `<text class="small muted mono" x="${L - 6}" y="${T + 8}" text-anchor="end">${max}</text>`;
-    s += `<text class="small muted" x="${12}" y="${T + H / 2}" text-anchor="middle" transform="rotate(-90 12 ${T + H / 2})">pares${log ? ' (log)' : ''}</text>`;
+    s += `<text class="small muted" x="${12}" y="${T + H / 2}" text-anchor="middle" transform="rotate(-90 12 ${T + H / 2})">${t('plot.pairs')}${log ? ' (log)' : ''}</text>`;
     return `${s}</svg>`;
 }
 
@@ -185,7 +197,7 @@ export function paretoSvg(pts, front, { xLabel, yLabel, logY = false, knee = nul
     const L = 84, B = 44, T = 14, R = 90;
     const W = width - L - R, H = height - T - B;
     let s = `<svg class="fig-svg pareto" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img">`;
-    if (!pts.length) return `${s}<text class="small muted" x="${width / 2}" y="${height / 2}" text-anchor="middle">Adicione configurações à comparação.</text></svg>`;
+    if (!pts.length) return `${s}<text class="small muted" x="${width / 2}" y="${height / 2}" text-anchor="middle">${t('plot.emptyCmp')}</text></svg>`;
     const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
     const x0 = Math.min(...xs), x1 = Math.max(...xs);
     const ty = (v) => (logY ? Math.log10(v + 1e-9) : v);
@@ -221,7 +233,7 @@ export function paretoSvg(pts, front, { xLabel, yLabel, logY = false, knee = nul
         placed.push({ x: lx, y: ly, w: lw });
         labelled.add(i);
     }
-    if (knee !== null) s += `<circle class="knee" cx="${X(pts[knee].x)}" cy="${Y(pts[knee].y)}" r="11"/><text class="small bold" x="${X(pts[knee].x) - 12}" y="${Y(pts[knee].y) + 22}" text-anchor="end">joelho</text>`;
+    if (knee !== null) s += `<circle class="knee" cx="${X(pts[knee].x)}" cy="${Y(pts[knee].y)}" r="11"/><text class="small bold" x="${X(pts[knee].x) - 12}" y="${Y(pts[knee].y) + 22}" text-anchor="end">${t('plot.knee')}</text>`;
     pts.forEach((p, i) => {
         s += `<g><circle class="pt${onFront.has(i) ? ' front' : ''}${p.current ? ' cur' : ''}" cx="${X(p.x)}" cy="${Y(p.y)}" r="${p.current ? 7 : 5}"><title>${esc(p.label)}: ${fmt(p.x)}, ${fmt(p.y)}</title></circle>`;
         if (labelled.has(i)) s += `<text class="small mono" x="${X(p.x) + 8}" y="${Y(p.y) - 6}">${esc(p.label)}</text>`;
@@ -265,7 +277,7 @@ export function scatterSvg(pts, { xLabel, yLabel, width = 520, height = 340, log
     const L = 64, B = 44, T = 14, R = 24;
     const W = width - L - R, H = height - T - B;
     let s = `<svg class="fig-svg scatter" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img">`;
-    if (!pts.length) return `${s}<text class="small muted" x="${width / 2}" y="${height / 2}" text-anchor="middle">Sem dados de síntese.</text></svg>`;
+    if (!pts.length) return `${s}<text class="small muted" x="${width / 2}" y="${height / 2}" text-anchor="middle">${t('plot.noSynth')}</text></svg>`;
     const tx = (v) => (logX ? Math.log10(Math.max(v, 1)) : v), ty = (v) => (logY ? Math.log10(Math.max(v, 1)) : v);
     const xs = pts.map((p) => tx(p.x)), ys = pts.map((p) => ty(p.y));
     const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
@@ -283,7 +295,7 @@ export function scatterSvg(pts, { xLabel, yLabel, width = 520, height = 340, log
     const groups = [...new Set(pts.map((p) => p.group))];
     groups.forEach((g, k) => {
         const lx = L + 12 + (k % 2) * 190, ly = T + 6 + Math.floor(k / 2) * 15;
-        s += `<circle class="pt g-${g}" cx="${lx}" cy="${ly}" r="5"/><text class="small" x="${lx + 10}" y="${ly + 4}">${esc(g.replace(/(\d+)/, ' $1 bits').replace('mul', 'multiplicador').replace('add', 'somador'))}</text>`;
+        s += `<circle class="pt g-${g}" cx="${lx}" cy="${ly}" r="5"/><text class="small" x="${lx + 10}" y="${ly + 4}">${esc(t(`plot.group.${g.replace(/\d+/, '')}`, { n: g.replace(/\D+/, '') }))}</text>`;
     });
     return `${s}</svg>`;
 }

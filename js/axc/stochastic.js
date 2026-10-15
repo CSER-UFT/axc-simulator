@@ -264,11 +264,12 @@ export function scCost(op, N, { sharedRng = false } = {}) {
     const core = op === 'mul' ? 1 : op === 'bmul' ? 2 : 4;                  // AND; XOR e NOT; MUX com NOT
     const lfsrs = sharedRng ? 1 : nIn;
     const cbits = Math.ceil(Math.log2(N + 1));
+    // Os nomes são chaves de tradução (js/i18n), com os parâmetros para o texto.
     const parts = [
-        { name: 'operação', gates: core, ff: 0 },
-        { name: `${nIn} SNG (comparadores de 8 bits)`, gates: nIn * cmp.gates, ff: 0 },
-        { name: `${lfsrs} LFSR de 8 bits`, gates: lfsrs * 3, ff: lfsrs * 8 },
-        { name: `contador de ${cbits} bits`, gates: 2 * cbits, ff: cbits },
+        { key: 'sc.part.op', params: {}, gates: core, ff: 0 },
+        { key: 'sc.part.sng', params: { n: nIn }, gates: nIn * cmp.gates, ff: 0 },
+        { key: 'sc.part.lfsr', params: { n: lfsrs }, gates: lfsrs * 3, ff: lfsrs * 8 },
+        { key: 'sc.part.counter', params: { bits: cbits }, gates: 2 * cbits, ff: cbits },
     ];
     const gates = parts.reduce((s, p) => s + p.gates, 0), ff = parts.reduce((s, p) => s + p.ff, 0);
     const bin = buildUnit(op === 'mul' ? { kind: 'mul', width: 8 } : op === 'bmul' ? { kind: 'mul', width: 8, method: 'booth' } : { kind: 'add', width: 8, adder: 'exact' });
@@ -276,7 +277,7 @@ export function scCost(op, N, { sharedRng = false } = {}) {
         parts, gates, ff, cycles: N, gateCycles: (gates + ff) * N,
         // Período do relógio: comparador e operação (o contador corre em paralelo).
         depth: cmp.depth + (op === 'add' ? 2 : 1),
-        bin: { name: bin.kind === 'mul' ? (op === 'bmul' ? 'Booth exato de 8 bits' : 'multiplicador exato de 8 bits') : 'somador exato de 8 bits', gates: bin.net.gates, depth: bin.net.delay() },
+        bin: { key: `sc.bin.${op}`, gates: bin.net.gates, depth: bin.net.delay() },
     };
 }
 
