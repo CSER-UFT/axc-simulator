@@ -105,3 +105,15 @@ table.metrics td.note { text-align: left; }
 .scroll-x { overflow-x: auto; }
 #synthTable td.left, #cmpTable td.left { white-space: nowrap; }
 .refs li { margin-bottom: 4px; }
+
+/* Rede neural */
+#nnLayers label.check { margin: 0 10px 0 0; }
+.conf { border-collapse: collapse; font-family: var(--mono, monospace); font-size: 12px; }
+.conf th, .conf td { width: 34px; height: 26px; text-align: center; padding: 0; border: 1px solid var(--line); }
+.conf td.diag { background: color-mix(in srgb, var(--z-exact) calc(var(--v) * 100%), transparent); }
+.conf td.off { background: color-mix(in srgb, var(--z-approx) calc(var(--v) * 100%), transparent); font-weight: 600; }
+.digit-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.digit-grid figure { margin: 0; text-align: center; }
+.digit-grid canvas { width: 56px; height: 56px; image-rendering: pixelated; border: 1px solid var(--line); display: block; }
+.digit-grid figcaption { font-size: 12px; font-family: var(--mono, monospace); margin-top: 2px; }
+#nnLayers > span { font-size: 13px; color: var(--muted); }

@@ -5,7 +5,7 @@
 import { cite, refHtml, REF_GROUPS } from '../refs.js';
 
 const c = (...keys) => keys.map((k) => `<a class="cite" href="#h-refs">${cite(k, 'pt')}</a>`).join('; ');
-const GROUP_TITLES = { arith: 'Circuitos aritméticos aproximados', eval: 'Avaliação: métricas, qualidade de imagem, escolha e energia', vos: 'Tensão e memória', sc: 'Computação estocástica', tools: 'Ferramentas e PDK' };
+const GROUP_TITLES = { nn: 'Rede neural', arith: 'Circuitos aritméticos aproximados', eval: 'Avaliação: métricas, qualidade de imagem, escolha e energia', vos: 'Tensão e memória', sc: 'Computação estocástica', tools: 'Ferramentas e PDK' };
 
 export default {
     title: 'Simulador de Computação Aproximada',
@@ -169,11 +169,25 @@ export default {
 <p><strong>PSNR</strong> = 10 log<sub>10</sub>(255² / MSE), em dB. <strong>SSIM</strong> (${c('wang2004')}) compara brilho, contraste e estrutura em janelas 8 × 8; 1 é igual. A diferença, colorida com a mesma rampa do mapa de erro (preto é zero), mostra em que regiões da imagem a aproximação aparece.</p>`,
         },
         {
+            id: 'nn',
+            title: 'Rede neural (LeNet-5 no MNIST)',
+            html: `
+<p>A aba classifica 1000 dígitos de teste do MNIST (${c('mnist')}), 100 de cada dígito, com uma LeNet-5 (${c('lecun1998')}) nas versões modernas: ReLU e max pooling. São duas convoluções 5 × 5 (6 e 16 filtros) e três camadas densas (120, 84 e 10 saídas), com cerca de 61 mil pesos e 416 mil multiplicações por imagem.</p>
+<p>A rede foi treinada uma vez com <code>scripts/lenet5/train.py</code>, que só usa NumPy (8 épocas, uns 4 minutos num computador comum), e quantizada depois do treino como nas redes inteiras (${c('jacob2018')}): pesos inteiros de −127 a 127, ativações de 0 a 255, uma escala por camada e acumulação inteira. A acurácia no teste completo é 98,9% em ponto flutuante e 98,9% em 8 bits; no subconjunto de 1000 imagens, 98,4%. O navegador faz exatamente a mesma conta inteira do script, e um teste confere que as 1000 classes são iguais.</p>
+<p>Os produtos das camadas marcadas vêm da unidade da esquerda. Como em todas as aplicações, o circuito é avaliado uma vez para todos os pares (ativação, peso), e a inferência consulta essa tabela. Nas unidades sem sinal, a unidade calcula |peso| × ativação e o sinal é aplicado de forma exata; no Booth de 8 bits a ativação perde o bit mais baixo para caber no operando com sinal; nas unidades de 16 bits, os operandos ocupam os bits baixos.</p>
+<p>O que a aba mostra, e que a literatura de redes aproximadas explora (${c('venkataramani2014', 'mrazek2016')}):</p>
+<ul>
+    <li><strong>a rede tolera muito erro</strong>: truncar 4 colunas não muda nenhuma classe, e o Mitchell (MRED de 3,8%) dá praticamente a mesma acurácia da rede exata;</li>
+    <li><strong>o viés importa mais que o erro médio</strong>: cada saída soma até 400 produtos, e um erro sempre do mesmo lado se acumula. O Mitchell com compensação tem MED menor que sem, mas erro relativo enorme nos produtos pequenos, que são a maioria numa rede, e a acurácia cai uns 4 pontos. O Booth de 16 bits com 6 colunas truncadas, sem compensação, erra em média −88 por produto e a rede quase para de funcionar;</li>
+    <li><strong>as camadas não são iguais</strong>: o botão de sensibilidade aproxima uma camada por vez. A conv2 faz mais da metade dos produtos; aproximar só as camadas tolerantes é a estratégia dos projetos reais.</li>
+</ul>
+<p>A matriz de confusão mostra para onde vão os erros, e a grade mostra os dígitos que a rede exata acerta e a aproximada erra. As imagens do MNIST são distribuídas sob a licença CC BY-SA 3.0.</p>`,
+        },
+        {
             id: 'next',
             title: 'Próximas etapas',
             html: `
 <ul>
-    <li>mais aplicações: detector de bordas de Sobel, realce de bordas e uma camada de rede neural quantizada em 8 bits;</li>
     <li>mais técnicas: codificador de Booth aproximado, somadores com outras previsões de vai um;</li>
     <li>exportar a unidade para o simulador de compilador, como operação aproximada no DFG e no escalonamento.</li>
 </ul>`,

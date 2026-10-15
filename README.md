@@ -19,6 +19,7 @@ Interface e ajuda em **português e inglês** (seletor no cabeçalho). O botão 
 * **Estocástica**: valores como fluxos de bits, multiplicação por AND ou XNOR e soma escalada por MUX; quatro geradores (aleatório ideal, LFSRs diferentes, um LFSR só, sequência de Sobol) com o erro contra o comprimento do fluxo, o efeito da correlação, o custo dos geradores e do contador contra o binário, a tolerância a bits errados e um filtro gaussiano feito só com um MUX.
 * **Síntese**: exportação de qualquer configuração em Verilog com testbench autoverificável; a cada publicação, uma action exporta as configurações pré-definidas, confere o Verilog no Icarus Verilog contra o simulador e sintetiza com o Yosys para FPGA (Xilinx 7 series) e para ASIC (sky130_fd_sc_hd, canto típico; a biblioteca é baixada de uma versão fixa do OpenROAD-flow-scripts e conferida pelo SHA-256), com o script `scripts/synth.mjs` e o resultado em `data/synth.json`.
 * **Comparação**: configurações guardadas, varredura do parâmetro principal, fronteira de Pareto com custo e métrica de erro à escolha, contagem de dominância, ponto de joelho, exportação em CSV e SVG.
+* **Rede neural**: LeNet-5 treinada no MNIST e quantizada em 8 bits, com os produtos das camadas escolhidas feitos pela unidade aproximada; acurácia contra a rede exata, sensibilidade por camada, matriz de confusão e os dígitos que passaram a errar. A rede é treinada uma vez com `scripts/lenet5/train.py` (só NumPy): `python3 scripts/lenet5/train.py <pasta com os 4 .gz do MNIST> --epochs 8`. O subconjunto de teste incluído (1000 imagens, `data/mnist1000.bin`) é do MNIST, sob a licença CC BY-SA 3.0.
 * **Aplicação**: filtro gaussiano 3 × 3, bordas de Sobel, realce de bordas, ganho de brilho ou média de pares sobre uma imagem de teste sintética ou do usuário (formatos do navegador e também PPM, PGM e PBM), com a imagem exata, a aproximada, a diferença, PSNR e SSIM.
 
 ## Executar
@@ -38,6 +39,8 @@ npm run synth  # exporta, confere e sintetiza as configurações pré-definidas 
 | `js/axc/metrics.js` | entradas de teste, métricas de erro, histograma, mapa de erro, fronteira de Pareto |
 | `js/axc/image.js` | imagem de teste, leitura de PPM, PGM e PBM, filtros, PSNR e SSIM |
 | `js/axc/vos.js` | escalonamento de tensão (atraso, tempo de chegada, captura) e memória aproximada |
+| `js/axc/lenet.js` | inferência inteira da LeNet-5 com a tabela de produtos da unidade |
+| `scripts/lenet5/train.py` | treino da LeNet-5 com NumPy e quantização em 8 bits (gera `data/lenet5.json` e `data/mnist1000.bin`) |
 | `js/axc/stochastic.js` | computação estocástica: geradores (LFSR, Sobol), fluxos, operações, erro, custo, falhas e o filtro com MUX |
 | `js/axc/verilog.js` | exportação em Verilog, testbench e vetores de teste |
 | `js/axc/presets.js` | configurações pré-definidas, sintetizadas na publicação |
@@ -50,7 +53,7 @@ Os testes conferem as unidades exatas contra a aritmética (8 bits exaustivo), o
 
 ## Próximas etapas possíveis
 
-* Mais aplicações: detector de bordas de Sobel, realce de bordas e uma camada de rede neural quantizada em 8 bits.
+* Calibrar o modelo de tensão com os cantos de tensão da biblioteca sky130.
 * Mais técnicas (codificador de Booth aproximado, outros somadores).
 * Integração com o riscv-cc-simulator (a unidade aproximada como operação no DFG e no escalonamento).
 
@@ -86,6 +89,14 @@ As técnicas e os modelos do simulador vêm destes trabalhos (a mesma lista est�
 
 * T. Sakurai e A. R. Newton. "Alpha-power law MOSFET model and its applications to CMOS inverter delay and other formulas". *IEEE Journal of Solid-State Circuits, vol. 25, n. 2*, 1990. DOI: [10.1109/4.52187](https://doi.org/10.1109/4.52187).
 * S. Liu, K. Pattabiraman, T. Moscibroda e B. G. Zorn. "Flikker: saving DRAM refresh-power through critical data partitioning". *ASPLOS*, 2011. DOI: [10.1145/1950365.1950391](https://doi.org/10.1145/1950365.1950391).
+
+### Rede neural
+
+* Y. LeCun, L. Bottou, Y. Bengio e P. Haffner. "Gradient-based learning applied to document recognition". *Proceedings of the IEEE, vol. 86, n. 11*, 1998. DOI: [10.1109/5.726791](https://doi.org/10.1109/5.726791).
+* Y. LeCun, C. Cortes e C. J. C. Burges. "The MNIST database of handwritten digits (licença CC BY-SA 3.0)". <http://yann.lecun.com/exdb/mnist/>.
+* B. Jacob, S. Kligys, B. Chen, M. Zhu, M. Tang, A. Howard, H. Adam e D. Kalenichenko. "Quantization and training of neural networks for efficient integer-arithmetic-only inference". *IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)*, 2018. DOI: [10.1109/CVPR.2018.00286](https://doi.org/10.1109/CVPR.2018.00286).
+* S. Venkataramani, A. Ranjan, K. Roy e A. Raghunathan. "AxNN: energy-efficient neuromorphic systems using approximate computing". *International Symposium on Low Power Electronics and Design (ISLPED)*, 2014. DOI: [10.1145/2627369.2627613](https://doi.org/10.1145/2627369.2627613).
+* V. Mrázek, S. S. Sarwar, L. Sekanina, Z. Vašíček e K. Roy. "Design of power-efficient approximate multipliers for approximate artificial neural networks". *IEEE/ACM International Conference on Computer-Aided Design (ICCAD)*, 2016. DOI: [10.1145/2966986.2967021](https://doi.org/10.1145/2966986.2967021).
 
 ### Computação estocástica
 

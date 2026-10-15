@@ -13,6 +13,7 @@ import { SC_GENERATORS, scCurve, binaryError, streamDemo, scCost, faultError, sc
 import { timingTrace, capturedOutputs, vosCurve, randomSequence, outputDepths, delayFactor, corruptImage, expectedMemoryMSE } from './axc/vos.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale, dec } from './i18n/index.js';
 import { REFS, TECH_REFS, cite } from './refs.js';
+import { LAYERS, decodeModel, decodeTestSet, productTable, classifyRange, summarize, macsPerLayer } from './axc/lenet.js';
 
 const $ = (id) => document.getElementById(id);
 const store = {
@@ -118,8 +119,8 @@ function randomPairs(N, n, seed) {
 }
 
 /** Abas que precisam ser redesenhadas depois de uma mudança na unidade (ou no idioma). */
-const dirty = { struct: true, error: true, cmp: true, app: true, synth: true, vos: true, sc: true };
-const RENDER = { struct: () => renderStruct(), error: () => renderError(), cmp: () => renderCmp(), app: () => renderApp(), synth: () => renderSynth(), vos: () => renderVos() };
+const dirty = { struct: true, error: true, cmp: true, app: true, synth: true, vos: true, sc: true, nn: true };
+const RENDER = { struct: () => renderStruct(), error: () => renderError(), cmp: () => renderCmp(), app: () => renderApp(), synth: () => renderSynth(), vos: () => renderVos(), nn: () => renderNN() };
 function renderTab(name) {
     if (name === 'vos') renderMem();
     if (name === 'sc') { if (dirty.sc) { dirty.sc = false; renderSc(); } return; }
@@ -660,6 +661,144 @@ function renderApp() {
         + `<tr><th>${t('app.mredUnit')}</th><td class="mono">${pct(cur.m.MRED)}</td><td class="note">${t('app.mredNote')}</td></tr></table>`;
 }
 
+// Rede neural (LeNet-5 no MNIST) -----------------------------------------------------------------------------
+
+let nnData = null;          // {model, test} depois de carregar
+let nnLoading = null;
+let nnRun = 0;              // muda a cada nova execução: as antigas param
+const nnCache = new Map();  // nome da unidade e camadas -> classes previstas
+const nnMask = () => LAYERS.map((l) => $(`nnL-${l}`).checked);
+$('nnLayers').insertAdjacentHTML('beforeend', LAYERS.map((l) => `<label class="check"><input type="checkbox" id="nnL-${l}" checked /> ${l}</label>`).join(''));
+
+function loadNN() {
+    if (!nnLoading) {
+        nnLoading = Promise.all([
+            fetch('data/lenet5.json').then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status)))),
+            fetch('data/mnist1000.bin').then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(r.status)))),
+        ]).then(([json, bin]) => {
+            const model = decodeModel(json);
+            nnData = { model, test: decodeTestSet(bin, model.subset.n) };
+            return nnData;
+        });
+    }
+    return nnLoading;
+}
+
+/** Classifica o conjunto de teste em lotes, sem travar a página. */
+function classifyAsync(tables, key, onProgress) {
+    if (nnCache.has(key)) return Promise.resolve(nnCache.get(key));
+    const { model, test } = nnData;
+    const run = nnRun;
+    const preds = new Uint8Array(test.n);
+    return new Promise((resolve, reject) => {
+        let k = 0;
+        const step = () => {
+            if (run !== nnRun) { reject(new Error('cancelada')); return; }
+            const end = Math.min(test.n, k + 50);
+            classifyRange(model, test, tables, k, end, preds);
+            k = end;
+            onProgress?.(k, test.n);
+            if (k < test.n) setTimeout(step, 0);
+            else { nnCache.set(key, preds); resolve(preds); }
+        };
+        setTimeout(step, 0);
+    });
+}
+
+const tableCache = new Map();
+function tableOf(unit) {
+    const key = unit ? unitName(unit.cfg) : 'exata';
+    if (!tableCache.has(key)) tableCache.set(key, productTable(unit));
+    return tableCache.get(key);
+}
+
+function drawDigit(canvas, img) {
+    canvas.width = 28; canvas.height = 28;
+    const ctx = canvas.getContext('2d');
+    const id = ctx.createImageData(28, 28);
+    for (let k = 0; k < 784; k++) { const v = 255 - img[k]; id.data.set([v, v, v, 255], 4 * k); }
+    ctx.putImageData(id, 0, 0);
+}
+
+async function renderNN() {
+    if (!cur) return;
+    nnRun++;
+    $('nnSens').innerHTML = '';
+    if (cur.cfg.kind !== 'mul') {
+        $('nnStatus').textContent = '';
+        $('nnTable').innerHTML = `<p class="note">${t('nn.needMul')}</p>`;
+        $('nnNote').textContent = ''; $('nnConf').innerHTML = ''; $('nnBroke').innerHTML = '';
+        return;
+    }
+    try {
+        if (!nnData) { $('nnStatus').textContent = t('nn.loading'); await loadNN(); }
+    } catch {
+        $('nnStatus').textContent = t('nn.loadError');
+        return;
+    }
+    const { model, test } = nnData;
+    const mask = nnMask();
+    const unit = cur.unit, name = unitName(cur.cfg);
+    const Tu = tableOf(unit), Tx = tableOf(null);
+    const progress = (k, n) => { $('nnStatus').textContent = t('nn.progress', { k, n }); };
+    let preds, refUnitPreds = null;
+    try {
+        preds = await classifyAsync(mask.map((m) => (m ? Tu : Tx)), `${name}|${mask.join('')}`, progress);
+        // Booth de 8 bits: a unidade recebe a >> 1; a referência da técnica (Booth exato) também perde o bit baixo.
+        if (unit.signed && cur.cfg.width === 8) {
+            const ex = cur.exact;
+            refUnitPreds = await classifyAsync(mask.map((m) => (m ? tableOf(ex) : Tx)), `${unitName(ex.cfg)}|${mask.join('')}`, progress);
+        }
+    } catch { return; }   // outra execução começou
+    $('nnStatus').textContent = '';
+    const ref = model.expected;   // a rede exata (as mesmas classes do script em Python)
+    const sx = summarize(test, ref), su = summarize(test, preds, ref);
+    const macs = macsPerLayer(model), total = macs.reduce((a, b) => a + b, 0);
+    const approxMacs = macs.reduce((a, m, i) => a + (mask[i] ? m : 0), 0);
+    let h = '<table class="kv">';
+    h += `<tr><th>${t('nn.accExact')}</th><td class="mono">${pct(sx.accuracy)}</td></tr>`;
+    if (refUnitPreds) h += `<tr><th>${t('nn.accRefUnit', { name: dn(unitName(cur.exact.cfg)) })}</th><td class="mono">${pct(summarize(test, refUnitPreds).accuracy)}</td></tr>`;
+    h += `<tr><th><b>${t('nn.accUnit', { name: dn(name) })}</b></th><td class="mono"><b>${pct(su.accuracy)}</b> (${su.accuracy >= sx.accuracy ? '+' : '−'}${nf(Math.abs(su.accuracy - sx.accuracy) * 100, 1)} ${t('nn.pp')})</td></tr>`;
+    h += `<tr><th>${t('nn.changed')}</th><td class="mono">${t('nn.changedV', { broke: su.broke.length, fixed: su.fixed })}</td></tr>`;
+    h += `<tr><th>${t('nn.approxMacs')}</th><td class="mono">${nf(approxMacs)} ${t('nn.of')} ${nf(total)} (${pct(approxMacs / total)})</td></tr>`;
+    h += `<tr><th>${t('nn.unitMred')}</th><td class="mono">${pct(cur.m.MRED)}</td></tr></table>`;
+    $('nnTable').innerHTML = h;
+    $('nnNote').innerHTML = t('nn.note', { float: pct(model.accuracy.float), int8: pct(model.accuracy.int8) }) + (refUnitPreds ? ` ${t('nn.booth8')}` : '');
+    // Matriz de confusão da rede com a unidade.
+    let c = `<table class="conf"><tr><th></th>${Array.from({ length: 10 }, (_, k) => `<th>${k}</th>`).join('')}</tr>`;
+    su.conf.forEach((row, y) => {
+        const n = row.reduce((a, b) => a + b, 0) || 1;
+        c += `<tr><th>${y}</th>${row.map((v, p) => `<td class="${p === y ? 'diag' : v ? 'off' : ''}" style="--v:${p === y ? (0.15 + 0.6 * v / n).toFixed(2) : Math.min(1, 0.25 + v / 20).toFixed(2)}">${v || ''}</td>`).join('')}</tr>`;
+    });
+    $('nnConf').innerHTML = `${c}</table>`;
+    // Dígitos que passaram a errar.
+    const shown = su.broke.slice(0, 40);
+    $('nnBroke').innerHTML = shown.length ? shown.map((k) => `<figure><canvas data-k="${k}"></canvas><figcaption>${test.labels[k]} → ${preds[k]}</figcaption></figure>`).join('')
+        + (su.broke.length > shown.length ? `<p class="note">${t('nn.more', { n: su.broke.length - shown.length })}</p>` : '')
+        : `<p class="note">${t('nn.noneBroke')}</p>`;
+    for (const cv of $('nnBroke').querySelectorAll('canvas')) drawDigit(cv, test.images.subarray(+cv.dataset.k * 784, (+cv.dataset.k + 1) * 784));
+}
+
+$('nnLayers').addEventListener('change', () => { if (tab === 'nn') renderNN(); else dirty.nn = true; });
+$('nnSensBtn').onclick = async () => {
+    if (!cur || cur.cfg.kind !== 'mul' || !nnData) return;
+    const run = ++nnRun;
+    const Tu = tableOf(cur.unit), Tx = tableOf(null), name = unitName(cur.cfg);
+    const macs = macsPerLayer(nnData.model), total = macs.reduce((a, b) => a + b, 0);
+    const rows = [];
+    for (let i = 0; i < LAYERS.length; i++) {
+        const mask = LAYERS.map((_, j) => j === i);
+        let preds;
+        try {
+            preds = await classifyAsync(mask.map((m) => (m ? Tu : Tx)), `${name}|${mask.join('')}`, (k, n) => { $('nnStatus').textContent = t('nn.sensProgress', { layer: LAYERS[i], k, n }); });
+        } catch { return; }
+        if (run !== nnRun) return;
+        rows.push(`<tr><th>${LAYERS[i]}</th><td class="mono">${pct(macs[i] / total)}</td><td class="mono">${pct(summarize(nnData.test, preds).accuracy)}</td></tr>`);
+    }
+    $('nnStatus').textContent = '';
+    $('nnSens').innerHTML = `<h3>${t('nn.sensTitle')}</h3><table class="kv"><tr><th></th><td class="note">${t('nn.sensMacs')}</td><td class="note">${t('nn.sensAcc')}</td></tr>${rows.join('')}</table><p class="note">${t('nn.sensNote')}</p>`;
+};
+
 // Computação estocástica -------------------------------------------------------------------------------------
 
 const scCurves = new Map();          // operação -> {gerador: curva}
@@ -850,7 +989,7 @@ for (const id of ['kind', 'width', 'adder', 'dist', 'approxCarry', 'mulMethod', 
  * Controles guardados no link, na ordem em que são restaurados (a largura e o tipo antes dos que dependem
  * deles). O estado vai no fragmento do endereço (#kind=mul&width=8&...), legível e sem ir ao servidor.
  */
-const SHARE_IDS = ['kind', 'width', 'mulMethod', 'kTrunc', 'kApprox', 'approxCarry', 'kBlock', 'drumK', 'comp', 'adder', 'kAdd', 'segL', 'segP', 'dist',
+const SHARE_IDS = [...LAYERS.map((l) => `nnL-${l}`), 'kind', 'width', 'mulMethod', 'kTrunc', 'kApprox', 'approxCarry', 'kBlock', 'drumK', 'comp', 'adder', 'kAdd', 'segL', 'segP', 'dist',
     'histLog', 'cmpX', 'cmpY', 'cmpLog', 'filter', 'vosV', 'vosClock', 'memBer', 'memProt', 'scOp', 'scGen', 'scN', 'scX', 'scY', 'scBer', 'synthTarget'];
 const DEFAULTS = new Map(SHARE_IDS.map((id) => [id, $(id).type === 'checkbox' ? $(id).checked : $(id).value]));
 const ctrlValue = (id) => ($(id).type === 'checkbox' ? $(id).checked : $(id).value);

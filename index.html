@@ -90,6 +90,7 @@
                         <button type="button" class="btn" data-tab="error" data-i18n="tab.error">Erro</button>
                         <button type="button" class="btn" data-tab="cmp" data-i18n="tab.cmp">Comparação</button>
                         <button type="button" class="btn" data-tab="app" data-i18n="tab.app">Aplicação</button>
+                        <button type="button" class="btn" data-tab="nn" data-i18n="tab.nn">Rede neural</button>
                         <button type="button" class="btn" data-tab="vos" data-i18n="tab.vos">Tensão e memória</button>
                         <button type="button" class="btn" data-tab="sc" data-i18n="tab.sc">Estocástica</button>
                         <button type="button" class="btn" data-tab="synth" data-i18n="tab.synth">Síntese</button>
@@ -228,6 +229,21 @@
                                 <div class="fig-box" id="synthFig"></div><p class="note" id="synthCorr"></p></div>
                             <div><h3 data-i18n="synth.list">Configurações sintetizadas</h3><p class="note" data-i18n="synth.click">Clique numa linha para carregar a configuração.</p><div class="scroll-box"><table id="synthTable"></table></div></div>
                         </div>
+                    </div>
+
+                    <div class="pane" id="pane-nn">
+                        <p class="note" data-i18n="nn.intro">Uma LeNet-5 treinada no MNIST e quantizada em 8 bits classifica 1000 dígitos de teste. Os produtos das camadas marcadas são feitos pela unidade da esquerda (multiplicador); as somas são exatas. A referência é a mesma rede com os produtos exatos.</p>
+                        <div class="row" id="nnLayers"><span data-i18n="nn.layers">Camadas com a unidade aproximada:</span></div>
+                        <div class="row" style="margin-top:6px">
+                            <button type="button" class="btn outline" id="nnSensBtn" data-i18n="nn.sensBtn">Sensibilidade por camada</button>
+                            <span class="note" id="nnStatus"></span>
+                        </div>
+                        <div class="graph-pair">
+                            <div><div id="nnTable"></div><p class="note" id="nnNote"></p><div id="nnSens"></div></div>
+                            <div><h3 data-i18n="nn.conf">Matriz de confusão (linhas: dígito real; colunas: previsto)</h3><div class="scroll-box" id="nnConf"></div></div>
+                        </div>
+                        <h3 data-i18n="nn.broke">Dígitos que a rede exata acerta e a aproximada erra</h3>
+                        <div id="nnBroke" class="digit-grid"></div>
                     </div>
 
                     <div class="pane" id="pane-app">

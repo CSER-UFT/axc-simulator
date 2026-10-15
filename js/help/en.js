@@ -5,7 +5,7 @@
 import { cite, refHtml, REF_GROUPS } from '../refs.js';
 
 const c = (...keys) => keys.map((k) => `<a class="cite" href="#h-refs">${cite(k, 'en')}</a>`).join('; ');
-const GROUP_TITLES = { arith: 'Approximate arithmetic circuits', eval: 'Evaluation: metrics, image quality, selection and energy', vos: 'Voltage and memory', sc: 'Stochastic computing', tools: 'Tools and PDK' };
+const GROUP_TITLES = { nn: 'Neural network', arith: 'Approximate arithmetic circuits', eval: 'Evaluation: metrics, image quality, selection and energy', vos: 'Voltage and memory', sc: 'Stochastic computing', tools: 'Tools and PDK' };
 
 export default {
     title: 'Approximate Computing Simulator',
@@ -169,11 +169,25 @@ export default {
 <p><strong>PSNR</strong> = 10 log<sub>10</sub>(255² / MSE), in dB. <strong>SSIM</strong> (${c('wang2004')}) compares brightness, contrast and structure in 8 × 8 windows; 1 is identical. The difference, colored with the same ramp as the error map (black is zero), shows in which regions of the image the approximation appears.</p>`,
         },
         {
+            id: 'nn',
+            title: 'Neural network (LeNet-5 on MNIST)',
+            html: `
+<p>The tab classifies 1000 MNIST test digits (${c('mnist')}), 100 of each digit, with a LeNet-5 (${c('lecun1998')}) in its modern form: ReLU and max pooling. There are two 5 × 5 convolutions (6 and 16 filters) and three dense layers (120, 84 and 10 outputs), with about 61 thousand weights and 416 thousand multiplications per image.</p>
+<p>The network was trained once with <code>scripts/lenet5/train.py</code>, which uses only NumPy (8 epochs, about 4 minutes on a regular computer), and quantized after training as in integer networks (${c('jacob2018')}): integer weights from −127 to 127, activations from 0 to 255, one scale per layer and integer accumulation. Accuracy on the full test set is 98.9% in floating point and 98.9% in 8 bits; on the 1000 image subset, 98.4%. The browser does exactly the same integer computation as the script, and a test checks that the 1000 classes are the same.</p>
+<p>The products of the checked layers come from the unit on the left. As in all applications, the circuit is evaluated once for all (activation, weight) pairs, and inference looks up that table. In unsigned units, the unit computes |weight| × activation and the sign is applied exactly; in the 8 bit Booth the activation loses its lowest bit to fit in the signed operand; in 16 bit units, the operands take the low bits.</p>
+<p>What the tab shows, and what the literature on approximate networks explores (${c('venkataramani2014', 'mrazek2016')}):</p>
+<ul>
+    <li><strong>the network tolerates a lot of error</strong>: truncating 4 columns changes no class, and Mitchell (MRED of 3.8%) gives practically the same accuracy as the exact network;</li>
+    <li><strong>bias matters more than mean error</strong>: each output adds up to 400 products, and an error always on the same side accumulates. Mitchell with compensation has a lower MED than without, but a huge relative error on small products, which are most of them in a network, and accuracy drops about 4 points. The 16 bit Booth with 6 truncated columns, without compensation, errs on average by −88 per product and the network almost stops working;</li>
+    <li><strong>layers are not equal</strong>: the sensitivity button approximates one layer at a time. conv2 does more than half of the products; approximating only the tolerant layers is the strategy of real designs.</li>
+</ul>
+<p>The confusion matrix shows where the errors go, and the grid shows the digits the exact network gets right and the approximate one gets wrong. The MNIST images are distributed under the CC BY-SA 3.0 license.</p>`,
+        },
+        {
             id: 'next',
             title: 'Next steps',
             html: `
 <ul>
-    <li>more applications: Sobel edge detector, edge enhancement and an 8 bit quantized neural network layer;</li>
     <li>more techniques: approximate Booth encoder, adders with other carry predictions;</li>
     <li>exporting the unit to the compiler simulator, as an approximate operation in the DFG and in scheduling.</li>
 </ul>`,
