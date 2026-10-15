@@ -239,9 +239,10 @@
                     </div>
 
                     <div class="pane" id="pane-nn">
-                        <p class="note" data-i18n="nn.intro">Uma LeNet-5 treinada no MNIST e quantizada em 8 bits classifica 1000 dígitos de teste. Os produtos das camadas marcadas são feitos pela unidade da esquerda (multiplicador); as somas são exatas. A referência é a mesma rede com os produtos exatos.</p>
+                        <p class="note" data-i18n="nn.intro">Uma LeNet-5 treinada no MNIST e quantizada em 8 bits classifica 1000 dígitos de teste. Nas camadas marcadas, os produtos são feitos pelo multiplicador da esquerda e as somas pelo somador escolhido (ou pelo da esquerda, quando ele é um somador). A referência é a mesma rede exata.</p>
                         <div class="row" id="nnLayers"><span data-i18n="nn.layers">Camadas com a unidade aproximada:</span></div>
                         <div class="row" style="margin-top:6px">
+                            <label style="margin:0"><span data-i18n="nn.adder">Somador das acumulações</span> <select id="nnAdder"></select></label>
                             <button type="button" class="btn outline" id="nnSensBtn" data-i18n="nn.sensBtn">Sensibilidade por camada</button>
                             <span class="note" id="nnStatus"></span>
                         </div>

@@ -398,6 +398,39 @@ export function buildAdder(cfg) {
     return { kind: 'add', cfg, net, zones, blocks, exact: (x, y) => x + y, outBits: N + 1, maxOut: 2 * (2 ** N - 1) };
 }
 
+/**
+ * Modelo funcional do somador: a mesma soma que o circuito de buildAdder dá, calculada com aritmética (os testes
+ * conferem os dois em todos os pares de 8 bits e em pares sorteados de 16). Serve para aplicações com muitas somas
+ * em sequência, como a acumulação da rede neural, em que avaliar o circuito porta a porta seria lento.
+ */
+export function adderFunction(cfg) {
+    const N = cfg.width;
+    const field = (x, lo, hi) => (x >>> lo) & ((1 << (hi - lo)) - 1);
+    if (cfg.adder === 'trunc' || cfg.adder === 'loa') {
+        const k = Math.min(cfg.k ?? 0, N), m = (1 << k) - 1;
+        if (cfg.adder === 'trunc') return (a, b) => ((a >>> k) + (b >>> k)) * 2 ** k;
+        return (a, b) => {
+            const cin = k > 0 ? (a >>> (k - 1)) & (b >>> (k - 1)) & 1 : 0;
+            return ((a >>> k) + (b >>> k) + cin) * 2 ** k + ((a | b) & m);
+        };
+    }
+    if (cfg.adder === 'seg') {
+        const L = Math.max(1, cfg.L ?? 4), P = Math.max(0, cfg.P ?? 0);
+        return (a, b) => {
+            let res = 0, cout = 0;
+            for (let s = 0; s < N; s += L) {
+                const hi = Math.min(N, s + L), lo = Math.max(0, s - P);
+                const cin = s === 0 || P === 0 ? 0 : (field(a, lo, s) + field(b, lo, s)) >>> (s - lo);
+                const sum = field(a, s, hi) + field(b, s, hi) + cin;
+                res += (sum & ((1 << (hi - s)) - 1)) * 2 ** s;
+                cout = sum >>> (hi - s);
+            }
+            return res + cout * 2 ** N;
+        };
+    }
+    return (a, b) => a + b;
+}
+
 export function buildUnit(cfg) {
     return cfg.kind === 'mul' ? buildMultiplier(cfg) : buildAdder(cfg);
 }

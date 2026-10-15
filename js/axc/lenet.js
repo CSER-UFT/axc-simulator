@@ -159,3 +159,122 @@ export function summarize(test, preds, ref) {
     }
     return { accuracy: ok / test.n, conf, broke, fixed };
 }
+
+// Somador aproximado nas acumulações -------------------------------------------------------------------------
+
+/**
+ * Soma de acumuladores (inteiros de 32 bits com sinal) com um somador de N bits: a unidade soma os N bits baixos,
+ * e a parte alta é somada de forma exata com o vai um que sai dela. Com o somador exato, é a soma exata; com o
+ * truncado, o LOA ou o segmentado, o erro fica nos bits baixos, como no circuito.
+ * A soma dos bits baixos usa o modelo funcional do somador (o mesmo de adderFunction), conferido contra o circuito nos testes.
+ */
+export function adderAccumulate(unit) {
+    const cfg = unit.cfg, N = cfg.width, M = (1 << N) - 1;
+    // Mesma conta de adderFunction (units.js), escrita dentro do laço para ficar rápida: são centenas de milhões
+    // de somas para classificar o conjunto de teste.
+    const type = cfg.adder === 'trunc' || cfg.adder === 'loa' || cfg.adder === 'seg' ? cfg.adder : 'exact';
+    const k = Math.min(cfg.k ?? 0, N), km = (1 << k) - 1;
+    const L = Math.max(1, cfg.L ?? 4), P = Math.max(0, cfg.P ?? 0);
+    return (acc, prod) => {
+        const n = acc.length;
+        for (let i = 0; i < n; i++) {
+            const x = acc[i], y = prod[i], a = x & M, b = y & M;
+            let r;
+            if (type === 'exact') r = a + b;
+            else if (type === 'trunc') r = ((a >>> k) + (b >>> k)) << k;
+            else if (type === 'loa') r = (((a >>> k) + (b >>> k) + (k > 0 ? (a >>> (k - 1)) & (b >>> (k - 1)) & 1 : 0)) << k) | ((a | b) & km);
+            else {
+                r = 0;
+                let cout = 0;
+                for (let s = 0; s < N; s += L) {
+                    const hi = s + L < N ? s + L : N, w = hi - s, lo = s - P > 0 ? s - P : 0;
+                    const cin = s === 0 || P === 0 ? 0 : ((((a >>> lo) & ((1 << (s - lo)) - 1)) + ((b >>> lo) & ((1 << (s - lo)) - 1))) >>> (s - lo));
+                    const sum = ((a >>> s) & ((1 << w) - 1)) + ((b >>> s) & ((1 << w) - 1)) + cin;
+                    r |= (sum & ((1 << w) - 1)) << s;
+                    cout = sum >>> w;
+                }
+                r += cout << N;
+            }
+            const carry = r >>> N;
+            acc[i] = (((x >> N) + (y >> N) + carry) << N) + (r & M);
+        }
+        return acc;
+    };
+}
+
+const exactAccumulate = (acc, prod) => { for (let i = 0; i < acc.length; i++) acc[i] += prod[i]; return acc; };
+
+/** Camada convolucional para um lote de imagens, termo a termo (viés primeiro, depois cada produto). */
+function convPoolBatch(inp, B, C, H, L, T, add) {
+    const F = L.shape[0], O = H - 4, P2 = O / 2, n = B * F * O * O;
+    const acc = new Int32Array(n), prod = new Int32Array(n);
+    for (let i = 0; i < n; i++) acc[i] = L.b[Math.floor(i / (O * O)) % F];
+    for (let c = 0; c < C; c++) {
+        for (let ky = 0; ky < 5; ky++) {
+            for (let kx = 0; kx < 5; kx++) {
+                let i = 0;
+                for (let b = 0; b < B; b++) {
+                    const base = (b * C + c) * H * H;
+                    for (let f = 0; f < F; f++) {
+                        const wo = (L.w[((f * C + c) * 5 + ky) * 5 + kx] + 127) * 256;
+                        for (let y = 0; y < O; y++) {
+                            const row = base + (y + ky) * H + kx;
+                            for (let x = 0; x < O; x++) prod[i++] = T[wo + inp[row + x]];
+                        }
+                    }
+                }
+                add(acc, prod);
+            }
+        }
+    }
+    const out = new Uint8Array(B * F * P2 * P2);
+    for (let bf = 0; bf < B * F; bf++) {
+        for (let y = 0; y < P2; y++) {
+            for (let x = 0; x < P2; x++) {
+                const i = bf * O * O + 2 * y * O + 2 * x;
+                out[bf * P2 * P2 + y * P2 + x] = Math.max(requant(acc[i], L.M), requant(acc[i + 1], L.M), requant(acc[i + O], L.M), requant(acc[i + O + 1], L.M));
+            }
+        }
+    }
+    return out;
+}
+
+function denseBatch(inp, B, L, T, add, last) {
+    const [O, I] = L.shape, n = B * O;
+    const acc = new Int32Array(n), prod = new Int32Array(n);
+    for (let i = 0; i < n; i++) acc[i] = L.b[i % O];
+    for (let k = 0; k < I; k++) {
+        for (let b = 0; b < B; b++) for (let o = 0; o < O; o++) prod[b * O + o] = T[(L.w[o * I + k] + 127) * 256 + inp[b * I + k]];
+        add(acc, prod);
+    }
+    if (last) return acc;
+    return Uint8Array.from(acc, (v) => requant(v, L.M));
+}
+
+/**
+ * Classifica as imagens [from, to) em lote, com tabelas de produtos e somas (exatas ou com o somador) por camada.
+ * O max pooling depois da nova escala dá o mesmo que antes dela (a nova escala é monótona).
+ * @param {Array<Int32Array>} tables tabela de produtos de cada camada
+ * @param {Array<Function|null>} adds soma de acumuladores de cada camada (null: exata)
+ */
+export function classifyBatch(model, test, tables, adds, from, to, preds) {
+    const B = to - from;
+    const x = new Uint8Array(B * 32 * 32);
+    for (let b = 0; b < B; b++) {
+        const img = test.images.subarray((from + b) * 784, (from + b + 1) * 784);
+        for (let y = 0; y < 28; y++) for (let k = 0; k < 28; k++) x[b * 1024 + (y + 2) * 32 + k + 2] = img[y * 28 + k];
+    }
+    const [c1, c2, f1, f2, f3] = model.layers;
+    const a = (i) => adds[i] ?? exactAccumulate;
+    const a1 = convPoolBatch(x, B, 1, 32, c1, tables[0], a(0));
+    const a2 = convPoolBatch(a1, B, c1.shape[0], 14, c2, tables[1], a(1));
+    const a3 = denseBatch(a2, B, f1, tables[2], a(2), false);
+    const a4 = denseBatch(a3, B, f2, tables[3], a(3), false);
+    const logits = denseBatch(a4, B, f3, tables[4], a(4), true);
+    for (let b = 0; b < B; b++) {
+        let p = 0;
+        for (let k = 1; k < 10; k++) if (logits[b * 10 + k] > logits[b * 10 + p]) p = k;
+        preds[from + b] = p;
+    }
+    return preds;
+}

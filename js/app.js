@@ -13,7 +13,8 @@ import { SC_GENERATORS, scCurve, binaryError, streamDemo, scCost, faultError, sc
 import { timingTrace, capturedOutputs, vosCurve, randomSequence, outputDepths, delayFactor, corruptImage, expectedMemoryMSE, DELAY_MODELS } from './axc/vos.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale, dec } from './i18n/index.js';
 import { REFS, TECH_REFS, cite } from './refs.js';
-import { LAYERS, decodeModel, decodeTestSet, productTable, classifyRange, summarize, macsPerLayer } from './axc/lenet.js';
+import { LAYERS, decodeModel, decodeTestSet, productTable, classifyRange, classifyBatch, adderAccumulate, summarize, macsPerLayer } from './axc/lenet.js';
+import { PRESETS } from './axc/presets.js';
 
 const $ = (id) => document.getElementById(id);
 const store = {
@@ -717,9 +718,18 @@ function renderApp() {
 let nnData = null;          // {model, test} depois de carregar
 let nnLoading = null;
 let nnRun = 0;              // muda a cada nova execução: as antigas param
-const nnCache = new Map();  // nome da unidade e camadas -> classes previstas
+const nnCache = new Map();  // unidades e camadas -> classes previstas
 const nnMask = () => LAYERS.map((l) => $(`nnL-${l}`).checked);
 $('nnLayers').insertAdjacentHTML('beforeend', LAYERS.map((l) => `<label class="check"><input type="checkbox" id="nnL-${l}" checked /> ${l}</label>`).join(''));
+// Somadores para as acumulações: os pré-definidos (8 e 16 bits); a unidade fica nos bits baixos do acumulador.
+const NN_ADDERS = PRESETS.filter((c) => c.kind === 'add' && c.adder !== 'exact');
+function fillNNAdders() {
+    const v = $('nnAdder').value;
+    $('nnAdder').innerHTML = `<option value="exact">${t('nn.adderExact')}</option><option value="left">${t('nn.adderLeft')}</option>`
+        + NN_ADDERS.map((c, i) => `<option value="${i}">${esc(dn(unitName(c)))}</option>`).join('');
+    $('nnAdder').value = [...$('nnAdder').options].some((o) => o.value === v) ? v : 'exact';
+}
+fillNNAdders();
 
 function loadNN() {
     if (!nnLoading) {
@@ -735,18 +745,24 @@ function loadNN() {
     return nnLoading;
 }
 
-/** Classifica o conjunto de teste em lotes, sem travar a página. */
-function classifyAsync(tables, key, onProgress) {
+/**
+ * Classifica o conjunto de teste em lotes, sem travar a página. Com o somador exato, imagem a imagem (mais
+ * rápido); com um somador aproximado, em lotes de 25 imagens, camada a camada.
+ */
+function classifyAsync(tables, adds, key, onProgress) {
     if (nnCache.has(key)) return Promise.resolve(nnCache.get(key));
     const { model, test } = nnData;
     const run = nnRun;
     const preds = new Uint8Array(test.n);
+    const approxAdd = adds.some((f) => f);
+    const chunk = approxAdd ? 25 : 50;
     return new Promise((resolve, reject) => {
         let k = 0;
         const step = () => {
             if (run !== nnRun) { reject(new Error('cancelada')); return; }
-            const end = Math.min(test.n, k + 50);
-            classifyRange(model, test, tables, k, end, preds);
+            const end = Math.min(test.n, k + chunk);
+            if (approxAdd) classifyBatch(model, test, tables, adds, k, end, preds);
+            else classifyRange(model, test, tables, k, end, preds);
             k = end;
             onProgress?.(k, test.n);
             if (k < test.n) setTimeout(step, 0);
@@ -763,6 +779,26 @@ function tableOf(unit) {
     return tableCache.get(key);
 }
 
+/** Multiplicador e somador usados nas camadas aproximadas. */
+function nnUnits() {
+    const mul = cur.cfg.kind === 'mul' ? cur.unit : null;
+    let add = null;
+    const sel = $('nnAdder').value;
+    $('nnAdder').querySelector('option[value="left"]').disabled = cur.cfg.kind !== 'add';
+    if (cur.cfg.kind === 'add') { add = cur.unit; $('nnAdder').value = 'left'; }
+    else if (sel === 'left') $('nnAdder').value = 'exact';
+    else if (sel !== 'exact') add = buildUnit(NN_ADDERS[+sel]);
+    if (add && add.cfg.adder === 'exact') add = null;
+    return { mul, add };
+}
+const nnKey = (mul, add, mask) => `${mul ? unitName(mul.cfg) : 'exata'}|${add ? unitName(add.cfg) : 'exato'}|${mask.join('')}`;
+function nnSetup(mask) {
+    const { mul, add } = nnUnits();
+    const Tu = tableOf(mul), Tx = tableOf(null);
+    const accum = add ? adderAccumulate(add) : null;
+    return { mul, add, tables: mask.map((m) => (m ? Tu : Tx)), adds: mask.map((m) => (m ? accum : null)), key: nnKey(mul, add, mask) };
+}
+
 function drawDigit(canvas, img) {
     canvas.width = 28; canvas.height = 28;
     const ctx = canvas.getContext('2d');
@@ -775,12 +811,6 @@ async function renderNN() {
     if (!cur) return;
     nnRun++;
     $('nnSens').innerHTML = '';
-    if (cur.cfg.kind !== 'mul') {
-        $('nnStatus').textContent = '';
-        $('nnTable').innerHTML = `<p class="note">${t('nn.needMul')}</p>`;
-        $('nnNote').textContent = ''; $('nnConf').innerHTML = ''; $('nnBroke').innerHTML = '';
-        return;
-    }
     try {
         if (!nnData) { $('nnStatus').textContent = t('nn.loading'); await loadNN(); }
     } catch {
@@ -789,16 +819,15 @@ async function renderNN() {
     }
     const { model, test } = nnData;
     const mask = nnMask();
-    const unit = cur.unit, name = unitName(cur.cfg);
-    const Tu = tableOf(unit), Tx = tableOf(null);
+    const setup = nnSetup(mask);
     const progress = (k, n) => { $('nnStatus').textContent = t('nn.progress', { k, n }); };
     let preds, refUnitPreds = null;
     try {
-        preds = await classifyAsync(mask.map((m) => (m ? Tu : Tx)), `${name}|${mask.join('')}`, progress);
+        preds = await classifyAsync(setup.tables, setup.adds, setup.key, progress);
         // Booth de 8 bits: a unidade recebe a >> 1; a referência da técnica (Booth exato) também perde o bit baixo.
-        if (unit.signed && cur.cfg.width === 8) {
-            const ex = cur.exact;
-            refUnitPreds = await classifyAsync(mask.map((m) => (m ? tableOf(ex) : Tx)), `${unitName(ex.cfg)}|${mask.join('')}`, progress);
+        if (setup.mul?.signed && cur.cfg.width === 8) {
+            const T = tableOf(cur.exact);
+            refUnitPreds = await classifyAsync(mask.map((m) => (m ? T : tableOf(null))), Array(5).fill(null), nnKey(cur.exact, null, mask), progress);
         }
     } catch { return; }   // outra execução começou
     $('nnStatus').textContent = '';
@@ -806,15 +835,17 @@ async function renderNN() {
     const sx = summarize(test, ref), su = summarize(test, preds, ref);
     const macs = macsPerLayer(model), total = macs.reduce((a, b) => a + b, 0);
     const approxMacs = macs.reduce((a, m, i) => a + (mask[i] ? m : 0), 0);
+    const label = `${setup.mul ? dn(unitName(setup.mul.cfg)) : t('nn.mulExact')} + ${setup.add ? dn(unitName(setup.add.cfg)) : t('nn.addExact')}`;
     let h = '<table class="kv">';
     h += `<tr><th>${t('nn.accExact')}</th><td class="mono">${pct(sx.accuracy)}</td></tr>`;
     if (refUnitPreds) h += `<tr><th>${t('nn.accRefUnit', { name: dn(unitName(cur.exact.cfg)) })}</th><td class="mono">${pct(summarize(test, refUnitPreds).accuracy)}</td></tr>`;
-    h += `<tr><th><b>${t('nn.accUnit', { name: dn(name) })}</b></th><td class="mono"><b>${pct(su.accuracy)}</b> (${su.accuracy >= sx.accuracy ? '+' : '−'}${nf(Math.abs(su.accuracy - sx.accuracy) * 100, 1)} ${t('nn.pp')})</td></tr>`;
+    h += `<tr><th><b>${t('nn.accUnit', { name: label })}</b></th><td class="mono"><b>${pct(su.accuracy)}</b> (${su.accuracy >= sx.accuracy ? '+' : '−'}${nf(Math.abs(su.accuracy - sx.accuracy) * 100, 1)} ${t('nn.pp')})</td></tr>`;
     h += `<tr><th>${t('nn.changed')}</th><td class="mono">${t('nn.changedV', { broke: su.broke.length, fixed: su.fixed })}</td></tr>`;
     h += `<tr><th>${t('nn.approxMacs')}</th><td class="mono">${nf(approxMacs)} ${t('nn.of')} ${nf(total)} (${pct(approxMacs / total)})</td></tr>`;
-    h += `<tr><th>${t('nn.unitMred')}</th><td class="mono">${pct(cur.m.MRED)}</td></tr></table>`;
+    if (setup.mul) h += `<tr><th>${t('nn.unitMred')}</th><td class="mono">${pct(cur.m.MRED)}</td></tr>`;
+    h += '</table>';
     $('nnTable').innerHTML = h;
-    $('nnNote').innerHTML = t('nn.note', { float: pct(model.accuracy.float), int8: pct(model.accuracy.int8) }) + (refUnitPreds ? ` ${t('nn.booth8')}` : '');
+    $('nnNote').innerHTML = t('nn.note', { float: pct(model.accuracy.float), int8: pct(model.accuracy.int8) }) + (refUnitPreds ? ` ${t('nn.booth8')}` : '') + (setup.add ? ` ${t('nn.adderNote', { n: setup.add.cfg.width })}` : '');
     // Matriz de confusão da rede com a unidade.
     let c = `<table class="conf"><tr><th></th>${Array.from({ length: 10 }, (_, k) => `<th>${k}</th>`).join('')}</tr>`;
     su.conf.forEach((row, y) => {
@@ -831,17 +862,17 @@ async function renderNN() {
 }
 
 $('nnLayers').addEventListener('change', () => { if (tab === 'nn') renderNN(); else dirty.nn = true; });
+$('nnAdder').addEventListener('change', () => { if (tab === 'nn') renderNN(); else dirty.nn = true; });
 $('nnSensBtn').onclick = async () => {
-    if (!cur || cur.cfg.kind !== 'mul' || !nnData) return;
+    if (!cur || !nnData) return;
     const run = ++nnRun;
-    const Tu = tableOf(cur.unit), Tx = tableOf(null), name = unitName(cur.cfg);
     const macs = macsPerLayer(nnData.model), total = macs.reduce((a, b) => a + b, 0);
     const rows = [];
     for (let i = 0; i < LAYERS.length; i++) {
-        const mask = LAYERS.map((_, j) => j === i);
+        const setup = nnSetup(LAYERS.map((_, j) => j === i));
         let preds;
         try {
-            preds = await classifyAsync(mask.map((m) => (m ? Tu : Tx)), `${name}|${mask.join('')}`, (k, n) => { $('nnStatus').textContent = t('nn.sensProgress', { layer: LAYERS[i], k, n }); });
+            preds = await classifyAsync(setup.tables, setup.adds, setup.key, (k, n) => { $('nnStatus').textContent = t('nn.sensProgress', { layer: LAYERS[i], k, n }); });
         } catch { return; }
         if (run !== nnRun) return;
         rows.push(`<tr><th>${LAYERS[i]}</th><td class="mono">${pct(macs[i] / total)}</td><td class="mono">${pct(summarize(nnData.test, preds).accuracy)}</td></tr>`);
@@ -1042,7 +1073,7 @@ for (const id of ['kind', 'width', 'adder', 'dist', 'approxCarry', 'mulMethod', 
  * deles). O estado vai no fragmento do endereço (#kind=mul&width=8&...), legível e sem ir ao servidor.
  */
 const SHARE_IDS = [...LAYERS.map((l) => `nnL-${l}`), 'kind', 'width', 'mulMethod', 'kTrunc', 'kApprox', 'approxCarry', 'kBlock', 'drumK', 'comp', 'adder', 'kAdd', 'segL', 'segP', 'dist',
-    'histLog', 'cmpX', 'cmpY', 'cmpLog', 'filter', 'vosV', 'vosClock', 'vosModel', 'memBer', 'memProt', 'scOp', 'scGen', 'scN', 'scX', 'scY', 'scBer', 'synthTarget'];
+    'histLog', 'cmpX', 'cmpY', 'cmpLog', 'filter', 'vosV', 'vosClock', 'vosModel', 'memBer', 'memProt', 'scOp', 'scGen', 'scN', 'scX', 'scY', 'scBer', 'synthTarget', 'nnAdder'];
 const DEFAULTS = new Map(SHARE_IDS.map((id) => [id, $(id).type === 'checkbox' ? $(id).checked : $(id).value]));
 const ctrlValue = (id) => ($(id).type === 'checkbox' ? $(id).checked : $(id).value);
 
@@ -1126,6 +1157,7 @@ function applyDomTranslations() {
     for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
     for (const el of document.querySelectorAll('[data-i18n-html]')) el.innerHTML = t(el.dataset.i18nHtml);
     for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle);
+    fillNNAdders();
     help.render();
 }
 langSelect.addEventListener('change', () => {
