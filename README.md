@@ -19,7 +19,7 @@ Interface e ajuda em **português e inglês** (seletor no cabeçalho). O botão 
 * **Estocástica**: valores como fluxos de bits, multiplicação por AND ou XNOR e soma escalada por MUX; quatro geradores (aleatório ideal, LFSRs diferentes, um LFSR só, sequência de Sobol) com o erro contra o comprimento do fluxo, o efeito da correlação, o custo dos geradores e do contador contra o binário, a tolerância a bits errados e um filtro gaussiano feito só com um MUX.
 * **Síntese**: exportação de qualquer configuração em Verilog com testbench autoverificável; a cada publicação, uma action exporta as configurações pré-definidas, confere o Verilog no Icarus Verilog contra o simulador e sintetiza com o Yosys para FPGA (Xilinx 7 series) e para ASIC (sky130_fd_sc_hd, canto típico; a biblioteca é baixada de uma versão fixa do OpenROAD-flow-scripts e conferida pelo SHA-256), com o script `scripts/synth.mjs` e o resultado em `data/synth.json`.
 * **Comparação**: configurações guardadas, varredura do parâmetro principal, fronteira de Pareto com custo e métrica de erro à escolha, contagem de dominância, ponto de joelho, exportação em CSV e SVG.
-* **Aplicação**: filtro gaussiano 3 × 3, ganho de brilho ou média de pares sobre uma imagem de teste sintética ou do usuário (formatos do navegador e também PPM, PGM e PBM), com a imagem exata, a aproximada, a diferença, PSNR e SSIM.
+* **Aplicação**: filtro gaussiano 3 × 3, bordas de Sobel, realce de bordas, ganho de brilho ou média de pares sobre uma imagem de teste sintética ou do usuário (formatos do navegador e também PPM, PGM e PBM), com a imagem exata, a aproximada, a diferença, PSNR e SSIM.
 
 ## Executar
 

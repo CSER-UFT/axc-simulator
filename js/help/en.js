@@ -163,6 +163,8 @@ export default {
     <li><strong>Gaussian 1 2 1</strong>: weights that are powers of 2. Each product has a single partial product per row, and truncating low columns may cause no error at all: the error depends on the data the unit receives.</li>
     <li><strong>brightness gain</strong>: one product per pixel.</li>
     <li><strong>average with the neighbor</strong>: one 8 bit sum per pixel.</li>
+    <li><strong>Sobel edges</strong>: the gradients Gx and Gy, with weights ±1 and ±2 (the same operations as the unrolled MiniC code of the compiler simulator), and the output (|Gx| + |Gy|) / 4. The units are unsigned, so the positive and negative parts of each gradient are accumulated with the unit and subtracted exactly. With a 16 bit adder, the sums are approximate: the LOA with k = 4 gives about 40 dB, and the segmented adder with L = 4 and P = 2, about 20 dB. With a multiplier, the products by 1 and by 2 have a single partial product per row, and the approximate compressors and Mitchell make no error; truncation and DRUM do.</li>
+    <li><strong>edge enhancement</strong>: 5 times the pixel minus the 4 neighbors, clamped to 0 and 255. The result is a difference between large values, so a small error in one of the parts becomes a large error in the result: the same units lose much more PSNR here than in the Gaussian.</li>
 </ul>
 <p><strong>PSNR</strong> = 10 log<sub>10</sub>(255² / MSE), in dB. <strong>SSIM</strong> (${c('wang2004')}) compares brightness, contrast and structure in 8 × 8 windows; 1 is identical. The difference, colored with the same ramp as the error map (black is zero), shows in which regions of the image the approximation appears.</p>`,
         },

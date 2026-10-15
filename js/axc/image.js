@@ -136,12 +136,28 @@ export const KERNELS = {
     gauss2: [16, 32, 16, 32, 64, 32, 16, 32, 16],    // 1 2 1, potências de 2: cada produto tem um só termo
 };
 
+/**
+ * Filtros com pesos negativos. As unidades são sem sinal, então a parte positiva (P) e a negativa (N) de cada
+ * convolução são calculadas separadamente com a unidade e a diferença P − N é exata.
+ */
+export const SIGNED_KERNELS = {
+    sobelX: [-1, 0, 1, -2, 0, 2, -1, 0, 1],
+    sobelY: [-1, -2, -1, 0, 0, 0, 1, 2, 1],
+    sharpen: [0, -1, 0, -1, 5, -1, 0, -1, 0],     // realce: 5 vezes o centro menos os 4 vizinhos
+};
+
+/** Módulos dos pesos de um filtro com sinal (os produtos que o multiplicador calcula). */
+function signedWeights(filter) {
+    const K = filter === 'sobel' ? [...SIGNED_KERNELS.sobelX, ...SIGNED_KERNELS.sobelY] : SIGNED_KERNELS[filter] ?? [];
+    return K.filter((v) => v !== 0).map(Math.abs);
+}
+
 const clampAt = (img, x, y) => img.data[Math.min(img.h - 1, Math.max(0, y)) * img.w + Math.min(img.w - 1, Math.max(0, x))];
 
 /**
  * Aplica o filtro com a unidade dada. Com um multiplicador, os produtos pixel x peso são aproximados e as
  * somas exatas; com um somador, os produtos são exatos e a acumulação usa o somador.
- * @param {'gauss'|'gauss2'|'gain'|'pairs'} filter
+ * @param {'gauss'|'gauss2'|'gain'|'pairs'|'sobel'|'sharpen'} filter
  * @param {object|null} unit saída de buildUnit (null: tudo exato)
  */
 export function applyFilter(img, filter, unit, { gain = 180 } = {}) {
@@ -152,7 +168,7 @@ export function applyFilter(img, filter, unit, { gain = 180 } = {}) {
     let table = null;
     const product = (x, w) => {
         if (!table) {
-            const ws = [...new Set(filter === 'gain' ? [gain] : (KERNELS[filter] ?? []))];
+            const ws = [...new Set(filter === 'gain' ? [gain] : (KERNELS[filter] ?? signedWeights(filter)))];
             const as = new Uint32Array(256 * ws.length), bs = new Uint32Array(256 * ws.length);
             ws.forEach((wt, i) => { for (let p = 0; p < 256; p++) { as[i * 256 + p] = p; bs[i * 256 + p] = wt; } });
             const y = unit.net.evaluate(as, bs);
@@ -163,6 +179,34 @@ export function applyFilter(img, filter, unit, { gain = 180 } = {}) {
     const mul = (as, bs) => (unit?.kind === 'mul' ? Float64Array.from(as, (x, k) => product(x, bs[k])) : Float64Array.from(as, (x, k) => x * bs[k]));
     const add = (as, bs) => (unit?.kind === 'add' ? unit.net.evaluate(as, bs) : Float64Array.from(as, (x, k) => x + bs[k]));
     const out = new Uint8ClampedArray(n);
+    if (filter === 'sobel' || filter === 'sharpen') {
+        // Convolução com sinal: P e N acumulados com a unidade (produtos e somas), P − N exato.
+        const conv = (K) => {
+            const part = (sign) => {
+                let acc = null;
+                K.forEach((wt, t) => {
+                    if (Math.sign(wt) !== sign) return;
+                    const dx = (t % 3) - 1, dy = Math.floor(t / 3) - 1;
+                    const p = new Uint32Array(n);
+                    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) p[y * w + x] = clampAt(img, x + dx, y + dy);
+                    const prod = Math.abs(wt) === 1 && unit?.kind !== 'mul' ? Float64Array.from(p) : mul(p, new Uint32Array(n).fill(Math.abs(wt)));
+                    acc = acc === null ? prod : add(Uint32Array.from(acc), Uint32Array.from(prod));
+                });
+                return acc;
+            };
+            const P = part(1), N = part(-1);
+            return Float64Array.from(P, (v, k) => v - N[k]);
+        };
+        if (filter === 'sharpen') {
+            const g = conv(SIGNED_KERNELS.sharpen);
+            for (let k = 0; k < n; k++) out[k] = Math.max(0, Math.min(255, g[k]));
+        } else {
+            // |Gx| + |Gy| (a norma L1, comum em hardware), dividido por 4: o máximo, 2040, cabe em 8 bits.
+            const gx = conv(SIGNED_KERNELS.sobelX), gy = conv(SIGNED_KERNELS.sobelY);
+            for (let k = 0; k < n; k++) out[k] = Math.min(255, Math.floor((Math.abs(gx[k]) + Math.abs(gy[k])) / 4));
+        }
+        return { w, h, data: out };
+    }
     if (filter === 'gain') {
         // Ganho de brilho: pixel x g / 128 (g em 8 bits).
         const p = Uint32Array.from(img.data), g = new Uint32Array(n).fill(gain);

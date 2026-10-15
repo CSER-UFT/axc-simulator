@@ -163,6 +163,8 @@ export default {
     <li><strong>gaussiano 1 2 1</strong>: pesos que são potências de 2. Cada produto tem um único produto parcial por linha, e truncar colunas baixas pode não errar nada: o erro depende dos dados que a unidade recebe.</li>
     <li><strong>ganho de brilho</strong>: um produto por pixel.</li>
     <li><strong>média com o vizinho</strong>: uma soma de 8 bits por pixel.</li>
+    <li><strong>bordas de Sobel</strong>: os gradientes Gx e Gy, com pesos ±1 e ±2 (as mesmas contas do código MiniC desenrolado do simulador de compilador), e a saída (|Gx| + |Gy|) / 4. As unidades são sem sinal, então a parte positiva e a negativa de cada gradiente são acumuladas com a unidade e subtraídas de forma exata. Com um somador de 16 bits, as somas são aproximadas: o LOA com k = 4 dá uns 40 dB, e o segmentado com L = 4 e P = 2, uns 20 dB. Com um multiplicador, os produtos por 1 e por 2 têm um só produto parcial por linha, e os compressores aproximados e o Mitchell não erram nada; o truncamento e o DRUM erram.</li>
+    <li><strong>realce de bordas</strong>: 5 vezes o pixel menos os 4 vizinhos, limitado a 0 e 255. O resultado é uma diferença entre valores grandes, então um erro pequeno numa das partes vira um erro grande no resultado: as mesmas unidades perdem bem mais PSNR aqui que no gaussiano.</li>
 </ul>
 <p><strong>PSNR</strong> = 10 log<sub>10</sub>(255² / MSE), em dB. <strong>SSIM</strong> (${c('wang2004')}) compara brilho, contraste e estrutura em janelas 8 × 8; 1 é igual. A diferença, colorida com a mesma rampa do mapa de erro (preto é zero), mostra em que regiões da imagem a aproximação aparece.</p>`,
         },

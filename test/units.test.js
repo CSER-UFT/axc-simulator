@@ -223,3 +223,24 @@ test('atividade de chaveamento: zero sem mudança de entrada, menor quando o cir
     const ae = e.net.activity(inp.a, inp.b), at = t.net.activity(inp.a, inp.b);
     assert.ok(ae > 50 && at < ae);
 });
+
+test('Sobel e realce: a referência confere com a fórmula, as unidades exatas não erram e as aproximadas erram', async () => {
+    const { SIGNED_KERNELS } = await import('../js/axc/image.js');
+    const img = testImage(40, 30);
+    const at = (x, y) => img.data[Math.min(img.h - 1, Math.max(0, y)) * img.w + Math.min(img.w - 1, Math.max(0, x))];
+    const conv = (K, x, y) => K.reduce((s, w, t) => s + w * at(x + (t % 3) - 1, y + Math.floor(t / 3) - 1), 0);
+    const sob = applyFilter(img, 'sobel', null), shp = applyFilter(img, 'sharpen', null);
+    for (let y = 0; y < img.h; y++) for (let x = 0; x < img.w; x++) {
+        const k = y * img.w + x;
+        assert.equal(sob.data[k], Math.min(255, Math.floor((Math.abs(conv(SIGNED_KERNELS.sobelX, x, y)) + Math.abs(conv(SIGNED_KERNELS.sobelY, x, y))) / 4)));
+        assert.equal(shp.data[k], Math.max(0, Math.min(255, conv(SIGNED_KERNELS.sharpen, x, y))));
+    }
+    for (const f of ['sobel', 'sharpen']) {
+        for (const cfg of [{ kind: 'mul', width: 8 }, { kind: 'add', width: 16, adder: 'exact' }, { kind: 'mul', width: 16, method: 'booth' }]) {
+            assert.equal(psnr(applyFilter(img, f, null), applyFilter(img, f, buildUnit(cfg))), Infinity, `${f} ${JSON.stringify(cfg)}`);
+        }
+        assert.ok(psnr(applyFilter(img, f, null), applyFilter(img, f, buildUnit({ kind: 'add', width: 16, adder: 'loa', k: 4 }))) < 60);
+    }
+    // Pesos 1 e 2: um só produto parcial por linha, e o compressor aproximado não erra.
+    assert.equal(psnr(sob, applyFilter(img, 'sobel', buildUnit({ kind: 'mul', width: 8, kApprox: 8 }))), Infinity);
+});
