@@ -117,3 +117,4 @@ table.metrics td.note { text-align: left; }
 .digit-grid canvas { width: 56px; height: 56px; image-rendering: pixelated; border: 1px solid var(--line); display: block; }
 .digit-grid figcaption { font-size: 12px; font-family: var(--mono, monospace); margin-top: 2px; }
 #nnLayers > span { font-size: 13px; color: var(--muted); }
+#vosCalTable th, #vosCalTable td { white-space: nowrap; }

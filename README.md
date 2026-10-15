@@ -15,7 +15,7 @@ Interface e ajuda em **português e inglês** (seletor no cabeçalho). O botão 
 * **Estrutura**: diagrama de pontos dos produtos parciais com as zonas, altura das colunas a cada estágio de redução e tabela verdade do compressor aproximado.
 * **Erro**: ME, MED, WCE (com o par que o produz), MSE, NMED, MRED e EP; avaliação exaustiva para 8 bits com entradas uniformes e por amostragem nos outros casos (entradas uniformes, normais ou exponenciais); mapa do erro sobre o plano (a, b) e histograma do erro com sinal.
 * **Custo**: área em portas de duas entradas, atraso em níveis de porta e atividade de chaveamento (indicador de energia dinâmica), todos do modelo didático, e, para as configurações pré-definidas, LUTs, CARRY4 e profundidade de uma síntese real com o Yosys para FPGA Xilinx 7 series, e área (µm²) e atraso (ps) de uma síntese para ASIC com a biblioteca de células do PDK aberto SkyWater 130 nm.
-* **Tensão e memória**: escalonamento de tensão além da margem, com atraso pela lei de potência alfa, tempo de chegada de cada bit dependente dos dados e captura do valor antigo quando o bit atrasa; curva de erro contra tensão da unidade e da exata, energia relativa e a imagem degradando; memória aproximada com inversão de bits e proteção dos bits mais significativos, com o MSE medido e o esperado.
+* **Tensão e memória**: escalonamento de tensão além da margem, com atraso pela lei de potência alfa, tempo de chegada de cada bit dependente dos dados e captura do valor antigo quando o bit atrasa; curva de erro contra tensão da unidade e da exata, energia relativa e a imagem degradando; memória aproximada com inversão de bits e proteção dos bits mais significativos, com o MSE medido e o esperado. O modelo de atraso pode ser o genérico ou o ajustado às células do sky130 no canto lento a −40 °C (de 1,28 a 1,76 V), lido das tabelas da biblioteca pelo script `scripts/sky130/voltage.py` (resultado em `data/sky130-voltage.json`).
 * **Estocástica**: valores como fluxos de bits, multiplicação por AND ou XNOR e soma escalada por MUX; quatro geradores (aleatório ideal, LFSRs diferentes, um LFSR só, sequência de Sobol) com o erro contra o comprimento do fluxo, o efeito da correlação, o custo dos geradores e do contador contra o binário, a tolerância a bits errados e um filtro gaussiano feito só com um MUX.
 * **Síntese**: exportação de qualquer configuração em Verilog com testbench autoverificável; a cada publicação, uma action exporta as configurações pré-definidas, confere o Verilog no Icarus Verilog contra o simulador e sintetiza com o Yosys para FPGA (Xilinx 7 series) e para ASIC (sky130_fd_sc_hd, canto típico; a biblioteca é baixada de uma versão fixa do OpenROAD-flow-scripts e conferida pelo SHA-256), com o script `scripts/synth.mjs` e o resultado em `data/synth.json`.
 * **Comparação**: configurações guardadas, varredura do parâmetro principal, fronteira de Pareto com custo e métrica de erro à escolha, contagem de dominância, ponto de joelho, exportação em CSV e SVG.
@@ -41,6 +41,7 @@ npm run synth  # exporta, confere e sintetiza as configurações pré-definidas 
 | `js/axc/vos.js` | escalonamento de tensão (atraso, tempo de chegada, captura) e memória aproximada |
 | `js/axc/lenet.js` | inferência inteira da LeNet-5 com a tabela de produtos da unidade |
 | `scripts/lenet5/train.py` | treino da LeNet-5 com NumPy e quantização em 8 bits (gera `data/lenet5.json` e `data/mnist1000.bin`) |
+| `scripts/sky130/voltage.py` | atraso e energia das células sky130 por canto de tensão e ajuste da lei de potência alfa |
 | `js/axc/stochastic.js` | computação estocástica: geradores (LFSR, Sobol), fluxos, operações, erro, custo, falhas e o filtro com MUX |
 | `js/axc/verilog.js` | exportação em Verilog, testbench e vetores de teste |
 | `js/axc/presets.js` | configurações pré-definidas, sintetizadas na publicação |
@@ -53,7 +54,6 @@ Os testes conferem as unidades exatas contra a aritmética (8 bits exaustivo), o
 
 ## Próximas etapas possíveis
 
-* Calibrar o modelo de tensão com os cantos de tensão da biblioteca sky130.
 * Mais técnicas (codificador de Booth aproximado, outros somadores).
 * Integração com o riscv-cc-simulator (a unidade aproximada como operação no DFG e no escalonamento).
 

@@ -18,6 +18,16 @@ import { rng } from './metrics.js';
 
 export const VT = 0.3, ALPHA = 1.3, VNOM = 1.0;
 
+/**
+ * Modelos de atraso: o genérico (Vt = 0,3 e alfa = 1,3, tensões normalizadas) e o ajustado às células da
+ * biblioteca sky130_fd_sc_hd no canto lento a −40 °C (scripts/sky130/voltage.py, data/sky130-voltage.json):
+ * Vt = 1,03 V, ou 0,572 da nominal de 1,8 V, e alfa = 1,44.
+ */
+export const DELAY_MODELS = {
+    generic: { vt: VT, alpha: ALPHA },
+    sky130: { vt: 0.572, alpha: 1.44 },
+};
+
 /** Atraso relativo de uma porta na tensão V (1 na nominal). */
 export function delayFactor(V, vt = VT, alpha = ALPHA) {
     const d = (v) => v / (v - vt) ** alpha;
@@ -67,8 +77,8 @@ export function timingTrace(unit, as, bs) {
  * Saídas capturadas com o relógio em `period` atrasos de porta nominais, na tensão V: um bit que chega depois da
  * borda fica com o valor da operação anterior.
  */
-export function capturedOutputs(trace, period, V) {
-    const limit = period / delayFactor(V);
+export function capturedOutputs(trace, period, V, model = DELAY_MODELS.generic) {
+    const limit = period / delayFactor(V, model.vt, model.alpha);
     const { n, W, out, arr } = trace;
     const cap = new Float64Array(n);
     let late = 0;
@@ -114,11 +124,11 @@ export function randomSequence(N, n = 4096, seed = 2024) {
  * Curva de erro contra tensão.
  * @returns {Array<{V: number, MRED: number, EP: number, MED: number, lateBits: number, energy: number}>}
  */
-export function vosCurve(unit, trace, seq, period, { from = 1.0, to = 0.5, step = 0.01 } = {}) {
+export function vosCurve(unit, trace, seq, period, { from = 1.0, to = 0.5, step = 0.01, model = DELAY_MODELS.generic } = {}) {
     const pts = [];
     for (let V = from; V >= to - 1e-9; V -= step) {
         const v = Math.round(V * 100) / 100;
-        const { cap, lateBits } = capturedOutputs(trace, period, v);
+        const { cap, lateBits } = capturedOutputs(trace, period, v, model);
         const m = vosMetrics(unit, seq.a, seq.b, cap);
         pts.push({ V: v, ...m, lateBits, energy: (v / VNOM) ** 2 });
     }

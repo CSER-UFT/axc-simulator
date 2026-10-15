@@ -56,3 +56,23 @@ test('memória aproximada: MSE medido perto do esperado e proteção dos bits al
     const { img: same } = corruptImage(img, 0.5, 8);
     assert.deepEqual([...same.data], [...img.data]);
 });
+
+test('modelo de atraso ajustado ao sky130: confere com os dados medidos e é mais sensível à tensão', async () => {
+    const { DELAY_MODELS } = await import('../js/axc/vos.js');
+    const { readFileSync } = await import('node:fs');
+    const cal = JSON.parse(readFileSync(new URL('../data/sky130-voltage.json', import.meta.url), 'utf8'));
+    assert.ok(Math.abs(cal.fit.VtNorm - DELAY_MODELS.sky130.vt) < 0.001);
+    assert.ok(Math.abs(cal.fit.alpha - DELAY_MODELS.sky130.alpha) < 0.001);
+    assert.ok(cal.fit.rmsLogError < 0.01);
+    // A energia medida segue V² dentro de 5% na série lenta.
+    for (const c of cal.corners.filter((x) => x.process === 'ss' && x.temp === -40)) assert.ok(Math.abs(c.energyRel / (c.V / 1.76) ** 2 - 1) < 0.05, c.name);
+    const g = DELAY_MODELS.generic, s = DELAY_MODELS.sky130;
+    assert.ok(delayFactor(0.8, s.vt, s.alpha) > 1.5 * delayFactor(0.8, g.vt, g.alpha));
+    assert.equal(delayFactor(0.55, s.vt, s.alpha), Infinity);
+    const u = buildUnit({ kind: 'mul', width: 8 });
+    const seq = randomSequence(8, 2000, 4);
+    const tr = timingTrace(u, seq.a, seq.b);
+    const P = Math.max(...outputDepths(u));
+    const onset = (model) => vosCurve(u, tr, seq, P, { from: 1, to: 0.6, step: 0.01, model }).find((p) => p.MRED > 0)?.V;
+    assert.ok(onset(s) > onset(g));
+});

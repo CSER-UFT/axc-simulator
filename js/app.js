@@ -10,7 +10,7 @@ import { lineChartSvg, stagesSvg, dotDiagram, adderDiagram, histogramSvg, drawHe
 import { toVerilog, testbench, vectors, moduleName } from './axc/verilog.js';
 import { Help } from './ui/help.js';
 import { SC_GENERATORS, scCurve, binaryError, streamDemo, scCost, faultError, scFilter, flipPixelBits } from './axc/stochastic.js';
-import { timingTrace, capturedOutputs, vosCurve, randomSequence, outputDepths, delayFactor, corruptImage, expectedMemoryMSE } from './axc/vos.js';
+import { timingTrace, capturedOutputs, vosCurve, randomSequence, outputDepths, delayFactor, corruptImage, expectedMemoryMSE, DELAY_MODELS } from './axc/vos.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale, dec } from './i18n/index.js';
 import { REFS, TECH_REFS, cite } from './refs.js';
 import { LAYERS, decodeModel, decodeTestSet, productTable, classifyRange, summarize, macsPerLayer } from './axc/lenet.js';
@@ -122,7 +122,7 @@ function randomPairs(N, n, seed) {
 const dirty = { struct: true, error: true, cmp: true, app: true, synth: true, vos: true, sc: true, nn: true };
 const RENDER = { struct: () => renderStruct(), error: () => renderError(), cmp: () => renderCmp(), app: () => renderApp(), synth: () => renderSynth(), vos: () => renderVos(), nn: () => renderNN() };
 function renderTab(name) {
-    if (name === 'vos') renderMem();
+    if (name === 'vos') { renderMem(); renderCal(); }
     if (name === 'sc') { if (dirty.sc) { dirty.sc = false; renderSc(); } return; }
     if (!cur || !dirty[name]) return;
     dirty[name] = false;
@@ -448,14 +448,16 @@ function renderVos() {
     if (!cur) return;
     const unit = cur.unit, exact = cur.exact;
     const V = +$('vosV').value;
+    const modelKey = $('vosModel').value, model = DELAY_MODELS[modelKey];
     $('vosVV').textContent = fx(V, 2);
     const dU = maxDepth(unit), dE = maxDepth(exact);
     const exactClock = $('vosClock').value === 'exact';
     const period = exactClock ? dE : dU;
     const tu = traceOf(unit), te = traceOf(exact);
     const curveOf = (tr, u, per) => {
-        if (!tr.curves.has(per)) tr.curves.set(per, vosCurve(u, tr.trace, tr.seq, per));
-        return tr.curves.get(per);
+        const key = `${per}|${modelKey}`;
+        if (!tr.curves.has(key)) tr.curves.set(key, vosCurve(u, tr.trace, tr.seq, per, { model }));
+        return tr.curves.get(key);
     };
     const cu = curveOf(tu, unit, period), ce = curveOf(te, exact, dE);
     $('vosFig').innerHTML = lineChartSvg([
@@ -464,8 +466,9 @@ function renderVos() {
     ], { xLabel: t('vos.xLabel'), yLabel: 'MRED (%)', marker: V, xReverse: true });
     const at = (c) => c.find((p) => Math.abs(p.V - V) < 1e-6) ?? c[c.length - 1];
     const pu = at(cu), pe = at(ce);
-    const s = delayFactor(V);
+    const s = delayFactor(V, model.vt, model.alpha);
     let note = t('vos.note', { period, which: t(exactClock ? 'vos.ofExact' : 'vos.ofOwn'), V: fx(V, 2), s: nf(s, 2), fit: nf(period / s, 1) });
+    if (s === Infinity) note = t('vos.belowVt', { vt: fx(model.vt, 2) }).trim();
     if (exactClock && dU > dE) note += t('vos.deeper', { dU, dE });
     else if (exactClock && dU < dE) note += t('vos.shallower', { dU, dE });
     $('vosNote').textContent = note;
@@ -496,7 +499,7 @@ function renderVos() {
         vosImgCache = { key, img, trace: timingTrace(unit, as, bs) };
     }
     const fin = (v) => (cur.cfg.kind === 'mul' ? Math.min(255, Math.floor(v / 128)) : Math.floor(v / 2));
-    const { cap } = capturedOutputs(vosImgCache.trace, period, V);
+    const { cap } = capturedOutputs(vosImgCache.trace, period, V, model);
     const exImg = { w: img.w, h: img.h, data: Uint8ClampedArray.from(vosImgCache.trace.out, (v) => fin(unit.decode ? unit.decode(v) : v)) };
     const ref = { w: img.w, h: img.h, data: Uint8ClampedArray.from(img.data, (p, k) => fin(cur.cfg.kind === 'mul' ? p * 180 : p + img.data[k % img.w === img.w - 1 ? k : k + 1])) };
     const vi = { w: img.w, h: img.h, data: Uint8ClampedArray.from(cap, (v) => fin(unit.decode ? unit.decode(v) : v)) };
@@ -506,6 +509,32 @@ function renderVos() {
     const f = (x) => (x === Infinity ? '∞' : `${nf(x, 1)} dB`);
     $('vosExactCap').textContent = t('vos.capExact', { f: cur.cfg.kind === 'mul' ? 'pixel × 180 / 128' : t('vos.pairs') });
     $('vosImgCap').textContent = t('vos.capV', { V: fx(V, 2), p: f(pV), pa: f(pAp) });
+}
+
+/** Calibração: atraso e energia medidos nas células do sky130 contra os dois modelos (data/sky130-voltage.json). */
+let calData = null, calLoading = null;
+function renderCal() {
+    if (!calData) {
+        calLoading ??= fetch('data/sky130-voltage.json').then((r) => (r.ok ? r.json() : null)).catch(() => null).then((d) => { calData = d; if (d && tab === 'vos') renderCal(); });
+        return;
+    }
+    const fit = calData.fit, vnom = calData.vnom;
+    const rel = (v, vt, a) => (v / (v - vt) ** a) / (1 / (1 - vt) ** a);   // atraso relativo à nominal, v normalizado
+    const ss = calData.corners.filter((c) => c.process === 'ss' && c.temp === -40);
+    const k176 = rel(Math.max(...ss.map((c) => c.V)) / vnom, fit.VtNorm, fit.alpha);   // os medidos são relativos a 1,76 V
+    const xs = Array.from({ length: 41 }, (_, i) => 0.6 + i * 0.01);
+    const g = DELAY_MODELS.generic, k = DELAY_MODELS.sky130;
+    $('vosCal').innerHTML = lineChartSvg([
+        { name: t('vos.cal.generic'), cls: 's-exact', pts: xs.map((x) => ({ x, y: rel(x, g.vt, g.alpha) })) },
+        { name: t('vos.cal.fit'), cls: 's-unit', pts: xs.filter((x) => x > k.vt + 0.02).map((x) => ({ x, y: rel(x, k.vt, k.alpha) })) },
+        { name: t('vos.cal.measured'), cls: 's-sobol', dots: true, pts: ss.map((c) => ({ x: c.V / vnom, y: c.delayRel * k176 })) },
+    ], { xLabel: t('vos.cal.x'), yLabel: t('vos.cal.y'), logY: true, xReverse: true, width: 520, height: 300 });
+    const row = (c) => `<tr><th>${c.process} ${String(c.temp).replace("-", "−")} °C</th><td class="mono">${fx(c.V, 2)} V</td><td class="mono">${nf(c.delayRel, 2)}</td><td class="mono">${pct(c.energyRel)}</td><td class="mono">${pct((c.V / 1.76) ** 2)}</td></tr>`;
+    $('vosCalTable').innerHTML = `<table class="kv"><tr><th>${t('vos.cal.corner')}</th><td class="note">${t('vos.cal.V')}</td><td class="note">${t('vos.cal.delay')}</td><td class="note">${t('vos.cal.energy')}</td><td class="note">(V / 1,76)²</td></tr>`
+        + calData.corners.filter((c) => c.process === 'ss' && c.temp === -40).slice().reverse().map(row).join('')
+        + calData.corners.filter((c) => c.process !== 'ss').map(row).join('') + '</table>';
+    const tt = calData.corners.find((c) => c.name === 'tt_025C_1v80');
+    $('vosCalNote').innerHTML = t('vos.cal.note', { load: nf(calData.load_pF * 1000, 1), vt: fx(fit.Vt, 2), vtn: fx(fit.VtNorm, 3), a: fx(fit.alpha, 2), err: pct(fit.rmsLogError), tt: tt ? nf(1 / tt.delayRel, 2) : '' });
 }
 
 function renderMem() {
@@ -927,6 +956,7 @@ $('scBer').addEventListener('input', () => renderScFault());
 $('filter').onchange = () => { renderApp(); };
 $('vosV').addEventListener('input', () => renderVos());
 $('vosClock').addEventListener('change', () => renderVos());
+$('vosModel').addEventListener('change', () => renderVos());
 for (const id of ['memBer', 'memProt']) $(id).addEventListener('input', () => renderMem());
 $('imgSynth').onclick = () => { image = testImage(); imgMessage = null; dirty.vos = true; dirty.sc = true; if (cur) cur.appCache = null; renderApp(); };
 $('imgFile').onchange = (e) => {
@@ -990,7 +1020,7 @@ for (const id of ['kind', 'width', 'adder', 'dist', 'approxCarry', 'mulMethod', 
  * deles). O estado vai no fragmento do endereço (#kind=mul&width=8&...), legível e sem ir ao servidor.
  */
 const SHARE_IDS = [...LAYERS.map((l) => `nnL-${l}`), 'kind', 'width', 'mulMethod', 'kTrunc', 'kApprox', 'approxCarry', 'kBlock', 'drumK', 'comp', 'adder', 'kAdd', 'segL', 'segP', 'dist',
-    'histLog', 'cmpX', 'cmpY', 'cmpLog', 'filter', 'vosV', 'vosClock', 'memBer', 'memProt', 'scOp', 'scGen', 'scN', 'scX', 'scY', 'scBer', 'synthTarget'];
+    'histLog', 'cmpX', 'cmpY', 'cmpLog', 'filter', 'vosV', 'vosClock', 'vosModel', 'memBer', 'memProt', 'scOp', 'scGen', 'scN', 'scX', 'scY', 'scBer', 'synthTarget'];
 const DEFAULTS = new Map(SHARE_IDS.map((id) => [id, $(id).type === 'checkbox' ? $(id).checked : $(id).value]));
 const ctrlValue = (id) => ($(id).type === 'checkbox' ? $(id).checked : $(id).value);
 

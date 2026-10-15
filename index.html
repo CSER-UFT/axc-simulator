@@ -148,6 +148,7 @@
                         <div class="row">
                             <label class="slider wide"><span data-i18n="vos.V">Tensão (V/Vnom)</span> <input type="range" id="vosV" min="0.5" max="1" step="0.01" value="0.8" /> <output id="vosVV">0,80</output></label>
                             <label style="margin:0"><span data-i18n="vos.clock">Relógio</span> <select id="vosClock"><option value="exact" data-i18n="vos.clockExact">o da unidade exata</option><option value="own" data-i18n="vos.clockOwn">o da própria unidade</option></select></label>
+                            <label style="margin:0"><span data-i18n="vos.model">Atraso</span> <select id="vosModel"><option value="generic" data-i18n="vos.model.generic">genérico (Vt 0,3; α 1,3)</option><option value="sky130" data-i18n="vos.model.sky130">sky130 lento a −40 °C (Vt 0,57; α 1,44)</option></select></label>
                         </div>
                         <div class="graph-pair">
                             <div><div class="fig-box" id="vosFig"></div><p class="note" id="vosNote"></p></div>
@@ -157,6 +158,11 @@
                                     <figure><canvas id="vosImg"></canvas><figcaption id="vosImgCap"></figcaption></figure>
                                 </div>
                             </div>
+                        </div>
+                        <h3 style="margin-top:16px" data-i18n="vos.calTitle">Calibração com as células do sky130</h3>
+                        <div class="graph-pair">
+                            <div class="fig-box" id="vosCal"></div>
+                            <div><div id="vosCalTable"></div><p class="note" id="vosCalNote"></p></div>
                         </div>
                         <h3 style="margin-top:16px" data-i18n="mem.title">Memória aproximada</h3>
                         <p class="note" data-i18n="mem.intro">A imagem é guardada numa memória que inverte cada bit com a probabilidade escolhida, como uma DRAM com intervalo de refresh maior que o seguro (Flikker, Liu e colegas, 2011). Os bits mais significativos de cada pixel podem ficar numa parte confiável da memória: é a divisão por significância.</p>
