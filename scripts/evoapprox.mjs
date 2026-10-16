@@ -9,7 +9,8 @@
  * e a energia com os operandos reais das aplicações (data/operands.bin), como nas unidades do simulador.
  *
  * A saída de cada circuito vem da simulação do próprio Verilog da biblioteca no Icarus Verilog (o Verilog é a
- * referência; os modelos em C não são usados).
+ * referência). Em 16 bits, para não simular centenas de milhares de pares, usa o modelo em C da biblioteca, depois de
+ * conferir que ele dá as mesmas saídas que o Verilog em 4096 pares (nos que não conferem, simula o Verilog).
  *
  * Uso: node scripts/evoapprox.mjs [--jobs N] [--src build/evoapproxlib] [--only regex] [--out data/evoapprox.json]
  *                                 [--synth data/synth.json]
@@ -103,17 +104,61 @@ endmodule
         if (out.length !== a.length || out.some((x) => /[xz]/i.test(x))) throw new Error(`${c.name}: saída inválida na simulação`);
         return Float64Array.from(out, (x) => parseInt(x, 16));
     };
-    if (N > 8) return sim;
+    if (N > 8) return cModel(c, sim) ?? sim;
     // Em 8 bits, uma simulação só com todos os pares e depois consulta à tabela.
     const all = testInputs(N, 'uniform');
     const table = sim(all.a, all.b);
     return (a, b) => Float64Array.from(a, (x, k) => table[(x << N) | b[k]]);
 }
 
+/**
+ * Modelo em C da biblioteca (bem mais rápido que simular o Verilog em 16 bits), usado só depois de conferido contra o
+ * Verilog em 4096 pares. A ordem dos parâmetros varia entre os arquivos (A, B ou B, A): vem dos nomes na assinatura.
+ * Devolve null se não houver modelo, se ele não compilar ou se discordar do Verilog.
+ */
+function cModel(c, sim) {
+    const cfile = c.file.replace(/\.v$/, '.c');
+    if (!existsSync(cfile)) return null;
+    const src = read(cfile);
+    const sig = new RegExp(`\\b${c.name}\\s*\\(\\s*(?:const\\s+)?\\w+\\s+(\\w+)\\s*,\\s*(?:const\\s+)?\\w+\\s+(\\w+)\\s*\\)`).exec(src);
+    if (!sig) return null;
+    // A ordem pela assinatura primeiro; nos compostos de quatro multiplicadores de 8 bits, o C às vezes troca a ordem
+    // dos operandos do submódulo em relação ao Verilog, e então a ordem invertida é que confere.
+    const first = sig[1].toLowerCase() === 'b' ? 'p[1], p[0]' : 'p[0], p[1]';
+    const second = first === 'p[0], p[1]' ? 'p[1], p[0]' : 'p[0], p[1]';
+    const t = testInputs(c.width, 'uniform', 4096, 99);
+    const y = sim(t.a, t.b);
+    for (const [i, args] of [first, second].entries()) {
+        const run = build(c, cfile, args, i);
+        if (!run) return null;
+        const x = run(t.a, t.b);
+        if (x.every((v, k) => v === y[k])) return run;
+    }
+    console.error(`${c.name}: o modelo em C discorda do Verilog nas duas ordens; usando a simulação`);
+    return null;
+}
+
+/** Compila o modelo em C com um programa que lê pares (binário) e escreve as saídas. */
+function build(c, cfile, args, i) {
+    const harness = join(work, `${c.name}.harness${i}.c`), bin = join(work, `${c.name}.${i}.bin`);
+    writeFileSync(harness, `#include <stdint.h>\n#include <stdio.h>\n#include "${cfile.startsWith('/') ? cfile : join(process.cwd(), cfile)}"\nint main(void) { uint32_t p[2]; while (fread(p, 4, 2, stdin) == 2) { uint32_t o = (uint32_t)${c.name}(${args}); fwrite(&o, 4, 1, stdout); } return 0; }\n`);
+    try { execSync(`gcc -O2 -w -o ${bin} ${harness}`, { stdio: 'ignore' }); } catch { return null; }
+    return (a, b) => {
+        const inp = new Uint32Array(2 * a.length);
+        for (let k = 0; k < a.length; k++) { inp[2 * k] = a[k]; inp[2 * k + 1] = b[k]; }
+        const out = execSync(bin, { input: Buffer.from(inp.buffer), maxBuffer: 1 << 28 });
+        return Float64Array.from(new Uint32Array(out.buffer, out.byteOffset, out.byteLength / 4));
+    };
+}
+
 async function one(c) {
     const text = read(c.file);
-    const W = +(/output\s*\[(\d+):0\]\s*O/.exec(text)?.[1] ?? NaN) + 1;
-    if (!(W > 0)) throw new Error(`${c.name}: largura da saída não encontrada`);
+    // Largura da saída: 2N no multiplicador, N + 1 no somador (alguns arquivos têm submódulos com outras larguras
+    // antes do módulo principal). Confere com a declaração dentro do próprio módulo.
+    const W = c.kind === 'mul' ? 2 * c.width : c.width + 1;
+    const body = text.slice(text.search(new RegExp(`module\\s+${c.name}\\b`)));
+    const decl = /output\s*\[(\d+):0\]\s*O\b/.exec(body.slice(0, body.indexOf('endmodule')));
+    if (!decl || +decl[1] + 1 !== W) throw new Error(`${c.name}: saída de ${decl ? +decl[1] + 1 : '?'} bits, esperado ${W}`);
     const top = `eal_${c.name}`;
     const wrapper = join(work, `${top}.v`);
     writeFileSync(wrapper, `module ${top}(input [${c.width - 1}:0] a, input [${c.width - 1}:0] b, output [${W - 1}:0] y);\n    ${c.name} u (.A(a), .B(b), .O(y));\nendmodule\n`);

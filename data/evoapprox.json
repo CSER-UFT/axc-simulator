@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-15",
+ "generated": "2026-10-16",
  "source": {
   "repo": "https://github.com/ehw-fit/evoapproxlib.git",
   "commit": "ec28be83bfce1b8e8b92bd456be520d323a568b5",
@@ -3769,6 +3769,3463 @@
    "sha256": "cfb749d7df19806e015e330faac5e03a40955f22244e8fa1d8302e4672837d85"
   },
   {
+   "name": "mul16u_0ZG",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 8775.92,
+    "delay": 5369.1,
+    "energy": 10697,
+    "leakage": 4.552,
+    "cells": 1587,
+    "energyApp": {
+     "lenet": 1650.64,
+     "image": 2428.84
+    },
+    "flows": {
+     "delay": {
+      "area": 8775.92,
+      "cells": 1587,
+      "delayAbc": 4646.64,
+      "delay": 5369.1,
+      "energy": 10697,
+      "leakage": 4.552,
+      "pins": 5520,
+      "sha256": "71a083caf901562b6e96b8095cc2fff2ee63c006f58033d53740d1421e7f6fcb"
+     },
+     "area": {
+      "area": 6997.96,
+      "cells": 1313,
+      "delayAbc": 8959.63,
+      "delay": 9182.1,
+      "energy": 8587.86,
+      "leakage": 3.668,
+      "pins": 4435,
+      "sha256": "6a601a1270ead90806e16f8fce3748f20bbd06f6c493a55f8f53066e6394e355"
+     },
+     "iso": {
+      "area": 8775.92,
+      "cells": 1587,
+      "delayAbc": 4646.64,
+      "delay": 5369.1,
+      "energy": 10697,
+      "leakage": 4.552,
+      "pins": 5520,
+      "sha256": "71a083caf901562b6e96b8095cc2fff2ee63c006f58033d53740d1421e7f6fcb",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 59684600,
+    "WCE": 946995200,
+    "MSE": 27927570173040010,
+    "NMED": 0.0138968,
+    "MRED": 0.0331353,
+    "EP": 0.80881,
+    "ci": {
+     "MED": 684112,
+     "MSE": 449012000000000,
+     "NMED": 0.000159287,
+     "MRED": 0.000267834,
+     "EP": 0.00172344
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 33.1841,
+     "WCE": 3570,
+     "MSE": 55411.1,
+     "NMED": 7.72652e-9,
+     "MRED": 0.0179469,
+     "EP": 0.116333,
+     "ci": {
+      "MED": 2.52331,
+      "MSE": 6592.9,
+      "NMED": 5.87522e-10,
+      "MRED": 0.000773034,
+      "EP": 0.00347158
+     }
+    },
+    "image": {
+     "MED": 69.2925,
+     "WCE": 2560,
+     "MSE": 97701.5,
+     "NMED": 1.61339e-8,
+     "MRED": 0.011538,
+     "EP": 0.375122,
+     "ci": {
+      "MED": 3.30019,
+      "MSE": 6948.01,
+      "NMED": 7.68409e-10,
+      "MRED": 0.000347425,
+      "EP": 0.00524222
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 1.39,
+    "WCEpct": 22.22,
+    "EPpct": 80.98,
+    "MREpct": 3.32,
+    "pdk45": {
+     "power_mW": 1.984,
+     "area_um2": 3094.1,
+     "delay_ns": 3.23
+    }
+   },
+   "sha256": "0c81bf04024659523a5a775d2421c2460e644dade14117dda25bc0271bd2779f"
+  },
+  {
+   "name": "mul16u_34S",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 10945.5,
+    "delay": 5106.4,
+    "energy": 12651.8,
+    "leakage": 5.712,
+    "cells": 1977,
+    "energyApp": {
+     "lenet": 1759.04,
+     "image": 2780.21
+    },
+    "flows": {
+     "delay": {
+      "area": 10945.5,
+      "cells": 1977,
+      "delayAbc": 4341.47,
+      "delay": 5106.4,
+      "energy": 12651.8,
+      "leakage": 5.712,
+      "pins": 6883,
+      "sha256": "7ddc0cd21d98d6a95e8aa334a10ab21d49d4ea1d55aa35212d10b9440367082e"
+     },
+     "area": {
+      "area": 8566.97,
+      "cells": 1695,
+      "delayAbc": 7402.04,
+      "delay": 7973.4,
+      "energy": 9787.23,
+      "leakage": 4.552,
+      "pins": 5601,
+      "sha256": "15281657e4201e132b0f92bc5a3a8cd456d33a0b66b392f8d4a9a909d375beba"
+     },
+     "iso": {
+      "area": 10945.5,
+      "cells": 1977,
+      "delayAbc": 4341.47,
+      "delay": 5106.4,
+      "energy": 12651.8,
+      "leakage": 5.712,
+      "pins": 6883,
+      "sha256": "7ddc0cd21d98d6a95e8aa334a10ab21d49d4ea1d55aa35212d10b9440367082e",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 16450.3,
+    "WCE": 66049,
+    "MSE": 1076020000,
+    "NMED": 0.00000383024,
+    "MRED": 0.000138621,
+    "EP": 0.56199,
+    "ci": {
+     "MED": 124.379,
+     "MSE": 8178140,
+     "NMED": 2.89602e-8,
+     "MRED": 0.0000129167,
+     "EP": 0.00217444
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 0.121704,
+     "WCE": 1,
+     "MSE": 0.121704,
+     "NMED": 2.83373e-11,
+     "MRED": 0.00263039,
+     "EP": 0.121704,
+     "ci": {
+      "MED": 0.00354001,
+      "MSE": 0.00354001,
+      "NMED": 8.24247e-13,
+      "MRED": 0.000388413,
+      "EP": 0.00354001
+     }
+    },
+    "image": {
+     "MED": 0.201782,
+     "WCE": 1,
+     "MSE": 0.201782,
+     "NMED": 4.69825e-11,
+     "MRED": 0.000121606,
+     "EP": 0.201782,
+     "ci": {
+      "MED": 0.00434543,
+      "MSE": 0.00434543,
+      "NMED": 1.01178e-12,
+      "MRED": 0.00000345058,
+      "EP": 0.00434543
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.00038,
+    "WCEpct": 0.0015,
+    "EPpct": 56.25,
+    "MREpct": 0.014,
+    "pdk45": {
+     "power_mW": 2.153,
+     "area_um2": 3086.1,
+     "delay_ns": 3.03
+    }
+   },
+   "sha256": "ebd4111388e5b43d9f4140ff3dd8956e16ccead394b94b11ea82d6d3bc933b9e"
+  },
+  {
+   "name": "mul16u_60L",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 11153.2,
+    "delay": 5154.1,
+    "energy": 12920.1,
+    "leakage": 5.795,
+    "cells": 2064,
+    "energyApp": {
+     "lenet": 1858.84,
+     "image": 2902.02
+    },
+    "flows": {
+     "delay": {
+      "area": 11153.2,
+      "cells": 2064,
+      "delayAbc": 4447.43,
+      "delay": 5154.1,
+      "energy": 12920.1,
+      "leakage": 5.795,
+      "pins": 7197,
+      "sha256": "a692c35d36b0bc19fb3b1bcdba723cb5dbc7f2bdc7b3d8af5ae003c0664d76c4"
+     },
+     "area": {
+      "area": 8677.07,
+      "cells": 1735,
+      "delayAbc": 7727.01,
+      "delay": 8381.4,
+      "energy": 9828.32,
+      "leakage": 4.694,
+      "pins": 5707,
+      "sha256": "02d44a13fad53b2a3e44d9095b63584a9c71e279670be454f476b8a4ee2ad184"
+     },
+     "iso": {
+      "area": 11153.2,
+      "cells": 2064,
+      "delayAbc": 4447.43,
+      "delay": 5154.1,
+      "energy": 12920.1,
+      "leakage": 5.795,
+      "pins": 7197,
+      "sha256": "a692c35d36b0bc19fb3b1bcdba723cb5dbc7f2bdc7b3d8af5ae003c0664d76c4",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 12388.4,
+    "WCE": 66049,
+    "MSE": 809986000,
+    "NMED": 0.00000288449,
+    "MRED": 0.000116388,
+    "EP": 0.47761,
+    "ci": {
+     "MED": 112.296,
+     "MSE": 7384280,
+     "NMED": 2.61467e-8,
+     "MRED": 0.0000127316,
+     "EP": 0.00218915
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 0.0877991,
+     "WCE": 1,
+     "MSE": 0.0877991,
+     "NMED": 2.04429e-11,
+     "MRED": 0.00214924,
+     "EP": 0.0877991,
+     "ci": {
+      "MED": 0.00306423,
+      "MSE": 0.00306423,
+      "NMED": 7.13468e-13,
+      "MRED": 0.000384458,
+      "EP": 0.00306423
+     }
+    },
+    "image": {
+     "MED": 0.16629,
+     "WCE": 1,
+     "MSE": 0.16629,
+     "NMED": 3.87187e-11,
+     "MRED": 0.000120602,
+     "EP": 0.16629,
+     "ci": {
+      "MED": 0.00403155,
+      "MSE": 0.00403155,
+      "NMED": 9.38697e-13,
+      "MRED": 0.00000382001,
+      "EP": 0.00403155
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.00029,
+    "WCEpct": 0.0015,
+    "EPpct": 47.9,
+    "MREpct": 0.012,
+    "pdk45": {
+     "power_mW": 2.173,
+     "area_um2": 3052.3,
+     "delay_ns": 3.13
+    }
+   },
+   "sha256": "a7abd87301585384089782ce97f7d6f7e52db69d7c1b54288733ed0de9c766e8"
+  },
+  {
+   "name": "mul16u_BMC",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep",
+    "pareto_pwr_mae",
+    "pareto_pwr_mre",
+    "pareto_pwr_mse",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 12059.1,
+    "delay": 4917.4,
+    "energy": 14042.3,
+    "leakage": 6.613,
+    "cells": 2280,
+    "energyApp": {
+     "lenet": 1881.94,
+     "image": 2999.68
+    },
+    "flows": {
+     "delay": {
+      "area": 12059.1,
+      "cells": 2280,
+      "delayAbc": 4230,
+      "delay": 4917.4,
+      "energy": 14042.3,
+      "leakage": 6.613,
+      "pins": 7763,
+      "sha256": "10de3b45c1e4b4dc7f2d076ea13ea07995f263a4105e3c62193aa28b038b5b85"
+     },
+     "area": {
+      "area": 8882.27,
+      "cells": 1867,
+      "delayAbc": 6761.41,
+      "delay": 7291.7,
+      "energy": 10654.3,
+      "leakage": 5.11,
+      "pins": 5744,
+      "sha256": "da306190caee50b20662806f769063095e3925b422edeac156c39f2c224b00ba"
+     },
+     "iso": {
+      "area": 12059.1,
+      "cells": 2280,
+      "delayAbc": 4230,
+      "delay": 4917.4,
+      "energy": 14042.3,
+      "leakage": 6.613,
+      "pins": 7763,
+      "sha256": "10de3b45c1e4b4dc7f2d076ea13ea07995f263a4105e3c62193aa28b038b5b85",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 0,
+    "WCE": 0,
+    "MSE": 0,
+    "NMED": 0,
+    "MRED": 0,
+    "EP": 0,
+    "ci": {
+     "MED": 0,
+     "MSE": 0,
+     "NMED": 0,
+     "MRED": 0,
+     "EP": 0
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 0,
+     "WCE": 0,
+     "MSE": 0,
+     "NMED": 0,
+     "MRED": 0,
+     "EP": 0,
+     "ci": {
+      "MED": 0,
+      "MSE": 0,
+      "NMED": 0,
+      "MRED": 0,
+      "EP": 0
+     }
+    },
+    "image": {
+     "MED": 0,
+     "WCE": 0,
+     "MSE": 0,
+     "NMED": 0,
+     "MRED": 0,
+     "EP": 0,
+     "ci": {
+      "MED": 0,
+      "MSE": 0,
+      "NMED": 0,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0,
+    "WCEpct": 0,
+    "EPpct": 0,
+    "MREpct": 0,
+    "pdk45": {
+     "power_mW": 2.202,
+     "area_um2": 3203,
+     "delay_ns": 3.11
+    }
+   },
+   "sha256": "5433c6e3fa1f83399a746964249d77168572d209155c931f578e6ecfc22b00b5"
+  },
+  {
+   "name": "mul16u_FGN",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 11339.6,
+    "delay": 5089.6,
+    "energy": 13217.3,
+    "leakage": 6.021,
+    "cells": 2088,
+    "energyApp": {
+     "lenet": 1848.32,
+     "image": 2858.02
+    },
+    "flows": {
+     "delay": {
+      "area": 11339.6,
+      "cells": 2088,
+      "delayAbc": 4409.42,
+      "delay": 5089.6,
+      "energy": 13217.3,
+      "leakage": 6.021,
+      "pins": 7142,
+      "sha256": "fe9c957d7bd06e529f56c2292d6fc78cea0f140d446ce7688bb4a64444415c93"
+     },
+     "area": {
+      "area": 8775.92,
+      "cells": 1757,
+      "delayAbc": 8181.77,
+      "delay": 8825.5,
+      "energy": 10215.4,
+      "leakage": 4.817,
+      "pins": 5532,
+      "sha256": "43b5ec5c556c43ac3e38b49017112d61614a8c2b3de130371a155df4a90bcc9e"
+     },
+     "iso": {
+      "area": 11339.6,
+      "cells": 2088,
+      "delayAbc": 4409.42,
+      "delay": 5089.6,
+      "energy": 13217.3,
+      "leakage": 6.021,
+      "pins": 7142,
+      "sha256": "fe9c957d7bd06e529f56c2292d6fc78cea0f140d446ce7688bb4a64444415c93",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 64.1542,
+    "WCE": 257,
+    "MSE": 16408.1,
+    "NMED": 1.49375e-8,
+    "MRED": 9.36808e-7,
+    "EP": 0.37478,
+    "ci": {
+     "MED": 0.485912,
+     "MSE": 124.6,
+     "NMED": 1.13139e-10,
+     "MRED": 2.38875e-7,
+     "EP": 0.00212151
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 0.121704,
+     "WCE": 1,
+     "MSE": 0.121704,
+     "NMED": 2.83373e-11,
+     "MRED": 0.00263039,
+     "EP": 0.121704,
+     "ci": {
+      "MED": 0.00354001,
+      "MSE": 0.00354001,
+      "NMED": 8.24247e-13,
+      "MRED": 0.000388413,
+      "EP": 0.00354001
+     }
+    },
+    "image": {
+     "MED": 0.201782,
+     "WCE": 1,
+     "MSE": 0.201782,
+     "NMED": 4.69825e-11,
+     "MRED": 0.000121606,
+     "EP": 0.201782,
+     "ci": {
+      "MED": 0.00434543,
+      "MSE": 0.00434543,
+      "NMED": 1.01178e-12,
+      "MRED": 0.00000345058,
+      "EP": 0.00434543
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0000015,
+    "WCEpct": 0.000006,
+    "EPpct": 37.5,
+    "MREpct": 0.00011,
+    "pdk45": {
+     "power_mW": 2.184,
+     "area_um2": 3084.2,
+     "delay_ns": 3.12
+    }
+   },
+   "sha256": "55d0831a9dc6b2cce2ba94f6bc551df8e8f14d297aa0308ba6fa1b519b310fed"
+  },
+  {
+   "name": "mul16u_GZ7",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 10294.9,
+    "delay": 6303.4,
+    "energy": 11753.2,
+    "leakage": 5.838,
+    "cells": 1754,
+    "energyApp": {
+     "lenet": 810.34,
+     "image": 1437.5
+    },
+    "flows": {
+     "delay": {
+      "area": 10294.9,
+      "cells": 1754,
+      "delayAbc": 5472.13,
+      "delay": 6303.4,
+      "energy": 11753.2,
+      "leakage": 5.838,
+      "pins": 5968,
+      "sha256": "2021b53afbb7570722203eae01e410e347e76b96a1a4212098ad9528b5150175"
+     },
+     "area": {
+      "area": 6602.58,
+      "cells": 1354,
+      "delayAbc": 10008.5,
+      "delay": 10395.4,
+      "energy": 7761.28,
+      "leakage": 3.752,
+      "pins": 4097,
+      "sha256": "a88a2f7cb9cb9353ef3e54a1dbc78d76bc542d4d2bedf6de70a70a623d089c21"
+     },
+     "iso": {
+      "area": 10294.9,
+      "cells": 1754,
+      "delayAbc": 5472.13,
+      "delay": 6303.4,
+      "energy": 11753.2,
+      "leakage": 5.838,
+      "pins": 5968,
+      "sha256": "2021b53afbb7570722203eae01e410e347e76b96a1a4212098ad9528b5150175",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 114845,
+    "WCE": 458710,
+    "MSE": 25087000000,
+    "NMED": 0.0000267403,
+    "MRED": 0.000530848,
+    "EP": 0.906705,
+    "ci": {
+     "MED": 478.046,
+     "MSE": 171430000,
+     "NMED": 1.11307e-7,
+     "MRED": 0.0000402255,
+     "EP": 0.00127469
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 48.4983,
+     "WCE": 897,
+     "MSE": 10966.6,
+     "NMED": 1.12922e-8,
+     "MRED": 0.236195,
+     "EP": 0.413696,
+     "ci": {
+      "MED": 1.00495,
+      "MSE": 384.195,
+      "NMED": 2.33991e-10,
+      "MRED": 0.00565598,
+      "EP": 0.00533253
+     }
+    },
+    "image": {
+     "MED": 108.145,
+     "WCE": 364,
+     "MSE": 17569.2,
+     "NMED": 2.51803e-8,
+     "MRED": 0.0470462,
+     "EP": 0.917725,
+     "ci": {
+      "MED": 0.829831,
+      "MSE": 249.872,
+      "NMED": 1.93216e-10,
+      "MRED": 0.000587514,
+      "EP": 0.00297524
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0027,
+    "WCEpct": 0.011,
+    "EPpct": 90.62,
+    "MREpct": 0.058,
+    "pdk45": {
+     "power_mW": 1.859,
+     "area_um2": 2332.4,
+     "delay_ns": 2.84
+    }
+   },
+   "sha256": "2de80159d2b95f3875c87c1aabbb509dd8211a0620a47010ffdf1c1ee1716578"
+  },
+  {
+   "name": "mul16u_HF0",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep",
+    "pareto_pwr_mae",
+    "pareto_pwr_mre",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 6.26,
+    "delay": 164.2,
+    "energy": 6.5,
+    "leakage": 0.002,
+    "cells": 1,
+    "energyApp": {
+     "lenet": 0,
+     "image": 0
+    },
+    "flows": {
+     "delay": {
+      "area": 6.26,
+      "cells": 1,
+      "delayAbc": 104.14,
+      "delay": 164.2,
+      "energy": 6.5,
+      "leakage": 0.002,
+      "pins": 67,
+      "sha256": "d585f1aad7d1b870924ee5ee92bd564f826ef2530e4e7a7237354da623ca50b8"
+     },
+     "area": {
+      "area": 6.26,
+      "cells": 1,
+      "delayAbc": 104.14,
+      "delay": 164.2,
+      "energy": 6.5,
+      "leakage": 0.002,
+      "pins": 67,
+      "sha256": "d585f1aad7d1b870924ee5ee92bd564f826ef2530e4e7a7237354da623ca50b8"
+     },
+     "iso": {
+      "area": 6.26,
+      "cells": 1,
+      "delayAbc": 104.14,
+      "delay": 164.2,
+      "energy": 6.5,
+      "leakage": 0.002,
+      "pins": 67,
+      "sha256": "d585f1aad7d1b870924ee5ee92bd564f826ef2530e4e7a7237354da623ca50b8",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 804646000,
+    "WCE": 3200979258,
+    "MSE": 1039362275381275400,
+    "NMED": 0.187352,
+    "MRED": 0.879077,
+    "EP": 0.999955,
+    "ci": {
+     "MED": 2743670,
+     "MSE": 6234766156355685,
+     "NMED": 0.00063883,
+     "MRED": 0.000963742,
+     "EP": 0.0000293993
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 954.455,
+     "WCE": 32385,
+     "MSE": 6815760,
+     "NMED": 2.22233e-7,
+     "MRED": 1,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 26.3107,
+      "MSE": 416922,
+      "NMED": 6.12613e-9,
+      "MRED": 0,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 18.75,
+    "WCEpct": 75,
+    "EPpct": 100,
+    "MREpct": 87.99,
+    "pdk45": {
+     "power_mW": 0.0003,
+     "area_um2": 2.3,
+     "delay_ns": 0.04
+    }
+   },
+   "sha256": "ca16bcaeee8e5f948fdf9dbbe2ecf9aac0b1e5e3d9f8884ecd96d7c4211b44ee"
+  },
+  {
+   "name": "mul16u_5FA",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae"
+   ],
+   "asic": {
+    "area": 10974.3,
+    "delay": 5079.8,
+    "energy": 12962.1,
+    "leakage": 5.989,
+    "cells": 2067,
+    "energyApp": {
+     "lenet": 1411.19,
+     "image": 2357.25
+    },
+    "flows": {
+     "delay": {
+      "area": 10974.3,
+      "cells": 2067,
+      "delayAbc": 4382.48,
+      "delay": 5079.8,
+      "energy": 12962.1,
+      "leakage": 5.989,
+      "pins": 6946,
+      "sha256": "2c3c003f05da920cbe7e2a538f37ed2055794e9a969cc513bcdf52509e04c7a3"
+     },
+     "area": {
+      "area": 8434.34,
+      "cells": 1712,
+      "delayAbc": 7829.11,
+      "delay": 8408.9,
+      "energy": 9953.74,
+      "leakage": 4.775,
+      "pins": 5304,
+      "sha256": "7a60d1af9e196363ebbdcc0f71d31b21046f1b31a13d6912ea3318271eb3de7b"
+     },
+     "iso": {
+      "area": 10974.3,
+      "cells": 2067,
+      "delayAbc": 4382.48,
+      "delay": 5079.8,
+      "energy": 12962.1,
+      "leakage": 5.989,
+      "pins": 6946,
+      "sha256": "2c3c003f05da920cbe7e2a538f37ed2055794e9a969cc513bcdf52509e04c7a3",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 24.5177,
+    "WCE": 79,
+    "MSE": 891.557,
+    "NMED": 5.70865e-9,
+    "MRED": 4.1705e-7,
+    "EP": 0.9816,
+    "ci": {
+     "MED": 0.0746909,
+     "MSE": 4.7402,
+     "NMED": 1.73909e-11,
+     "MRED": 4.62341e-8,
+     "EP": 0.000589003
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 28.1365,
+     "WCE": 77,
+     "MSE": 932.824,
+     "NMED": 6.55123e-9,
+     "MRED": 0.143883,
+     "EP": 0.991486,
+     "ci": {
+      "MED": 0.128645,
+      "MSE": 7.42339,
+      "NMED": 2.99533e-11,
+      "MRED": 0.0135038,
+      "EP": 0.000994836
+     }
+    },
+    "image": {
+     "MED": 23.6284,
+     "WCE": 77,
+     "MSE": 858.038,
+     "NMED": 5.50157e-9,
+     "MRED": 0.0110133,
+     "EP": 0.900146,
+     "ci": {
+      "MED": 0.187457,
+      "MSE": 10.7017,
+      "NMED": 4.36471e-11,
+      "MRED": 0.000158758,
+      "EP": 0.00324616
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 5.7e-7,
+    "WCEpct": 0.0000018,
+    "EPpct": 98.12,
+    "MREpct": 0.000071,
+    "pdk45": {
+     "power_mW": 2.135,
+     "area_um2": 3019.9,
+     "delay_ns": 3.11
+    }
+   },
+   "sha256": "3d750169dd5e87eeca53066233aef5709bdf4e4b14c472a31604aaae191d9f3b"
+  },
+  {
+   "name": "mul16u_8VH",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae",
+    "pareto_pwr_mse",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 4625.69,
+    "delay": 3296.2,
+    "energy": 5293.66,
+    "leakage": 2.358,
+    "cells": 821,
+    "energyApp": {
+     "lenet": 23.89,
+     "image": 38.57
+    },
+    "flows": {
+     "delay": {
+      "area": 4625.69,
+      "cells": 821,
+      "delayAbc": 2786.65,
+      "delay": 3296.2,
+      "energy": 5293.66,
+      "leakage": 2.358,
+      "pins": 2913,
+      "sha256": "0996e44176fc1b27f882de784879c56effa07ed2e03bb985b8d79b5f7e6380d9"
+     },
+     "area": {
+      "area": 3226.84,
+      "cells": 650,
+      "delayAbc": 5229.16,
+      "delay": 5614.1,
+      "energy": 3645.23,
+      "leakage": 1.735,
+      "pins": 2109,
+      "sha256": "d9575e629f2d308075ff62abac667dc12a71e5b2c5c96f9a9611b328c386990e"
+     },
+     "iso": {
+      "area": 4625.69,
+      "cells": 821,
+      "delayAbc": 2786.65,
+      "delay": 3296.2,
+      "energy": 5293.66,
+      "leakage": 2.358,
+      "pins": 2913,
+      "sha256": "0996e44176fc1b27f882de784879c56effa07ed2e03bb985b8d79b5f7e6380d9",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 462785,
+    "WCE": 2251427,
+    "MSE": 327997000000,
+    "NMED": 0.000107754,
+    "MRED": 0.00446043,
+    "EP": 0.999945,
+    "ci": {
+     "MED": 1478.65,
+     "MSE": 1899200000,
+     "NMED": 3.44284e-7,
+     "MRED": 0.000220845,
+     "EP": 0.000032502
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 863.967,
+     "WCE": 16001,
+     "MSE": 4652160,
+     "NMED": 2.01164e-7,
+     "MRED": 0.988612,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 21.3984,
+      "MSE": 206617,
+      "NMED": 4.98236e-9,
+      "MRED": 0.00149442,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.011,
+    "WCEpct": 0.058,
+    "EPpct": 100,
+    "MREpct": 0.46,
+    "pdk45": {
+     "power_mW": 0.791,
+     "area_um2": 1284.9,
+     "delay_ns": 2.03
+    }
+   },
+   "sha256": "b6cdf6b4e43747f5a97432a1c0863acae762da8d7b69e39acc7ce869dd421cee"
+  },
+  {
+   "name": "mul16u_AQ1",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae",
+    "pareto_pwr_mre"
+   ],
+   "asic": {
+    "area": 10887.9,
+    "delay": 5115.4,
+    "energy": 12768.3,
+    "leakage": 5.77,
+    "cells": 2020,
+    "energyApp": {
+     "lenet": 1668.37,
+     "image": 2544.12
+    },
+    "flows": {
+     "delay": {
+      "area": 10887.9,
+      "cells": 2020,
+      "delayAbc": 4440.94,
+      "delay": 5115.4,
+      "energy": 12768.3,
+      "leakage": 5.77,
+      "pins": 6882,
+      "sha256": "e6ea806798dbb0a59772ae11fb8d80d216766b6fc23774cfc8372888a42ae2db"
+     },
+     "area": {
+      "area": 8698.34,
+      "cells": 1779,
+      "delayAbc": 7620.4,
+      "delay": 8054.6,
+      "energy": 10307.6,
+      "leakage": 4.879,
+      "pins": 5601,
+      "sha256": "73e9d90dd83d55ecfa2de305d8d976d01f21ce7b00a435ff2b77e5c39c69e0c4"
+     },
+     "iso": {
+      "area": 10887.9,
+      "cells": 2020,
+      "delayAbc": 4440.94,
+      "delay": 5115.4,
+      "energy": 12768.3,
+      "leakage": 5.77,
+      "pins": 6882,
+      "sha256": "e6ea806798dbb0a59772ae11fb8d80d216766b6fc23774cfc8372888a42ae2db",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 1.34281,
+    "WCE": 4,
+    "MSE": 3.62246,
+    "NMED": 3.12657e-10,
+    "MRED": 2.51629e-8,
+    "EP": 0.64073,
+    "ci": {
+     "MED": 0.00591147,
+     "MSE": 0.0225678,
+     "NMED": 1.37641e-12,
+     "MRED": 3.81112e-9,
+     "EP": 0.00210276
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 0.644073,
+     "WCE": 4,
+     "MSE": 1.77017,
+     "NMED": 1.49965e-10,
+     "MRED": 0.0106866,
+     "EP": 0.298248,
+     "ci": {
+      "MED": 0.0126054,
+      "MSE": 0.044167,
+      "NMED": 2.93501e-12,
+      "MRED": 0.000826517,
+      "EP": 0.0049535
+     }
+    },
+    "image": {
+     "MED": 0.990387,
+     "WCE": 4,
+     "MSE": 3.03049,
+     "NMED": 2.30599e-10,
+     "MRED": 0.000573872,
+     "EP": 0.397217,
+     "ci": {
+      "MED": 0.0155013,
+      "MSE": 0.0570172,
+      "NMED": 3.60929e-12,
+      "MRED": 0.0000131394,
+      "EP": 0.00529816
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 3e-8,
+    "WCEpct": 9.3e-8,
+    "EPpct": 64.06,
+    "MREpct": 0.0000044,
+    "pdk45": {
+     "power_mW": 2.188,
+     "area_um2": 3118.5,
+     "delay_ns": 3.11
+    }
+   },
+   "sha256": "cb2033670524b1e0a2c4125303cac6e0a4ee0d0c2e311a30fe64470893dd983f"
+  },
+  {
+   "name": "mul16u_CK3",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 7220.68,
+    "delay": 4269.3,
+    "energy": 8494.08,
+    "leakage": 3.699,
+    "cells": 1303,
+    "energyApp": {
+     "lenet": 173.82,
+     "image": 249.27
+    },
+    "flows": {
+     "delay": {
+      "area": 7220.68,
+      "cells": 1303,
+      "delayAbc": 3786.21,
+      "delay": 4269.3,
+      "energy": 8494.08,
+      "leakage": 3.699,
+      "pins": 4570,
+      "sha256": "f6043e69bc84fbf783a509f242c24a0ca60473a35ff05969cacb7bcb3889838b"
+     },
+     "area": {
+      "area": 4802.11,
+      "cells": 966,
+      "delayAbc": 6009.29,
+      "delay": 6567.7,
+      "energy": 5589.51,
+      "leakage": 2.715,
+      "pins": 3113,
+      "sha256": "22ae2abbff5388d6a3ed9949aa555ffae86616f79b5391e9e44eb0a363917fe0"
+     },
+     "iso": {
+      "area": 7220.68,
+      "cells": 1303,
+      "delayAbc": 3786.21,
+      "delay": 4269.3,
+      "energy": 8494.08,
+      "leakage": 3.699,
+      "pins": 4570,
+      "sha256": "f6043e69bc84fbf783a509f242c24a0ca60473a35ff05969cacb7bcb3889838b",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 31384.2,
+    "WCE": 158609,
+    "MSE": 1529090000,
+    "NMED": 0.00000730743,
+    "MRED": 0.000440002,
+    "EP": 0.999815,
+    "ci": {
+     "MED": 102.232,
+     "MSE": 9200250,
+     "NMED": 2.38035e-8,
+     "MRED": 0.000042215,
+     "EP": 0.0000596056
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 863.967,
+     "WCE": 16001,
+     "MSE": 4652160,
+     "NMED": 2.01164e-7,
+     "MRED": 0.988612,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 21.3984,
+      "MSE": 206617,
+      "NMED": 4.98236e-9,
+      "MRED": 0.00149442,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.00073,
+    "WCEpct": 0.0047,
+    "EPpct": 99.98,
+    "MREpct": 0.047,
+    "pdk45": {
+     "power_mW": 1.231,
+     "area_um2": 1900.2,
+     "delay_ns": 2.45
+    }
+   },
+   "sha256": "c1283698ca1ff5cdda8534db4d17efe15f8a1eed776a69181fcd3069e7bcf3d8"
+  },
+  {
+   "name": "mul16u_DAE",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae"
+   ],
+   "asic": {
+    "area": 11473.5,
+    "delay": 4735.5,
+    "energy": 13274,
+    "leakage": 6.083,
+    "cells": 2137,
+    "energyApp": {
+     "lenet": 730.47,
+     "image": 1263.39
+    },
+    "flows": {
+     "delay": {
+      "area": 11473.5,
+      "cells": 2137,
+      "delayAbc": 3977.09,
+      "delay": 4735.5,
+      "energy": 13274,
+      "leakage": 6.083,
+      "pins": 7436,
+      "sha256": "6a8ab8837a534c5360a842d085ce01a8844d6fa15e59cee97a56837f98517fbb"
+     },
+     "area": {
+      "area": 7809.99,
+      "cells": 1600,
+      "delayAbc": 6972.31,
+      "delay": 7512,
+      "energy": 9264.67,
+      "leakage": 4.441,
+      "pins": 4906,
+      "sha256": "a61543145cf271c63bddde6556d6024dd7ed8dcca3441268e69c0be9f59f3f84"
+     },
+     "iso": {
+      "area": 11473.5,
+      "cells": 2137,
+      "delayAbc": 3977.09,
+      "delay": 4735.5,
+      "energy": 13274,
+      "leakage": 6.083,
+      "pins": 7436,
+      "sha256": "6a8ab8837a534c5360a842d085ce01a8844d6fa15e59cee97a56837f98517fbb",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 194.197,
+    "WCE": 907,
+    "MSE": 58628.6,
+    "NMED": 4.52163e-8,
+    "MRED": 0.00000322547,
+    "EP": 0.98679,
+    "ci": {
+     "MED": 0.633845,
+     "MSE": 349.163,
+     "NMED": 1.47583e-10,
+     "MRED": 3.64996e-7,
+     "EP": 0.000500386
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 71.8598,
+     "WCE": 753,
+     "MSE": 17696.7,
+     "NMED": 1.67317e-8,
+     "MRED": 0.395633,
+     "EP": 0.446991,
+     "ci": {
+      "MED": 1.21215,
+      "MSE": 438.662,
+      "NMED": 2.82234e-10,
+      "MRED": 0.0068167,
+      "EP": 0.00538328
+     }
+    },
+    "image": {
+     "MED": 175.61,
+     "WCE": 573,
+     "MSE": 48403.7,
+     "NMED": 4.08886e-8,
+     "MRED": 0.0734888,
+     "EP": 0.972931,
+     "ci": {
+      "MED": 1.43501,
+      "MSE": 742.757,
+      "NMED": 3.34124e-10,
+      "MRED": 0.0008306,
+      "EP": 0.00175715
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0000045,
+    "WCEpct": 0.000021,
+    "EPpct": 98.71,
+    "MREpct": 0.0005,
+    "pdk45": {
+     "power_mW": 1.952,
+     "area_um2": 2800.8,
+     "delay_ns": 2.79
+    }
+   },
+   "sha256": "e0dac246264a14212cda9475ce52959c4147bfd82127bbccaa50de609e117a35"
+  },
+  {
+   "name": "mul16u_F6B",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae",
+    "pareto_pwr_mre",
+    "pareto_pwr_mse",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 8605.75,
+    "delay": 4460.2,
+    "energy": 9958.88,
+    "leakage": 4.553,
+    "cells": 1564,
+    "energyApp": {
+     "lenet": 277.36,
+     "image": 445.2
+    },
+    "flows": {
+     "delay": {
+      "area": 8605.75,
+      "cells": 1564,
+      "delayAbc": 3842.64,
+      "delay": 4460.2,
+      "energy": 9958.88,
+      "leakage": 4.553,
+      "pins": 5440,
+      "sha256": "321d49993896097b9e51b1b8b808509920bf44037242b68393b7aff25c808a2c"
+     },
+     "area": {
+      "area": 6327.32,
+      "cells": 1268,
+      "delayAbc": 6631.91,
+      "delay": 7056.9,
+      "energy": 7341.88,
+      "leakage": 3.528,
+      "pins": 4086,
+      "sha256": "347aab98d52e4437322b240c9b8605b7f1c50fb582a9882e99230c854b203e98"
+     },
+     "iso": {
+      "area": 8605.75,
+      "cells": 1564,
+      "delayAbc": 3842.64,
+      "delay": 4460.2,
+      "energy": 9958.88,
+      "leakage": 4.553,
+      "pins": 5440,
+      "sha256": "321d49993896097b9e51b1b8b808509920bf44037242b68393b7aff25c808a2c",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 3226.63,
+    "WCE": 17103,
+    "MSE": 16185600,
+    "NMED": 7.51282e-7,
+    "MRED": 0.0000542478,
+    "EP": 0.998345,
+    "ci": {
+     "MED": 10.5317,
+     "MSE": 97048.7,
+     "NMED": 2.45217e-9,
+     "MRED": 0.00000824529,
+     "EP": 0.000178148
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 497.889,
+     "WCE": 6930,
+     "MSE": 1170980,
+     "NMED": 1.15927e-7,
+     "MRED": 0.861145,
+     "EP": 0.447968,
+     "ci": {
+      "MED": 10.4028,
+      "MSE": 39375.9,
+      "NMED": 2.42217e-9,
+      "MRED": 0.00532257,
+      "EP": 0.00538439
+     }
+    },
+    "image": {
+     "MED": 1536.99,
+     "WCE": 5772,
+     "MSE": 3550110,
+     "NMED": 3.57869e-7,
+     "MRED": 0.594641,
+     "EP": 0.996368,
+     "ci": {
+      "MED": 11.8004,
+      "MSE": 52712.5,
+      "NMED": 2.74759e-9,
+      "MRED": 0.00448654,
+      "EP": 0.000651313
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.000075,
+    "WCEpct": 0.00042,
+    "EPpct": 99.84,
+    "MREpct": 0.0067,
+    "pdk45": {
+     "power_mW": 1.648,
+     "area_um2": 2404.2,
+     "delay_ns": 2.44
+    }
+   },
+   "sha256": "1a131ef3553473aa3064d99bb8a7cb8054cf757e9a9987c7b55654ec8562f7ba"
+  },
+  {
+   "name": "mul16u_GPF",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae"
+   ],
+   "asic": {
+    "area": 2757.64,
+    "delay": 3787.4,
+    "energy": 3017.59,
+    "leakage": 1.589,
+    "cells": 443,
+    "energyApp": {
+     "lenet": 0.41,
+     "image": 1.32
+    },
+    "flows": {
+     "delay": {
+      "area": 2757.64,
+      "cells": 443,
+      "delayAbc": 3365.66,
+      "delay": 3787.4,
+      "energy": 3017.59,
+      "leakage": 1.589,
+      "pins": 1527,
+      "sha256": "4d5f7896106cf8c074784c3f242ff15c7643711c234e1fdb07e23acc997e9b85"
+     },
+     "area": {
+      "area": 2059.48,
+      "cells": 420,
+      "delayAbc": 5982.19,
+      "delay": 6598.9,
+      "energy": 2363.92,
+      "leakage": 1.223,
+      "pins": 1310,
+      "sha256": "57b48541b20fe345187fcca9ed62d07570bcffe92ddfe32a5f811451b5eee328"
+     },
+     "iso": {
+      "area": 2757.64,
+      "cells": 443,
+      "delayAbc": 3365.66,
+      "delay": 3787.4,
+      "energy": 3017.59,
+      "leakage": 1.589,
+      "pins": 1527,
+      "sha256": "4d5f7896106cf8c074784c3f242ff15c7643711c234e1fdb07e23acc997e9b85",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 4429470,
+    "WCE": 15275138,
+    "MSE": 24467900000000,
+    "NMED": 0.00103135,
+    "MRED": 0.0204348,
+    "EP": 0.999955,
+    "ci": {
+     "MED": 9649.58,
+     "MSE": 103439000000,
+     "NMED": 0.00000224679,
+     "MRED": 0.000331012,
+     "EP": 0.0000293993
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 954.455,
+     "WCE": 32385,
+     "MSE": 6815760,
+     "NMED": 2.22233e-7,
+     "MRED": 1,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 26.3107,
+      "MSE": 416922,
+      "NMED": 6.12613e-9,
+      "MRED": 0,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.1,
+    "WCEpct": 0.41,
+    "EPpct": 100,
+    "MREpct": 2.07,
+    "pdk45": {
+     "power_mW": 0.482,
+     "area_um2": 746.2,
+     "delay_ns": 2.03
+    }
+   },
+   "sha256": "3a5738bf9e523eb8b22885c940c1dc49c128858053fcde0912b7922eb4eb25cc"
+  },
+  {
+   "name": "mul16u_HGP",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae"
+   ],
+   "asic": {
+    "area": 914.63,
+    "delay": 1643.2,
+    "energy": 879.68,
+    "leakage": 0.486,
+    "cells": 156,
+    "energyApp": {
+     "lenet": 0,
+     "image": 0
+    },
+    "flows": {
+     "delay": {
+      "area": 914.63,
+      "cells": 156,
+      "delayAbc": 1309.18,
+      "delay": 1643.2,
+      "energy": 879.68,
+      "leakage": 0.486,
+      "pins": 597,
+      "sha256": "1c5a4af7713a4e19d1a7625878ce0c193f61ea7f0b49862b6557ba5b16ea9019"
+     },
+     "area": {
+      "area": 668.14,
+      "cells": 140,
+      "delayAbc": 2219.82,
+      "delay": 2436.8,
+      "energy": 762.78,
+      "leakage": 0.397,
+      "pins": 474,
+      "sha256": "4526b76b430937f63b4966c7c50faab32b22f354de1860657bc8a7135de7db36"
+     },
+     "iso": {
+      "area": 663.14,
+      "cells": 129,
+      "delayAbc": 2379.39,
+      "delay": 2597.6,
+      "energy": 761.44,
+      "leakage": 0.359,
+      "pins": 450,
+      "sha256": "b017d23c9429a234270a482168f14b00768961c6ba5700316ee451b85d1991cf",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 66037100,
+    "WCE": 257968335,
+    "MSE": 6105621324479252,
+    "NMED": 0.0153759,
+    "MRED": 0.159253,
+    "EP": 0.999955,
+    "ci": {
+     "MED": 183064,
+     "MSE": 31067400000000,
+     "NMED": 0.0000426243,
+     "MRED": 0.00103154,
+     "EP": 0.0000293993
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 954.455,
+     "WCE": 32385,
+     "MSE": 6815760,
+     "NMED": 2.22233e-7,
+     "MRED": 1,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 26.3107,
+      "MSE": 416922,
+      "NMED": 6.12613e-9,
+      "MRED": 0,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 1.54,
+    "WCEpct": 6.15,
+    "EPpct": 100,
+    "MREpct": 15.9,
+    "pdk45": {
+     "power_mW": 0.106,
+     "area_um2": 269.4,
+     "delay_ns": 0.81
+    }
+   },
+   "sha256": "40af328120db9a45a3a798691566abc44434c063b745616729df731c5a7fd39e"
+  },
+  {
+   "name": "mul16u_3BB",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre"
+   ],
+   "asic": {
+    "area": 6109.61,
+    "delay": 3512.2,
+    "energy": 6700.24,
+    "leakage": 3.347,
+    "cells": 1065,
+    "energyApp": {
+     "lenet": 75.37,
+     "image": 115.19
+    },
+    "flows": {
+     "delay": {
+      "area": 6109.61,
+      "cells": 1065,
+      "delayAbc": 2976.21,
+      "delay": 3512.2,
+      "energy": 6700.24,
+      "leakage": 3.347,
+      "pins": 3752,
+      "sha256": "25056c64841feb783768c0f3d6d034a000dd56abc97f299cc4a285f8cda69109"
+     },
+     "area": {
+      "area": 4063.9,
+      "cells": 829,
+      "delayAbc": 4933.02,
+      "delay": 5420.1,
+      "energy": 4701.47,
+      "leakage": 2.252,
+      "pins": 2614,
+      "sha256": "fa6bbaca0b9eebe76d62a8065c8313f7aa3887fae97a0dbd407012dd7465a59e"
+     },
+     "iso": {
+      "area": 6109.61,
+      "cells": 1065,
+      "delayAbc": 2976.21,
+      "delay": 3512.2,
+      "energy": 6700.24,
+      "leakage": 3.347,
+      "pins": 3752,
+      "sha256": "25056c64841feb783768c0f3d6d034a000dd56abc97f299cc4a285f8cda69109",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 132158,
+    "WCE": 673779,
+    "MSE": 26934900000,
+    "NMED": 0.0000307714,
+    "MRED": 0.001562,
+    "EP": 0.999905,
+    "ci": {
+     "MED": 426.476,
+     "MSE": 158077000,
+     "NMED": 9.92996e-8,
+     "MRED": 0.0000903941,
+     "EP": 0.0000427152
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 863.967,
+     "WCE": 16001,
+     "MSE": 4652160,
+     "NMED": 2.01164e-7,
+     "MRED": 0.988612,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 21.3984,
+      "MSE": 206617,
+      "NMED": 4.98236e-9,
+      "MRED": 0.00149442,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0031,
+    "WCEpct": 0.018,
+    "EPpct": 99.99,
+    "MREpct": 0.17,
+    "pdk45": {
+     "power_mW": 0.984,
+     "area_um2": 1599.4,
+     "delay_ns": 1.89
+    }
+   },
+   "sha256": "d94c403b635135f785686425929b4900926972c5060facca12c05554a6dc8a4c"
+  },
+  {
+   "name": "mul16u_6NY",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre"
+   ],
+   "asic": {
+    "area": 4146.48,
+    "delay": 3616.7,
+    "energy": 4565.31,
+    "leakage": 2.065,
+    "cells": 706,
+    "energyApp": {
+     "lenet": 7.63,
+     "image": 23.34
+    },
+    "flows": {
+     "delay": {
+      "area": 4146.48,
+      "cells": 706,
+      "delayAbc": 3044.28,
+      "delay": 3616.7,
+      "energy": 4565.31,
+      "leakage": 2.065,
+      "pins": 2575,
+      "sha256": "9e14b50a1bb974a9671d0a3e81a6431b82a549263dce9d8d087391f04968fa7b"
+     },
+     "area": {
+      "area": 2353.51,
+      "cells": 497,
+      "delayAbc": 4978.06,
+      "delay": 5320.7,
+      "energy": 2737.67,
+      "leakage": 1.344,
+      "pins": 1530,
+      "sha256": "1416904e14e04637c80cb5a1ef625ea43736bc35bb10669934d458c1fe9c9d24"
+     },
+     "iso": {
+      "area": 4146.48,
+      "cells": 706,
+      "delayAbc": 3044.28,
+      "delay": 3616.7,
+      "energy": 4565.31,
+      "leakage": 2.065,
+      "pins": 2575,
+      "sha256": "9e14b50a1bb974a9671d0a3e81a6431b82a549263dce9d8d087391f04968fa7b",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 2036840,
+    "WCE": 8184066,
+    "MSE": 6129240000000,
+    "NMED": 0.000474254,
+    "MRED": 0.0134408,
+    "EP": 0.999945,
+    "ci": {
+     "MED": 6167.78,
+     "MSE": 32847600000,
+     "NMED": 0.00000143609,
+     "MRED": 0.000298277,
+     "EP": 0.000032502
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 863.967,
+     "WCE": 16001,
+     "MSE": 4652160,
+     "NMED": 2.01164e-7,
+     "MRED": 0.988612,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 21.3984,
+      "MSE": 206617,
+      "NMED": 4.98236e-9,
+      "MRED": 0.00149442,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.048,
+    "WCEpct": 0.2,
+    "EPpct": 100,
+    "MREpct": 1.34,
+    "pdk45": {
+     "power_mW": 0.512,
+     "area_um2": 872.9,
+     "delay_ns": 1.64
+    }
+   },
+   "sha256": "aea66bc383b2bbad000835b0abd8accaf523707d2488223a07b8b4357296c5bf"
+  },
+  {
+   "name": "mul16u_A7Z",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre"
+   ],
+   "asic": {
+    "area": 10625.2,
+    "delay": 4660.4,
+    "energy": 12455.2,
+    "leakage": 5.845,
+    "cells": 1950,
+    "energyApp": {
+     "lenet": 897.31,
+     "image": 1466.43
+    },
+    "flows": {
+     "delay": {
+      "area": 10625.2,
+      "cells": 1950,
+      "delayAbc": 4059.01,
+      "delay": 4660.4,
+      "energy": 12455.2,
+      "leakage": 5.845,
+      "pins": 6679,
+      "sha256": "fbdafc939c24c7230f0df8014fd3d745272123a763d0eb049d76ef6cba5ae003"
+     },
+     "area": {
+      "area": 7852.53,
+      "cells": 1613,
+      "delayAbc": 7355.95,
+      "delay": 7885.9,
+      "energy": 9400.31,
+      "leakage": 4.43,
+      "pins": 5079,
+      "sha256": "02094c162c0269aeb0c91635e1b161606c85c07da35d8782c3b13b56e4f7a6ea"
+     },
+     "iso": {
+      "area": 10625.2,
+      "cells": 1950,
+      "delayAbc": 4059.01,
+      "delay": 4660.4,
+      "energy": 12455.2,
+      "leakage": 5.845,
+      "pins": 6679,
+      "sha256": "fbdafc939c24c7230f0df8014fd3d745272123a763d0eb049d76ef6cba5ae003",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 129.156,
+    "WCE": 508,
+    "MSE": 25414.5,
+    "NMED": 3.00724e-8,
+    "MRED": 0.00000216164,
+    "EP": 0.991075,
+    "ci": {
+     "MED": 0.409568,
+     "MSE": 142.616,
+     "NMED": 9.53629e-11,
+     "MRED": 2.51366e-7,
+     "EP": 0.000412191
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 66.6029,
+     "WCE": 470,
+     "MSE": 9396.77,
+     "NMED": 1.55077e-8,
+     "MRED": 0.391878,
+     "EP": 0.643616,
+     "ci": {
+      "MED": 0.76262,
+      "MSE": 164.429,
+      "NMED": 1.77567e-10,
+      "MRED": 0.0333478,
+      "EP": 0.00518566
+     }
+    },
+    "image": {
+     "MED": 101.629,
+     "WCE": 383,
+     "MSE": 16062.4,
+     "NMED": 2.36631e-8,
+     "MRED": 0.0438944,
+     "EP": 1,
+     "ci": {
+      "MED": 0.819891,
+      "MSE": 228.794,
+      "NMED": 1.90901e-10,
+      "MRED": 0.000496493,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.000003,
+    "WCEpct": 0.000012,
+    "EPpct": 99.11,
+    "MREpct": 0.00034,
+    "pdk45": {
+     "power_mW": 2.002,
+     "area_um2": 2889.5,
+     "delay_ns": 2.9
+    }
+   },
+   "sha256": "84ddb2856cd5878edf6bb00e490be06a3e523982da3eceb79ad947a90309305b"
+  },
+  {
+   "name": "mul16u_EHF",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre"
+   ],
+   "asic": {
+    "area": 9661.77,
+    "delay": 4486.4,
+    "energy": 11266.8,
+    "leakage": 5.066,
+    "cells": 1753,
+    "energyApp": {
+     "lenet": 386.66,
+     "image": 600.73
+    },
+    "flows": {
+     "delay": {
+      "area": 9661.77,
+      "cells": 1753,
+      "delayAbc": 3836.88,
+      "delay": 4486.4,
+      "energy": 11266.8,
+      "leakage": 5.066,
+      "pins": 6117,
+      "sha256": "8985ad8ecdd30d0043ce4c1fa5ebbd92463932793c92fc16e2b8091b513c4ac3"
+     },
+     "area": {
+      "area": 6999.21,
+      "cells": 1417,
+      "delayAbc": 6788.01,
+      "delay": 7218.4,
+      "energy": 8330.89,
+      "leakage": 3.792,
+      "pins": 4528,
+      "sha256": "652b46b7c84fa6ff43b38b4a27425aadc1d39ca410e79065dd62aad5d1084204"
+     },
+     "iso": {
+      "area": 9661.77,
+      "cells": 1753,
+      "delayAbc": 3836.88,
+      "delay": 4486.4,
+      "energy": 11266.8,
+      "leakage": 5.066,
+      "pins": 6117,
+      "sha256": "8985ad8ecdd30d0043ce4c1fa5ebbd92463932793c92fc16e2b8091b513c4ac3",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 1136.31,
+    "WCE": 4801,
+    "MSE": 1999970,
+    "NMED": 2.64576e-7,
+    "MRED": 0.0000182186,
+    "EP": 0.99265,
+    "ci": {
+     "MED": 3.68972,
+     "MSE": 11567.7,
+     "NMED": 8.59105e-10,
+     "MRED": 0.00000226583,
+     "EP": 0.000374354
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 354.647,
+     "WCE": 4481,
+     "MSE": 509404,
+     "NMED": 8.25752e-8,
+     "MRED": 0.944146,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 6.70637,
+      "MSE": 14507.1,
+      "NMED": 1.56149e-9,
+      "MRED": 0.0186365,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 945.349,
+     "WCE": 3116,
+     "MSE": 1295120,
+     "NMED": 2.20113e-7,
+     "MRED": 0.466692,
+     "EP": 0.996368,
+     "ci": {
+      "MED": 6.86024,
+      "MSE": 15160.9,
+      "NMED": 1.59732e-9,
+      "MRED": 0.0060023,
+      "EP": 0.000651313
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.000026,
+    "WCEpct": 0.00011,
+    "EPpct": 99.26,
+    "MREpct": 0.0024,
+    "pdk45": {
+     "power_mW": 1.783,
+     "area_um2": 2589.1,
+     "delay_ns": 2.32
+    }
+   },
+   "sha256": "eac533960072d647139c97b29a644efcb790c2bdd7cb9378465596977daae5c4"
+  },
+  {
+   "name": "mul16u_FGL",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre"
+   ],
+   "asic": {
+    "area": 10366.2,
+    "delay": 5044,
+    "energy": 12185.9,
+    "leakage": 5.661,
+    "cells": 1943,
+    "energyApp": {
+     "lenet": 1362.13,
+     "image": 2214
+    },
+    "flows": {
+     "delay": {
+      "area": 10366.2,
+      "cells": 1943,
+      "delayAbc": 4434.4,
+      "delay": 5044,
+      "energy": 12185.9,
+      "leakage": 5.661,
+      "pins": 6525,
+      "sha256": "44edc55c233b2ce48285039d0aa190291e74e3b5ffef515688739b127ef80b3d"
+     },
+     "area": {
+      "area": 8460.61,
+      "cells": 1723,
+      "delayAbc": 7923.58,
+      "delay": 8412.1,
+      "energy": 10049.7,
+      "leakage": 4.683,
+      "pins": 5448,
+      "sha256": "dbc35d4223b970497e910a24d993a53683151d91abd202f6844b933267e4e8df"
+     },
+     "iso": {
+      "area": 10366.2,
+      "cells": 1943,
+      "delayAbc": 4434.4,
+      "delay": 5044,
+      "energy": 12185.9,
+      "leakage": 5.661,
+      "pins": 6525,
+      "sha256": "44edc55c233b2ce48285039d0aa190291e74e3b5ffef515688739b127ef80b3d",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 12.3924,
+    "WCE": 43,
+    "MSE": 248.756,
+    "NMED": 2.88541e-9,
+    "MRED": 2.32126e-7,
+    "EP": 0.915845,
+    "ci": {
+     "MED": 0.0427588,
+     "MSE": 1.45115,
+     "NMED": 9.95587e-12,
+     "MRED": 4.50262e-8,
+     "EP": 0.00121672
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 5.77289,
+     "WCE": 42,
+     "MSE": 117.9,
+     "NMED": 1.34415e-9,
+     "MRED": 0.0780816,
+     "EP": 0.411102,
+     "ci": {
+      "MED": 0.0995748,
+      "MSE": 2.85615,
+      "NMED": 2.31848e-11,
+      "MRED": 0.00467992,
+      "EP": 0.00532753
+     }
+    },
+    "image": {
+     "MED": 5.64569,
+     "WCE": 31,
+     "MSE": 94.5562,
+     "NMED": 1.31453e-9,
+     "MRED": 0.00309223,
+     "EP": 0.461884,
+     "ci": {
+      "MED": 0.0857242,
+      "MSE": 1.9703,
+      "NMED": 1.99598e-11,
+      "MRED": 0.000071049,
+      "EP": 0.00539803
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 2.9e-7,
+    "WCEpct": 0.000001,
+    "EPpct": 91.6,
+    "MREpct": 0.000038,
+    "pdk45": {
+     "power_mW": 2.149,
+     "area_um2": 3064.1,
+     "delay_ns": 3.12
+    }
+   },
+   "sha256": "af2bec08e3c88e4be8a5c1208cdd9e0bbbde8c6aa5e8296f74adbf594ea2f6a7"
+  },
+  {
+   "name": "mul16u_HGK",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre"
+   ],
+   "asic": {
+    "area": 1502.69,
+    "delay": 2356.3,
+    "energy": 1504.73,
+    "leakage": 0.844,
+    "cells": 253,
+    "energyApp": {
+     "lenet": 0,
+     "image": 0
+    },
+    "flows": {
+     "delay": {
+      "area": 1502.69,
+      "cells": 253,
+      "delayAbc": 1894.14,
+      "delay": 2356.3,
+      "energy": 1504.73,
+      "leakage": 0.844,
+      "pins": 931,
+      "sha256": "a1bfa1c05c54a4429a3cbb203e24c5629e1c95f060971576812cee2bfd618a02"
+     },
+     "area": {
+      "area": 1004.71,
+      "cells": 203,
+      "delayAbc": 3371.51,
+      "delay": 3705.6,
+      "energy": 1144.76,
+      "leakage": 0.55,
+      "pins": 663,
+      "sha256": "58ac1d94b7a6d086f4acfa6e5dc1fd58e40043f9d3447d51cbf7c042eee89959"
+     },
+     "iso": {
+      "area": 1034.74,
+      "cells": 199,
+      "delayAbc": 2380.97,
+      "delay": 2643.5,
+      "energy": 1150.34,
+      "leakage": 0.607,
+      "pins": 676,
+      "sha256": "c899539960e458f0d49e19ce6e07cd4544d3e9250bc8bb0fb704a8f88387740c",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 33263900,
+    "WCE": 128993487,
+    "MSE": 1545589257798019,
+    "NMED": 0.0077451,
+    "MRED": 0.0915357,
+    "EP": 0.999955,
+    "ci": {
+     "MED": 91838.2,
+     "MSE": 7841960000000,
+     "NMED": 0.0000213834,
+     "MRED": 0.000784075,
+     "EP": 0.0000293993
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 954.455,
+     "WCE": 32385,
+     "MSE": 6815760,
+     "NMED": 2.22233e-7,
+     "MRED": 1,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 26.3107,
+      "MSE": 416922,
+      "NMED": 6.12613e-9,
+      "MRED": 0,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.77,
+    "WCEpct": 3.1,
+    "EPpct": 100,
+    "MREpct": 9.15,
+    "pdk45": {
+     "power_mW": 0.176,
+     "area_um2": 385.8,
+     "delay_ns": 1.01
+    }
+   },
+   "sha256": "d7f484052d92a277bc90de5e000449e60fa8173d843d5f79bf33de11a2c26bff"
+  },
+  {
+   "name": "mul16u_52B",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 11084.4,
+    "delay": 5265,
+    "energy": 12962.6,
+    "leakage": 5.864,
+    "cells": 2001,
+    "energyApp": {
+     "lenet": 1667.4,
+     "image": 2600.69
+    },
+    "flows": {
+     "delay": {
+      "area": 11084.4,
+      "cells": 2001,
+      "delayAbc": 4492.81,
+      "delay": 5265,
+      "energy": 12962.6,
+      "leakage": 5.864,
+      "pins": 6826,
+      "sha256": "c4032be1ea80b9f62a91176859874edc8d496e5d89e8b4e29495a27ff54efdc8"
+     },
+     "area": {
+      "area": 8443.1,
+      "cells": 1681,
+      "delayAbc": 7735.25,
+      "delay": 8320.4,
+      "energy": 10106.5,
+      "leakage": 4.573,
+      "pins": 5327,
+      "sha256": "0692cbb6ec7c4d3c09204d44551aa3c8f0a9b9925408ccb916b0329535efc9ce"
+     },
+     "iso": {
+      "area": 11084.4,
+      "cells": 2001,
+      "delayAbc": 4492.81,
+      "delay": 5265,
+      "energy": 12962.6,
+      "leakage": 5.864,
+      "pins": 6826,
+      "sha256": "c4032be1ea80b9f62a91176859874edc8d496e5d89e8b4e29495a27ff54efdc8",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 2.93355,
+    "WCE": 9,
+    "MSE": 16.2182,
+    "NMED": 6.83041e-10,
+    "MRED": 5.97422e-8,
+    "EP": 0.71196,
+    "ci": {
+     "MED": 0.0120921,
+     "MSE": 0.0956539,
+     "NMED": 2.81551e-12,
+     "MRED": 1.16455e-8,
+     "EP": 0.0019847
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 1.36539,
+     "WCE": 9,
+     "MSE": 7.45132,
+     "NMED": 3.17914e-10,
+     "MRED": 0.0203825,
+     "EP": 0.332184,
+     "ci": {
+      "MED": 0.0255931,
+      "MSE": 0.178857,
+      "NMED": 5.95903e-12,
+      "MRED": 0.00129353,
+      "EP": 0.00509975
+     }
+    },
+    "image": {
+     "MED": 2.02097,
+     "WCE": 9,
+     "MSE": 12.2911,
+     "NMED": 4.70557e-10,
+     "MRED": 0.00126303,
+     "EP": 0.442566,
+     "ci": {
+      "MED": 0.0310183,
+      "MSE": 0.243494,
+      "NMED": 7.22223e-12,
+      "MRED": 0.0000281814,
+      "EP": 0.00537795
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 6.8e-8,
+    "WCEpct": 2.1e-7,
+    "EPpct": 71.09,
+    "MREpct": 0.0000097,
+    "pdk45": {
+     "power_mW": 2.18,
+     "area_um2": 3109.1,
+     "delay_ns": 3.11
+    }
+   },
+   "sha256": "1e5bb8f80adacc1b04a064c0484f4feb875f9436eb4f1a8667d4d1c19551409c"
+  },
+  {
+   "name": "mul16u_679",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 10567.6,
+    "delay": 4517.7,
+    "energy": 12181.8,
+    "leakage": 5.588,
+    "cells": 1994,
+    "energyApp": {
+     "lenet": 483.45,
+     "image": 847.66
+    },
+    "flows": {
+     "delay": {
+      "area": 10567.6,
+      "cells": 1994,
+      "delayAbc": 3863.88,
+      "delay": 4517.7,
+      "energy": 12181.8,
+      "leakage": 5.588,
+      "pins": 6916,
+      "sha256": "7bad899dad9c56c34d5d0278ddc355427c75e60a033b71384588497a26ed218a"
+     },
+     "area": {
+      "area": 7453.4,
+      "cells": 1521,
+      "delayAbc": 6402.55,
+      "delay": 6839.6,
+      "energy": 8767.25,
+      "leakage": 4.334,
+      "pins": 4733,
+      "sha256": "da845ac10048bfbc5e3a8d6386e5e7addce017348a2ecdfdc719d168affcec71"
+     },
+     "iso": {
+      "area": 10567.6,
+      "cells": 1994,
+      "delayAbc": 3863.88,
+      "delay": 4517.7,
+      "energy": 12181.8,
+      "leakage": 5.588,
+      "pins": 6916,
+      "sha256": "7bad899dad9c56c34d5d0278ddc355427c75e60a033b71384588497a26ed218a",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 458.694,
+    "WCE": 2181,
+    "MSE": 328535,
+    "NMED": 1.06801e-7,
+    "MRED": 0.00000780674,
+    "EP": 0.991335,
+    "ci": {
+     "MED": 1.50637,
+     "MSE": 1980.19,
+     "NMED": 3.50739e-10,
+     "MRED": 9.10068e-7,
+     "EP": 0.000406196
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 158.738,
+     "WCE": 1615,
+     "MSE": 93517.5,
+     "NMED": 3.69602e-8,
+     "MRED": 0.56747,
+     "EP": 0.447876,
+     "ci": {
+      "MED": 2.83012,
+      "MSE": 2526.1,
+      "NMED": 6.58958e-10,
+      "MRED": 0.00717155,
+      "EP": 0.00538429
+     }
+    },
+    "image": {
+     "MED": 394.928,
+     "WCE": 1292,
+     "MSE": 217330,
+     "NMED": 9.19541e-8,
+     "MRED": 0.175451,
+     "EP": 0.988464,
+     "ci": {
+      "MED": 2.68214,
+      "MSE": 2762.1,
+      "NMED": 6.24504e-10,
+      "MRED": 0.00217862,
+      "EP": 0.0011562
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.000011,
+    "WCEpct": 0.000051,
+    "EPpct": 99.15,
+    "MREpct": 0.0011,
+    "pdk45": {
+     "power_mW": 1.855,
+     "area_um2": 2685.3,
+     "delay_ns": 2.62
+    }
+   },
+   "sha256": "05fa860d6136115bb4b4568a5eefbf1f78e15d89a81d19207fc5edb983f712d0"
+  },
+  {
+   "name": "mul16u_94L",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 6887.86,
+    "delay": 4345.2,
+    "energy": 7824.09,
+    "leakage": 3.673,
+    "cells": 1297,
+    "energyApp": {
+     "lenet": 121.28,
+     "image": 155.34
+    },
+    "flows": {
+     "delay": {
+      "area": 6887.86,
+      "cells": 1297,
+      "delayAbc": 3750.51,
+      "delay": 4345.2,
+      "energy": 7824.09,
+      "leakage": 3.673,
+      "pins": 4536,
+      "sha256": "9eabfba91274ea50c28e0c2bb28f4013641041b89b2928b714c787c324c22b0f"
+     },
+     "area": {
+      "area": 4853.4,
+      "cells": 990,
+      "delayAbc": 5759.71,
+      "delay": 6155.3,
+      "energy": 5569.92,
+      "leakage": 2.726,
+      "pins": 3190,
+      "sha256": "8887dd81f0591baf0c6b7dcc024ae2103512bda6803f54f0f28ff3d856d5b5dc"
+     },
+     "iso": {
+      "area": 6887.86,
+      "cells": 1297,
+      "delayAbc": 3750.51,
+      "delay": 4345.2,
+      "energy": 7824.09,
+      "leakage": 3.673,
+      "pins": 4536,
+      "sha256": "9eabfba91274ea50c28e0c2bb28f4013641041b89b2928b714c787c324c22b0f",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 54002.1,
+    "WCE": 234978,
+    "MSE": 4430680000,
+    "NMED": 0.0000125737,
+    "MRED": 0.000766941,
+    "EP": 0.99985,
+    "ci": {
+     "MED": 170.557,
+     "MSE": 24938300,
+     "NMED": 3.9712e-8,
+     "MRED": 0.0000631266,
+     "EP": 0.0000536728
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 863.967,
+     "WCE": 16001,
+     "MSE": 4652160,
+     "NMED": 2.01164e-7,
+     "MRED": 0.988612,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 21.3984,
+      "MSE": 206617,
+      "NMED": 4.98236e-9,
+      "MRED": 0.00149442,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0013,
+    "WCEpct": 0.0062,
+    "EPpct": 99.98,
+    "MREpct": 0.083,
+    "pdk45": {
+     "power_mW": 1.23,
+     "area_um2": 2044.7,
+     "delay_ns": 2.9
+    }
+   },
+   "sha256": "eba406353e068a856d8fc9c34ebf0069506e8f300f88c2b5e229dd60d810648c"
+  },
+  {
+   "name": "mul16u_C37",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 10134.7,
+    "delay": 5048.9,
+    "energy": 11878.1,
+    "leakage": 5.499,
+    "cells": 1916,
+    "energyApp": {
+     "lenet": 1150.76,
+     "image": 1933.76
+    },
+    "flows": {
+     "delay": {
+      "area": 10134.7,
+      "cells": 1916,
+      "delayAbc": 4460.69,
+      "delay": 5048.9,
+      "energy": 11878.1,
+      "leakage": 5.499,
+      "pins": 6493,
+      "sha256": "449220a22de226674206e1c4095b8f9c79bfe566e732139078c9f19be37b052e"
+     },
+     "area": {
+      "area": 8187.85,
+      "cells": 1666,
+      "delayAbc": 7378.4,
+      "delay": 7905.9,
+      "energy": 9750.41,
+      "leakage": 4.536,
+      "pins": 5269,
+      "sha256": "bc55fffad71b6c5856ec629d29577c09fca865ca5ff3c7de100e1147ab9eafd5"
+     },
+     "iso": {
+      "area": 10134.7,
+      "cells": 1916,
+      "delayAbc": 4460.69,
+      "delay": 5048.9,
+      "energy": 11878.1,
+      "leakage": 5.499,
+      "pins": 6493,
+      "sha256": "449220a22de226674206e1c4095b8f9c79bfe566e732139078c9f19be37b052e",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 41.4082,
+    "WCE": 139,
+    "MSE": 2577.85,
+    "NMED": 9.6414e-9,
+    "MRED": 7.33715e-7,
+    "EP": 0.983605,
+    "ci": {
+     "MED": 0.128765,
+     "MSE": 13.8419,
+     "NMED": 2.99813e-11,
+     "MRED": 1.19876e-7,
+     "EP": 0.000556554
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 43.0732,
+     "WCE": 136,
+     "MSE": 2944.94,
+     "NMED": 1.00291e-8,
+     "MRED": 0.288572,
+     "EP": 0.837921,
+     "ci": {
+      "MED": 0.357414,
+      "MSE": 36.3592,
+      "NMED": 8.32194e-11,
+      "MRED": 0.0314397,
+      "EP": 0.00399021
+     }
+    },
+    "image": {
+     "MED": 44.5892,
+     "WCE": 133,
+     "MSE": 3039.71,
+     "NMED": 1.0382e-8,
+     "MRED": 0.0231549,
+     "EP": 0.938599,
+     "ci": {
+      "MED": 0.351106,
+      "MSE": 38.1267,
+      "NMED": 8.17508e-11,
+      "MRED": 0.000358794,
+      "EP": 0.00259932
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 9.6e-7,
+    "WCEpct": 0.0000032,
+    "EPpct": 98.37,
+    "MREpct": 0.00013,
+    "pdk45": {
+     "power_mW": 2.087,
+     "area_um2": 2977.2,
+     "delay_ns": 3.02
+    }
+   },
+   "sha256": "69f199e64c8e4f2a3a25a5b16d8d49ae955afc69218cdc2705d55f7ed9b454e0"
+  },
+  {
+   "name": "mul16u_G9P",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 12.51,
+    "delay": 170.8,
+    "energy": 12.73,
+    "leakage": 0.004,
+    "cells": 2,
+    "energyApp": {
+     "lenet": 0,
+     "image": 0
+    },
+    "flows": {
+     "delay": {
+      "area": 12.51,
+      "cells": 2,
+      "delayAbc": 104.14,
+      "delay": 170.8,
+      "energy": 12.73,
+      "leakage": 0.004,
+      "pins": 70,
+      "sha256": "8683de5ad22b24296fffc118b91dd9501e254907bae4791125fb0279805420e3"
+     },
+     "area": {
+      "area": 18.77,
+      "cells": 5,
+      "delayAbc": 77.74,
+      "delay": 176.8,
+      "energy": 23.52,
+      "leakage": 0.02,
+      "pins": 76,
+      "sha256": "9a97d5324a8885c1ffe1e28d76f215e9cf2a0f4ca9ccddabd67a5166d164fe94"
+     },
+     "iso": {
+      "area": 18.77,
+      "cells": 5,
+      "delayAbc": 77.74,
+      "delay": 176.8,
+      "energy": 23.52,
+      "leakage": 0.02,
+      "pins": 76,
+      "sha256": "9a97d5324a8885c1ffe1e28d76f215e9cf2a0f4ca9ccddabd67a5166d164fe94",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 670848000,
+    "WCE": 2664108346,
+    "MSE": 716295831397803100,
+    "NMED": 0.156199,
+    "MRED": 0.794236,
+    "EP": 0.999955,
+    "ci": {
+     "MED": 2261480,
+     "MSE": 4280010637503375,
+     "NMED": 0.000526559,
+     "MRED": 0.00122363,
+     "EP": 0.0000293993
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 954.455,
+     "WCE": 32385,
+     "MSE": 6815760,
+     "NMED": 2.22233e-7,
+     "MRED": 1,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 26.3107,
+      "MSE": 416922,
+      "NMED": 6.12613e-9,
+      "MRED": 0,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 15.62,
+    "WCEpct": 62.5,
+    "EPpct": 100,
+    "MREpct": 79.49,
+    "pdk45": {
+     "power_mW": 0.00063,
+     "area_um2": 4.7,
+     "delay_ns": 0.04
+    }
+   },
+   "sha256": "b3061bbeb88bbf32cbdb2c152a750c16e21b7ef05bd7b9e414474bd1131f85bc"
+  },
+  {
+   "name": "mul16u_GPE",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 2567.46,
+    "delay": 3677.7,
+    "energy": 2873.61,
+    "leakage": 1.438,
+    "cells": 420,
+    "energyApp": {
+     "lenet": 0.24,
+     "image": 0.76
+    },
+    "flows": {
+     "delay": {
+      "area": 2567.46,
+      "cells": 420,
+      "delayAbc": 3234.68,
+      "delay": 3677.7,
+      "energy": 2873.61,
+      "leakage": 1.438,
+      "pins": 1477,
+      "sha256": "abdf2fd902c23a19ab9d0b0c8e9a2b249170d0636bcda43f8038267a3e8f4476"
+     },
+     "area": {
+      "area": 1722.9,
+      "cells": 343,
+      "delayAbc": 6213.87,
+      "delay": 6452.6,
+      "energy": 1979.07,
+      "leakage": 0.973,
+      "pins": 1082,
+      "sha256": "08161869a37b4df0e66be5345cab09d47056bb1036c2ba36d184084ce4cdfac2"
+     },
+     "iso": {
+      "area": 2567.46,
+      "cells": 420,
+      "delayAbc": 3234.68,
+      "delay": 3677.7,
+      "energy": 2873.61,
+      "leakage": 1.438,
+      "pins": 1477,
+      "sha256": "abdf2fd902c23a19ab9d0b0c8e9a2b249170d0636bcda43f8038267a3e8f4476",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 6788350,
+    "WCE": 23663746,
+    "MSE": 55247400000000,
+    "NMED": 0.00158059,
+    "MRED": 0.0304211,
+    "EP": 0.999955,
+    "ci": {
+     "MED": 13268.6,
+     "MSE": 207804000000,
+     "NMED": 0.00000308942,
+     "MRED": 0.000417428,
+     "EP": 0.0000293993
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 954.455,
+     "WCE": 32385,
+     "MSE": 6815760,
+     "NMED": 2.22233e-7,
+     "MRED": 1,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 26.3107,
+      "MSE": 416922,
+      "NMED": 6.12613e-9,
+      "MRED": 0,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.16,
+    "WCEpct": 0.63,
+    "EPpct": 100,
+    "MREpct": 3.06,
+    "pdk45": {
+     "power_mW": 0.401,
+     "area_um2": 642,
+     "delay_ns": 1.97
+    }
+   },
+   "sha256": "e3b79b1c41593f325a5e97b548b33efe6822b1a6b53125dd1bd71c8578558985"
+  },
+  {
+   "name": "mul16u_H6G",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 842.06,
+    "delay": 1909.3,
+    "energy": 796.92,
+    "leakage": 0.482,
+    "cells": 129,
+    "energyApp": {
+     "lenet": 0,
+     "image": 0
+    },
+    "flows": {
+     "delay": {
+      "area": 842.06,
+      "cells": 129,
+      "delayAbc": 1531.48,
+      "delay": 1909.3,
+      "energy": 796.92,
+      "leakage": 0.482,
+      "pins": 497,
+      "sha256": "a075faf39e4917336b4d8cdb5f59fd258d4fe64146c2dc5175e0c340c1f355e7"
+     },
+     "area": {
+      "area": 566.79,
+      "cells": 107,
+      "delayAbc": 2734.15,
+      "delay": 2982.9,
+      "energy": 622.86,
+      "leakage": 0.306,
+      "pins": 392,
+      "sha256": "f0391c88371b41605228c2b941f70d9d23f456c5e5ead6d45821e143cd398de3"
+     },
+     "iso": {
+      "area": 570.55,
+      "cells": 106,
+      "delayAbc": 2281.49,
+      "delay": 2551,
+      "energy": 592.6,
+      "leakage": 0.328,
+      "pins": 391,
+      "sha256": "f7d38658e1c9a368778a3adfb815073ebb76078f7ecfee63dcff0a15acadf278",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 75394400,
+    "WCE": 281743674,
+    "MSE": 7381132273764177,
+    "NMED": 0.0175547,
+    "MRED": 0.192969,
+    "EP": 0.999955,
+    "ci": {
+     "MED": 180534,
+     "MSE": 33386000000000,
+     "NMED": 0.000042035,
+     "MRED": 0.00111957,
+     "EP": 0.0000293993
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 954.455,
+     "WCE": 32385,
+     "MSE": 6815760,
+     "NMED": 2.22233e-7,
+     "MRED": 1,
+     "EP": 0.44809,
+     "ci": {
+      "MED": 26.3107,
+      "MSE": 416922,
+      "NMED": 6.12613e-9,
+      "MRED": 0,
+      "EP": 0.00538453
+     }
+    },
+    "image": {
+     "MED": 3495.12,
+     "WCE": 12584,
+     "MSE": 17104100,
+     "NMED": 8.13796e-7,
+     "MRED": 1,
+     "EP": 1,
+     "ci": {
+      "MED": 23.939,
+      "MSE": 250362,
+      "NMED": 5.57391e-9,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 1.76,
+    "WCEpct": 7.03,
+    "EPpct": 100,
+    "MREpct": 19.3,
+    "pdk45": {
+     "power_mW": 0.101,
+     "area_um2": 244,
+     "delay_ns": 1.03
+    }
+   },
+   "sha256": "b13912731a73bc6907067cc20deb443636d9751d4e8aff1356b3fa41904e6405"
+  },
+  {
+   "name": "mul16u_3HJ",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 10900.5,
+    "delay": 4602.2,
+    "energy": 12661.1,
+    "leakage": 5.85,
+    "cells": 2013,
+    "energyApp": {
+     "lenet": 517.07,
+     "image": 929.91
+    },
+    "flows": {
+     "delay": {
+      "area": 10900.5,
+      "cells": 2013,
+      "delayAbc": 3847.87,
+      "delay": 4602.2,
+      "energy": 12661.1,
+      "leakage": 5.85,
+      "pins": 7033,
+      "sha256": "14b0b3f6f36ff4069e5b2cdc663e9253d912bfbeeb8e11aab27114301e43209a"
+     },
+     "area": {
+      "area": 7490.93,
+      "cells": 1543,
+      "delayAbc": 5888.33,
+      "delay": 6592,
+      "energy": 9047.1,
+      "leakage": 4.177,
+      "pins": 4850,
+      "sha256": "42d25d89c39d9c3cd314b3e2795f6a780fa79b013418983196dfc0d40f28f904"
+     },
+     "iso": {
+      "area": 10900.5,
+      "cells": 2013,
+      "delayAbc": 3847.87,
+      "delay": 4602.2,
+      "energy": 12661.1,
+      "leakage": 5.85,
+      "pins": 7033,
+      "sha256": "14b0b3f6f36ff4069e5b2cdc663e9253d912bfbeeb8e11aab27114301e43209a",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 369.743,
+    "WCE": 1577,
+    "MSE": 209493,
+    "NMED": 8.60902e-8,
+    "MRED": 0.00000630612,
+    "EP": 0.98976,
+    "ci": {
+     "MED": 1.18237,
+     "MSE": 1194.23,
+     "NMED": 2.75301e-10,
+     "MRED": 7.91583e-7,
+     "EP": 0.000441221
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 137.884,
+     "WCE": 1453,
+     "MSE": 67694.9,
+     "NMED": 3.21046e-8,
+     "MRED": 0.534838,
+     "EP": 0.447388,
+     "ci": {
+      "MED": 2.38902,
+      "MSE": 1718.11,
+      "NMED": 5.56254e-10,
+      "MRED": 0.00697662,
+      "EP": 0.00538373
+     }
+    },
+    "image": {
+     "MED": 384.626,
+     "WCE": 1165,
+     "MSE": 205316,
+     "NMED": 8.95554e-8,
+     "MRED": 0.17569,
+     "EP": 0.989868,
+     "ci": {
+      "MED": 2.59364,
+      "MSE": 2577.07,
+      "NMED": 6.03897e-10,
+      "MRED": 0.00220141,
+      "EP": 0.00108434
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0000086,
+    "WCEpct": 0.000037,
+    "EPpct": 98.99,
+    "MREpct": 0.00091,
+    "pdk45": {
+     "power_mW": 1.893,
+     "area_um2": 2782.9,
+     "delay_ns": 2.52
+    }
+   },
+   "sha256": "b4b102de9da5f9617302b74607b8f7fad728829c93b29bcbaa632d0cd1ac70e9"
+  },
+  {
+   "name": "mul16u_4YJ",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 10242.3,
+    "delay": 5085.5,
+    "energy": 11930,
+    "leakage": 5.521,
+    "cells": 1888,
+    "energyApp": {
+     "lenet": 1247.22,
+     "image": 2036.12
+    },
+    "flows": {
+     "delay": {
+      "area": 10242.3,
+      "cells": 1888,
+      "delayAbc": 4403.77,
+      "delay": 5085.5,
+      "energy": 11930,
+      "leakage": 5.521,
+      "pins": 6379,
+      "sha256": "27eddbb238ff8d5dfe6a506be5d261df27c01a4cedd7685437f2d837028d1f75"
+     },
+     "area": {
+      "area": 8111.53,
+      "cells": 1622,
+      "delayAbc": 8087.38,
+      "delay": 8719.8,
+      "energy": 9658.32,
+      "leakage": 4.391,
+      "pins": 5144,
+      "sha256": "f5becb6ad9d64e09d568a0f5443ebe2744f394599603b55f1f8229c9c9c98933"
+     },
+     "iso": {
+      "area": 10242.3,
+      "cells": 1888,
+      "delayAbc": 4403.77,
+      "delay": 5085.5,
+      "energy": 11930,
+      "leakage": 5.521,
+      "pins": 6379,
+      "sha256": "27eddbb238ff8d5dfe6a506be5d261df27c01a4cedd7685437f2d837028d1f75",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 37.0597,
+    "WCE": 115,
+    "MSE": 2005.21,
+    "NMED": 8.62891e-9,
+    "MRED": 6.36964e-7,
+    "EP": 0.977045,
+    "ci": {
+     "MED": 0.110161,
+     "MSE": 10.0583,
+     "NMED": 2.56495e-11,
+     "MRED": 7.70905e-8,
+     "EP": 0.000656352
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 57.3596,
+     "WCE": 114,
+     "MSE": 3944.52,
+     "NMED": 1.33555e-8,
+     "MRED": 0.335361,
+     "EP": 0.990906,
+     "ci": {
+      "MED": 0.276982,
+      "MSE": 27.6124,
+      "NMED": 6.44919e-11,
+      "MRED": 0.0357452,
+      "EP": 0.00102785
+     }
+    },
+    "image": {
+     "MED": 36.4057,
+     "WCE": 102,
+     "MSE": 1987.84,
+     "NMED": 8.47662e-9,
+     "MRED": 0.0179969,
+     "EP": 0.945099,
+     "ci": {
+      "MED": 0.278684,
+      "MSE": 24.6624,
+      "NMED": 6.48881e-11,
+      "MRED": 0.00032344,
+      "EP": 0.00246638
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 8.6e-7,
+    "WCEpct": 0.0000027,
+    "EPpct": 97.72,
+    "MREpct": 0.00013,
+    "pdk45": {
+     "power_mW": 2.106,
+     "area_um2": 2992.3,
+     "delay_ns": 3.09
+    }
+   },
+   "sha256": "0efbdfdb37e5aaf3c95369488768d7867b45bc209f64c8652908e9d28c60a583"
+  },
+  {
+   "name": "mul16u_CG0",
+   "kind": "mul",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 10814.1,
+    "delay": 5200.1,
+    "energy": 12607.9,
+    "leakage": 5.886,
+    "cells": 2021,
+    "energyApp": {
+     "lenet": 1636.87,
+     "image": 2574.66
+    },
+    "flows": {
+     "delay": {
+      "area": 10814.1,
+      "cells": 2021,
+      "delayAbc": 4521.33,
+      "delay": 5200.1,
+      "energy": 12607.9,
+      "leakage": 5.886,
+      "pins": 6753,
+      "sha256": "0c8699accb6bd7d1caeb7e522561bd6dba49ff6332cdc5c03516cca5dfa9d32c"
+     },
+     "area": {
+      "area": 8683.33,
+      "cells": 1768,
+      "delayAbc": 7642.1,
+      "delay": 8260.3,
+      "energy": 10231.1,
+      "leakage": 4.876,
+      "pins": 5531,
+      "sha256": "7082f217bb3b75b0b90b226774ff6e08265f6765b484aff555438ec5680f4039"
+     },
+     "iso": {
+      "area": 10814.1,
+      "cells": 2021,
+      "delayAbc": 4521.33,
+      "delay": 5200.1,
+      "energy": 12607.9,
+      "leakage": 5.886,
+      "pins": 6753,
+      "sha256": "0c8699accb6bd7d1caeb7e522561bd6dba49ff6332cdc5c03516cca5dfa9d32c",
+      "target": 2381
+     }
+    }
+   },
+   "err": {
+    "MED": 4.86994,
+    "WCE": 10,
+    "MSE": 33.2092,
+    "NMED": 1.13391e-9,
+    "MRED": 8.98561e-8,
+    "EP": 0.9062,
+    "ci": {
+     "MED": 0.0135033,
+     "MSE": 0.139927,
+     "NMED": 3.14407e-12,
+     "MRED": 1.15897e-8,
+     "EP": 0.00127778
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 6.83109,
+     "WCE": 10,
+     "MSE": 54.2549,
+     "NMED": 1.59053e-9,
+     "MRED": 0.0315657,
+     "EP": 0.957733,
+     "ci": {
+      "MED": 0.0298322,
+      "MSE": 0.320346,
+      "NMED": 6.94607e-12,
+      "MRED": 0.00321527,
+      "EP": 0.00217848
+     }
+    },
+    "image": {
+     "MED": 7.05444,
+     "WCE": 10,
+     "MSE": 57.1239,
+     "NMED": 1.64254e-9,
+     "MRED": 0.00320941,
+     "EP": 1,
+     "ci": {
+      "MED": 0.0293719,
+      "MSE": 0.37012,
+      "NMED": 6.8389e-12,
+      "MRED": 0.000034392,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 1.1e-7,
+    "WCEpct": 2.3e-7,
+    "EPpct": 90.62,
+    "MREpct": 0.000015,
+    "pdk45": {
+     "power_mW": 2.176,
+     "area_um2": 3128.4,
+     "delay_ns": 3.15
+    }
+   },
+   "sha256": "51e6790031b143cf2fd1465b72e5ff8cbe84f805e755da24e3167acfed026d74"
+  },
+  {
    "name": "add8u_0FP",
    "kind": "add",
    "width": 8,
@@ -7008,6 +10465,3353 @@
     }
    },
    "sha256": "ae20768b50ba2167001e82736ac0b530d2367ee5b65804dd68812e91ec662d6c"
+  },
+  {
+   "name": "add16u_0MH",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep",
+    "pareto_pwr_mae",
+    "pareto_pwr_mre",
+    "pareto_pwr_mse",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 55.05,
+    "delay": 347.3,
+    "energy": 60.63,
+    "leakage": 0.031,
+    "cells": 8,
+    "energyApp": {
+     "lenet": 56.51,
+     "image": 29.08
+    },
+    "flows": {
+     "delay": {
+      "area": 55.05,
+      "cells": 8,
+      "delayAbc": 155.9,
+      "delay": 347.3,
+      "energy": 60.63,
+      "leakage": 0.031,
+      "pins": 74,
+      "sha256": "37d6c81bc4a34f4074980d2fed1bd28a769a9b612e02c9a48075b6a77d2ebe0c"
+     },
+     "area": {
+      "area": 25.02,
+      "cells": 6,
+      "delayAbc": 275.97,
+      "delay": 440.5,
+      "energy": 32.68,
+      "leakage": 0.016,
+      "pins": 68,
+      "sha256": "7d34f2797207b8592f05033398646517fb2d04494548492334fa9005cd3cee25"
+     },
+     "iso": {
+      "area": 25.02,
+      "cells": 6,
+      "delayAbc": 275.97,
+      "delay": 440.5,
+      "energy": 32.68,
+      "leakage": 0.016,
+      "pins": 68,
+      "sha256": "7d34f2797207b8592f05033398646517fb2d04494548492334fa9005cd3cee25",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 12990.2,
+    "WCE": 44623,
+    "MSE": 254364000,
+    "NMED": 0.0991087,
+    "MRED": 0.223121,
+    "EP": 0.999995,
+    "ci": {
+     "MED": 40.5533,
+     "MSE": 1392710,
+     "NMED": 0.000309402,
+     "MRED": 0.00082016,
+     "EP": 0.00000979998
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 8801.22,
+     "WCE": 44608,
+     "MSE": 155845000,
+     "NMED": 0.067149,
+     "MRED": 1.32771,
+     "EP": 0.999908,
+     "ci": {
+      "MED": 95.861,
+      "MSE": 3191420,
+      "NMED": 0.000731373,
+      "MRED": 0.0589435,
+      "EP": 0.000103597
+     }
+    },
+    "image": {
+     "MED": 8361.86,
+     "WCE": 25237,
+     "MSE": 103886000,
+     "NMED": 0.0637969,
+     "MRED": 0.576534,
+     "EP": 1,
+     "ci": {
+      "MED": 63.1024,
+      "MSE": 1335350,
+      "NMED": 0.000481441,
+      "MRED": 0.00426819,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 9.9,
+    "WCEpct": 34.18,
+    "EPpct": 100,
+    "MREpct": 22.35,
+    "pdk45": {
+     "power_mW": 0.0041,
+     "area_um2": 18.3,
+     "delay_ns": 0.2
+    }
+   },
+   "sha256": "11b1c03eb4f10c483e3124974a8790a9afd674fed707f0422d1fcf9a056a4697"
+  },
+  {
+   "name": "add16u_1DM",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 658.13,
+    "delay": 1886.9,
+    "energy": 838.33,
+    "leakage": 0.285,
+    "cells": 73,
+    "energyApp": {
+     "lenet": 681.52,
+     "image": 735.17
+    },
+    "flows": {
+     "delay": {
+      "area": 658.13,
+      "cells": 73,
+      "delayAbc": 1604.88,
+      "delay": 1886.9,
+      "energy": 838.33,
+      "leakage": 0.285,
+      "pins": 279,
+      "sha256": "f20a5b64bd1e4201f890cdf9c1db35b30191707d35f663ef65b90b7b590b1403"
+     },
+     "area": {
+      "area": 389.12,
+      "cells": 46,
+      "delayAbc": 4541.36,
+      "delay": 4687.9,
+      "energy": 417.06,
+      "leakage": 0.16,
+      "pins": 201,
+      "sha256": "32e896d322db2d8279106f42b841709923c95239c8db6499ad762f075f981824"
+     },
+     "iso": {
+      "area": 658.13,
+      "cells": 73,
+      "delayAbc": 1604.88,
+      "delay": 1886.9,
+      "energy": 838.33,
+      "leakage": 0.285,
+      "pins": 279,
+      "sha256": "f20a5b64bd1e4201f890cdf9c1db35b30191707d35f663ef65b90b7b590b1403",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 0.87681,
+    "WCE": 4,
+    "MSE": 2.2569,
+    "NMED": 0.00000668963,
+    "MRED": 0.0000183396,
+    "EP": 0.375495,
+    "ci": {
+     "MED": 0.00534635,
+     "MSE": 0.0175377,
+     "NMED": 4.07901e-8,
+     "MRED": 2.21826e-7,
+     "EP": 0.00212232
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 0.256958,
+     "WCE": 4,
+     "MSE": 0.633789,
+     "NMED": 0.00000196046,
+     "MRED": 0.0000165734,
+     "EP": 0.113495,
+     "ci": {
+      "MED": 0.00815857,
+      "MSE": 0.0242364,
+      "NMED": 6.22459e-8,
+      "MRED": 0.00000373338,
+      "EP": 0.00343447
+     }
+    },
+    "image": {
+     "MED": 0.325989,
+     "WCE": 4,
+     "MSE": 0.825317,
+     "NMED": 0.00000248713,
+     "MRED": 0.000030291,
+     "EP": 0.141327,
+     "ci": {
+      "MED": 0.00918143,
+      "MSE": 0.0281939,
+      "NMED": 7.00498e-8,
+      "MRED": 0.00000139049,
+      "EP": 0.00377188
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.00069,
+    "WCEpct": 0.0031,
+    "EPpct": 37.5,
+    "MREpct": 0.0019,
+    "pdk45": {
+     "power_mW": 0.065,
+     "area_um2": 138.4,
+     "delay_ns": 1.12
+    }
+   },
+   "sha256": "02c113f5f5a541909af4793cea3c4e3e732da331cd478059bb7b8361c4c009af"
+  },
+  {
+   "name": "add16u_1E2",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep",
+    "pareto_pwr_mae",
+    "pareto_pwr_mre",
+    "pareto_pwr_mse",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 740.71,
+    "delay": 2137,
+    "energy": 956.58,
+    "leakage": 0.312,
+    "cells": 80,
+    "energyApp": {
+     "lenet": 763.99,
+     "image": 823.19
+    },
+    "flows": {
+     "delay": {
+      "area": 740.71,
+      "cells": 80,
+      "delayAbc": 1849.26,
+      "delay": 2137,
+      "energy": 956.58,
+      "leakage": 0.312,
+      "pins": 300,
+      "sha256": "4e5325de95db123d895d9bbd4e45c40ba5d041b124742e26c417944087d92927"
+     },
+     "area": {
+      "area": 426.66,
+      "cells": 50,
+      "delayAbc": 5271.69,
+      "delay": 5427.1,
+      "energy": 458.98,
+      "leakage": 0.174,
+      "pins": 213,
+      "sha256": "e4f2cf83ec231639b5595cef5149db2c9cc2859d2f19c3d776a3aab4be6b5c7b"
+     },
+     "iso": {
+      "area": 740.71,
+      "cells": 80,
+      "delayAbc": 1849.26,
+      "delay": 2137,
+      "energy": 956.58,
+      "leakage": 0.312,
+      "pins": 300,
+      "sha256": "4e5325de95db123d895d9bbd4e45c40ba5d041b124742e26c417944087d92927",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 0,
+    "WCE": 0,
+    "MSE": 0,
+    "NMED": 0,
+    "MRED": 0,
+    "EP": 0,
+    "ci": {
+     "MED": 0,
+     "MSE": 0,
+     "NMED": 0,
+     "MRED": 0,
+     "EP": 0
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 0,
+     "WCE": 0,
+     "MSE": 0,
+     "NMED": 0,
+     "MRED": 0,
+     "EP": 0,
+     "ci": {
+      "MED": 0,
+      "MSE": 0,
+      "NMED": 0,
+      "MRED": 0,
+      "EP": 0
+     }
+    },
+    "image": {
+     "MED": 0,
+     "WCE": 0,
+     "MSE": 0,
+     "NMED": 0,
+     "MRED": 0,
+     "EP": 0,
+     "ci": {
+      "MED": 0,
+      "MSE": 0,
+      "NMED": 0,
+      "MRED": 0,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0,
+    "WCEpct": 0,
+    "EPpct": 0,
+    "MREpct": 0,
+    "pdk45": {
+     "power_mW": 0.072,
+     "area_um2": 141.7,
+     "delay_ns": 1.28
+    }
+   },
+   "sha256": "e0da324efbc8482123df8c141b262862c9a02e032f90ffb52650e031edc8b0b2"
+  },
+  {
+   "name": "add16u_1HK",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 700.67,
+    "delay": 1681.4,
+    "energy": 896.45,
+    "leakage": 0.309,
+    "cells": 78,
+    "energyApp": {
+     "lenet": 731.29,
+     "image": 778.55
+    },
+    "flows": {
+     "delay": {
+      "area": 700.67,
+      "cells": 78,
+      "delayAbc": 1441.96,
+      "delay": 1681.4,
+      "energy": 896.45,
+      "leakage": 0.309,
+      "pins": 290,
+      "sha256": "515ff228cb42d3cb3d691aaa64ef2b55fc5e441e429ca1a94319d6345fb74d69"
+     },
+     "area": {
+      "area": 402.89,
+      "cells": 52,
+      "delayAbc": 4176.2,
+      "delay": 4318.3,
+      "energy": 432.01,
+      "leakage": 0.174,
+      "pins": 217,
+      "sha256": "6b2083ad9ca56721b9ed1ce3bcc59716078100dc9a8eac400ed7ca605873ff71"
+     },
+     "iso": {
+      "area": 700.67,
+      "cells": 78,
+      "delayAbc": 1441.96,
+      "delay": 1681.4,
+      "energy": 896.45,
+      "leakage": 0.309,
+      "pins": 290,
+      "sha256": "515ff228cb42d3cb3d691aaa64ef2b55fc5e441e429ca1a94319d6345fb74d69",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 1.75477,
+    "WCE": 10,
+    "MSE": 13.0539,
+    "NMED": 0.000013388,
+    "MRED": 0.0000367015,
+    "EP": 0.29657,
+    "ci": {
+     "MED": 0.0138417,
+     "MSE": 0.115591,
+     "NMED": 1.05605e-7,
+     "MRED": 5.59609e-7,
+     "EP": 0.00200177
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 0.63739,
+     "WCE": 10,
+     "MSE": 4.87732,
+     "NMED": 0.00000486298,
+     "MRED": 0.0000372367,
+     "EP": 0.0972595,
+     "ci": {
+      "MED": 0.0228948,
+      "MSE": 0.186234,
+      "NMED": 1.74676e-7,
+      "MRED": 0.00000851268,
+      "EP": 0.00320833
+     }
+    },
+    "image": {
+     "MED": 0.774048,
+     "WCE": 10,
+     "MSE": 5.80249,
+     "NMED": 0.00000590561,
+     "MRED": 0.0000558689,
+     "EP": 0.125763,
+     "ci": {
+      "MED": 0.0246986,
+      "MSE": 0.201036,
+      "NMED": 1.88438e-7,
+      "MRED": 0.00000235763,
+      "EP": 0.00359023
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0014,
+    "WCEpct": 0.0076,
+    "EPpct": 29.69,
+    "MREpct": 0.0037,
+    "pdk45": {
+     "power_mW": 0.066,
+     "area_um2": 144.5,
+     "delay_ns": 1.03
+    }
+   },
+   "sha256": "d18d60afc130a887b34334c0dc825c95fca7e7b70c5e6c7d32f0b0849d9e6151"
+  },
+  {
+   "name": "add16u_1MB",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 586.81,
+    "delay": 1355,
+    "energy": 730.98,
+    "leakage": 0.268,
+    "cells": 72,
+    "energyApp": {
+     "lenet": 589.68,
+     "image": 626.04
+    },
+    "flows": {
+     "delay": {
+      "area": 586.81,
+      "cells": 72,
+      "delayAbc": 1112.97,
+      "delay": 1355,
+      "energy": 730.98,
+      "leakage": 0.268,
+      "pins": 274,
+      "sha256": "6172f01acdf302a6b0861f1c9b694bd02d6daa39bd94b142378e13a4379d2ef5"
+     },
+     "area": {
+      "area": 390.37,
+      "cells": 51,
+      "delayAbc": 3080.7,
+      "delay": 3209.5,
+      "energy": 420.48,
+      "leakage": 0.169,
+      "pins": 214,
+      "sha256": "cf71e0e17adda63d49b68e4e7837374e6a901b9f065ccb4964f18e1b50b05ff4"
+     },
+     "iso": {
+      "area": 586.81,
+      "cells": 72,
+      "delayAbc": 1112.97,
+      "delay": 1355,
+      "energy": 730.98,
+      "leakage": 0.268,
+      "pins": 274,
+      "sha256": "6172f01acdf302a6b0861f1c9b694bd02d6daa39bd94b142378e13a4379d2ef5",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 19.6387,
+    "WCE": 64,
+    "MSE": 874.844,
+    "NMED": 0.000149834,
+    "MRED": 0.000414617,
+    "EP": 0.493395,
+    "ci": {
+     "MED": 0.0969323,
+     "MSE": 5.62011,
+     "NMED": 7.39546e-7,
+     "MRED": 0.0000045698,
+     "EP": 0.00219116
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 8.41602,
+     "WCE": 64,
+     "MSE": 374.5,
+     "NMED": 0.0000642101,
+     "MRED": 0.000487552,
+     "EP": 0.211639,
+     "ci": {
+      "MED": 0.188683,
+      "MSE": 10.2119,
+      "NMED": 0.00000143956,
+      "MRED": 0.0000634192,
+      "EP": 0.00442274
+     }
+    },
+    "image": {
+     "MED": 13.749,
+     "WCE": 64,
+     "MSE": 556.594,
+     "NMED": 0.000104898,
+     "MRED": 0.00124482,
+     "EP": 0.372711,
+     "ci": {
+      "MED": 0.207584,
+      "MSE": 10.7007,
+      "NMED": 0.00000158377,
+      "MRED": 0.0000317205,
+      "EP": 0.00523541
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.015,
+    "WCEpct": 0.049,
+    "EPpct": 49.22,
+    "MREpct": 0.041,
+    "pdk45": {
+     "power_mW": 0.062,
+     "area_um2": 136.1,
+     "delay_ns": 0.79
+    }
+   },
+   "sha256": "72c4453d6d8e9ce0215961c3019f8e9b8f2b335d5f957522616f7e1ef071b194"
+  },
+  {
+   "name": "add16u_1NN",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 684.41,
+    "delay": 1887.5,
+    "energy": 868.86,
+    "leakage": 0.293,
+    "cells": 78,
+    "energyApp": {
+     "lenet": 702.5,
+     "image": 757.53
+    },
+    "flows": {
+     "delay": {
+      "area": 684.41,
+      "cells": 78,
+      "delayAbc": 1604.88,
+      "delay": 1887.5,
+      "energy": 868.86,
+      "leakage": 0.293,
+      "pins": 294,
+      "sha256": "5ea6c5d49df99649bea39534cdb9ee97c489d380211795109cdce787881f9b8e"
+     },
+     "area": {
+      "area": 415.4,
+      "cells": 51,
+      "delayAbc": 4541.36,
+      "delay": 4687.9,
+      "energy": 447.68,
+      "leakage": 0.169,
+      "pins": 216,
+      "sha256": "86fcc9a438ebd3ad9e470ed07e508644de4a78cb1b66f921f53aabaf288b68ff"
+     },
+     "iso": {
+      "area": 684.41,
+      "cells": 78,
+      "delayAbc": 1604.88,
+      "delay": 1887.5,
+      "energy": 868.86,
+      "leakage": 0.293,
+      "pins": 294,
+      "sha256": "5ea6c5d49df99649bea39534cdb9ee97c489d380211795109cdce787881f9b8e",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 0.7483,
+    "WCE": 4,
+    "MSE": 2.9932,
+    "NMED": 0.00000570916,
+    "MRED": 0.000015571,
+    "EP": 0.187075,
+    "ci": {
+     "MED": 0.00683651,
+     "MSE": 0.027346,
+     "NMED": 5.21592e-8,
+     "MRED": 2.46942e-7,
+     "EP": 0.00170913
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 0.220215,
+     "WCE": 4,
+     "MSE": 0.880859,
+     "NMED": 0.00000168013,
+     "MRED": 0.0000139771,
+     "EP": 0.0550537,
+     "ci": {
+      "MED": 0.00987843,
+      "MSE": 0.0395137,
+      "NMED": 7.53676e-8,
+      "MRED": 0.00000438233,
+      "EP": 0.00246961
+     }
+    },
+    "image": {
+     "MED": 0.293091,
+     "WCE": 4,
+     "MSE": 1.17236,
+     "NMED": 0.00000223614,
+     "MRED": 0.0000219931,
+     "EP": 0.0732727,
+     "ci": {
+      "MED": 0.011286,
+      "MSE": 0.0451438,
+      "NMED": 8.61063e-8,
+      "MRED": 0.00000107401,
+      "EP": 0.00282149
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.00061,
+    "WCEpct": 0.0031,
+    "EPpct": 18.75,
+    "MREpct": 0.0016,
+    "pdk45": {
+     "power_mW": 0.069,
+     "area_um2": 144.5,
+     "delay_ns": 1.11
+    }
+   },
+   "sha256": "a50d22b30cd156de0bb8121069c3ec56108246e413a72c43effb479006ee5cf9"
+  },
+  {
+   "name": "add16u_1US",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 573.05,
+    "delay": 1097.2,
+    "energy": 703.77,
+    "leakage": 0.266,
+    "cells": 69,
+    "energyApp": {
+     "lenet": 573.13,
+     "image": 587.78
+    },
+    "flows": {
+     "delay": {
+      "area": 573.05,
+      "cells": 69,
+      "delayAbc": 860.58,
+      "delay": 1097.2,
+      "energy": 703.77,
+      "leakage": 0.266,
+      "pins": 262,
+      "sha256": "50a3f7bc746a9708c18f65be401f6ade73148b95aefc536a7874ab92ce60dce9"
+     },
+     "area": {
+      "area": 356.59,
+      "cells": 52,
+      "delayAbc": 2350.27,
+      "delay": 2470.2,
+      "energy": 384.77,
+      "leakage": 0.162,
+      "pins": 215,
+      "sha256": "84a042022c278931df52ccd8306af1d5ab9b20ae5feafd11f2a077a0ccf213d0"
+     },
+     "iso": {
+      "area": 392.88,
+      "cells": 66,
+      "delayAbc": 1005.66,
+      "delay": 1150,
+      "energy": 481.77,
+      "leakage": 0.192,
+      "pins": 256,
+      "sha256": "c45e7bc4a25b5cbe6eb7982de2d2420b82905e79bcf9662dbe9c92e465ec77b6",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 73.4937,
+    "WCE": 418,
+    "MSE": 14563.2,
+    "NMED": 0.000560721,
+    "MRED": 0.00153958,
+    "EP": 0.68516,
+    "ci": {
+     "MED": 0.4195,
+     "MSE": 135.422,
+     "NMED": 0.00000320058,
+     "MRED": 0.0000170444,
+     "EP": 0.00203555
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 32.4597,
+     "WCE": 418,
+     "MSE": 6482.11,
+     "NMED": 0.000247651,
+     "MRED": 0.0015972,
+     "EP": 0.28949,
+     "ci": {
+      "MED": 0.797756,
+      "MSE": 236.509,
+      "NMED": 0.00000608649,
+      "MRED": 0.000135373,
+      "EP": 0.00491058
+     }
+    },
+    "image": {
+     "MED": 62.9769,
+     "WCE": 418,
+     "MSE": 12386,
+     "NMED": 0.000480483,
+     "MRED": 0.00565314,
+     "EP": 0.585968,
+     "ci": {
+      "MED": 0.99354,
+      "MSE": 304.554,
+      "NMED": 0.00000758022,
+      "MRED": 0.000152415,
+      "EP": 0.00533316
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.056,
+    "WCEpct": 0.32,
+    "EPpct": 68.55,
+    "MREpct": 0.15,
+    "pdk45": {
+     "power_mW": 0.057,
+     "area_um2": 143.1,
+     "delay_ns": 0.63
+    }
+   },
+   "sha256": "c62ea4c1bd43bad8bb7d9021f10d0335c4a82c3eafc675543b6f95fd2d3ac4ff"
+  },
+  {
+   "name": "add16u_1X9",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_ep"
+   ],
+   "asic": {
+    "area": 410.39,
+    "delay": 578.6,
+    "energy": 488.67,
+    "leakage": 0.204,
+    "cells": 72,
+    "energyApp": {
+     "lenet": 444.15,
+     "image": 414.21
+    },
+    "flows": {
+     "delay": {
+      "area": 410.39,
+      "cells": 72,
+      "delayAbc": 472.84,
+      "delay": 578.6,
+      "energy": 488.67,
+      "leakage": 0.204,
+      "pins": 274,
+      "sha256": "e499b528e9f4143f29d88a9f4c1b9c663ecbfa40ecfbdb24a52a57c85b3626f5"
+     },
+     "area": {
+      "area": 320.31,
+      "cells": 46,
+      "delayAbc": 1032.94,
+      "delay": 1140.5,
+      "energy": 355.31,
+      "leakage": 0.143,
+      "pins": 192,
+      "sha256": "20c9466d77ca4433b5c29bc0ae9ef88eba4e2b6bc1e753c140e0f6e57974e22d"
+     },
+     "iso": {
+      "area": 321.56,
+      "cells": 46,
+      "delayAbc": 965.16,
+      "delay": 1076.7,
+      "energy": 357.7,
+      "leakage": 0.144,
+      "pins": 192,
+      "sha256": "f8fc13fb8848ed1cc8022234b3973f7b3b0b5b4e4d6e03b7361d4e2c80dec32f",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 2628.82,
+    "WCE": 8465,
+    "MSE": 16747600,
+    "NMED": 0.0200566,
+    "MRED": 0.0539117,
+    "EP": 0.894425,
+    "ci": {
+     "MED": 13.7458,
+     "MSE": 110198,
+     "NMED": 0.000104874,
+     "MRED": 0.000440632,
+     "EP": 0.00134677
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 3099.82,
+     "WCE": 8465,
+     "MSE": 18878100,
+     "NMED": 0.0236501,
+     "MRED": 0.471888,
+     "EP": 0.930908,
+     "ci": {
+      "MED": 32.965,
+      "MSE": 268507,
+      "NMED": 0.000251506,
+      "MRED": 0.0157095,
+      "EP": 0.00274598
+     }
+    },
+    "image": {
+     "MED": 2646.67,
+     "WCE": 8464,
+     "MSE": 16981700,
+     "NMED": 0.0201928,
+     "MRED": 0.239308,
+     "EP": 0.873901,
+     "ci": {
+      "MED": 34.2002,
+      "MSE": 275362,
+      "NMED": 0.00026093,
+      "MRED": 0.00406133,
+      "EP": 0.00359433
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 2.01,
+    "WCEpct": 6.46,
+    "EPpct": 89.45,
+    "MREpct": 5.41,
+    "pdk45": {
+     "power_mW": 0.052,
+     "area_um2": 122,
+     "delay_ns": 0.32
+    }
+   },
+   "sha256": "bf30caf28a4cc12db69061183e389547bf675aa0abb8c9fd2ebd80bf74f9ce7a"
+  },
+  {
+   "name": "add16u_00G",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae"
+   ],
+   "asic": {
+    "area": 344.08,
+    "delay": 977.3,
+    "energy": 456.45,
+    "leakage": 0.167,
+    "cells": 40,
+    "energyApp": {
+     "lenet": 374.37,
+     "image": 365.37
+    },
+    "flows": {
+     "delay": {
+      "area": 344.08,
+      "cells": 40,
+      "delayAbc": 708.75,
+      "delay": 977.3,
+      "energy": 456.45,
+      "leakage": 0.167,
+      "pins": 168,
+      "sha256": "a0cd16837a06997a2927a69528bfd59fa71c05b03e42f857050c257dae1ce460"
+     },
+     "area": {
+      "area": 168.91,
+      "cells": 19,
+      "delayAbc": 2128.43,
+      "delay": 2250.9,
+      "energy": 188.72,
+      "leakage": 0.066,
+      "pins": 112,
+      "sha256": "511b46ea4c07f90713d6f19cf0cb890291770a59578c858ea3a73f89114b594e"
+     },
+     "iso": {
+      "area": 200.19,
+      "cells": 39,
+      "delayAbc": 962.95,
+      "delay": 1136.7,
+      "energy": 240.65,
+      "leakage": 0.127,
+      "pins": 166,
+      "sha256": "40661a36dde7ee3b3557c8dbe78e872699d5a818315ffc829a3f7015b42e7cde",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 386.132,
+    "WCE": 1197,
+    "MSE": 222497,
+    "NMED": 0.002946,
+    "MRED": 0.00810794,
+    "EP": 0.999125,
+    "ci": {
+     "MED": 1.18737,
+     "MSE": 1140.47,
+     "NMED": 0.00000905905,
+     "MRED": 0.0000628502,
+     "EP": 0.000129585
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 324.22,
+     "WCE": 1201,
+     "MSE": 154257,
+     "NMED": 0.00247364,
+     "MRED": 1.29081,
+     "EP": 0.999268,
+     "ci": {
+      "MED": 2.40016,
+      "MSE": 2080.95,
+      "NMED": 0.000018312,
+      "MRED": 0.0747383,
+      "EP": 0.000292922
+     }
+    },
+    "image": {
+     "MED": 390.259,
+     "WCE": 1186,
+     "MSE": 223854,
+     "NMED": 0.00297749,
+     "MRED": 0.0356422,
+     "EP": 0.999268,
+     "ci": {
+      "MED": 2.89629,
+      "MSE": 2816.26,
+      "NMED": 0.0000220972,
+      "MRED": 0.000541851,
+      "EP": 0.000292922
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.29,
+    "WCEpct": 0.92,
+    "EPpct": 99.92,
+    "MREpct": 0.82,
+    "pdk45": {
+     "power_mW": 0.026,
+     "area_um2": 55.4,
+     "delay_ns": 0.51
+    }
+   },
+   "sha256": "6a7510d11e97575a0e07e33f4dad41f6260b96e0912c2cdbe59f29051bf8e1f4"
+  },
+  {
+   "name": "add16u_02E",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae"
+   ],
+   "asic": {
+    "area": 123.87,
+    "delay": 457.5,
+    "energy": 149.23,
+    "leakage": 0.077,
+    "cells": 20,
+    "energyApp": {
+     "lenet": 145.81,
+     "image": 95.58
+    },
+    "flows": {
+     "delay": {
+      "area": 123.87,
+      "cells": 20,
+      "delayAbc": 299.71,
+      "delay": 457.5,
+      "energy": 149.23,
+      "leakage": 0.077,
+      "pins": 111,
+      "sha256": "33081cb4f392a4a03c8866283bb5a24ed0e4ab9df58d259b993e914389f16d01"
+     },
+     "area": {
+      "area": 67.56,
+      "cells": 13,
+      "delayAbc": 582.74,
+      "delay": 676.1,
+      "energy": 92.51,
+      "leakage": 0.034,
+      "pins": 89,
+      "sha256": "bc9c131f6488dd2424e1fd5ce53447fc7b2ef24522218e4fc4163d7720a4bfc4"
+     },
+     "iso": {
+      "area": 67.56,
+      "cells": 13,
+      "delayAbc": 582.74,
+      "delay": 676.1,
+      "energy": 92.51,
+      "leakage": 0.034,
+      "pins": 89,
+      "sha256": "bc9c131f6488dd2424e1fd5ce53447fc7b2ef24522218e4fc4163d7720a4bfc4",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 4625.41,
+    "WCE": 12723,
+    "MSE": 30585700,
+    "NMED": 0.0352896,
+    "MRED": 0.095258,
+    "EP": 0.99994,
+    "ci": {
+     "MED": 13.2871,
+     "MSE": 149078,
+     "NMED": 0.000101374,
+     "MRED": 0.000516739,
+     "EP": 0.0000339472
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 4555.52,
+     "WCE": 12759,
+     "MSE": 29649600,
+     "NMED": 0.0347564,
+     "MRED": 0.287966,
+     "EP": 0.999939,
+     "ci": {
+      "MED": 32.296,
+      "MSE": 357658,
+      "NMED": 0.000246403,
+      "MRED": 0.00551823,
+      "EP": 0.0000845878
+     }
+    },
+    "image": {
+     "MED": 4358.91,
+     "WCE": 12663,
+     "MSE": 27129300,
+     "NMED": 0.0332563,
+     "MRED": 0.346271,
+     "EP": 0.999939,
+     "ci": {
+      "MED": 30.8713,
+      "MSE": 331686,
+      "NMED": 0.000235533,
+      "MRED": 0.0033002,
+      "EP": 0.0000845878
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 3.52,
+    "WCEpct": 9.74,
+    "EPpct": 99.99,
+    "MREpct": 9.54,
+    "pdk45": {
+     "power_mW": 0.011,
+     "area_um2": 31.9,
+     "delay_ns": 0.27
+    }
+   },
+   "sha256": "3f5bab68377ceebee6cae8add2ae9a8d98f2234f58f98a3a97ebf64ff8599aff"
+  },
+  {
+   "name": "add16u_073",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae"
+   ],
+   "asic": {
+    "area": 505.48,
+    "delay": 1312,
+    "energy": 637.44,
+    "leakage": 0.267,
+    "cells": 70,
+    "energyApp": {
+     "lenet": 564.44,
+     "image": 551.92
+    },
+    "flows": {
+     "delay": {
+      "area": 505.48,
+      "cells": 70,
+      "delayAbc": 1052.27,
+      "delay": 1312,
+      "energy": 637.44,
+      "leakage": 0.267,
+      "pins": 268,
+      "sha256": "25d938bd874933e5eea526587013559a0b49ee24fcc1349e1523a1b4830e0e0a"
+     },
+     "area": {
+      "area": 287.78,
+      "cells": 53,
+      "delayAbc": 1928.91,
+      "delay": 2120.5,
+      "energy": 371.74,
+      "leakage": 0.139,
+      "pins": 210,
+      "sha256": "d9cfed45c767e4e444415715cc695ae124d574e17a460a28d32adf812b570b04"
+     },
+     "iso": {
+      "area": 505.48,
+      "cells": 70,
+      "delayAbc": 1052.27,
+      "delay": 1312,
+      "energy": 637.44,
+      "leakage": 0.267,
+      "pins": 268,
+      "sha256": "25d938bd874933e5eea526587013559a0b49ee24fcc1349e1523a1b4830e0e0a",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 26.8411,
+    "WCE": 103,
+    "MSE": 1128.2,
+    "NMED": 0.000204784,
+    "MRED": 0.000553724,
+    "EP": 0.987705,
+    "ci": {
+     "MED": 0.0885002,
+     "MSE": 6.73627,
+     "NMED": 6.75213e-7,
+     "MRED": 0.00000391704,
+     "EP": 0.000482969
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 35.3871,
+     "WCE": 102,
+     "MSE": 1697.86,
+     "NMED": 0.000269986,
+     "MRED": 1.0088,
+     "EP": 0.994781,
+     "ci": {
+      "MED": 0.228566,
+      "MSE": 17.7231,
+      "NMED": 0.00000174385,
+      "MRED": 0.0594375,
+      "EP": 0.000780132
+     }
+    },
+    "image": {
+     "MED": 31.1887,
+     "WCE": 103,
+     "MSE": 1469.94,
+     "NMED": 0.000237955,
+     "MRED": 0.0027218,
+     "EP": 0.990814,
+     "ci": {
+      "MED": 0.241435,
+      "MSE": 20.2669,
+      "NMED": 0.00000184203,
+      "MRED": 0.0000370046,
+      "EP": 0.00103296
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.021,
+    "WCEpct": 0.079,
+    "EPpct": 98.74,
+    "MREpct": 0.056,
+    "pdk45": {
+     "power_mW": 0.043,
+     "area_um2": 90.6,
+     "delay_ns": 0.8
+    }
+   },
+   "sha256": "a2bed4d06640f8e47ff0c5640db514b127e48ad5c788e812720057bb18978b7b"
+  },
+  {
+   "name": "add16u_0EM",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae"
+   ],
+   "asic": {
+    "area": 641.87,
+    "delay": 1680.8,
+    "energy": 835.82,
+    "leakage": 0.277,
+    "cells": 67,
+    "energyApp": {
+     "lenet": 679.28,
+     "image": 726.03
+    },
+    "flows": {
+     "delay": {
+      "area": 641.87,
+      "cells": 67,
+      "delayAbc": 1441.96,
+      "delay": 1680.8,
+      "energy": 835.82,
+      "leakage": 0.277,
+      "pins": 256,
+      "sha256": "185400f065b98208898965532327d527df671c5d2d5dd6855718bd77c24f3beb"
+     },
+     "area": {
+      "area": 344.08,
+      "cells": 41,
+      "delayAbc": 4176.2,
+      "delay": 4318.3,
+      "energy": 371.3,
+      "leakage": 0.142,
+      "pins": 183,
+      "sha256": "366fae65e8c6582291563fc495ffd8e89f5b423c26a18d759bdcea7b5c1b42dd"
+     },
+     "iso": {
+      "area": 641.87,
+      "cells": 67,
+      "delayAbc": 1441.96,
+      "delay": 1680.8,
+      "energy": 835.82,
+      "leakage": 0.277,
+      "pins": 256,
+      "sha256": "185400f065b98208898965532327d527df671c5d2d5dd6855718bd77c24f3beb",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 2.3824,
+    "WCE": 7,
+    "MSE": 8.5456,
+    "NMED": 0.0000181765,
+    "MRED": 0.0000499507,
+    "EP": 0.875155,
+    "ci": {
+     "MED": 0.00742446,
+     "MSE": 0.044908,
+     "NMED": 5.6645e-8,
+     "MRED": 4.01586e-7,
+     "EP": 0.00144867
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 2.44858,
+     "WCE": 7,
+     "MSE": 8.49704,
+     "NMED": 0.0000186815,
+     "MRED": 0.0489351,
+     "EP": 0.863983,
+     "ci": {
+      "MED": 0.0171251,
+      "MSE": 0.0943598,
+      "NMED": 1.30656e-7,
+      "MRED": 0.00288308,
+      "EP": 0.00371176
+     }
+    },
+    "image": {
+     "MED": 2.43695,
+     "WCE": 7,
+     "MSE": 8.41431,
+     "NMED": 0.0000185927,
+     "MRED": 0.000225837,
+     "EP": 0.892822,
+     "ci": {
+      "MED": 0.0170361,
+      "MSE": 0.0972519,
+      "NMED": 1.29977e-7,
+      "MRED": 0.00000343226,
+      "EP": 0.00334939
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0018,
+    "WCEpct": 0.0053,
+    "EPpct": 87.5,
+    "MREpct": 0.005,
+    "pdk45": {
+     "power_mW": 0.057,
+     "area_um2": 115,
+     "delay_ns": 1.04
+    }
+   },
+   "sha256": "6b425f0b2c1f73d671bdd3195f5c42a073d772d869b65bb8d6fc7fd8137da222"
+  },
+  {
+   "name": "add16u_0GK",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae",
+    "pareto_pwr_mre"
+   ],
+   "asic": {
+    "area": 215.21,
+    "delay": 794.2,
+    "energy": 280.34,
+    "leakage": 0.111,
+    "cells": 28,
+    "energyApp": {
+     "lenet": 228.56,
+     "image": 184.65
+    },
+    "flows": {
+     "delay": {
+      "area": 215.21,
+      "cells": 28,
+      "delayAbc": 493.32,
+      "delay": 794.2,
+      "energy": 280.34,
+      "leakage": 0.111,
+      "pins": 133,
+      "sha256": "3a32aad9c26a937adeecc1fcd7b16b5123e539b1e382a1f4802ff04bb8327be3"
+     },
+     "area": {
+      "area": 113.86,
+      "cells": 16,
+      "delayAbc": 1232.44,
+      "delay": 1417,
+      "energy": 134.86,
+      "leakage": 0.056,
+      "pins": 99,
+      "sha256": "2872fc9e41f99d9abfd711c7b3084d7d1b1aa571b89967b047be5be78f8f9c30"
+     },
+     "iso": {
+      "area": 117.61,
+      "cells": 16,
+      "delayAbc": 1065.62,
+      "delay": 1256.8,
+      "energy": 143.12,
+      "leakage": 0.06,
+      "pins": 99,
+      "sha256": "b1bbeadfe723efd7a1c5baa830b2e49ddbdb76d281b45a40e7ba3c949c7d495c",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 1185.39,
+    "WCE": 3783,
+    "MSE": 2047090,
+    "NMED": 0.00904398,
+    "MRED": 0.0248384,
+    "EP": 0.999775,
+    "ci": {
+     "MED": 3.51144,
+     "MSE": 10417.7,
+     "NMED": 0.0000267905,
+     "MRED": 0.000169687,
+     "EP": 0.000065733
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 831.741,
+     "WCE": 3691,
+     "MSE": 1117100,
+     "NMED": 0.00634577,
+     "MRED": 0.107331,
+     "EP": 0.969696,
+     "ci": {
+      "MED": 7.06128,
+      "MSE": 17584.7,
+      "NMED": 0.0000538741,
+      "MRED": 0.00484321,
+      "EP": 0.00185609
+     }
+    },
+    "image": {
+     "MED": 1158.47,
+     "WCE": 3767,
+     "MSE": 1947090,
+     "NMED": 0.00883856,
+     "MRED": 0.107867,
+     "EP": 0.999695,
+     "ci": {
+      "MED": 8.42216,
+      "MSE": 24440.8,
+      "NMED": 0.0000642569,
+      "MRED": 0.00150749,
+      "EP": 0.000189121
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.91,
+    "WCEpct": 2.9,
+    "EPpct": 99.98,
+    "MREpct": 2.49,
+    "pdk45": {
+     "power_mW": 0.018,
+     "area_um2": 45.5,
+     "delay_ns": 0.35
+    }
+   },
+   "sha256": "fc85709c6e8a322827df0344dd7b7b614b957013fea3ba4c9a524cd6e704b053"
+  },
+  {
+   "name": "add16u_0M0",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae",
+    "pareto_pwr_mre",
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 434.17,
+    "delay": 1208.5,
+    "energy": 564.5,
+    "leakage": 0.215,
+    "cells": 49,
+    "energyApp": {
+     "lenet": 462.26,
+     "image": 473.3
+    },
+    "flows": {
+     "delay": {
+      "area": 434.17,
+      "cells": 49,
+      "delayAbc": 961.95,
+      "delay": 1208.5,
+      "energy": 564.5,
+      "leakage": 0.215,
+      "pins": 196,
+      "sha256": "5b8a5db2c62c9353f141e9c9f6547cd488263f4cae63607bb286f1f4108238df"
+     },
+     "area": {
+      "area": 220.21,
+      "cells": 24,
+      "delayAbc": 2858.76,
+      "delay": 3014.8,
+      "energy": 242.89,
+      "leakage": 0.085,
+      "pins": 129,
+      "sha256": "e9e1ac16e6a320b4e1140bfc08742b533294c2eaeabef4a4c8e25ccd088d688d"
+     },
+     "iso": {
+      "area": 322.81,
+      "cells": 49,
+      "delayAbc": 1008.64,
+      "delay": 1186.5,
+      "energy": 440.15,
+      "leakage": 0.167,
+      "pins": 196,
+      "sha256": "21648b89fd409956090b9b587f57353d852d8d6820f9062c584f9fdbe3708a8b",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 74.701,
+    "WCE": 250,
+    "MSE": 8205.74,
+    "NMED": 0.000569932,
+    "MRED": 0.00155539,
+    "EP": 0.996125,
+    "ci": {
+     "MED": 0.224568,
+     "MSE": 42.5956,
+     "NMED": 0.00000171334,
+     "MRED": 0.0000126203,
+     "EP": 0.000272291
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 55.764,
+     "WCE": 240,
+     "MSE": 4940.46,
+     "NMED": 0.000425452,
+     "MRED": 1.00925,
+     "EP": 0.994934,
+     "ci": {
+      "MED": 0.463293,
+      "MSE": 79.6586,
+      "NMED": 0.0000035347,
+      "MRED": 0.0594365,
+      "EP": 0.000768701
+     }
+    },
+    "image": {
+     "MED": 74.6777,
+     "WCE": 240,
+     "MSE": 7941.33,
+     "NMED": 0.000569754,
+     "MRED": 0.006746,
+     "EP": 0.996033,
+     "ci": {
+      "MED": 0.52651,
+      "MSE": 94.6912,
+      "NMED": 0.00000401702,
+      "MRED": 0.0000964813,
+      "EP": 0.000680636
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.057,
+    "WCEpct": 0.19,
+    "EPpct": 99.61,
+    "MREpct": 0.16,
+    "pdk45": {
+     "power_mW": 0.036,
+     "area_um2": 71.3,
+     "delay_ns": 0.68
+    }
+   },
+   "sha256": "d7c01772dfe72149c6c8aa419b1739cc2b26a8c31b3e20efd5b398cf9bae4812"
+  },
+  {
+   "name": "add16u_1JH",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mae"
+   ],
+   "asic": {
+    "area": 559.29,
+    "delay": 1591.8,
+    "energy": 735.81,
+    "leakage": 0.241,
+    "cells": 61,
+    "energyApp": {
+     "lenet": 591.98,
+     "image": 638.79
+    },
+    "flows": {
+     "delay": {
+      "area": 559.29,
+      "cells": 61,
+      "delayAbc": 1352.56,
+      "delay": 1591.8,
+      "energy": 735.81,
+      "leakage": 0.241,
+      "pins": 239,
+      "sha256": "39697f89962dd54c0141566b96f63216249c1e87258548ccee278b7bea1181a8"
+     },
+     "area": {
+      "area": 307.8,
+      "cells": 37,
+      "delayAbc": 3811.03,
+      "delay": 3948.7,
+      "energy": 333.79,
+      "leakage": 0.127,
+      "pins": 170,
+      "sha256": "262d085bd28b0e413edef78e9367986efb9abaec5eaf8900be1b77d123df3baf"
+     },
+     "iso": {
+      "area": 559.29,
+      "cells": 61,
+      "delayAbc": 1352.56,
+      "delay": 1591.8,
+      "energy": 735.81,
+      "leakage": 0.241,
+      "pins": 239,
+      "sha256": "39697f89962dd54c0141566b96f63216249c1e87258548ccee278b7bea1181a8",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 8.717,
+    "WCE": 25,
+    "MSE": 108.733,
+    "NMED": 0.0000665064,
+    "MRED": 0.000183448,
+    "EP": 0.967805,
+    "ci": {
+     "MED": 0.02508,
+     "MSE": 0.526657,
+     "NMED": 1.91348e-7,
+     "MRED": 0.0000015704,
+     "EP": 0.000773623
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 8.44714,
+     "WCE": 25,
+     "MSE": 103.879,
+     "NMED": 0.0000644476,
+     "MRED": 0.163007,
+     "EP": 0.945831,
+     "ci": {
+      "MED": 0.06175,
+      "MSE": 1.23239,
+      "NMED": 4.71122e-7,
+      "MRED": 0.00959064,
+      "EP": 0.00245082
+     }
+    },
+    "image": {
+     "MED": 8.69568,
+     "WCE": 25,
+     "MSE": 109.038,
+     "NMED": 0.0000663438,
+     "MRED": 0.000783887,
+     "EP": 0.969879,
+     "ci": {
+      "MED": 0.0625975,
+      "MSE": 1.30286,
+      "NMED": 4.77588e-7,
+      "MRED": 0.0000111836,
+      "EP": 0.00185065
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0066,
+    "WCEpct": 0.019,
+    "EPpct": 96.88,
+    "MREpct": 0.018,
+    "pdk45": {
+     "power_mW": 0.051,
+     "area_um2": 100.4,
+     "delay_ns": 0.95
+    }
+   },
+   "sha256": "6389eb17a444a58483bde95d8320088044659f4974fb4a41b42f349a16de3e6f"
+  },
+  {
+   "name": "add16u_05T",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 449.18,
+    "delay": 1377.1,
+    "energy": 590.32,
+    "leakage": 0.205,
+    "cells": 52,
+    "energyApp": {
+     "lenet": 468.05,
+     "image": 502.04
+    },
+    "flows": {
+     "delay": {
+      "area": 449.18,
+      "cells": 52,
+      "delayAbc": 1112.97,
+      "delay": 1377.1,
+      "energy": 590.32,
+      "leakage": 0.205,
+      "pins": 210,
+      "sha256": "0222ed16090edb1275847c07c533fcdaf46c908a2e0dc0ecf077e3a696e82103"
+     },
+     "area": {
+      "area": 252.74,
+      "cells": 31,
+      "delayAbc": 3080.7,
+      "delay": 3209.5,
+      "energy": 279.75,
+      "leakage": 0.106,
+      "pins": 150,
+      "sha256": "fb414d8b8fa369155061d1a44258f516b0175d2afe95bb5135377799ff430a45"
+     },
+     "iso": {
+      "area": 449.18,
+      "cells": 52,
+      "delayAbc": 1112.97,
+      "delay": 1377.1,
+      "energy": 590.32,
+      "leakage": 0.205,
+      "pins": 210,
+      "sha256": "0222ed16090edb1275847c07c533fcdaf46c908a2e0dc0ecf077e3a696e82103",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 32.0424,
+    "WCE": 65,
+    "MSE": 1240.58,
+    "NMED": 0.000244468,
+    "MRED": 0.000674295,
+    "EP": 0.99634,
+    "ci": {
+     "MED": 0.0640939,
+     "MSE": 4.25563,
+     "NMED": 4.89005e-7,
+     "MRED": 0.00000510727,
+     "EP": 0.000264658
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 34.7236,
+     "WCE": 65,
+     "MSE": 1472.82,
+     "NMED": 0.000264924,
+     "MRED": 1.00851,
+     "EP": 0.994293,
+     "ci": {
+      "MED": 0.176955,
+      "MSE": 12.5938,
+      "NMED": 0.00000135008,
+      "MRED": 0.059438,
+      "EP": 0.000815613
+     }
+    },
+    "image": {
+     "MED": 31.929,
+     "WCE": 65,
+     "MSE": 1233.51,
+     "NMED": 0.000243603,
+     "MRED": 0.00299445,
+     "EP": 0.995544,
+     "ci": {
+      "MED": 0.158411,
+      "MSE": 10.5001,
+      "NMED": 0.0000012086,
+      "MRED": 0.0000411527,
+      "EP": 0.000721129
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.024,
+    "WCEpct": 0.05,
+    "EPpct": 99.61,
+    "MREpct": 0.068,
+    "pdk45": {
+     "power_mW": 0.041,
+     "area_um2": 82.6,
+     "delay_ns": 0.78
+    }
+   },
+   "sha256": "aa4dd8b5557c34420294d1fc1cb646efb0811668637cc59ac18cc7e911b2993a"
+  },
+  {
+   "name": "add16u_0DL",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre",
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 340.33,
+    "delay": 981.5,
+    "energy": 450.4,
+    "leakage": 0.165,
+    "cells": 39,
+    "energyApp": {
+     "lenet": 368.95,
+     "image": 358.25
+    },
+    "flows": {
+     "delay": {
+      "area": 340.33,
+      "cells": 39,
+      "delayAbc": 708.75,
+      "delay": 981.5,
+      "energy": 450.4,
+      "leakage": 0.165,
+      "pins": 165,
+      "sha256": "480af3188f964835a5d9e80dafedc5a2ded73cbe7c5aabd5302cb70199724bef"
+     },
+     "area": {
+      "area": 173.92,
+      "cells": 23,
+      "delayAbc": 1935.16,
+      "delay": 2058.1,
+      "energy": 198.31,
+      "leakage": 0.077,
+      "pins": 122,
+      "sha256": "13b8d1fd7b8b686f130e96492eb491d80bcce6de7c5de7520c444584454f4ff4"
+     },
+     "iso": {
+      "area": 201.44,
+      "cells": 41,
+      "delayAbc": 978.81,
+      "delay": 1156.3,
+      "energy": 251.38,
+      "leakage": 0.124,
+      "pins": 172,
+      "sha256": "61f484aaef93fb7ffd66470b27c380e71d8afa59aa9fdd122485d24c250cbfbd",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 261.426,
+    "WCE": 683,
+    "MSE": 92009.8,
+    "NMED": 0.00199456,
+    "MRED": 0.0055038,
+    "EP": 0.99906,
+    "ci": {
+     "MED": 0.674223,
+     "MSE": 388.302,
+     "NMED": 0.00000514399,
+     "MRED": 0.0000426854,
+     "EP": 0.000134308
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 232.477,
+     "WCE": 673,
+     "MSE": 79158.4,
+     "NMED": 0.00177369,
+     "MRED": 0.0553044,
+     "EP": 0.968933,
+     "ci": {
+      "MED": 1.71585,
+      "MSE": 849.542,
+      "NMED": 0.0000130911,
+      "MRED": 0.00221852,
+      "EP": 0.00187857
+     }
+    },
+    "image": {
+     "MED": 273.356,
+     "WCE": 668,
+     "MSE": 98181.7,
+     "NMED": 0.00208557,
+     "MRED": 0.0250183,
+     "EP": 0.999268,
+     "ci": {
+      "MED": 1.65835,
+      "MSE": 967.149,
+      "NMED": 0.0000126524,
+      "MRED": 0.000333268,
+      "EP": 0.000292922
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.2,
+    "WCEpct": 0.52,
+    "EPpct": 99.91,
+    "MREpct": 0.55,
+    "pdk45": {
+     "power_mW": 0.026,
+     "area_um2": 55.8,
+     "delay_ns": 0.51
+    }
+   },
+   "sha256": "ccbe4a0351f9dff9626acb057683dc1309b7b9d8d2607a9d51a5de6f046b24c4"
+  },
+  {
+   "name": "add16u_0FJ",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre"
+   ],
+   "asic": {
+    "area": 598.07,
+    "delay": 1691.3,
+    "energy": 798.44,
+    "leakage": 0.255,
+    "cells": 65,
+    "energyApp": {
+     "lenet": 683.9,
+     "image": 689.13
+    },
+    "flows": {
+     "delay": {
+      "area": 598.07,
+      "cells": 65,
+      "delayAbc": 1373.79,
+      "delay": 1691.3,
+      "energy": 798.44,
+      "leakage": 0.255,
+      "pins": 246,
+      "sha256": "160f5ca0bb9a3c4519a394ac458c6758a67b8439a3f3df5d49d05ec391d5205e"
+     },
+     "area": {
+      "area": 302.79,
+      "cells": 33,
+      "delayAbc": 3954.26,
+      "delay": 4201.3,
+      "energy": 335.12,
+      "leakage": 0.117,
+      "pins": 159,
+      "sha256": "4075ad5a1453ab596c60f5a3f4aabeffd58b637ab728706a300491ac5e9225eb"
+     },
+     "iso": {
+      "area": 598.07,
+      "cells": 65,
+      "delayAbc": 1373.79,
+      "delay": 1691.3,
+      "energy": 798.44,
+      "leakage": 0.255,
+      "pins": 246,
+      "sha256": "160f5ca0bb9a3c4519a394ac458c6758a67b8439a3f3df5d49d05ec391d5205e",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 9.29056,
+    "WCE": 27,
+    "MSE": 126.194,
+    "NMED": 0.0000708824,
+    "MRED": 0.000195907,
+    "EP": 0.96925,
+    "ci": {
+     "MED": 0.0276766,
+     "MSE": 0.639088,
+     "NMED": 2.11159e-7,
+     "MRED": 0.00000181042,
+     "EP": 0.000756626
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 8.86932,
+     "WCE": 27,
+     "MSE": 112.67,
+     "NMED": 0.0000676686,
+     "MRED": 0.0336713,
+     "EP": 0.943573,
+     "ci": {
+      "MED": 0.0631394,
+      "MSE": 1.30513,
+      "NMED": 4.81723e-7,
+      "MRED": 0.00192289,
+      "EP": 0.0024984
+     }
+    },
+    "image": {
+     "MED": 9.43008,
+     "WCE": 27,
+     "MSE": 129.642,
+     "NMED": 0.0000719469,
+     "MRED": 0.000852683,
+     "EP": 0.96701,
+     "ci": {
+      "MED": 0.0690895,
+      "MSE": 1.61555,
+      "NMED": 5.27119e-7,
+      "MRED": 0.0000113324,
+      "EP": 0.0019339
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0071,
+    "WCEpct": 0.021,
+    "EPpct": 96.89,
+    "MREpct": 0.02,
+    "pdk45": {
+     "power_mW": 0.05,
+     "area_um2": 98.1,
+     "delay_ns": 0.92
+    }
+   },
+   "sha256": "a7de2d4ac37abf76b0eb040169b134fe3989c8fb9920a5754c75bb1e0641d2a9"
+  },
+  {
+   "name": "add16u_0NK",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre",
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 641.87,
+    "delay": 1680.8,
+    "energy": 839.96,
+    "leakage": 0.277,
+    "cells": 67,
+    "energyApp": {
+     "lenet": 683.36,
+     "image": 730.33
+    },
+    "flows": {
+     "delay": {
+      "area": 641.87,
+      "cells": 67,
+      "delayAbc": 1441.96,
+      "delay": 1680.8,
+      "energy": 839.96,
+      "leakage": 0.277,
+      "pins": 256,
+      "sha256": "c1cd1d215d7be0bf4e8d5b51a1502b760cb1d92091b08e79844f2442f541a4a9"
+     },
+     "area": {
+      "area": 344.08,
+      "cells": 41,
+      "delayAbc": 4176.2,
+      "delay": 4318.3,
+      "energy": 375.44,
+      "leakage": 0.142,
+      "pins": 183,
+      "sha256": "cb6640e8ff5a975c6f0fd028c90a8ad32b0df7703aa2275dca7dd9e8c8bd2b8e"
+     },
+     "iso": {
+      "area": 641.87,
+      "cells": 67,
+      "delayAbc": 1441.96,
+      "delay": 1680.8,
+      "energy": 839.96,
+      "leakage": 0.277,
+      "pins": 256,
+      "sha256": "c1cd1d215d7be0bf4e8d5b51a1502b760cb1d92091b08e79844f2442f541a4a9",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 2.56962,
+    "WCE": 8,
+    "MSE": 10.0501,
+    "NMED": 0.0000196049,
+    "MRED": 0.0000539099,
+    "EP": 0.883275,
+    "ci": {
+     "MED": 0.00813717,
+     "MSE": 0.054141,
+     "NMED": 6.20826e-8,
+     "MRED": 4.48318e-7,
+     "EP": 0.00140725
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 2.25742,
+     "WCE": 8,
+     "MSE": 7.57126,
+     "NMED": 0.000017223,
+     "MRED": 0.032699,
+     "EP": 0.868988,
+     "ci": {
+      "MED": 0.0170352,
+      "MSE": 0.0968012,
+      "NMED": 1.2997e-7,
+      "MRED": 0.00192541,
+      "EP": 0.00365337
+     }
+    },
+    "image": {
+     "MED": 2.28622,
+     "WCE": 8,
+     "MSE": 7.88852,
+     "NMED": 0.0000174428,
+     "MRED": 0.000207279,
+     "EP": 0.86499,
+     "ci": {
+      "MED": 0.0176649,
+      "MSE": 0.104539,
+      "NMED": 1.34774e-7,
+      "MRED": 0.00000332648,
+      "EP": 0.00370015
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.002,
+    "WCEpct": 0.0061,
+    "EPpct": 88.28,
+    "MREpct": 0.0054,
+    "pdk45": {
+     "power_mW": 0.057,
+     "area_um2": 115,
+     "delay_ns": 1.04
+    }
+   },
+   "sha256": "78308219a49bc7e25f3433bafcf793d5d33a4651d8319556ff188c7d39c37fbe"
+  },
+  {
+   "name": "add16u_0QG",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre",
+    "pareto_pwr_mse",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 170.16,
+    "delay": 590.8,
+    "energy": 204.78,
+    "leakage": 0.085,
+    "cells": 22,
+    "energyApp": {
+     "lenet": 189.63,
+     "image": 128.69
+    },
+    "flows": {
+     "delay": {
+      "area": 170.16,
+      "cells": 22,
+      "delayAbc": 392.66,
+      "delay": 590.8,
+      "energy": 204.78,
+      "leakage": 0.085,
+      "pins": 118,
+      "sha256": "64e8cbc078dd280baa853309bb303e222399f6d22ebedc1e2c4ca5fa3bf121f8"
+     },
+     "area": {
+      "area": 87.58,
+      "cells": 13,
+      "delayAbc": 942.95,
+      "delay": 1051,
+      "energy": 99.11,
+      "leakage": 0.039,
+      "pins": 90,
+      "sha256": "58de21d84d3d807e058c3dfc6f1ea75105c6fdf10e5da7ce82f7b08f844f42ee"
+     },
+     "iso": {
+      "area": 87.58,
+      "cells": 13,
+      "delayAbc": 942.95,
+      "delay": 1051,
+      "energy": 99.11,
+      "leakage": 0.039,
+      "pins": 90,
+      "sha256": "58de21d84d3d807e058c3dfc6f1ea75105c6fdf10e5da7ce82f7b08f844f42ee",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 2132.85,
+    "WCE": 6066,
+    "MSE": 6297910,
+    "NMED": 0.0162726,
+    "MRED": 0.0450777,
+    "EP": 0.99984,
+    "ci": {
+     "MED": 5.79588,
+     "MSE": 28306.7,
+     "NMED": 0.0000442198,
+     "MRED": 0.000287312,
+     "EP": 0.0000554327
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 2028.48,
+     "WCE": 5911,
+     "MSE": 5762300,
+     "NMED": 0.0154763,
+     "MRED": 0.131137,
+     "EP": 0.969879,
+     "ci": {
+      "MED": 13.898,
+      "MSE": 60549.2,
+      "NMED": 0.000106035,
+      "MRED": 0.00302648,
+      "EP": 0.00185065
+     }
+    },
+    "image": {
+     "MED": 2234.98,
+     "WCE": 5996,
+     "MSE": 6915760,
+     "NMED": 0.0170518,
+     "MRED": 0.213003,
+     "EP": 0.999725,
+     "ci": {
+      "MED": 15.0056,
+      "MSE": 74456.8,
+      "NMED": 0.000114485,
+      "MRED": 0.00270949,
+      "EP": 0.000179419
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 1.63,
+    "WCEpct": 4.63,
+    "EPpct": 99.99,
+    "MREpct": 4.52,
+    "pdk45": {
+     "power_mW": 0.013,
+     "area_um2": 29.1,
+     "delay_ns": 0.3
+    }
+   },
+   "sha256": "4dc6802e4b9c0af393e136e81a48d9cd0d4cb17f5df940f541335e6e4e94bc80"
+  },
+  {
+   "name": "add16u_1B4",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mre"
+   ],
+   "asic": {
+    "area": 661.88,
+    "delay": 2015.4,
+    "energy": 899.19,
+    "leakage": 0.271,
+    "cells": 76,
+    "energyApp": {
+     "lenet": 709.29,
+     "image": 759.82
+    },
+    "flows": {
+     "delay": {
+      "area": 661.88,
+      "cells": 76,
+      "delayAbc": 1714.06,
+      "delay": 2015.4,
+      "energy": 899.19,
+      "leakage": 0.271,
+      "pins": 285,
+      "sha256": "0c036f67a431440f81b5266309c9a014220dba405bd75f2044d6fcce0f84f640"
+     },
+     "area": {
+      "area": 399.13,
+      "cells": 47,
+      "delayAbc": 4906.53,
+      "delay": 5096.6,
+      "energy": 434.45,
+      "leakage": 0.163,
+      "pins": 203,
+      "sha256": "5be1c9a27313af75a1a5de56bb92f95e0dd217e368ab5679fc06b08c9f3ff5d0"
+     },
+     "iso": {
+      "area": 661.88,
+      "cells": 76,
+      "delayAbc": 1714.06,
+      "delay": 2015.4,
+      "energy": 899.19,
+      "leakage": 0.271,
+      "pins": 285,
+      "sha256": "0c036f67a431440f81b5266309c9a014220dba405bd75f2044d6fcce0f84f640",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 0.751085,
+    "WCE": 2,
+    "MSE": 1.00152,
+    "NMED": 0.00000573041,
+    "MRED": 0.0000174166,
+    "EP": 0.625865,
+    "ci": {
+     "MED": 0.00289854,
+     "MSE": 0.00536967,
+     "NMED": 2.21144e-8,
+     "MRED": 1.92084e-7,
+     "EP": 0.00212078
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 0.598236,
+     "WCE": 2,
+     "MSE": 0.6586,
+     "NMED": 0.00000456425,
+     "MRED": 0.000176045,
+     "EP": 0.568054,
+     "ci": {
+      "MED": 0.00593755,
+      "MSE": 0.00829585,
+      "NMED": 4.53006e-8,
+      "MRED": 0.0000915954,
+      "EP": 0.00536341
+     }
+    },
+    "image": {
+     "MED": 0.61496,
+     "WCE": 2,
+     "MSE": 0.78714,
+     "NMED": 0.00000469184,
+     "MRED": 0.0000532799,
+     "EP": 0.52887,
+     "ci": {
+      "MED": 0.00692427,
+      "MSE": 0.0118641,
+      "NMED": 5.28288e-8,
+      "MRED": 0.00000102191,
+      "EP": 0.00540475
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.00061,
+    "WCEpct": 0.0015,
+    "EPpct": 62.5,
+    "MREpct": 0.0017,
+    "pdk45": {
+     "power_mW": 0.067,
+     "area_um2": 132.8,
+     "delay_ns": 1.2
+    }
+   },
+   "sha256": "65e77162854aee076c2f51b16f8fc350d29f5982f6ad24cd21fff22ebbce9bfa"
+  },
+  {
+   "name": "add16u_0KC",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse",
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 125.12,
+    "delay": 491.8,
+    "energy": 138.72,
+    "leakage": 0.068,
+    "cells": 16,
+    "energyApp": {
+     "lenet": 114.83,
+     "image": 58.92
+    },
+    "flows": {
+     "delay": {
+      "area": 125.12,
+      "cells": 16,
+      "delayAbc": 274.15,
+      "delay": 491.8,
+      "energy": 138.72,
+      "leakage": 0.068,
+      "pins": 101,
+      "sha256": "a189086fde9b785ebd351f1aa64d096cd3383687c7e94eb4453dae9a0b6655d9"
+     },
+     "area": {
+      "area": 58.81,
+      "cells": 10,
+      "delayAbc": 543.07,
+      "delay": 727.8,
+      "energy": 74.14,
+      "leakage": 0.035,
+      "pins": 79,
+      "sha256": "e0ef46abddb014947ca9d22049d24343ada3701954e8dc1a239fd4e7a2fdeb56"
+     },
+     "iso": {
+      "area": 58.81,
+      "cells": 10,
+      "delayAbc": 543.07,
+      "delay": 727.8,
+      "energy": 74.14,
+      "leakage": 0.035,
+      "pins": 79,
+      "sha256": "e0ef46abddb014947ca9d22049d24343ada3701954e8dc1a239fd4e7a2fdeb56",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 6152.85,
+    "WCE": 12387,
+    "MSE": 43476200,
+    "NMED": 0.0469432,
+    "MRED": 0.126323,
+    "EP": 0.999995,
+    "ci": {
+     "MED": 10.3886,
+     "MSE": 131323,
+     "NMED": 0.0000792598,
+     "MRED": 0.00057487,
+     "EP": 0.00000979998
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 4232.6,
+     "WCE": 12253,
+     "MSE": 23701500,
+     "NMED": 0.0322926,
+     "MRED": 1.73223,
+     "EP": 0.999969,
+     "ci": {
+      "MED": 26.0461,
+      "MSE": 235543,
+      "NMED": 0.000198719,
+      "MRED": 0.0897648,
+      "EP": 0.0000598135
+     }
+    },
+    "image": {
+     "MED": 6327.25,
+     "WCE": 12314,
+     "MSE": 46056100,
+     "NMED": 0.0482738,
+     "MRED": 0.498513,
+     "EP": 1,
+     "ci": {
+      "MED": 26.5708,
+      "MSE": 348030,
+      "NMED": 0.000202722,
+      "MRED": 0.00357523,
+      "EP": 0
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 4.69,
+    "WCEpct": 9.49,
+    "EPpct": 100,
+    "MREpct": 12.64,
+    "pdk45": {
+     "power_mW": 0.0079,
+     "area_um2": 20.2,
+     "delay_ns": 0.19
+    }
+   },
+   "sha256": "8f4b332aa9fbbbe4e839a09069b1d6ddfd700d5b82f58162aecd73b8ee6efbd5"
+  },
+  {
+   "name": "add16u_0M6",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 259,
+    "delay": 842.5,
+    "energy": 336.83,
+    "leakage": 0.134,
+    "cells": 34,
+    "energyApp": {
+     "lenet": 300.39,
+     "image": 258.02
+    },
+    "flows": {
+     "delay": {
+      "area": 259,
+      "cells": 34,
+      "delayAbc": 610.21,
+      "delay": 842.5,
+      "energy": 336.83,
+      "leakage": 0.134,
+      "pins": 152,
+      "sha256": "e78a8a87383a497d6d672a23d6919b251774670e238c7bc39cbb1324d9b6687b"
+     },
+     "area": {
+      "area": 141.39,
+      "cells": 19,
+      "delayAbc": 1638.96,
+      "delay": 1825,
+      "energy": 158.51,
+      "leakage": 0.067,
+      "pins": 109,
+      "sha256": "f37368f7ca1e855a5572a260703e98a3516feec37a80385f9d2f040a9e1eff50"
+     },
+     "iso": {
+      "area": 157.65,
+      "cells": 23,
+      "delayAbc": 989.44,
+      "delay": 1131.6,
+      "energy": 182.22,
+      "leakage": 0.084,
+      "pins": 119,
+      "sha256": "bcf0b8f025189c9e237773461f299b2ffd9928c102d5fcde34412b7c254fce2b",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 711.742,
+    "WCE": 2353,
+    "MSE": 761576,
+    "NMED": 0.00543025,
+    "MRED": 0.0148797,
+    "EP": 0.99962,
+    "ci": {
+     "MED": 2.21315,
+     "MSE": 4067.75,
+     "NMED": 0.0000168852,
+     "MRED": 0.000103481,
+     "EP": 0.0000854182
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 678.088,
+     "WCE": 2324,
+     "MSE": 699785,
+     "NMED": 0.00517348,
+     "MRED": 0.0820493,
+     "EP": 0.999817,
+     "ci": {
+      "MED": 5.3042,
+      "MSE": 8764.85,
+      "NMED": 0.0000404684,
+      "MRED": 0.00238669,
+      "EP": 0.000146501
+     }
+    },
+    "image": {
+     "MED": 719.307,
+     "WCE": 2329,
+     "MSE": 773924,
+     "NMED": 0.00548796,
+     "MRED": 0.0653136,
+     "EP": 0.999603,
+     "ci": {
+      "MED": 5.48394,
+      "MSE": 9997.33,
+      "NMED": 0.0000418398,
+      "MRED": 0.000914941,
+      "EP": 0.000215621
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.54,
+    "WCEpct": 1.8,
+    "EPpct": 99.96,
+    "MREpct": 1.5,
+    "pdk45": {
+     "power_mW": 0.022,
+     "area_um2": 46.9,
+     "delay_ns": 0.43
+    }
+   },
+   "sha256": "6174e587cd3cee808c898840416341839d6f552980cc4bfc8b642377d7bbba59"
+  },
+  {
+   "name": "add16u_0Q7",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 514.24,
+    "delay": 1576.7,
+    "energy": 700.4,
+    "leakage": 0.265,
+    "cells": 82,
+    "energyApp": {
+     "lenet": 612.69,
+     "image": 628.6
+    },
+    "flows": {
+     "delay": {
+      "area": 514.24,
+      "cells": 82,
+      "delayAbc": 1313.76,
+      "delay": 1576.7,
+      "energy": 700.4,
+      "leakage": 0.265,
+      "pins": 307,
+      "sha256": "aecd8cb24348f28970baf67fb007d0f917c109c260e6f2eae80e0ba49633b683"
+     },
+     "area": {
+      "area": 344.08,
+      "cells": 66,
+      "delayAbc": 2333.47,
+      "delay": 2541.8,
+      "energy": 447.84,
+      "leakage": 0.17,
+      "pins": 249,
+      "sha256": "c4b26f0f752bbc88fe83b555ef68eb177b542227dc444cd4e51e4ca7034912ec"
+     },
+     "iso": {
+      "area": 514.24,
+      "cells": 82,
+      "delayAbc": 1313.76,
+      "delay": 1576.7,
+      "energy": 700.4,
+      "leakage": 0.265,
+      "pins": 307,
+      "sha256": "aecd8cb24348f28970baf67fb007d0f917c109c260e6f2eae80e0ba49633b683",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 8.33327,
+    "WCE": 23,
+    "MSE": 95.8483,
+    "NMED": 0.0000635787,
+    "MRED": 0.000174684,
+    "EP": 0.96913,
+    "ci": {
+     "MED": 0.0225208,
+     "MSE": 0.426478,
+     "NMED": 1.71823e-7,
+     "MRED": 0.00000143522,
+     "EP": 0.000758054
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 8.48627,
+     "WCE": 23,
+     "MSE": 108.105,
+     "NMED": 0.0000647461,
+     "MRED": 0.0337275,
+     "EP": 0.933167,
+     "ci": {
+      "MED": 0.0650451,
+      "MSE": 1.25224,
+      "NMED": 4.96262e-7,
+      "MRED": 0.0019219,
+      "EP": 0.00270401
+     }
+    },
+    "image": {
+     "MED": 8.75671,
+     "WCE": 22,
+     "MSE": 113.558,
+     "NMED": 0.0000668094,
+     "MRED": 0.000822258,
+     "EP": 0.946991,
+     "ci": {
+      "MED": 0.0657525,
+      "MSE": 1.29628,
+      "NMED": 5.01659e-7,
+      "MRED": 0.0000130963,
+      "EP": 0.00242593
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0063,
+    "WCEpct": 0.018,
+    "EPpct": 96.88,
+    "MREpct": 0.018,
+    "pdk45": {
+     "power_mW": 0.051,
+     "area_um2": 100.4,
+     "delay_ns": 0.95
+    }
+   },
+   "sha256": "4bd0dc8c77840be74fdd5ece0696a3bf1ab11dbc54c3d15ff10af7cba0766398"
+  },
+  {
+   "name": "add16u_0QC",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_mse"
+   ],
+   "asic": {
+    "area": 510.49,
+    "delay": 1312,
+    "energy": 643.2,
+    "leakage": 0.268,
+    "cells": 69,
+    "energyApp": {
+     "lenet": 574.93,
+     "image": 558.18
+    },
+    "flows": {
+     "delay": {
+      "area": 510.49,
+      "cells": 69,
+      "delayAbc": 1052.26,
+      "delay": 1312,
+      "energy": 643.2,
+      "leakage": 0.268,
+      "pins": 266,
+      "sha256": "1ec8da00b510c7bea85ff4c185362d38b2ce2a4ea51e81edf4a93faf8554d664"
+     },
+     "area": {
+      "area": 287.78,
+      "cells": 53,
+      "delayAbc": 1928.92,
+      "delay": 2120.5,
+      "energy": 368.19,
+      "leakage": 0.14,
+      "pins": 210,
+      "sha256": "a70bdb65518b89ee5749e8be6e23aeee6cbebf69287c673ecdd515b4d09745d2"
+     },
+     "iso": {
+      "area": 510.49,
+      "cells": 69,
+      "delayAbc": 1052.26,
+      "delay": 1312,
+      "energy": 643.2,
+      "leakage": 0.268,
+      "pins": 266,
+      "sha256": "1ec8da00b510c7bea85ff4c185362d38b2ce2a4ea51e81edf4a93faf8554d664",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 25.4242,
+    "WCE": 89,
+    "MSE": 975.548,
+    "NMED": 0.000193974,
+    "MRED": 0.000530126,
+    "EP": 0.98786,
+    "ci": {
+     "MED": 0.0795138,
+     "MSE": 5.36098,
+     "NMED": 6.06651e-7,
+     "MRED": 0.0000040742,
+     "EP": 0.000479952
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 36.9954,
+     "WCE": 89,
+     "MSE": 1866.49,
+     "NMED": 0.000282257,
+     "MRED": 1.26677,
+     "EP": 0.994629,
+     "ci": {
+      "MED": 0.241587,
+      "MSE": 19.8327,
+      "NMED": 0.00000184319,
+      "MRED": 0.0746614,
+      "EP": 0.000791394
+     }
+    },
+    "image": {
+     "MED": 28.4395,
+     "WCE": 88,
+     "MSE": 1208.08,
+     "NMED": 0.000216979,
+     "MRED": 0.00262435,
+     "EP": 0.987671,
+     "ci": {
+      "MED": 0.216355,
+      "MSE": 16.0464,
+      "NMED": 0.00000165069,
+      "MRED": 0.0000386977,
+      "EP": 0.00119482
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.019,
+    "WCEpct": 0.068,
+    "EPpct": 98.83,
+    "MREpct": 0.054,
+    "pdk45": {
+     "power_mW": 0.043,
+     "area_um2": 90.6,
+     "delay_ns": 0.8
+    }
+   },
+   "sha256": "bca8e7b460c4a1abb8b3f5a93156cf2c4ec76c4ac72bb54a9401ab75d4dd7d2c"
+  },
+  {
+   "name": "add16u_02U",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 406.64,
+    "delay": 962.4,
+    "energy": 503.02,
+    "leakage": 0.188,
+    "cells": 39,
+    "energyApp": {
+     "lenet": 455.83,
+     "image": 397.1
+    },
+    "flows": {
+     "delay": {
+      "area": 406.64,
+      "cells": 39,
+      "delayAbc": 722.48,
+      "delay": 962.4,
+      "energy": 503.02,
+      "leakage": 0.188,
+      "pins": 166,
+      "sha256": "fac4aa4015d2f4dbd8cb4248e8b9f3903566816b335f619d4c3df71bba1d6522"
+     },
+     "area": {
+      "area": 182.68,
+      "cells": 33,
+      "delayAbc": 1279.97,
+      "delay": 1368,
+      "energy": 229.41,
+      "leakage": 0.091,
+      "pins": 151,
+      "sha256": "47f32a02c86326adc2c96a8b7302d1c43f63a0fd94b6a8fcd9171f697902d70c"
+     },
+     "iso": {
+      "area": 198.94,
+      "cells": 41,
+      "delayAbc": 930.46,
+      "delay": 1056.8,
+      "energy": 239.47,
+      "leakage": 0.127,
+      "pins": 170,
+      "sha256": "0ccf4bf0847495789e64eb357c0499b6bf39a2993bb0ac3fb92e721a2ea6c59b",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 260.658,
+    "WCE": 650,
+    "MSE": 92471.3,
+    "NMED": 0.00198869,
+    "MRED": 0.00547724,
+    "EP": 0.999,
+    "ci": {
+     "MED": 0.686404,
+     "MSE": 392.634,
+     "NMED": 0.00000523693,
+     "MRED": 0.0000417796,
+     "EP": 0.000138524
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 247.216,
+     "WCE": 640,
+     "MSE": 87733.7,
+     "NMED": 0.00188613,
+     "MRED": 0.0558695,
+     "EP": 0.969147,
+     "ci": {
+      "MED": 1.76653,
+      "MSE": 1001.16,
+      "NMED": 0.0000134777,
+      "MRED": 0.00211206,
+      "EP": 0.0018723
+     }
+    },
+    "image": {
+     "MED": 263.909,
+     "WCE": 649,
+     "MSE": 93484.8,
+     "NMED": 0.00201349,
+     "MRED": 0.0239893,
+     "EP": 0.99939,
+     "ci": {
+      "MED": 1.6717,
+      "MSE": 961.396,
+      "NMED": 0.0000127542,
+      "MRED": 0.000304588,
+      "EP": 0.000267417
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.2,
+    "WCEpct": 0.5,
+    "EPpct": 99.9,
+    "MREpct": 0.55,
+    "pdk45": {
+     "power_mW": 0.027,
+     "area_um2": 55.8,
+     "delay_ns": 0.54
+    }
+   },
+   "sha256": "a7d2c34129ffdaa9b4ffb91a2930a44bbc87d30ccb645bea12b2188260bde2b8"
+  },
+  {
+   "name": "add16u_08F",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 512.99,
+    "delay": 1623.6,
+    "energy": 692.24,
+    "leakage": 0.223,
+    "cells": 62,
+    "energyApp": {
+     "lenet": 607.5,
+     "image": 618.31
+    },
+    "flows": {
+     "delay": {
+      "area": 512.99,
+      "cells": 62,
+      "delayAbc": 1377.69,
+      "delay": 1623.6,
+      "energy": 692.24,
+      "leakage": 0.223,
+      "pins": 242,
+      "sha256": "7830943b1b35ef636052c1fd0446b4794b35e3bdaf5feab92ad030b38af58ef1"
+     },
+     "area": {
+      "area": 316.55,
+      "cells": 38,
+      "delayAbc": 3864.28,
+      "delay": 4006,
+      "energy": 349.65,
+      "leakage": 0.126,
+      "pins": 173,
+      "sha256": "714467c1c80ae7742098508f3c29a30907ef407843abeb828091a26687f271ef"
+     },
+     "iso": {
+      "area": 512.99,
+      "cells": 62,
+      "delayAbc": 1377.69,
+      "delay": 1623.6,
+      "energy": 692.24,
+      "leakage": 0.223,
+      "pins": 242,
+      "sha256": "7830943b1b35ef636052c1fd0446b4794b35e3bdaf5feab92ad030b38af58ef1",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 6.33882,
+    "WCE": 19,
+    "MSE": 59.8662,
+    "NMED": 0.0000483621,
+    "MRED": 0.000129145,
+    "EP": 0.957265,
+    "ci": {
+     "MED": 0.0194454,
+     "MSE": 0.319282,
+     "NMED": 1.48359e-7,
+     "MRED": 0.00000104052,
+     "EP": 0.000886439
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 9.15717,
+     "WCE": 19,
+     "MSE": 108.308,
+     "NMED": 0.0000698647,
+     "MRED": 0.228116,
+     "EP": 0.983124,
+     "ci": {
+      "MED": 0.0535433,
+      "MSE": 1.03801,
+      "NMED": 4.08509e-7,
+      "MRED": 0.0134279,
+      "EP": 0.00139467
+     }
+    },
+    "image": {
+     "MED": 8.48468,
+     "WCE": 17,
+     "MSE": 95.7444,
+     "NMED": 0.000064734,
+     "MRED": 0.000805906,
+     "EP": 0.976898,
+     "ci": {
+      "MED": 0.0527722,
+      "MSE": 0.984749,
+      "NMED": 4.02626e-7,
+      "MRED": 0.0000115375,
+      "EP": 0.00162659
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0048,
+    "WCEpct": 0.014,
+    "EPpct": 95.7,
+    "MREpct": 0.013,
+    "pdk45": {
+     "power_mW": 0.052,
+     "area_um2": 106.1,
+     "delay_ns": 0.96
+    }
+   },
+   "sha256": "f668f3436f46801f75713e02647e941fe953cab8573b6a243e0ab37b993f0871"
+  },
+  {
+   "name": "add16u_09P",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 432.92,
+    "delay": 1191.5,
+    "energy": 560.7,
+    "leakage": 0.21,
+    "cells": 48,
+    "energyApp": {
+     "lenet": 493.63,
+     "image": 470.32
+    },
+    "flows": {
+     "delay": {
+      "area": 432.92,
+      "cells": 48,
+      "delayAbc": 948.41,
+      "delay": 1191.5,
+      "energy": 560.7,
+      "leakage": 0.21,
+      "pins": 194,
+      "sha256": "85913d72c0769df20036dfe23625211d90bed805b431156aa9fcebde2f988947"
+     },
+     "area": {
+      "area": 228.97,
+      "cells": 29,
+      "delayAbc": 2676.07,
+      "delay": 2808,
+      "energy": 252.37,
+      "leakage": 0.099,
+      "pins": 142,
+      "sha256": "9824822ffd1ec562d09d482f49dc8819ec0952964c6d5b361a1378b02cc23640"
+     },
+     "iso": {
+      "area": 304.04,
+      "cells": 48,
+      "delayAbc": 1006.06,
+      "delay": 1170.9,
+      "energy": 396.66,
+      "leakage": 0.159,
+      "pins": 194,
+      "sha256": "ca6321c38d04d8811e07b1524452a5611be0bd1af2d6d89f1275d3d53b6182df",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 65.3136,
+    "WCE": 174,
+    "MSE": 5622.84,
+    "NMED": 0.000498311,
+    "MRED": 0.00137625,
+    "EP": 0.9972,
+    "ci": {
+     "MED": 0.161446,
+     "MSE": 23.5014,
+     "NMED": 0.00000123175,
+     "MRED": 0.0000113901,
+     "EP": 0.000231585
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 56.6631,
+     "WCE": 170,
+     "MSE": 4599.04,
+     "NMED": 0.000432312,
+     "MRED": 0.040236,
+     "EP": 0.96637,
+     "ci": {
+      "MED": 0.40344,
+      "MSE": 52.4744,
+      "NMED": 0.00000307805,
+      "MRED": 0.00198878,
+      "EP": 0.00195195
+     }
+    },
+    "image": {
+     "MED": 63.3976,
+     "WCE": 175,
+     "MSE": 5449.5,
+     "NMED": 0.000483692,
+     "MRED": 0.0056598,
+     "EP": 0.9953,
+     "ci": {
+      "MED": 0.409485,
+      "MSE": 59.1864,
+      "NMED": 0.00000312417,
+      "MRED": 0.0000739813,
+      "EP": 0.000740532
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.05,
+    "WCEpct": 0.13,
+    "EPpct": 99.71,
+    "MREpct": 0.14,
+    "pdk45": {
+     "power_mW": 0.036,
+     "area_um2": 73.7,
+     "delay_ns": 0.68
+    }
+   },
+   "sha256": "3cd5c1daa9b1153c30e1950de143c9d8f3ca62ed276fb23c850f5c5d33d68109"
+  },
+  {
+   "name": "add16u_0B4",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 256.5,
+    "delay": 963.1,
+    "energy": 338.66,
+    "leakage": 0.132,
+    "cells": 34,
+    "energyApp": {
+     "lenet": 301.88,
+     "image": 254.74
+    },
+    "flows": {
+     "delay": {
+      "area": 256.5,
+      "cells": 34,
+      "delayAbc": 610.21,
+      "delay": 963.1,
+      "energy": 338.66,
+      "leakage": 0.132,
+      "pins": 152,
+      "sha256": "9cd7bd6d46ec227992fc07c9fe2f7b335226a01745d49161a455f3deb536e85a"
+     },
+     "area": {
+      "area": 146.39,
+      "cells": 20,
+      "delayAbc": 1580.58,
+      "delay": 1733.9,
+      "energy": 168.67,
+      "leakage": 0.067,
+      "pins": 112,
+      "sha256": "042474b86e1aa9d4b72fbd2fdf8765ded292db7d5a1d2405ae9db4996438f88e"
+     },
+     "iso": {
+      "area": 153.9,
+      "cells": 28,
+      "delayAbc": 947.04,
+      "delay": 1180,
+      "energy": 184.12,
+      "leakage": 0.094,
+      "pins": 132,
+      "sha256": "ed7c03095ad124e3c4fac90de99f1cb95e2e601146ce1c198e6a03f499c26758",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 601.578,
+    "WCE": 2004,
+    "MSE": 532142,
+    "NMED": 0.00458974,
+    "MRED": 0.0127263,
+    "EP": 0.99955,
+    "ci": {
+     "MED": 1.80834,
+     "MSE": 2762.59,
+     "NMED": 0.0000137967,
+     "MRED": 0.00010055,
+     "EP": 0.00009295
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 494.459,
+     "WCE": 1987,
+     "MSE": 374488,
+     "NMED": 0.00377248,
+     "MRED": 1.04216,
+     "EP": 0.969788,
+     "ci": {
+      "MED": 3.90391,
+      "MSE": 5201.25,
+      "NMED": 0.0000297849,
+      "MRED": 0.0591316,
+      "EP": 0.00185337
+     }
+    },
+    "image": {
+     "MED": 618.597,
+     "WCE": 1999,
+     "MSE": 571133,
+     "NMED": 0.00471959,
+     "MRED": 0.0613631,
+     "EP": 0.99942,
+     "ci": {
+      "MED": 4.70061,
+      "MSE": 7440.36,
+      "NMED": 0.0000358633,
+      "MRED": 0.00116304,
+      "EP": 0.00026065
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.46,
+    "WCEpct": 1.54,
+    "EPpct": 99.95,
+    "MREpct": 1.28,
+    "pdk45": {
+     "power_mW": 0.022,
+     "area_um2": 46.9,
+     "delay_ns": 0.43
+    }
+   },
+   "sha256": "69fc0018336e65d361300b5fe23c672ee0b0520deb27d0d7340332048ea47acf"
+  },
+  {
+   "name": "add16u_0RN",
+   "kind": "add",
+   "width": 16,
+   "sets": [
+    "pareto_pwr_wce"
+   ],
+   "asic": {
+    "area": 623.1,
+    "delay": 1912.8,
+    "energy": 810.91,
+    "leakage": 0.263,
+    "cells": 70,
+    "energyApp": {
+     "lenet": 695.93,
+     "image": 723.73
+    },
+    "flows": {
+     "delay": {
+      "area": 623.1,
+      "cells": 70,
+      "delayAbc": 1604.81,
+      "delay": 1912.8,
+      "energy": 810.91,
+      "leakage": 0.263,
+      "pins": 267,
+      "sha256": "92d353591407cd5b607615eb1556e75cf7b4f6190e839155b0465f952a78b709"
+     },
+     "area": {
+      "area": 357.84,
+      "cells": 39,
+      "delayAbc": 4684.59,
+      "delay": 4823.9,
+      "energy": 379.78,
+      "leakage": 0.138,
+      "pins": 179,
+      "sha256": "fad9d6364a981a414a32bcc7f46f7d10d162a52a4f53ad8bde90bdd942c01ede"
+     },
+     "iso": {
+      "area": 623.1,
+      "cells": 70,
+      "delayAbc": 1604.81,
+      "delay": 1912.8,
+      "energy": 810.91,
+      "leakage": 0.263,
+      "pins": 267,
+      "sha256": "92d353591407cd5b607615eb1556e75cf7b4f6190e839155b0465f952a78b709",
+      "target": 1009
+     }
+    }
+   },
+   "err": {
+    "MED": 2.00038,
+    "WCE": 4,
+    "MSE": 5.00036,
+    "NMED": 0.0000152619,
+    "MRED": 0.0000421403,
+    "EP": 0.93754,
+    "ci": {
+     "MED": 0.00438015,
+     "MSE": 0.0183171,
+     "NMED": 3.34184e-8,
+     "MRED": 3.32102e-7,
+     "EP": 0.00106056
+    }
+   },
+   "errApp": {
+    "lenet": {
+     "MED": 1.92191,
+     "WCE": 4,
+     "MSE": 5.6102,
+     "NMED": 0.0000146632,
+     "MRED": 0.000516597,
+     "EP": 0.793793,
+     "ci": {
+      "MED": 0.0149894,
+      "MSE": 0.0597492,
+      "NMED": 1.14361e-7,
+      "MRED": 0.000149805,
+      "EP": 0.00438063
+     }
+    },
+    "image": {
+     "MED": 2.02423,
+     "WCE": 4,
+     "MSE": 6.21014,
+     "NMED": 0.0000154439,
+     "MRED": 0.000187326,
+     "EP": 0.798889,
+     "ci": {
+      "MED": 0.0157378,
+      "MSE": 0.0655936,
+      "NMED": 1.20071e-7,
+      "MRED": 0.00000282827,
+      "EP": 0.00434002
+     }
+    }
+   },
+   "published": {
+    "MAEpct": 0.0015,
+    "WCEpct": 0.0031,
+    "EPpct": 93.75,
+    "MREpct": 0.0042,
+    "pdk45": {
+     "power_mW": 0.06,
+     "area_um2": 115.9,
+     "delay_ns": 1.08
+    }
+   },
+   "sha256": "df46f0872c1d95121920012e6fd28aa8e20855dc0777dedff704f819c8fa7a6f"
   }
  ]
 }
