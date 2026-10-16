@@ -1,5 +1,7 @@
 # Simulador de Computação Aproximada
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23427697.svg)](https://doi.org/10.5281/zenodo.23427697)
+
 Simulador didático de **computação aproximada** (AxC), desenvolvido para o curso de **Ciência da Computação** da **Universidade Federal do Tocantins**, na família de simuladores do grupo CSER ([riscv-cpu-simulator](https://github.com/CSER-UFT/riscv-cpu-simulator), [riscv-dlp-simulator](https://github.com/CSER-UFT/riscv-dlp-simulator), [riscv-mp-simulator](https://github.com/CSER-UFT/riscv-mp-simulator), [riscv-fp-simulator](https://github.com/CSER-UFT/riscv-fp-simulator) e [riscv-cc-simulator](https://github.com/CSER-UFT/riscv-cc-simulator)).
 
 Somadores e multiplicadores aproximados são construídos porta a porta, avaliados contra a versão exata com as métricas de erro da literatura, comparados pelo custo na fronteira de Pareto e aplicados a um filtro de imagem. Roda inteiramente no navegador (HTML e JavaScript, sem dependências) e é publicado no GitHub Pages (em Settings > Pages, fonte "GitHub Actions").
@@ -59,7 +61,22 @@ A unidade é o nome mostrado na página ou uma configuração em JSON (`{"kind":
 
 ### Como citar
 
-O arquivo `CITATION.cff` traz os metadados (o GitHub mostra "Cite this repository"). Para um DOI permanente, ative a integração do repositório com o Zenodo e publique uma release: o Zenodo lê o `CITATION.cff` e atribui o DOI a cada versão. Anexe à release o `build/axc-netlists.tar.gz` gerado pelo `npm run synth`.
+O simulador está arquivado no Zenodo com o DOI [10.5281/zenodo.23427697](https://doi.org/10.5281/zenodo.23427697):
+
+> T. Almeida. *axc-simulator: Simulador de Computação Aproximada*. Zenodo, 2026. DOI: [10.5281/zenodo.23427697](https://doi.org/10.5281/zenodo.23427697).
+
+```bibtex
+@software{almeida_axc_simulator,
+  author    = {Almeida, Tiago},
+  title     = {axc-simulator: Simulador de Computação Aproximada},
+  publisher = {Zenodo},
+  year      = {2026},
+  doi       = {10.5281/zenodo.23427697},
+  url       = {https://doi.org/10.5281/zenodo.23427697}
+}
+```
+
+O arquivo `CITATION.cff` traz os mesmos metadados (o GitHub mostra "Cite this repository"). Cada release nova do repositório gera no Zenodo uma versão nova, com DOI próprio; anexe a ela o `build/axc-netlists.tar.gz` gerado pelo `npm run synth`.
 
 ## Arquivos
 

@@ -12,6 +12,11 @@ authors:
   - family-names: Almeida
     given-names: Tiago
     affiliation: "Universidade Federal do Tocantins (UFT)"
+doi: "10.5281/zenodo.23427697"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.23427697"
+    description: "Zenodo"
 repository-code: "https://github.com/CSER-UFT/axc-simulator"
 url: "https://cser-uft.github.io/axc-simulator/"
 license: GPL-3.0-only

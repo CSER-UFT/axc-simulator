@@ -217,6 +217,7 @@ export default {
             id: 'refs',
             title: 'Referências',
             html: `
+<p>Para citar o próprio simulador: T. Almeida, <em>axc-simulator: Simulador de Computação Aproximada</em>, Zenodo, 2026, DOI <a href="https://doi.org/10.5281/zenodo.23427697" target="_blank" rel="noopener">10.5281/zenodo.23427697</a>.</p>
 <p>As técnicas e os modelos do simulador vêm destes trabalhos. Os DOIs foram conferidos no Crossref ou no OpenAlex; o artigo de Dadda (1965), publicado na Alta Frequenza, não tem DOI.</p>
 ${REF_GROUPS.map((g) => `<h3>${GROUP_TITLES[g.key]}</h3>\n<ol class="refs">${g.keys.map((k) => `<li>${refHtml(k, 'pt')}</li>`).join('\n')}</ol>`).join('\n')}`,
         },
