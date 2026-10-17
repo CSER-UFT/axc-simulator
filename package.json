@@ -10,7 +10,8 @@
     "start": "node scripts/serve.mjs 8005",
     "evoapprox": "node scripts/evoapprox.mjs",
     "operands": "node scripts/operands.mjs",
-    "axc": "node bin/axc.mjs"
+    "axc": "node bin/axc.mjs",
+    "experiments": "node scripts/experiments.mjs"
   },
   "engines": {
     "node": ">=20"

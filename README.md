@@ -60,6 +60,10 @@ node bin/axc.mjs hls kernel.c --approx "16:mul8=MUL8 T4" --error --input uniform
 
 O alvo de `--approx` é um nó (`S1.3`), um grupo linha:operação (`16:mul8`), uma classe (`mul8`, `add16`, `add32`) ou `*`.
 
+### Metodologia e estudos de caso
+
+As hipóteses dos modelos de custo e de erro, as ameaças à validade e o passo a passo de reprodução estão em [`docs/METODOLOGIA.md`](docs/METODOLOGIA.md). Os estudos de caso (precisão do modelo de erro, comparação das heurísticas, fronteiras verificadas bit a bit, diretivas e período, sensibilidade aos dados) rodam com `npm run experiments` e ficam em [`results/`](results/RESULTADOS.md), em CSV, Markdown e LaTeX.
+
 ### Exploração do espaço de projeto
 
 A aba Exploração (e o comando `dse`) procura as unidades, e opcionalmente as diretivas e o período, que minimizam o objetivo com o erro dentro de um limite:
@@ -86,6 +90,7 @@ npm test           # testes (Node 20 ou mais novo; o teste do Verilog roda se ho
 npm run operands   # operandos reais da LeNet-5 e do filtro (data/operands.*)
 npm run synth      # espaço de projeto: confere e sintetiza (iverilog, yosys e sta do OpenSTA); --jobs N
 npm run evoapprox  # referência EvoApproxLib com o mesmo fluxo (depois do synth)
+npm run experiments # estudos de caso da síntese de alto nível (results/)
 ```
 
 O OpenSTA não tem pacote no Ubuntu; compila do código, com o CUDD (o `Dockerfile.ubuntu24.04` do repositório do OpenSTA mostra os passos), e o executável `sta` precisa estar no PATH.
@@ -149,6 +154,7 @@ O arquivo `CITATION.cff` traz os mesmos metadados (o GitHub mostra "Cite this re
 | `js/hls/exec.js` | execução bit a bit do projeto elaborado, perfil dos sinais, comparação das saídas (PSNR, SSIM) |
 | `js/hls/error.js` | modelo estático de erro (analítico e por amostras), recorrências, orçamento por operação |
 | `js/hls/dse.js`, `dse-worker.js` | exploração: avaliação, candidatas, heurísticas, fronteira, verificação (o worker roda na página sem travar) |
+| `scripts/experiments.mjs`, `docs/METODOLOGIA.md`, `results/` | estudos de caso reprodutíveis, metodologia e limitações, resultados (CSV, Markdown, LaTeX) |
 | `js/hls/highlight.js`, `js/ui/library.js` | destaque de sintaxe do kernel e da IR; aba Biblioteca (unidades sintetizadas, espaço de projeto, Verilog) |
 | `js/hls/index.js`, `kernels.js`, `ui.js`, `js/hls-app.js` | fluxo de síntese, exemplos, figuras (Gantt e DFG) e a página `hls.html` |
 | `scripts/hls-cells.mjs` | multiplexador, lógica, comparador e registrador medidos no fluxo sky130 (`data/hls-cells.json`) |

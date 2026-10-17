@@ -24,7 +24,7 @@
  *                que sozinha já viola a restrição (poda heurística: o erro não é monótono em geral);
  *                aleatória: amostras com sementes fixas, como referência;
  *   verificação  o melhor ponto é executado bit a bit; se o erro medido passar do limite, o próximo viável (em ordem
- *                de custo) é verificado, até maxVerify pontos. Os pontos da fronteira também podem ser verificados.
+ *                de custo) é verificado, até maxVerify pontos (25 por padrão). Os pontos da fronteira também podem ser verificados.
  */
 import { synthesize } from './index.js';
 import { estimateError, unitErrors, analyzeError } from './error.js';
@@ -86,20 +86,20 @@ const keyOf = (assign) => [...assign].filter(([, u]) => !/ exato$|2 × ADD16 exa
 function costOnly(v, assign, ctx) {
     const key = keyOf(assign);
     if (v.cache.has(key)) return v.cache.get(key).score;
-    if (!v.costCache.has(key)) {
-        const r = synthesize(v.src, { ...v.syn, design: v.design, assign });
-        v.costCache.set(key, { r, score: ctx.score(costOf(r)) });
-    }
-    return v.costCache.get(key).score;
+    // Só o número fica guardado: o resultado da síntese inteiro, para milhares de trocas, esgota a memória.
+    if (!v.costCache.has(key)) v.costCache.set(key, ctx.score(costOf(synthesize(v.src, { ...v.syn, design: v.design, assign }))));
+    return v.costCache.get(key);
 }
 
 /** Avalia uma atribuição (nó -> unidade): síntese e erro estimado, com cache. */
 function evaluate(v, assign, ctx) {
     const key = keyOf(assign);
     if (v.cache.has(key)) return v.cache.get(key);
-    const r = v.costCache.get(key)?.r ?? synthesize(v.src, { ...v.syn, design: v.design, assign });
-    // Na busca, o modelo por amostras usa até 512 instâncias por trecho (a verificação final é bit a bit).
-    const est = estimateError(r, v.prof, { method: v.method, budget: false, cache: v.ownCache, maxRows: ctx.maxRows ?? 512 });
+    const r = synthesize(v.src, { ...v.syn, design: v.design, assign });
+    // O modelo por amostras usa todas as instâncias guardadas no perfil (até 2048 por trecho). Com menos (maxRows), a
+    // busca fica mais rápida, mas o ruído da estimativa favorece os pontos estimados com folga a mais (os escolhidos
+    // perto do limite tendem a não passar na verificação).
+    const est = estimateError(r, v.prof, { method: v.method, budget: false, cache: v.ownCache, maxRows: ctx.maxRows ?? Infinity });
     const outs = [...est.outputs].map(([array, o]) => ({ array, ...o }));
     const cost = costOf(r);
     const p = { variant: v.label, clockNs: v.clockNs, key, assign: new Map(r.assign), units: r.cost.units.map((u) => `${u.count} × ${u.unit.name}`), cost, score: ctx.score(cost), outs, err: errScalar(outs), feasible: ctx.ok(outs), v };
@@ -177,9 +177,17 @@ function sequential(v, groups, ctx) {
     return { best: cur, trace };
 }
 
-/** Eficiência: a troca com a maior economia por aumento de erro, até não haver troca que economize. */
-function efficiency(v, groups, ctx, { granularity }) {
-    const choice = groups.map((g) => g.exact);
+/**
+ * Eficiência: a troca com a maior economia por aumento de erro, até não haver troca que economize.
+ *
+ * Avaliação preguiçosa (lazy greedy): cada troca guarda a eficiência da última vez em que foi avaliada; a cada passo,
+ * as refresh trocas de maior valor guardado (no mínimo) são reavaliadas no estado atual, e a melhor delas é aplicada
+ * quando nenhuma guardada passa dela. As trocas do grupo que mudou voltam a ser avaliadas com certeza. Supõe que a eficiência de uma troca não cresce quando
+ * outras são aplicadas (retorno decrescente), o que vale aproximadamente; com poucas trocas por passo (até
+ * fullBelow), a busca reavalia todas a cada passo, sem essa hipótese.
+ */
+function efficiency(v, groups, ctx, { granularity, fullBelow = 400, refresh = 40 }) {
+    let choice = groups.map((g) => g.exact);
     let cur = evaluate(v, expand(groups, choice), ctx);
     const trace = [cur];
     // Trocas de classe inteira (com grupos menores que a classe).
@@ -188,30 +196,63 @@ function efficiency(v, groups, ctx, { granularity }) {
         const cands = groups[idx[0]].cands.filter((u) => idx.every((i) => groups[i].cands.includes(u)));
         return { idx, cands };
     });
-    for (let step = 0; step < 500; step++) {
-        let best = null, bestEff = -Infinity, bestChoice = null;
-        const consider = (c) => {
-            const a = expand(groups, c);
-            // Troca que não economiza nem é avaliada no erro.
-            if (cur.score - costOnly(v, a, ctx) <= 1e-12) return;
-            const p = evaluate(v, a, ctx);
-            const ds = cur.score - p.score;
-            if (!p.feasible || ds <= 1e-12) return;
-            const de = p.err - cur.err;
-            const eff = de <= 1e-15 ? 1e15 + ds : ds / de;
-            if (eff > bestEff) { bestEff = eff; best = p; bestChoice = c; }
-        };
-        groups.forEach((g, i) => { for (const u of g.cands) if (u !== choice[i]) { const c = [...choice]; c[i] = u; consider(c); } });
-        for (const cl of classes) for (const u of cl.cands) {
-            if (cl.idx.every((i) => choice[i] === u)) continue;
-            const c = [...choice];
-            for (const i of cl.idx) c[i] = u;
-            consider(c);
+    const moves = [];
+    groups.forEach((g, i) => { for (const u of g.cands) moves.push({ idx: [i], u }); });
+    for (const cl of classes) for (const u of cl.cands) moves.push({ idx: cl.idx, u });
+    const target = (m) => { const c = [...choice]; for (const i of m.idx) c[i] = m.u; return c; };
+    const noop = (m) => m.idx.every((i) => choice[i] === m.u);
+    /** Eficiência da troca no estado atual (null se não economiza ou viola a restrição). */
+    const rate = (m) => {
+        const c = target(m), a = expand(groups, c);
+        if (cur.score - costOnly(v, a, ctx) <= 1e-12) return null;
+        const p = evaluate(v, a, ctx);
+        const ds = cur.score - p.score;
+        if (!p.feasible || ds <= 1e-12) return null;
+        const de = p.err - cur.err;
+        return { eff: de <= 1e-15 ? 1e15 + ds : ds / de, p, c };
+    };
+    const lazy = moves.length > fullBelow;
+    let entries = moves.map((m) => ({ m, eff: Infinity }));
+    for (let step = 0; step < 2000; step++) {
+        let taken = null;
+        if (!lazy) {
+            for (const e of entries) {
+                if (noop(e.m)) continue;
+                const r = rate(e.m);
+                if (r && (!taken || r.eff > taken.eff)) taken = { ...r, m: e.m };
+            }
+        } else {
+            entries = entries.filter((e) => !noop(e.m));
+            entries.sort((x, y) => y.eff - x.eff);
+            // Reavalia as trocas do topo (pelo menos refresh delas) até a melhor reavaliada passar a maior guardada.
+            const fresh = [];
+            let k = 0;
+            while (k < entries.length) {
+                const e = entries[k];
+                const best = fresh.reduce((m, x) => (x.eff > m ? x.eff : m), -Infinity);
+                if (fresh.length >= refresh && best >= e.eff) break;
+                const r = rate(e.m);
+                if (!r) { entries.splice(k, 1); continue; }
+                e.eff = r.eff;
+                fresh.push({ ...r, m: e.m });
+                k++;
+            }
+            for (const f of fresh) if (!taken || f.eff > taken.eff) taken = f;
         }
-        if (!best) break;
-        choice.splice(0, choice.length, ...bestChoice);
-        cur = best;
+        if (!taken) break;
+        choice = taken.c;
+        cur = taken.p;
         trace.push(cur);
+        if (lazy) {
+            // As trocas dos grupos que mudaram (inclusive as descartadas) são reavaliadas no próximo passo.
+            const changed = new Set(taken.m.idx);
+            const live = new Set(entries.map((e) => e.m));
+            for (const m of moves) {
+                if (!m.idx.some((i) => changed.has(i))) continue;
+                if (live.has(m)) entries.find((e) => e.m === m).eff = Infinity;
+                else entries.push({ m, eff: Infinity });
+            }
+        }
     }
     return { best: cur, trace };
 }
@@ -321,7 +362,7 @@ export function explore(src, o = {}) {
     const candMs = Date.now() - t2;
     for (const h of heuristics) {
         const t1 = Date.now();
-        const ctx = { score, ok, points: [], progress: o.progress };
+        const ctx = { score, ok, points: [], progress: o.progress, maxRows: o.maxRows };
         let best = null;
         const traces = [], last = [];
         for (const v of good) {
@@ -339,15 +380,16 @@ export function explore(src, o = {}) {
         best = ctx.points.filter((p) => p.feasible).sort((a, b) => a.score - b.score)[0] ?? ctx.points[0] ?? null;
         // Verificação bit a bit: o melhor; se não passar, o próximo viável em ordem de custo.
         const feasible = ctx.points.filter((p) => p.feasible).sort((a, b) => a.score - b.score);
-        let chosen = null;
-        for (const p of feasible.slice(0, o.maxVerify ?? 5)) {
+        let chosen = null, tries = 0;
+        for (const p of feasible.slice(0, o.maxVerify ?? 25)) {
+            tries++;
             verifyPoint(p, ok);
             if (p.measuredOk) { chosen = p; break; }
         }
         const front = paretoPoints(ctx.points);
         // Os pontos viáveis da fronteira mais baratos (os que interessam para a decisão).
         for (const p of front.filter((x) => x.feasible).slice(0, o.verifyFront ?? 0)) verifyPoint(p, ok);
-        runs.push({ heuristic: h, best, last, chosen, evals: ctx.points.length, ms: Date.now() - t1, points: ctx.points, front, traces, error: traces.find((x) => x.error)?.error ?? null });
+        runs.push({ heuristic: h, best, last, chosen, verifyTries: tries, evals: ctx.points.length, ms: Date.now() - t1, points: ctx.points, front, traces, error: traces.find((x) => x.error)?.error ?? null });
     }
     return { variants: prepared.map((v) => ({ label: v.label, error: v.error ?? null, ops: v.base?.ops.list.length ?? 0 })), ref, refScore: score(ref), runs, ms: Date.now() - t0, prepMs, candMs, options: { ...o, synth: undefined, cells: undefined, progress: undefined } };
 }
