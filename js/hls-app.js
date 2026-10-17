@@ -3,7 +3,7 @@
  */
 import { synthesize, MODEL } from './hls/index.js';
 import { KERNELS } from './hls/kernels.js';
-import { ganttSvg, dfgSvg } from './hls/ui.js';
+import { ganttSvg, dfgSvg, dseSvg } from './hls/ui.js';
 import { technique } from './hls/approx.js';
 import { analyzeError } from './hls/error.js';
 import { makeInputs, crop, inputArrays } from './hls/exec.js';
@@ -157,8 +157,8 @@ function renderTab() {
     if (!$(`pane-${tab}`)) tab = 'report';
     for (const b of $('tabs').querySelectorAll('[data-tab]')) b.classList.toggle('sel', b.dataset.tab === tab);
     for (const p of document.querySelectorAll('.pane')) p.classList.toggle('hidden', p.id !== `pane-${tab}`);
-    // A biblioteca não depende do kernel: ocupa a página toda.
-    document.querySelector('.hls-main').classList.toggle('wide', tab === 'lib');
+    // A biblioteca não depende do kernel e a exploração precisa de espaço: as duas ocupam a página toda.
+    document.querySelector('.hls-main').classList.toggle('wide', tab === 'lib' || tab === 'dse');
     if (tab === 'lib' && synthData) renderLibrary();
     if (!result) return;
     const sg = result.segs[+$('segSel').value] ?? result.segs[0];
@@ -169,7 +169,127 @@ function renderTab() {
     if (tab === 'dfg' && sg) $('dfg').innerHTML = dfgSvg(sg.seg, sg.sch);
     if (tab === 'ir') $('ir').innerHTML = highlightIR(irText(result));
     if (tab === 'approx') renderApprox();
+    if (tab === 'dse') renderDse();
 }
+
+// Exploração ------------------------------------------------------------------------------------------------------
+let dseWorker = null, dseResult = null;
+for (const id of ['dseObj', 'dseMetric', 'dseValue', 'dseGran', 'dseHeur', 'dseClocks', 'dseDir', 'dseAll', 'dseWa', 'dseWe', 'dseWl']) {
+    const el = $(id), v = store.get(`hls.${id}`);
+    if (v !== null) { if (el.type === 'checkbox') el.checked = v === '1'; else el.value = v; }
+    el.addEventListener('change', () => { store.set(`hls.${id}`, el.type === 'checkbox' ? (el.checked ? '1' : '0') : el.value); syncDse(); });
+}
+function syncDse() { $('dseWeights').style.display = $('dseObj').value === 'weighted' ? '' : 'none'; }
+syncDse();
+const dseOptions = () => ({
+    flow: $('flow').value, ports: +$('ports').value, input: $('apInput').value, method: $('apModel').value,
+    objective: $('dseObj').value, weights: { area: +$('dseWa').value, energy: +$('dseWe').value, latency: +$('dseWl').value },
+    constraint: { metric: $('dseMetric').value, value: +$('dseValue').value }, granularity: $('dseGran').value, heuristic: $('dseHeur').value,
+    clocks: $('dseClocks').value.split(/[,; ]+/).map(Number).filter((x) => x > 0), directives: $('dseDir').checked, allUnits: $('dseAll').checked,
+    verifyFront: 6,
+});
+$('dseRun').addEventListener('click', () => {
+    if (!synthData) return;
+    dseWorker?.terminate();
+    const opts = dseOptions();
+    const t0 = performance.now();
+    dseWorker = new Worker(new URL('./hls/dse-worker.js', import.meta.url), { type: 'module' });
+    $('dseRun').disabled = true; $('dseStop').disabled = false;
+    $('dseStatus').textContent = t('dse.preparing');
+    dseWorker.onmessage = (e) => {
+        const m = e.data;
+        if (m.type === 'progress') $('dseStatus').textContent = t('dse.progress', { n: nf(m.n), s: nf((performance.now() - t0) / 1000, 1) });
+        else {
+            $('dseRun').disabled = false; $('dseStop').disabled = true;
+            dseWorker.terminate(); dseWorker = null;
+            if (m.type === 'error') { $('dseStatus').textContent = m.message; return; }
+            dseResult = { ...m.result, opts };
+            $('dseStatus').textContent = t('dse.done', { s: nf(m.result.ms / 1000, 1), prep: nf(m.result.prepMs / 1000, 1), cand: nf(m.result.candMs / 1000, 1), v: m.result.variants.length });
+            renderDse();
+        }
+    };
+    dseWorker.onerror = (e) => { $('dseStatus').textContent = e.message; $('dseRun').disabled = false; $('dseStop').disabled = true; };
+    dseWorker.postMessage({ src: $('code').value, options: opts, synth: synthData, cells: cellsData });
+});
+$('dseStop').addEventListener('click', () => { dseWorker?.terminate(); dseWorker = null; $('dseRun').disabled = false; $('dseStop').disabled = true; $('dseStatus').textContent = t('dse.stopped'); });
+
+function fmtScore(v, obj) {
+    if (v === null || v === undefined) return '-';
+    switch (obj) {
+        case 'area': return `${nf(v)} µm²`;
+        case 'luts': return nf(v);
+        case 'energy': return `${nf(v / 1e6, 1)} nJ`;
+        case 'latency': case 'interval': return `${nf(v, 1)} ns`;
+        default: return nf(v, 3);
+    }
+}
+const hName = (h) => t(`dse.h.${h}`);
+function renderDse() {
+    $('dseKernel').textContent = result ? t('dse.kernel', { k: result.design.name, n: result.ops.list.length }) : '';
+    const R = dseResult;
+    if (!R) { $('dseRuns').innerHTML = ''; $('dseFig').innerHTML = ''; $('dseFront').innerHTML = ''; return; }
+    const obj = R.opts.objective, ps = (x) => (x === null || x === undefined ? '-' : x === Infinity ? '∞' : nf(x, 2));
+    const minP = (arr) => (arr ? Math.min(...arr.map((o) => o.PSNR)) : null);
+    const pctS = (x) => `${nf(100 * x, 1)}%`;
+    $('dseRuns').innerHTML = `<tr><th class="left">${t('dse.th.heuristic')}</th><th>${t('dse.th.evals')}</th><th>${t('dse.th.time')}</th><th>${t('dse.th.cost')}</th><th>${t('dse.th.savings')}</th><th>PSNR (${t('dse.estMeas')})</th><th class="left">${t('dse.th.units')}</th><th></th></tr>`
+        + R.runs.map((r, k) => {
+            const p = r.chosen ?? r.best;
+            if (!p || r.error) return `<tr><td class="left">${esc(hName(r.heuristic))}</td><td>${nf(r.evals)}</td><td>${nf(r.ms / 1000, 1)} s</td><td colspan="5" class="left note">${esc(r.error ?? '-')}</td></tr>`;
+            return `<tr><td class="left">${esc(hName(r.heuristic))}</td><td>${nf(r.evals)}</td><td>${nf(r.ms / 1000, 1)} s</td><td>${fmtScore(p.score, obj)}</td>`
+                + `<td>${t('dse.sav', { a: pctS(p.savings.area), e: pctS(p.savings.energy), l: pctS(p.savings.latency) })}</td><td>${ps(minP(p.estimated))} / ${ps(minP(p.measured))}${r.chosen ? '' : ` <span class="note">${t('dse.notVerified')}</span>`}</td>`
+                + `<td class="units">${esc(p.variant)}<br>${esc(p.units.join(', '))}</td><td><button type="button" class="btn outline" data-apply="${k}:best">${t('dse.apply')}</button></td></tr>`;
+        }).join('');
+    const names = { exact: t('dse.exact'), y: t('dse.yLabel'), ...Object.fromEntries(['efficiency', 'sequential', 'exhaustive', 'random'].map((h) => [h, hName(h)])) };
+    const xLabel = `${t(`dse.obj.${obj}`)}${obj === 'weighted' ? ` (${t('dse.exactIs', { v: nf(R.refScore, 2) })})` : ''}`;
+    $('dseFig').innerHTML = dseSvg(R.runs.filter((r) => !r.error), { xLabel, psnrMin: R.opts.constraint.metric === 'psnr' ? R.opts.constraint.value : null, refScore: R.refScore, names, chosenLabel: t('dse.chosen') });
+    $('dseFigNote').textContent = t('dse.figNote', { v: R.variants.map((v) => v.label + (v.error ? ` (${v.error})` : '')).join('; ') });
+    const sel = $('dseFrontSel'), prev = sel.value;
+    sel.innerHTML = R.runs.map((r, k) => `<option value="${k}">${esc(hName(r.heuristic))}</option>`).join('');
+    if (prev && +prev < R.runs.length) sel.value = prev;
+    const r = R.runs[+sel.value || 0];
+    const bestKey = (r.chosen ?? r.best);
+    $('dseFront').innerHTML = `<tr><th>${t('dse.th.cost')}</th><th>µm²</th><th>LUT</th><th>nJ</th><th>${t('dse.th.latency')}</th><th>PSNR (${t('dse.estMeas')})</th><th></th><th class="left">${t('dse.th.units')}</th><th></th></tr>`
+        + r.front.map((p, i) => `<tr class="${bestKey && p.score === bestKey.score && p.variant === bestKey.variant ? 'best' : ''}"><td>${fmtScore(p.score, obj)}</td><td>${nf(p.cost.area)}</td><td>${nf(p.cost.luts)}</td><td>${nf(p.cost.energy / 1e6, 1)}</td><td>${nf(p.cost.latency, 0)} ns</td>`
+            + `<td>${ps(minP(p.estimated))} / ${ps(minP(p.measured))}</td><td>${p.feasible ? '✓' : ''}</td><td class="units">${esc(p.variant)}<br>${esc(p.units.join(', '))}</td><td><button type="button" class="btn outline" data-apply="${+sel.value || 0}:${i}">${t('dse.apply')}</button></td></tr>`).join('');
+}
+$('dseFrontSel').addEventListener('change', () => renderDse());
+function applyPoint(p) {
+    if (p.code !== $('code').value) { $('code').value = p.code; $('example').value = 'custom'; store.set('hls.example', 'custom'); store.set('hls.code', p.code); }
+    $('clock').value = String(p.clockNs);
+    store.set('hls.clock', $('clock').value);
+    assign = new Map(Object.entries(p.assign));
+    saveAssign();
+    paintCode();
+    tab = 'approx';
+    store.set('hls.tab', tab);
+    run();
+    renderTab();
+}
+for (const id of ['dseRuns', 'dseFront']) $(id).addEventListener('click', (e) => {
+    const b = e.target.closest('[data-apply]');
+    if (!b || !dseResult) return;
+    const [k, w] = b.dataset.apply.split(':');
+    const r = dseResult.runs[+k];
+    applyPoint(w === 'best' ? r.chosen ?? r.best : r.front[+w]);
+});
+function dlFile(name, text, type) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+$('dseCsv').addEventListener('click', () => {
+    if (!dseResult) return;
+    const rows = [['heuristic', 'variant', 'clock_ns', 'score', 'area_um2', 'luts_carry4', 'energy_fJ', 'latency_ns', 'interval_ns', 'psnr_est', 'mse_est', 'psnr_measured', 'feasible', 'units']];
+    for (const r of dseResult.runs) for (const p of r.front) rows.push([r.heuristic, p.variant, p.clockNs, p.score, p.cost.area, p.cost.luts, p.cost.energy, p.cost.latency, p.cost.interval, p.estimated[0]?.PSNR, p.estimated[0]?.MSE, p.measured?.[0]?.PSNR ?? '', p.feasible, p.units.join(' + ')]);
+    dlFile('axc-dse-front.csv', `${rows.map((x) => x.map((c) => (typeof c === 'string' && /[",]/.test(c) ? `"${c.replace(/"/g, '""')}"` : c)).join(',')).join('\n')}\n`, 'text/csv');
+});
+$('dseJson').addEventListener('click', () => {
+    if (!dseResult) return;
+    const { runs, ...rest } = dseResult;
+    dlFile('axc-dse.json', `${JSON.stringify({ ...rest, runs: runs.map((r) => ({ ...r, front: r.front.map(({ code, ...p }) => p), best: r.best && (({ code, ...p }) => p)(r.best), chosen: r.chosen && (({ code, ...p }) => p)(r.chosen) })) }, null, 1)}\n`, 'application/json');
+});
 
 // Aproximação ---------------------------------------------------------------------------------------------------
 for (const id of ['apInput', 'apModel']) {

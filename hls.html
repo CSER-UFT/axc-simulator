@@ -59,6 +59,7 @@
                         <button type="button" class="btn" data-tab="sched" data-i18n="hls.tab.sched">Escalonamento</button>
                         <button type="button" class="btn" data-tab="dfg" data-i18n="hls.tab.dfg">DFG</button>
                         <button type="button" class="btn" data-tab="approx" data-i18n="hls.tab.approx">Aproximação</button>
+                        <button type="button" class="btn" data-tab="dse" data-i18n="hls.tab.dse">Exploração</button>
                         <button type="button" class="btn" data-tab="ir" data-i18n="hls.tab.ir">IR</button>
                         <button type="button" class="btn" data-tab="lib" data-i18n="hls.tab.lib">Biblioteca</button>
                     </div>
@@ -140,6 +141,39 @@
                             <div class="fig-box" id="dsFig"></div>
                             <div><h3 id="dsFrontTitle"></h3><p class="note" data-i18n="lib.click">Clique numa linha para escolher a unidade.</p><div class="scroll-box"><table id="dsTable"></table></div></div>
                         </div>
+                    </div>
+                    <div class="pane hidden" id="pane-dse">
+                        <div class="dse-controls">
+                            <div class="row">
+                                <label style="margin:0"><span data-i18n="dse.objective">Objetivo</span> <select id="dseObj"><option value="area" data-i18n="dse.obj.area">área ASIC (µm²)</option><option value="luts" data-i18n="dse.obj.luts">LUT + CARRY4</option><option value="energy" data-i18n="dse.obj.energy">energia por execução</option><option value="latency" data-i18n="dse.obj.latency">latência (ns)</option><option value="interval" data-i18n="dse.obj.interval">intervalo entre resultados (ns)</option><option value="weighted" data-i18n="dse.obj.weighted">ponderado (área, energia, latência)</option></select></label>
+                                <span id="dseWeights" class="row" style="gap:4px"><span data-i18n="dse.weights">pesos</span> <input class="w" id="dseWa" type="number" min="0" step="0.5" value="1" title="área" /><input class="w" id="dseWe" type="number" min="0" step="0.5" value="1" title="energia" /><input class="w" id="dseWl" type="number" min="0" step="0.5" value="1" title="latência" /></span>
+                                <label style="margin:0"><span data-i18n="dse.constraint">Restrição</span> <select id="dseMetric"><option value="psnr">PSNR ≥ (dB)</option><option value="mse">MSE ≤</option></select> <input id="dseValue" type="number" step="any" value="40" /></label>
+                            </div>
+                            <div class="row">
+                                <label style="margin:0"><span data-i18n="dse.granularity">Grupos</span> <select id="dseGran"><option value="class" data-i18n="dse.gran.class">por classe (mul8, add16 ...)</option><option value="line" data-i18n="dse.gran.line">por linha do código</option><option value="op" data-i18n="dse.gran.op">por operação</option></select></label>
+                                <label style="margin:0"><span data-i18n="dse.heuristic">Heurística</span> <select id="dseHeur"><option value="efficiency" data-i18n="dse.h.efficiency">eficiência</option><option value="sequential" data-i18n="dse.h.sequential">sequencial</option><option value="exhaustive" data-i18n="dse.h.exhaustive">exaustiva com poda</option><option value="random" data-i18n="dse.h.random">aleatória</option><option value="all" data-i18n="dse.h.all">comparar todas</option></select></label>
+                                <label style="margin:0"><span data-i18n="dse.clocks">Períodos (ns)</span> <input id="dseClocks" type="text" value="5" style="width:6em" /></label>
+                                <label class="check"><input type="checkbox" id="dseDir" /> <span data-i18n="dse.directives">variar as diretivas</span></label>
+                                <label class="check"><input type="checkbox" id="dseAll" /> <span data-i18n="dse.allUnits">todas as unidades</span></label>
+                            </div>
+                            <div class="row">
+                                <span class="mono" id="dseKernel"></span>
+                                <button type="button" class="btn primary" id="dseRun" data-i18n="dse.run">Explorar</button>
+                                <button type="button" class="btn" id="dseStop" data-i18n="dse.stop" disabled>Parar</button>
+                                <span class="note" id="dseStatus"></span>
+                            </div>
+                            <p class="note" data-i18n="dse.note">Usa os dados de entrada e o modelo de erro da aba Aproximação. Cada ponto é sintetizado de novo (compartilhamento, multiplexadores e II entram no custo) e o erro vem do modelo estático; o melhor ponto é verificado bit a bit.</p>
+                        </div>
+                        <div class="scroll-box"><table id="dseRuns" class="hls-table"></table></div>
+                        <div class="fig-box" id="dseFig"></div>
+                        <p class="note" id="dseFigNote"></p>
+                        <h3 data-i18n="dse.front">Fronteira de Pareto</h3>
+                        <div class="row"><label style="margin:0"><span data-i18n="dse.frontOf">Heurística</span> <select id="dseFrontSel"></select></label><button type="button" class="btn outline" id="dseCsv" data-i18n="ds.csv">Exportar CSV</button><button type="button" class="btn outline" id="dseJson" data-i18n="ds.json">Exportar JSON</button></div>
+                        <div class="scroll-box"><table id="dseFront" class="hls-table"></table></div>
+                        <details class="hls-lang">
+                            <summary data-i18n="dse.helpTitle">Como a exploração funciona</summary>
+                            <div data-i18n-html="dse.help"></div>
+                        </details>
                     </div>
                     <div class="pane hidden" id="pane-ir">
                         <pre class="hls-ir" id="ir"></pre>

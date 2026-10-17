@@ -11,12 +11,17 @@
  *   node bin/axc.mjs lenet <multiplicador> [--add <somador>] [--layers conv1,conv2,fc1,fc2,fc3]
  *   node bin/axc.mjs hls <kernel.c | --example gauss|sobel|sharpen|fir|dot> [--clock ns] [--flow delay|area|iso] [--ports n]
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
+ *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
+ *        [--weights 1,1,1] [--psnr dB | --mse v] [--granularity class|line|op] [--heuristic sequential|efficiency|
+ *        exhaustive|random|all] [--directives] [--clocks 5,2.5] [--input image|uniform] [--model sampled|analytic]
+ *        [--all-units] [--samples n] [--verify-front n] [--csv]
  *
  * A <unidade> é o nome mostrado na página (por exemplo "MUL8 DRUM4", "MUL16 T8 A8c", "ADD16 LOA8"), procurado no
  * espaço de projeto e nas pré-definidas, ou uma configuração em JSON ({"kind":"mul","width":8,"method":"drum","k":4}).
  * No hls, --ops lista as somas e multiplicações que aceitam unidade aproximada; --approx atribui unidades (o alvo é
  * o nó, como S1.3, o grupo linha:operação, como 16:mul8, a classe, como mul8, ou *); --error estima o erro nas saídas
- * (modelo estático) e o mede na execução bit a bit.
+ * (modelo estático) e o mede na execução bit a bit. O dse explora as unidades (e, com --directives e --clocks, as
+ * diretivas e o período) com a restrição de erro e o objetivo dados; --heuristic all compara as heurísticas.
  * Todos os comandos aceitam --json.
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -34,6 +39,7 @@ import { KERNELS } from '../js/hls/kernels.js';
 import { parseAssign } from '../js/hls/approx.js';
 import { analyzeError } from '../js/hls/error.js';
 import { makeInputs } from '../js/hls/exec.js';
+import { explore, pointSummary } from '../js/hls/dse.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2);
@@ -193,6 +199,51 @@ switch (cmd) {
             `  energia ${(r.cost.energy.total / 1000).toFixed(1)} pJ por execução (operações ${(r.cost.energy.ops / 1000).toFixed(1)}, registradores ${(r.cost.energy.registers / 1000).toFixed(1)})`,
             ...r.warnings.map((w) => `  aviso, linha ${w.line}: ${w.msg}`),
             ...errText,
+        ].join('\n'));
+        break;
+    }
+    case 'dse': {
+        const ex = opt('--example');
+        const src = ex ? (KERNELS.find((k) => k.id === ex) ?? die(`exemplo desconhecido: ${ex}`)).code
+            : pos[0] ? readFileSync(pos[0], 'utf8') : die('falta o arquivo do kernel ou --example');
+        const constraint = opt('--mse') !== undefined ? { metric: 'mse', value: +opt('--mse') } : { metric: 'psnr', value: +opt('--psnr', 40) };
+        const w = (opt('--weights', '1,1,1')).split(',').map(Number);
+        let res;
+        try {
+            res = explore(src, {
+                synth: synthData(), cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')),
+                flow: opt('--flow', 'delay'), ports: +opt('--ports', 2), input: opt('--input', 'image'), method: opt('--model', 'sampled'),
+                objective: opt('--objective', 'area'), weights: { area: w[0] ?? 1, energy: w[1] ?? 1, latency: w[2] ?? 1 }, constraint,
+                granularity: opt('--granularity', 'class'), heuristic: opt('--heuristic', 'efficiency'), directives: flag('--directives'),
+                clocks: opt('--clocks', opt('--clock', '5')).split(',').map(Number), allUnits: flag('--all-units'),
+                samples: +opt('--samples', 200), verifyFront: +opt('--verify-front', 0),
+            });
+        } catch (e) { die(e.message); }
+        const runs = res.runs.map((r) => ({
+            heuristic: r.heuristic, evaluations: r.evals, ms: r.ms, error: r.error, best: pointSummary(r.best, res.ref), verified: pointSummary(r.chosen, res.ref),
+            front: r.front.map((p) => pointSummary(p, res.ref)),
+        }));
+        if (flag('--csv')) {
+            const rows = [['heuristic', 'variant', 'clock_ns', 'score', 'area_um2', 'luts_carry4', 'energy_fJ', 'latency_ns', 'interval_ns', 'psnr_est', 'mse_est', 'psnr_measured', 'feasible', 'units']];
+            for (const r of runs) for (const p of r.front) rows.push([r.heuristic, p.variant, p.clockNs, p.score, p.cost.area, p.cost.luts, p.cost.energy, p.cost.latency, p.cost.interval, p.estimated[0]?.PSNR, p.estimated[0]?.MSE, p.measured?.[0]?.PSNR ?? '', p.feasible, p.units.join(' + ')]);
+            console.log(rows.map((r) => r.map((x) => (typeof x === 'string' && /[",]/.test(x) ? `"${x.replace(/"/g, '""')}"` : x)).join(',')).join('\n'));
+            break;
+        }
+        const f = (v, d = 2) => (v === Infinity ? 'inf' : Number.isFinite(v) ? v.toFixed(d) : '-');
+        const pctS = (v) => `${(100 * v).toFixed(1)}%`;
+        out({ variants: res.variants, reference: res.ref, referenceScore: res.refScore, ms: res.ms, runs }, () => [
+            `${res.variants.length} variante(s); referência exata: área ${f(res.ref.area, 0)} µm², energia ${f(res.ref.energy / 1e6, 2)} nJ, latência ${f(res.ref.latency, 0)} ns; preparo ${res.prepMs} ms, candidatas ${res.candMs} ms`,
+            `restrição: ${constraint.metric === 'psnr' ? `PSNR >= ${constraint.value} dB` : `MSE <= ${constraint.value}`}; objetivo ${opt('--objective', 'area')}; grupos por ${opt('--granularity', 'class')}`,
+            ...runs.flatMap((r) => {
+                const b = r.verified ?? r.best;
+                if (!b) return [`  ${r.heuristic}: ${r.error ?? 'nada'}`];
+                return [
+                    `  ${r.heuristic.padEnd(11)} ${String(r.evaluations).padStart(5)} avaliações, ${r.ms} ms${r.error ? ` (${r.error})` : ''}`,
+                    `    custo ${f(b.score, 3)} (área ${pctS(b.savings.area)} menor, energia ${pctS(b.savings.energy)}, latência ${pctS(b.savings.latency)}); ${b.variant}`,
+                    `    PSNR estimado ${f(b.estimated[0]?.PSNR)} dB, medido ${b.measured ? f(b.measured[0].PSNR) : '-'} dB${r.verified ? '' : ' (nenhum ponto passou na verificação)'}`,
+                    `    ${b.units.join(', ')}`,
+                ];
+            }),
         ].join('\n'));
         break;
     }

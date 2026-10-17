@@ -115,7 +115,7 @@ export function unitErrors(result, stats, assign, cache = new Map()) {
  * @param {{stats: Map, segRows?: Map}} prof perfil da execução exata
  * @param {{intrinsic?: Map, fns?: Map, method?: 'analytic'|'sampled', seed?: number}} o
  */
-export function propagate(result, prof, { intrinsic = new Map(), fns = new Map(), method = 'analytic', seed = 99 } = {}) {
+export function propagate(result, prof, { intrinsic = new Map(), fns = new Map(), method = 'analytic', seed = 99, maxRows = Infinity } = {}) {
     const stats = prof.stats;
     const design = result.design;
     const P = method === 'sampled' ? compile(design) : null;
@@ -246,7 +246,7 @@ export function propagate(result, prof, { intrinsic = new Map(), fns = new Map()
     }
     /** Trecho refeito nas instâncias amostradas, com as unidades aproximadas e o erro de entrada como ruído. */
     function replaySeg(seg, record) {
-        const rows = prof.segRows?.get(seg.id);
+        const rows = prof.segRows?.get(seg.id)?.slice(0, maxRows);
         const prog = P.progs.get(seg);
         if (!rows?.length) { for (const n of seg.nodes) node(n, seg, record); return; }
         const loc = new Map(prog.map((ins, k) => [ins.ix, k]));
@@ -389,14 +389,14 @@ export function propagate(result, prof, { intrinsic = new Map(), fns = new Map()
  * Estimativa completa: erro próprio de cada operação, propagação até as saídas e o orçamento (a parcela do erro de
  * cada saída que vem de cada operação, propagando só o erro dela).
  */
-export function estimateError(result, prof, { cache, method = 'analytic', budget: wantBudget = true } = {}) {
+export function estimateError(result, prof, { cache, method = 'analytic', budget: wantBudget = true, maxRows = Infinity } = {}) {
     const own = unitErrors(result, prof.stats, result.assign, cache);
     const fns = new Map([...result.assign].map(([id, name]) => [id, opFunction(result.lib, result.ops.byId.get(id), name)]));
-    const total = propagate(result, prof, { intrinsic: own, fns, method });
+    const total = propagate(result, prof, { intrinsic: own, fns, method, maxRows });
     const budget = [];
     if (wantBudget) {
         for (const [id, e] of own) {
-            const alone = own.size > 1 ? propagate(result, prof, { intrinsic: new Map([[id, e]]), fns: new Map([[id, fns.get(id)]]), method }).outputs : total.outputs;
+            const alone = own.size > 1 ? propagate(result, prof, { intrinsic: new Map([[id, e]]), fns: new Map([[id, fns.get(id)]]), method, maxRows }).outputs : total.outputs;
             budget.push({ id, unit: result.assign.get(id), own: e, outputs: alone });
         }
     }

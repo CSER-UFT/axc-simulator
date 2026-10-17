@@ -59,3 +59,26 @@
 .hls-main.wide { grid-template-columns: minmax(0, 1fr); }
 .hls-main.wide > div:first-child { display: none; }
 @media (max-width: 1000px) { .hls-main { grid-template-columns: 1fr; } .page-nav { margin-left: 4px; } }
+/* Exploração: heurísticas em azul, laranja e verde-água (paleta validada para pares de pontos, claro e escuro) e a
+   aleatória como referência em cinza vazado; a forma do ponto também identifica a heurística. */
+:root { --h-eff: #2a78d6; --h-seq: #eb6834; --h-exh: #1baf7a; --h-rnd: #8b8f97; }
+:root[data-theme="dark"] { --h-eff: #3987e5; --h-seq: #d95926; --h-exh: #199e70; --h-rnd: #9aa0a8; }
+.fig-svg.hls-dse { width: 100%; height: auto; max-width: 1100px; display: block; }
+.fig-svg.hls-dse .grid { stroke: var(--line); }
+.fig-svg.hls-dse .axis { stroke: var(--muted); }
+.fig-svg.hls-dse .limit { stroke: var(--ink); stroke-dasharray: 6 4; stroke-width: 1.2; }
+.fig-svg.hls-dse .ref { stroke: var(--muted); stroke-dasharray: 2 3; }
+.fig-svg.hls-dse .pt { stroke: var(--panel); stroke-width: 1; fill-opacity: .8; }
+.fig-svg.hls-dse .pt.off { fill-opacity: .25; }
+.fig-svg.hls-dse .pt.h-random { fill: none !important; stroke: var(--h-rnd); stroke-width: 1.2; }
+.fig-svg.hls-dse .front { fill: none; stroke-width: 2; }
+.fig-svg.hls-dse .chosen { fill: none; stroke-width: 2.2; }
+.fig-svg.hls-dse .h-efficiency { fill: var(--h-eff); } .fig-svg.hls-dse .front.h-efficiency, .fig-svg.hls-dse .chosen.h-efficiency { stroke: var(--h-eff); fill: none; }
+.fig-svg.hls-dse .h-sequential { fill: var(--h-seq); } .fig-svg.hls-dse .front.h-sequential, .fig-svg.hls-dse .chosen.h-sequential { stroke: var(--h-seq); fill: none; }
+.fig-svg.hls-dse .h-exhaustive { fill: var(--h-exh); } .fig-svg.hls-dse .front.h-exhaustive, .fig-svg.hls-dse .chosen.h-exhaustive { stroke: var(--h-exh); fill: none; }
+.fig-svg.hls-dse .front.h-random, .fig-svg.hls-dse .chosen.h-random { stroke: var(--h-rnd); fill: none; }
+.dse-controls .row { margin-bottom: 6px; }
+.dse-controls input[type=number] { width: 5.5em; }
+.dse-controls input.w { width: 3.5em; }
+.hls-table tr.best td { font-weight: 600; }
+.hls-table td.units { text-align: left; font-family: var(--mono); font-size: 12px; white-space: normal; min-width: 220px; }

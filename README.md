@@ -40,7 +40,7 @@ Uma segunda página leva as unidades caracterizadas para o nível do algoritmo: 
 * escalonamento com encadeamento: as operações cabem num ciclo enquanto os atrasos da síntese sky130 somados não passam do período menos o tempo do registrador; sem pipeline, por lista; com pipeline, modular, com o II e o motivo (portas dos bancos de memória, limite de unidades ou recorrência);
 * ligação e custo: compartilhamento das unidades, multiplexadores de entrada, registradores pela vida de cada valor, contadores dos laços; área ASIC (µm²) e FPGA (LUTs, CARRY4, FF), energia por execução e latência.
 
-O relatório segue o do Vitis (latência, II por laço, recursos), com o diagrama de Gantt (as operações encadeadas aparecem dentro do ciclo), o DFG e a IR. A linha de comando roda o mesmo motor: `node bin/axc.mjs hls kernel.c --clock 5` (ou `--example gauss`). As peças além das unidades (multiplexador, lógica, comparador e o registrador dfxtp_1) foram medidas com o mesmo fluxo por `scripts/hls-cells.mjs` (`data/hls-cells.json`). As constantes do modelo (latência da memória, ciclos de controle) estão em `js/hls/sched.js` e serão calibradas contra o Vitis HLS e o Vivado. A próxima etapa é a exploração do espaço de projeto.
+O relatório segue o do Vitis (latência, II por laço, recursos), com o diagrama de Gantt (as operações encadeadas aparecem dentro do ciclo), o DFG e a IR. A linha de comando roda o mesmo motor: `node bin/axc.mjs hls kernel.c --clock 5` (ou `--example gauss`). As peças além das unidades (multiplexador, lógica, comparador e o registrador dfxtp_1) foram medidas com o mesmo fluxo por `scripts/hls-cells.mjs` (`data/hls-cells.json`). As constantes do modelo (latência da memória, ciclos de controle) estão em `js/hls/sched.js` e serão calibradas contra o Vitis HLS e o Vivado. Na aba Biblioteca ficam as unidades sintetizadas, o espaço de projeto e a exportação em Verilog; o editor e a IR têm destaque de sintaxe.
 
 ### Aproximação no kernel e erro
 
@@ -59,6 +59,24 @@ node bin/axc.mjs hls kernel.c --approx "16:mul8=MUL8 T4" --error --input uniform
 ```
 
 O alvo de `--approx` é um nó (`S1.3`), um grupo linha:operação (`16:mul8`), uma classe (`mul8`, `add16`, `add32`) ou `*`.
+
+### Exploração do espaço de projeto
+
+A aba Exploração (e o comando `dse`) procura as unidades, e opcionalmente as diretivas e o período, que minimizam o objetivo com o erro dentro de um limite:
+
+* **avaliação**: cada ponto é sintetizado de novo (o compartilhamento das unidades, os multiplexadores e o II entram no custo, por isso o custo de uma troca não é a soma dos custos das unidades) e o erro das saídas vem do modelo estático; a elaboração e o perfil exato são feitos uma vez por variante de diretivas;
+* **objetivo**: área ASIC, LUT + CARRY4, energia por execução, latência, intervalo entre resultados, ou a soma ponderada de área, energia e latência divididas pelas do projeto exato; **restrição**: PSNR mínimo ou MSE máximo em todas as saídas;
+* **grupos**: a unidade é escolhida por classe (todas as multiplicações de 8 bits juntas), por linha do código ou por operação; **candidatas**: em cada grupo, as unidades da fronteira de Pareto entre o custo da unidade e o erro próprio sobre os operandos reais do grupo;
+* **heurísticas**: sequencial (os grupos na ordem do código, multiplicações antes das somas, em cada um a candidata de menor custo que mantém a restrição), eficiência (a partir do exato, a troca com a maior economia por aumento de erro, até nenhuma economizar; com grupos menores que a classe, também a troca da classe inteira), exaustiva com poda (em ordem de custo: o primeiro viável é o ótimo do modelo) e aleatória;
+* **verificação**: o ponto viável mais barato de cada heurística é executado bit a bit; se o erro medido passar do limite, o próximo viável em ordem de custo é verificado.
+
+No gaussiano com PSNR de pelo menos 40 dB e área como objetivo, por classe as quatro heurísticas chegam ao mesmo ponto (3 × MUL8 T8 +C e 4 × ADD16 LOA6, 31% menos área, 40,2 dB medidos). Por operação, a eficiência mistura unidades e chega a 13.454 µm² (40% menos que o exato, 40,0 dB medidos), contra 16.228 µm² da sequencial: com o compartilhamento, aproximar uma operação isolada pode exigir uma unidade a mais, e a ordem do código faz a sequencial gastar o orçamento de erro primeiro nas operações que economizam menos.
+
+```
+node bin/axc.mjs dse --example gauss --psnr 40 --heuristic all --granularity op
+node bin/axc.mjs dse kernel.c --objective weighted --weights 1,1,1 --directives --clocks 5,2.5 --json
+node bin/axc.mjs dse --example fir --mse 100 --objective energy --csv > fronteira.csv
+```
 
 ## Executar
 
@@ -130,6 +148,8 @@ O arquivo `CITATION.cff` traz os mesmos metadados (o GitHub mostra "Cite this re
 | `js/hls/approx.js` | operações aproximáveis, unidades candidatas e modelos funcionais das unidades |
 | `js/hls/exec.js` | execução bit a bit do projeto elaborado, perfil dos sinais, comparação das saídas (PSNR, SSIM) |
 | `js/hls/error.js` | modelo estático de erro (analítico e por amostras), recorrências, orçamento por operação |
+| `js/hls/dse.js`, `dse-worker.js` | exploração: avaliação, candidatas, heurísticas, fronteira, verificação (o worker roda na página sem travar) |
+| `js/hls/highlight.js`, `js/ui/library.js` | destaque de sintaxe do kernel e da IR; aba Biblioteca (unidades sintetizadas, espaço de projeto, Verilog) |
 | `js/hls/index.js`, `kernels.js`, `ui.js`, `js/hls-app.js` | fluxo de síntese, exemplos, figuras (Gantt e DFG) e a página `hls.html` |
 | `scripts/hls-cells.mjs` | multiplexador, lógica, comparador e registrador medidos no fluxo sky130 (`data/hls-cells.json`) |
 | `bin/axc.mjs` | interface de linha de comando |
@@ -141,7 +161,7 @@ Os testes conferem as unidades exatas contra a aritmética (8 bits exaustivo), o
 
 ## Próximas etapas possíveis
 
-* Exploração do espaço de projeto do kernel: diretivas e unidades juntas, com limite de erro e área, energia ou atraso como objetivo, e a fronteira de Pareto.
+* Exploração: busca local depois da gulosa (trocas de duas unidades), diretivas com valores numéricos (II, fatores de unroll e de partição) e exploração em lote de vários kernels.
 * Validação e calibração contra o Vitis HLS e o Vivado.
 * Recorrências com somadores aproximados no modelo de erro (execuções consecutivas no perfil).
 * Mais técnicas (codificador de Booth aproximado, outros somadores) e somas com sinal aproximadas.

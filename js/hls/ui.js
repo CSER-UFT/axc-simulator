@@ -127,3 +127,60 @@ export function dfgSvg(seg, sch) {
     }
     return `${s}</svg>`;
 }
+
+const DSE_SHAPES = { efficiency: 'circle', sequential: 'square', exhaustive: 'triangle', random: 'ring' };
+const mark = (shape, x, y, r, cls) => {
+    if (shape === 'square') return `<rect class="${cls}" x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" rx="1"/>`;
+    if (shape === 'triangle') return `<path class="${cls}" d="M${x},${y - r * 1.2} L${x + r * 1.1},${y + r * 0.8} L${x - r * 1.1},${y + r * 0.8} Z"/>`;
+    return `<circle class="${cls}" cx="${x}" cy="${y}" r="${r}"/>`;
+};
+
+/**
+ * Pontos avaliados pela exploração: custo do objetivo (x) contra o PSNR estimado da pior saída (y), com a fronteira
+ * de cada heurística, a restrição e o projeto exato. Forma e cor identificam a heurística.
+ * @param {object[]} runs resultado da exploração (pontos e fronteira de cada heurística)
+ * @param {{xLabel: string, psnrMin?: number, refScore: number, names: object}} o
+ */
+export function dseSvg(runs, { xLabel, psnrMin = null, refScore, names, chosenLabel }) {
+    const W = 1000, H = 400, L = 64, R = 16, T = 34, B = 46;
+    const all = runs.flatMap((r) => r.points);
+    const finite = all.map((p) => p.psnr).filter(Number.isFinite);
+    const yTop = Math.ceil(Math.max(psnrMin ?? 0, ...finite, 20) / 10) * 10 + 10;
+    const yBot = Math.max(0, Math.floor(Math.min(...finite, yTop - 10) / 10) * 10, psnrMin !== null ? Math.floor((psnrMin - 20) / 10) * 10 : 0);
+    const xs = all.map((p) => p.score).concat(refScore);
+    let x0 = Math.min(...xs), x1 = Math.max(...xs);
+    const pad = (x1 - x0) * 0.04 || Math.abs(x1) * 0.05 || 1;
+    x0 -= pad; x1 += pad;
+    const X = (v) => L + ((v - x0) / (x1 - x0)) * (W - L - R);
+    const Y = (v) => T + (1 - (Math.min(v, yTop) - yBot) / (yTop - yBot)) * (H - T - B);
+    const fmt = (v) => (Math.abs(v) >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : Math.abs(v) >= 1e4 ? `${(v / 1e3).toFixed(0)}k` : Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(2));
+    let s = `<svg class="fig-svg hls-dse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img">`;
+    for (let k = 0; k <= 5; k++) {
+        const v = yBot + ((yTop - yBot) * k) / 5, y = Y(v);
+        s += `<line class="grid" x1="${L}" y1="${y}" x2="${W - R}" y2="${y}"/><text class="small muted" x="${L - 6}" y="${y + 4}" text-anchor="end">${k === 5 ? '∞' : v.toFixed(0)}</text>`;
+        const xv = x0 + ((x1 - x0) * k) / 5;
+        s += `<text class="small muted" x="${X(xv)}" y="${H - B + 16}" text-anchor="middle">${fmt(xv)}</text>`;
+    }
+    s += `<line class="axis" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H - B}"/>`;
+    s += `<text class="small" x="${(L + W - R) / 2}" y="${H - 8}" text-anchor="middle">${esc(xLabel)}</text>`;
+    s += `<text class="small" transform="translate(14 ${(T + H - B) / 2}) rotate(-90)" text-anchor="middle">${esc(names.y)}</text>`;
+    if (psnrMin !== null) s += `<line class="limit" x1="${L}" y1="${Y(psnrMin)}" x2="${W - R}" y2="${Y(psnrMin)}"/><text class="small muted" x="${W - R - 4}" y="${Y(psnrMin) - 5}" text-anchor="end">${esc(`${psnrMin} dB`)}</text>`;
+    s += `<line class="ref" x1="${X(refScore)}" y1="${T}" x2="${X(refScore)}" y2="${H - B}"/><text class="small muted" x="${X(refScore) - 4}" y="${T + 10}" text-anchor="end">${esc(names.exact)}</text>`;
+    runs.forEach((r) => {
+        const cls = `h-${r.heuristic}`, shape = DSE_SHAPES[r.heuristic] ?? 'circle';
+        for (const p of r.points) {
+            if (Number.isFinite(p.psnr) && p.psnr < yBot) continue;
+            s += `<g>${mark(shape, X(p.score), Y(p.psnr), 3.2, `pt ${cls}${p.feasible ? '' : ' off'}`)}<title>${esc(`${names[r.heuristic]}: ${fmt(p.score)}, ${Number.isFinite(p.psnr) ? p.psnr.toFixed(2) : '∞'} dB · ${p.variant}`)}</title></g>`;
+        }
+        const fr = r.front.filter((p) => !Number.isFinite(p.estimated[0]?.PSNR) || p.estimated.every((o) => o.PSNR >= yBot));
+        if (fr.length > 1) s += `<path class="front ${cls}" d="${fr.map((p, k) => `${k ? 'L' : 'M'}${X(p.score)},${Y(Math.min(...p.estimated.map((o) => o.PSNR)))}`).join(' ')}"/>`;
+        const c = r.chosen ?? r.best;
+        if (c) s += `<g>${mark(shape, X(c.score), Y(Math.min(...c.estimated.map((o) => o.PSNR))), 7, `chosen ${cls}`)}<title>${esc(`${names[r.heuristic]}: ${chosenLabel}`)}</title></g>`;
+    });
+    // Legenda: forma e cor de cada heurística.
+    runs.forEach((r, k) => {
+        const x = L + 8 + k * 190;
+        s += `${mark(DSE_SHAPES[r.heuristic] ?? 'circle', x, 16, 4.5, `pt h-${r.heuristic}`)}<text class="small" x="${x + 10}" y="20">${esc(names[r.heuristic])}</text>`;
+    });
+    return `${s}</svg>`;
+}

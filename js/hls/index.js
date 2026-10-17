@@ -15,12 +15,14 @@ export { MODEL };
 /**
  * @param {string} src código do kernel
  * @param {{synth: object, cells: object, flow?: string, target?: string, clockNs?: number, ports?: number, model?: object,
- *          assign?: Map<string, string>|object}} o assign: unidade aproximada de cada operação (id do nó -> nome)
+ *          assign?: Map<string, string>|object, design?: object}} o assign: unidade aproximada de cada operação (id do
+ *          nó -> nome); design: projeto já elaborado do mesmo código, reaproveitado
  */
-export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic', clockNs = 5, ports = 2, model = MODEL, assign = null } = {}) {
+export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic', clockNs = 5, ports = 2, model = MODEL, assign = null, design: given = null } = {}) {
     const clockPs = Math.round(clockNs * 1000);
-    const ast = parse(src);
-    const design = elaborate(ast, { ports });
+    // A elaboração é a parte cara; a exploração passa o projeto já elaborado (o mesmo código e as mesmas portas).
+    const design = given ?? elaborate(parse(src), { ports });
+    const warnings = [...design.warnings];
     const lib = makeLibrary(synth, cells, { flow, target });
     const arrays = new Map(design.arrays.map((a) => [a.name, a]));
     // Operações que aceitam unidade aproximada e a atribuição pedida (os ids que não existem mais são ignorados).
@@ -29,7 +31,7 @@ export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic',
     for (const [id, name] of assign instanceof Map ? assign : Object.entries(assign ?? {})) {
         const op = ops.byId.get(id);
         if (!op) continue;
-        if (!op.candidates.includes(name)) { design.warnings.push({ msg: `${id}: ${name} não serve para ${op.label} (ignorada)`, line: op.node.line }); continue; }
+        if (!op.candidates.includes(name)) { warnings.push({ msg: `${id}: ${name} não serve para ${op.label} (ignorada)`, line: op.node.line }); continue; }
         if (name !== op.candidates[0]) asg.set(id, name);
     }
     const schedOf = new Map();
@@ -69,7 +71,7 @@ export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic',
     const critPs = Math.max(0, ...segs.map((s) => s.sch.critPs));
     const inner = design.loops.filter((l) => l.mode === 'pipelined');
     return {
-        design, lib, segs, cost, warnings: design.warnings, model, ops, assign: asg,
+        design, lib, segs, cost, warnings, model, ops, assign: asg,
         totals: {
             cycles: totalCycles, clockPs, timeNs: (totalCycles * clockPs) / 1000, critPs,
             area: cost.area.total, luts: cost.fpga.luts, carry4: cost.fpga.carry4, ff: cost.fpga.ff, energy: cost.energy.total,
