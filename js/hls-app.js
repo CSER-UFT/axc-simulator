@@ -7,6 +7,9 @@ import { ganttSvg, dfgSvg } from './hls/ui.js';
 import { technique } from './hls/approx.js';
 import { analyzeError } from './hls/error.js';
 import { makeInputs, crop, inputArrays } from './hls/exec.js';
+import { initLibrary, renderLibrary } from './ui/library.js';
+import { highlightC, highlightIR } from './hls/highlight.js';
+import { affSource } from './hls/elab.js';
 import { esc } from './ui/plots.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale } from './i18n/index.js';
 
@@ -36,8 +39,17 @@ $('example').addEventListener('change', () => {
     const k = KERNELS.find((x) => x.id === $('example').value);
     store.set('hls.example', $('example').value);
     loadAssign();
-    if (k) { $('code').value = k.code; store.set('hls.code', ''); run(); }
+    if (k) { $('code').value = k.code; store.set('hls.code', ''); errLine = null; paintCode(); run(); }
 });
+// Editor com destaque: a camada colorida fica atrás do textarea (texto transparente) e acompanha a rolagem.
+let errLine = null;
+function paintCode() {
+    $('codeHl').innerHTML = highlightC($('code').value, errLine);
+    $('codeHl').scrollTop = $('code').scrollTop;
+    $('codeHl').scrollLeft = $('code').scrollLeft;
+}
+$('code').addEventListener('scroll', () => { $('codeHl').scrollTop = $('code').scrollTop; $('codeHl').scrollLeft = $('code').scrollLeft; });
+$('code').addEventListener('input', () => { errLine = null; paintCode(); });
 $('code').addEventListener('input', () => { $('example').value = 'custom'; store.set('hls.example', 'custom'); store.set('hls.code', $('code').value); });
 $('code').addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); run(); }
@@ -46,6 +58,7 @@ $('code').addEventListener('keydown', (e) => {
         const ta = e.target, s = ta.selectionStart;
         ta.value = `${ta.value.slice(0, s)}    ${ta.value.slice(ta.selectionEnd)}`;
         ta.selectionStart = ta.selectionEnd = s + 4;
+        paintCode();
     }
 });
 for (const id of ['clock', 'flow', 'ports']) {
@@ -64,8 +77,11 @@ function run() {
     } catch (e) {
         result = null;
         $('error').textContent = e.message;
+        errLine = e.line ?? null;
+        paintCode();
         return;
     }
+    if (errLine !== null) { errLine = null; paintCode(); }
     fillSegments();
     render();
 }
@@ -138,8 +154,12 @@ function render() {
 }
 
 function renderTab() {
+    if (!$(`pane-${tab}`)) tab = 'report';
     for (const b of $('tabs').querySelectorAll('[data-tab]')) b.classList.toggle('sel', b.dataset.tab === tab);
     for (const p of document.querySelectorAll('.pane')) p.classList.toggle('hidden', p.id !== `pane-${tab}`);
+    // A biblioteca não depende do kernel: ocupa a página toda.
+    document.querySelector('.hls-main').classList.toggle('wide', tab === 'lib');
+    if (tab === 'lib' && synthData) renderLibrary();
     if (!result) return;
     const sg = result.segs[+$('segSel').value] ?? result.segs[0];
     if (tab === 'sched' && sg) {
@@ -147,7 +167,7 @@ function renderTab() {
         $('segInfo').textContent = t('hls.segInfo', { depth: sg.sch.depth, execs: nf(sg.execs), tc: nf(sg.sch.Tc), ov: sg.sch.overhead });
     }
     if (tab === 'dfg' && sg) $('dfg').innerHTML = dfgSvg(sg.seg, sg.sch);
-    if (tab === 'ir') $('ir').textContent = irText(result);
+    if (tab === 'ir') $('ir').innerHTML = highlightIR(irText(result));
     if (tab === 'approx') renderApprox();
 }
 
@@ -274,7 +294,8 @@ function irText(r) {
                 lines.push(`${ind}${t('hls.ir.seg', { id: it.seg.id, d: sg.sch.depth })}`);
                 for (const n of it.seg.nodes) {
                     const s = sg.sch.sched.get(n.id), me = sg.sch.info.get(n.id);
-                    const what = n.op === 'load' ? `load ${n.text}` : n.op === 'store' ? `store ${n.text} ← ${n.args.map(arg).join(', ')}` : n.op === 'carry' ? `φ ${n.name} ← %${n.carryFrom ?? '?'} (${t('hls.ir.prev')})` : n.op === 'iv' ? `iv ${n.text}` : n.op === 'in' ? `in ${n.name ?? n.from}` : `${n.op}${n.cond ? ` ${n.cond}` : ''} ${n.args.map(arg).join(', ')}`;
+                    const ref = n.idx ? `${n.array}[${n.idx.map((x) => affSource(x, r.design.loops)).join('][')}]` : n.text;
+                    const what = n.op === 'load' ? `load ${ref}` : n.op === 'store' ? `store ${ref} ← ${n.args.map(arg).join(', ')}` : n.op === 'carry' ? `φ ${n.name} ← %${n.carryFrom ?? '?'} (${t('hls.ir.prev')})` : n.op === 'iv' ? `iv ${affSource(n.aff, r.design.loops)}` : n.op === 'in' ? `in ${n.name ?? n.from}` : `${n.op}${n.cond ? ` ${n.cond}` : ''} ${n.args.map(arg).join(', ')}`;
                     const unit = me.unit ? me.unit.name : '';
                     const when = s ? `c${s.cycle}${me.multi ? `..${s.cycle + me.k - 1}` : me.cls === 'free' ? '' : ` +${(s.start / 1000).toFixed(2)}ns`}` : '';
                     lines.push(`${ind}  %${n.id.padEnd(8)} = ${what.padEnd(34)} [${n.range[0]}, ${n.range[1]}]`.padEnd(ind.length + 72) + ` ${unit.padEnd(14)} ${when}`);
@@ -298,7 +319,7 @@ function applyDomTranslations() {
     for (const el of document.querySelectorAll('[data-i18n-html]')) el.innerHTML = t(el.dataset.i18nHtml);
     for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle);
     fillExamples();
-    if (result) { fillSegments(); render(); }
+    if (result) { fillSegments(); render(); } else renderTab();
 }
 langSelect.addEventListener('change', () => { setLanguage(langSelect.value); applyDomTranslations(); });
 const themeButton = $('theme-toggle');
@@ -316,6 +337,7 @@ applyDomTranslations();
 const savedCode = store.get('hls.code');
 loadAssign();
 $('code').value = $('example').value === 'custom' && savedCode ? savedCode : (KERNELS.find((k) => k.id === $('example').value) ?? KERNELS[0]).code;
+paintCode();
 Promise.all([fetch('data/synth.json').then((r) => r.json()), fetch('data/hls-cells.json').then((r) => r.json())])
-    .then(([s, c]) => { synthData = s; cellsData = c; run(); })
+    .then(([s, c]) => { synthData = s; cellsData = c; initLibrary(s, () => tab === 'lib'); run(); })
     .catch(() => { $('error').textContent = t('hls.noData'); });

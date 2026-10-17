@@ -554,5 +554,10 @@ export default {
     'hls.tech.trunc': 'truncado',
     'hls.tech.loa': 'LOA',
     'hls.tech.seg': 'segmentado',
+    'hls.tab.lib': 'Biblioteca',
+    'lib.selected': 'Unidade escolhida: {name}',
+    'lib.dlVerilog': 'Verilog (módulo e testbench)',
+    'lib.open': 'Abrir na página de unidades',
+    'lib.click': 'Clique numa linha para escolher a unidade.',
     'hls.noData': 'Não foi possível carregar a biblioteca (data/synth.json e data/hls-cells.json).',
 };

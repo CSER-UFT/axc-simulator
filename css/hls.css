@@ -4,7 +4,18 @@
 .page-nav a.sel { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
 .page-nav a:hover:not(.sel) { color: var(--ink); background: var(--panel-2); }
 .hls-main { grid-template-columns: minmax(380px, 520px) minmax(0, 1fr); }
-.code-edit { width: 100%; min-height: 420px; font-family: var(--mono); font-size: 13px; line-height: 1.45; tab-size: 4; color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px; resize: vertical; margin: 8px 0; white-space: pre; }
+.code-wrap { position: relative; margin: 8px 0; }
+.code-edit, .code-hl { font-family: var(--mono); font-size: 13px; line-height: 1.45; tab-size: 4; padding: 8px; border: 1px solid var(--line); border-radius: var(--radius); white-space: pre; overflow-wrap: normal; letter-spacing: 0; margin: 0; }
+.code-edit { position: relative; z-index: 1; display: block; width: 100%; min-height: 420px; resize: vertical; color: transparent; background: transparent; caret-color: var(--ink); overflow: auto; }
+.code-edit::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); color: transparent; }
+.code-hl { position: absolute; inset: 0; overflow: hidden; color: var(--ink); background: var(--panel-2); pointer-events: none; }
+/* Cores do destaque de sintaxe (C e IR) */
+:root { --tk-kw: #8a2be2; --tk-ty: #0b6e99; --tk-num: #b5520a; --tk-com: #6b7280; --tk-pp: #a0307a; --tk-prag: #c2410c; --tk-opt: #0f766e; --tk-val: #1d4ed8; --tk-fn: #7c3aed; --tk-lbl: #0f766e; --tk-mac: #9a6700; --tk-id: #2563eb; --tk-rng: #6b7280; --tk-err: rgba(220, 38, 38, .16); }
+:root[data-theme="dark"] { --tk-kw: #c792ea; --tk-ty: #7fdbca; --tk-num: #f78c6c; --tk-com: #8b93a1; --tk-pp: #ff9cac; --tk-prag: #ffcb6b; --tk-opt: #89ddff; --tk-val: #82aaff; --tk-fn: #c3a6ff; --tk-lbl: #addb67; --tk-mac: #ecc48d; --tk-id: #82aaff; --tk-rng: #9aa3b2; --tk-err: rgba(248, 113, 113, .22); }
+.tk-kw { color: var(--tk-kw); font-weight: 600; } .tk-ty { color: var(--tk-ty); } .tk-num { color: var(--tk-num); } .tk-com { color: var(--tk-com); font-style: italic; }
+.tk-pp { color: var(--tk-pp); } .tk-prag { color: var(--tk-prag); font-weight: 600; } .tk-opt { color: var(--tk-opt); } .tk-val { color: var(--tk-val); }
+.tk-fn { color: var(--tk-fn); } .tk-lbl { color: var(--tk-lbl); font-weight: 600; } .tk-mac { color: var(--tk-mac); } .tk-id { color: var(--tk-id); } .tk-rng { color: var(--tk-rng); }
+.tk-errline { background: var(--tk-err); display: inline-block; min-width: 100%; }
 .hls-lang { margin-top: 10px; font-size: 13px; }
 .hls-lang summary { cursor: pointer; color: var(--muted); }
 .hls-lang code { font-size: 12px; }
@@ -45,4 +56,6 @@
 .hls-table tr.grp td { background: var(--panel-2); font-weight: 600; }
 .hls-table td.expr { text-align: left; font-family: var(--mono); font-size: 12px; white-space: normal; min-width: 180px; }
 .hls-table td.dim { color: var(--muted); }
+.hls-main.wide { grid-template-columns: minmax(0, 1fr); }
+.hls-main.wide > div:first-child { display: none; }
 @media (max-width: 1000px) { .hls-main { grid-template-columns: 1fr; } .page-nav { margin-left: 4px; } }
