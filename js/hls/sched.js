@@ -8,7 +8,8 @@
  *   memória     leitura síncrona: ocupa uma porta do banco no ciclo em que é feita e o dado chega MODEL.memLatency
  *               ciclos depois; escrita ocupa uma porta no ciclo; cada banco tem as portas da memória (2 por padrão);
  *   unidades    sem allocation, cada operação pode ter a sua unidade (a ligação depois compartilha as que não se
- *               sobrepõem); com allocation instances=add|mul limit=n, no máximo n por largura;
+ *               sobrepõem); com allocation instances=add|mul limit=n, no máximo n por tipo de unidade (largura e
+ *               técnica: uma operação aproximada não usa a unidade exata, nem o contrário);
  *   sem pipeline escalonamento por lista: a operação pronta de maior prioridade (o caminho mais longo até o fim, em
  *               ps) vai para o primeiro ciclo em que as dependências e os recursos permitem;
  *   com pipeline escalonamento modular: os recursos são contados módulo II (tabela de reservas). O II começa no
@@ -40,9 +41,15 @@ export function scheduleSegment(seg, ctx) {
         const cls = opClass(n);
         const W = opWidth(n, rangeOf);
         let delay = 0, unit = null;
-        if (SHARED.has(cls)) { unit = lib.exactUnit(cls, W); delay = unit.delay; } else if (['cmp', 'mux', 'logic'].includes(cls)) { unit = lib.cell(cls, W); delay = unit.delay; }
+        if (SHARED.has(cls)) {
+            const name = ctx.assign?.get(n.id);
+            unit = name ? lib.unitByName(name) : lib.exactUnit(cls, W);
+            if (name && (unit.cfg.kind !== (cls === 'mul' ? 'mul' : 'add') || unit.cfg.width !== W)) throw new Error(`${n.id}: ${name} não serve para uma operação ${cls} de ${W} bits`);
+            delay = unit.delay;
+        } else if (['cmp', 'mux', 'logic'].includes(cls)) { unit = lib.cell(cls, W); delay = unit.delay; }
         const k = delay > Tc ? Math.ceil((delay + overhead) / clockPs) : 1;
-        const key = cls === 'mem' ? n.bank?.key ?? n.array : SHARED.has(cls) ? `${cls}${W}` : null;
+        // Recurso: o banco de memória, ou o tipo de unidade (exatas e aproximadas da mesma largura não se misturam).
+        const key = cls === 'mem' ? n.bank?.key ?? n.array : SHARED.has(cls) ? unit.name : null;
         info.set(n.id, { n, cls, W, delay, k, unit, key, multi: delay > Tc });
     }
     // Prioridade: caminho mais longo (ps) do nó até o fim do trecho.

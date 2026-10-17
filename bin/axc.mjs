@@ -10,9 +10,13 @@
  *   node bin/axc.mjs verilog <unidade> [--tb] [--out arquivo.v]
  *   node bin/axc.mjs lenet <multiplicador> [--add <somador>] [--layers conv1,conv2,fc1,fc2,fc3]
  *   node bin/axc.mjs hls <kernel.c | --example gauss|sobel|sharpen|fir|dot> [--clock ns] [--flow delay|area|iso] [--ports n]
+ *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *
  * A <unidade> é o nome mostrado na página (por exemplo "MUL8 DRUM4", "MUL16 T8 A8c", "ADD16 LOA8"), procurado no
  * espaço de projeto e nas pré-definidas, ou uma configuração em JSON ({"kind":"mul","width":8,"method":"drum","k":4}).
+ * No hls, --ops lista as somas e multiplicações que aceitam unidade aproximada; --approx atribui unidades (o alvo é
+ * o nó, como S1.3, o grupo linha:operação, como 16:mul8, a classe, como mul8, ou *); --error estima o erro nas saídas
+ * (modelo estático) e o mede na execução bit a bit.
  * Todos os comandos aceitam --json.
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -27,6 +31,9 @@ import { LAYERS, decodeModel, decodeTestSet, productTable, classifyBatch, adderA
 
 import { synthesize } from '../js/hls/index.js';
 import { KERNELS } from '../js/hls/kernels.js';
+import { parseAssign } from '../js/hls/approx.js';
+import { analyzeError } from '../js/hls/error.js';
+import { makeInputs } from '../js/hls/exec.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2);
@@ -138,9 +145,16 @@ switch (cmd) {
         const synthJ = synthData();
         const cellsJ = JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8'));
         let r;
+        const synOpt = { synth: synthJ, cells: cellsJ, clockNs: +opt('--clock', 5), flow: opt('--flow', 'delay'), ports: +opt('--ports', 2) };
         try {
-            r = synthesize(src, { synth: synthJ, cells: cellsJ, clockNs: +opt('--clock', 5), flow: opt('--flow', 'delay'), ports: +opt('--ports', 2) });
+            r = synthesize(src, synOpt);
+            if (opt('--approx')) r = synthesize(src, { ...synOpt, assign: parseAssign(r.ops, opt('--approx')) });
         } catch (e) { die(e.message); }
+        if (flag('--ops')) {
+            const list = r.ops.list.map((o) => ({ id: o.id, group: o.group, line: o.node.line, op: o.node.op, width: o.W, expression: o.text, units: o.candidates.length, restriction: o.reason, assigned: r.assign.get(o.id) ?? o.candidates[0] }));
+            out(list, () => list.map((o) => `${o.id.padEnd(7)} ${o.group.padEnd(9)} ${o.expression.padEnd(42)} ${String(o.units).padStart(4)} unidades${o.restriction ? ` (só a exata: ${o.restriction === 'sub' ? 'subtração' : 'com sinal'})` : ''}  ${o.assigned}`).join('\n'));
+            break;
+        }
         const loopsOut = r.design.loops.filter((l) => l.mode !== 'unrolled').map((l) => ({
             loop: l.label ?? l.id, line: l.line, trip: l.trip, mode: l.mode, unroll: l.factor, II: l.IIachieved ?? null, IItarget: l.II ?? null,
             limitedBy: l.why ? `${l.why.kind}${l.why.label ?? l.why.key ? `: ${l.why.label ?? l.why.key}` : ''}` : null, iterationLatency: l.iterLatency, latency: l.latency,
@@ -150,7 +164,26 @@ switch (cmd) {
             units: r.cost.units.map((u) => ({ unit: u.unit.name, count: u.count, area: u.area, luts: u.luts })),
             cells: r.cost.cells.map((c) => ({ cell: c.key, count: c.count, area: c.area })),
             area: r.cost.area, energy: r.cost.energy, fpga: r.cost.fpga, warnings: r.warnings,
+            approx: Object.fromEntries(r.assign),
         };
+        let errText = [];
+        if (flag('--error')) {
+            const input = opt('--input', 'image'), model = opt('--model', 'sampled');
+            const a = analyzeError(r, { inputs: makeInputs(r.design, input), method: model });
+            const fmt = (v, d = 3) => (v === Infinity ? 'inf' : Number.isFinite(v) ? v.toFixed(d) : '-');
+            res.error = {
+                input, model,
+                outputs: a.measured.map((m) => ({ array: m.array, estimated: a.est.outputs.get(m.array), measured: { ...m, box: undefined } })),
+                budget: a.est.budget.map((b) => ({ id: b.id, unit: b.unit, ownMean: b.own.mu, ownMSE: b.own.m2, outputs: Object.fromEntries(b.outputs) })),
+                flags: a.est.flags,
+            };
+            errText = [
+                `  erro (entrada ${input}, modelo ${model}):`,
+                ...res.error.outputs.map(({ array, estimated: e, measured: m }) => `    ${array}: ME ${fmt(e.ME)} estimado, ${fmt(m.ME)} medido; MSE ${fmt(e.MSE, 4)} / ${fmt(m.MSE, 4)}; PSNR ${fmt(e.PSNR, 2)} / ${fmt(m.PSNR, 2)} dB${m.SSIM !== null ? `; SSIM ${fmt(m.SSIM, 4)} medido` : ''}; WCE ${m.WCE}, EP ${fmt(m.EP)}`),
+                ...res.error.budget.map((b) => `    ${b.id.padEnd(7)} ${b.unit.padEnd(32)} erro próprio ${fmt(b.ownMean)} (MSE ${fmt(b.ownMSE, 2)}), sozinho na saída: MSE ${Object.entries(b.outputs).map(([k, v]) => `${k} ${fmt(v.MSE, 4)}`).join(', ')}`),
+                ...a.est.flags.map((f) => `    nota: ${f}`),
+            ];
+        }
         out(res, () => [
             `${res.kernel}: ${r.totals.cycles} ciclos de ${res.clockNs} ns = ${r.totals.timeNs.toFixed(1)} ns${r.totals.intervalNs ? `, um resultado a cada ${r.totals.intervalNs} ns` : ''} (período mínimo ${r.totals.critPs} ps)`,
             ...loopsOut.map((l) => `  ${l.loop.padEnd(10)} ${l.mode.padEnd(10)} ${String(l.trip).padStart(5)} iterações${l.unroll > 1 ? ` (unroll ${l.unroll})` : ''}${l.II ? `  II ${l.II}${l.limitedBy ? ` (${l.limitedBy})` : ''}` : ''}  latência ${l.latency}`),
@@ -159,10 +192,11 @@ switch (cmd) {
             `  FPGA ${r.cost.fpga.luts} LUTs, ${r.cost.fpga.carry4} CARRY4, ${r.cost.fpga.ff} FF`,
             `  energia ${(r.cost.energy.total / 1000).toFixed(1)} pJ por execução (operações ${(r.cost.energy.ops / 1000).toFixed(1)}, registradores ${(r.cost.energy.registers / 1000).toFixed(1)})`,
             ...r.warnings.map((w) => `  aviso, linha ${w.line}: ${w.msg}`),
+            ...errText,
         ].join('\n'));
         break;
     }
     default:
-        console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(2, 17).map((l) => l.replace(/^ \*\s?/, '')).join('\n'));
+        { const lines = readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n'); console.log(lines.slice(2, lines.indexOf(' */')).map((l) => l.replace(/^ \*\s?/, '')).join('\n')); }
         if (cmd && cmd !== 'help') process.exit(1);
 }

@@ -94,6 +94,8 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model }) 
             for (const w of n.succs) last = Math.max(last, sch.sched.get(w).cycle);
             if (n.liveOut) last = Math.max(last, sch.depth);
             const bits = bitsFor(n.range);
+            // Recorrência só repassada a um laço interno (o acumulador continua no registrador do interno).
+            if (n.op === 'carry' && !n.succs.length) continue;
             if (n.op === 'carry') { regs.push({ seg: seg.id, name: n.name, bits, kind: 'recorrência' }); regBits += bits; continue; }
             if (n.op === 'iv' || n.op === 'in') continue;
             const regStart = n.op === 'load' ? ready : me.multi ? ready : s.cycle + 1;

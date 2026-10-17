@@ -16,7 +16,7 @@ function rowsOf(sch) {
         const me = sch.info.get(id);
         if (me.cls === 'free') continue;
         let row;
-        if (me.binding) row = add(me.binding, `${me.unit.name.replace(/ \(.*\)/, '')} #${+me.binding.split('#')[1] + 1}`, me.cls === 'mul' ? 0 : 1);
+        if (me.binding) row = add(me.binding, `${me.unit.short ?? me.unit.name} #${+me.binding.split('#').pop() + 1}`, me.cls === 'mul' ? 0 : 1);
         else if (me.cls === 'mem') {
             // Uma linha por porta do banco: a primeira porta livre naquele ciclo.
             let p = 0;

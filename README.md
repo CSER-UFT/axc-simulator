@@ -40,7 +40,25 @@ Uma segunda página leva as unidades caracterizadas para o nível do algoritmo: 
 * escalonamento com encadeamento: as operações cabem num ciclo enquanto os atrasos da síntese sky130 somados não passam do período menos o tempo do registrador; sem pipeline, por lista; com pipeline, modular, com o II e o motivo (portas dos bancos de memória, limite de unidades ou recorrência);
 * ligação e custo: compartilhamento das unidades, multiplexadores de entrada, registradores pela vida de cada valor, contadores dos laços; área ASIC (µm²) e FPGA (LUTs, CARRY4, FF), energia por execução e latência.
 
-O relatório segue o do Vitis (latência, II por laço, recursos), com o diagrama de Gantt (as operações encadeadas aparecem dentro do ciclo), o DFG e a IR. A linha de comando roda o mesmo motor: `node bin/axc.mjs hls kernel.c --clock 5` (ou `--example gauss`). As peças além das unidades (multiplexador, lógica, comparador e o registrador dfxtp_1) foram medidas com o mesmo fluxo por `scripts/hls-cells.mjs` (`data/hls-cells.json`). As constantes do modelo (latência da memória, ciclos de controle) estão em `js/hls/sched.js` e serão calibradas contra o Vitis HLS e o Vivado. As próximas etapas são o erro do kernel (viés e variância propagados e a execução bit a bit) e a exploração do espaço de projeto.
+O relatório segue o do Vitis (latência, II por laço, recursos), com o diagrama de Gantt (as operações encadeadas aparecem dentro do ciclo), o DFG e a IR. A linha de comando roda o mesmo motor: `node bin/axc.mjs hls kernel.c --clock 5` (ou `--example gauss`). As peças além das unidades (multiplexador, lógica, comparador e o registrador dfxtp_1) foram medidas com o mesmo fluxo por `scripts/hls-cells.mjs` (`data/hls-cells.json`). As constantes do modelo (latência da memória, ciclos de controle) estão em `js/hls/sched.js` e serão calibradas contra o Vitis HLS e o Vivado. A próxima etapa é a exploração do espaço de projeto.
+
+### Aproximação no kernel e erro
+
+Na aba Aproximação, cada soma e multiplicação do DFG (depois do desenrolamento) pode usar qualquer unidade da biblioteca com a largura dela; a área, a energia e o atraso do relatório passam a usar as unidades escolhidas (exatas e aproximadas da mesma largura são recursos diferentes no escalonamento e na ligação). Subtrações e somas com sinal ficam exatas, porque as unidades são sem sinal e sem vem um; os multiplicadores sem sinal recebem os módulos dos operandos.
+
+* Perfil: uma execução exata do projeto elaborado com os dados de entrada (a imagem de teste ou valores uniformes na faixa do tipo) dá a média e o segundo momento de cada valor, amostras dos operandos de cada operação e execuções amostradas de cada trecho.
+* Estimativa estática: o viés (média) e o segundo momento do erro de cada nó, propagados das unidades até as saídas. O erro próprio de cada operação é o da unidade sobre os operandos reais dela. Há dois modelos: o analítico (fórmulas por operação, com o arredondamento dos deslocamentos e a troca de decisão das comparações) e o por amostras (cada trecho refeito nas execuções amostradas, com o erro que chega de fora como ruído normal), que mantém as correlações dentro do trecho. Recorrências seguem e(t + 1) = g·e(t) + d; memórias guardam a média dos erros escritos. O orçamento mostra o erro que cada operação causaria sozinha na saída.
+* Verificação bit a bit: o projeto elaborado (os mesmos laços, truncamentos e larguras de memória do hardware) executado com os modelos funcionais das unidades, comparado com o exato nas posições escritas: ME, MSE, PSNR, SSIM, MED, WCE, EP e MRED, com as imagens exata, aproximada e a diferença.
+
+Nos exemplos, o modelo por amostras fica a menos de 10% do MSE medido nos kernels com pipeline (gaussiano, Sobel, realce, FIR), com unidades de todas as técnicas. A limitação conhecida é o somador truncado ou segmentado dentro de um acumulador (o produto escalar, o gaussiano sem diretivas): o modelo supõe bits baixos quaisquer no acumulador e superestima o erro do truncado (até 13 vezes no produto escalar). A execução bit a bit é a referência para decidir.
+
+```
+node bin/axc.mjs hls --example gauss --ops                                          # operações aproximáveis
+node bin/axc.mjs hls --example gauss --approx "mul8=MUL8 DRUM6;add16=ADD16 LOA4" --error
+node bin/axc.mjs hls kernel.c --approx "16:mul8=MUL8 T4" --error --input uniform --model analytic --json
+```
+
+O alvo de `--approx` é um nó (`S1.3`), um grupo linha:operação (`16:mul8`), uma classe (`mul8`, `add16`, `add32`) ou `*`.
 
 ## Executar
 
@@ -107,6 +125,13 @@ O arquivo `CITATION.cff` traz os mesmos metadados (o GitHub mostra "Cite this re
 | `scripts/synth.mjs` e `scripts/lib/asic.mjs` | verificação (Icarus Verilog), síntese para FPGA e ASIC sky130 (Yosys e ABC), atraso e energia (OpenSTA), cache |
 | `scripts/evoapprox.mjs` | referência EvoApproxLib com o mesmo fluxo (`data/evoapprox.json`) |
 | `scripts/operands.mjs` | operandos reais da LeNet-5 e do filtro gaussiano (`data/operands.json` e `data/operands.bin`) |
+| `js/hls/lang.js`, `elab.js` | linguagem do kernel (análise) e elaboração: laços, diretivas, DFG por trecho, faixas, bancos de memória |
+| `js/hls/lib.js`, `sched.js`, `cost.js` | biblioteca de custos, escalonamento com encadeamento e pipeline, ligação, área, energia |
+| `js/hls/approx.js` | operações aproximáveis, unidades candidatas e modelos funcionais das unidades |
+| `js/hls/exec.js` | execução bit a bit do projeto elaborado, perfil dos sinais, comparação das saídas (PSNR, SSIM) |
+| `js/hls/error.js` | modelo estático de erro (analítico e por amostras), recorrências, orçamento por operação |
+| `js/hls/index.js`, `kernels.js`, `ui.js`, `js/hls-app.js` | fluxo de síntese, exemplos, figuras (Gantt e DFG) e a página `hls.html` |
+| `scripts/hls-cells.mjs` | multiplexador, lógica, comparador e registrador medidos no fluxo sky130 (`data/hls-cells.json`) |
 | `bin/axc.mjs` | interface de linha de comando |
 | `js/ui/plots.js` | figuras (diagramas, histograma, mapa de calor, Pareto) |
 | `js/refs.js` | referências com DOI, usadas na ajuda, no Resumo e nesta lista |
@@ -116,8 +141,10 @@ Os testes conferem as unidades exatas contra a aritmética (8 bits exaustivo), o
 
 ## Próximas etapas possíveis
 
-* Mais técnicas (codificador de Booth aproximado, outros somadores).
-* Usar o produto aproximado também na execução do programa no riscv-cc-simulator.
+* Exploração do espaço de projeto do kernel: diretivas e unidades juntas, com limite de erro e área, energia ou atraso como objetivo, e a fronteira de Pareto.
+* Validação e calibração contra o Vitis HLS e o Vivado.
+* Recorrências com somadores aproximados no modelo de erro (execuções consecutivas no perfil).
+* Mais técnicas (codificador de Booth aproximado, outros somadores) e somas com sinal aproximadas.
 
 ## Referências
 

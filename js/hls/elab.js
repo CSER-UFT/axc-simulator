@@ -47,6 +47,22 @@ function affAdd(a, b, s = 1) {
     return { c: a.c + s * b.c, t };
 }
 const affScale = (a, k) => ({ c: a.c * k, t: Object.fromEntries(Object.entries(a.t).map(([s, v]) => [s, v * k]).filter(([, v]) => v)) });
+/** Texto de uma expressão afim nas variáveis do código (i, x, ...) em vez das iterações dos laços (L1, L2). */
+export function affSource(a, loops) {
+    const byId = new Map(loops.map((l) => [l.id, l]));
+    let c = a.c;
+    const parts = [];
+    for (const [s, k] of Object.entries(a.t)) {
+        const l = byId.get(s);
+        const su = l?.step !== undefined ? l.step * (l.factor ?? 1) : null;
+        if (!l || !su || k % su) { parts.push(k === 1 ? s : `${k}*${s}`); continue; }
+        const m = k / su;
+        c -= m * l.start;
+        parts.push(m === 1 ? l.v : m === -1 ? `-${l.v}` : `${m}*${l.v}`);
+    }
+    if (c || !parts.length) parts.push(String(c));
+    return parts.join(' + ').replace(/\+ -/g, '- ');
+}
 export const affText = (a) => {
     const parts = Object.entries(a.t).map(([s, v]) => (v === 1 ? s : v === -1 ? `-${s}` : `${v}*${s}`));
     if (a.c || !parts.length) parts.push(String(a.c));
@@ -498,6 +514,8 @@ export function elaborate(ast, { ports = 2 } = {}) {
         info.factor = U;
         info.tripHw = trip / U;
         info.II = dir.pipeline?.II ?? null;
+        info.start = start;
+        info.step = step;
         const sym = info.id;
         const ivRange = [Math.min(start, values[trip - 1]), Math.max(start, values[trip - 1])];
         // Passo seco: quais variáveis de fora o corpo altera (recorrências).
@@ -528,7 +546,7 @@ export function elaborate(ast, { ports = 2 } = {}) {
             }
             // Acumulação que só cresce: os valores ficam dentro da faixa exata que o laço de fora já calculou.
             if (bound && monotone) range = [Math.max(range[0], bound[0]), Math.min(range[1], bound[1])];
-            const c = emit('carry', [], range, s.line, { name: name2, init: prev.k === 'const' ? prev.v : null });
+            const c = emit('carry', [], range, s.line, { name: name2, init: prev.k === 'const' ? prev.v : null, initFrom: prev.k === 'node' ? prev.id : null, initAff: prev.k === 'aff' ? prev.a : null });
             // Faixa que vale para todos os valores da variável durante o laço (passo seco exato, acumulação monótona).
             if ((fin && exact) || (bound && monotone)) c.node.bound = range;
             carries.set(name2, { node: c.node, outerSym, prev });
@@ -620,12 +638,16 @@ export function elaborate(ast, { ports = 2 } = {}) {
     const segments = [];
     const walk = (r) => r.items.forEach((it) => (it.k === 'seg' ? segments.push(it.seg) : walk(it.region)));
     walk(top);
-    for (const sg of segments) finishSegment(sg);
+    // Valores iniciais de recorrências (um laço interno que continua o acumulador do externo) não são arestas do
+    // DFG, mas precisam ficar.
+    const initRefs = new Set();
+    for (const sg of segments) for (const n of sg.nodes) if (n.initFrom) initRefs.add(n.initFrom);
+    for (const sg of segments) finishSegment(sg, initRefs);
     return { name: fn.name, arrays: [...arrays.values()], loops, top, segments, warnings, allocation, ports };
 }
 
 /** Arestas do DFG de um trecho, a partir dos argumentos dos nós. */
-function finishSegment(seg) {
+function finishSegment(seg, initRefs) {
     const byId = new Map(seg.nodes.map((n) => [n.id, n]));
     for (const n of seg.nodes) {
         n.preds = n.args.filter((a) => a.n !== undefined && byId.has(a.n)).map((a) => a.n);
@@ -634,7 +656,7 @@ function finishSegment(seg) {
     for (const n of seg.nodes) for (const p of n.preds) byId.get(p).succs.push(n.id);
     // Remove nós sem uso (sem efeito e sem sucessores), de trás para frente.
     const live = new Set();
-    const keep = (n) => ['store', 'out', 'carryout'].includes(n.op) || n.liveOut;
+    const keep = (n) => ['store', 'out', 'carryout'].includes(n.op) || n.liveOut || initRefs.has(n.id);
     for (let k = seg.nodes.length - 1; k >= 0; k--) {
         const n = seg.nodes[k];
         if (keep(n) || n.succs.some((s) => live.has(s))) live.add(n.id);

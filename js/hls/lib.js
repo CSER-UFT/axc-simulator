@@ -53,16 +53,38 @@ export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic' } = 
         const d = byName.get(name);
         if (!d) throw new HlsError(`unidade ${name} não está na biblioteca sintetizada`);
         const f = d.asic.flows[flow] ?? d.asic.flows.delay;
-        return { name, cfg: d.cfg, area: f.area, delay: f.delay, energy: f.energy, leakage: f.leakage, luts: d.luts, carry4: d.carry4, err: d.err };
+        return { name, short: name.replace(/ \(.*\)/, ''), cfg: d.cfg, area: f.area, delay: f.delay, energy: f.energy, leakage: f.leakage, luts: d.luts, carry4: d.carry4, err: d.err };
     }
     const exactName = (cls, W) => `${cls === 'mul' ? 'MUL' : 'ADD'}${W} exato`;
+    /** Somador de 32 bits: a cascata de dois de 16 (o de baixo pode ser aproximado; o vai um passa para o de cima). */
+    function composite(lowName) {
+        const lo = unit(lowName), hi = unit('ADD16 exato');
+        const exact = lowName === 'ADD16 exato';
+        return {
+            name: exact ? 'ADD32 (2 × ADD16 exato)' : `ADD32 (${lowName} + ADD16 exato)`, short: exact ? 'ADD32' : `ADD32 (${lowName.slice(6)})`,
+            cfg: { kind: 'add', width: 32, low: lo.cfg }, low: lowName,
+            area: lo.area + hi.area, delay: lo.delay + hi.delay, energy: lo.energy + hi.energy, leakage: (lo.leakage ?? 0) + (hi.leakage ?? 0),
+            luts: lo.luts + hi.luts, carry4: lo.carry4 + hi.carry4, err: lo.err, composite: 2,
+        };
+    }
     /** Unidade de uma classe e largura; o somador de 32 bits é a cascata de dois de 16. */
     function exactUnit(cls, W) {
-        if (cls === 'add' && W === 32) {
-            const u = unit('ADD16 exato');
-            return { ...u, name: 'ADD32 (2 × ADD16 exato)', area: 2 * u.area, delay: 2 * u.delay, energy: 2 * u.energy, leakage: 2 * u.leakage, luts: 2 * u.luts, carry4: 2 * u.carry4, composite: 2 };
-        }
+        if (cls === 'add' && W === 32) return composite('ADD16 exato');
         return unit(exactName(cls, W));
+    }
+    /** Unidade pelo nome, inclusive os somadores de 32 bits compostos (ADD32 (ADD16 LOA8 + ADD16 exato)). */
+    function unitByName(name) {
+        if (name === 'ADD32 (2 × ADD16 exato)') return composite('ADD16 exato');
+        const m = /^ADD32 \((ADD16 .+) \+ ADD16 exato\)$/.exec(name);
+        return m ? composite(m[1]) : unit(name);
+    }
+    /** Unidades da biblioteca para uma classe e largura (a exata primeiro). */
+    function candidates(cls, W) {
+        if (cls === 'add' && W === 32) return [exactUnit('add', 32).name, ...candidates('add', 16).slice(1).map((n) => `ADD32 (${n} + ADD16 exato)`)];
+        const kind = cls === 'mul' ? 'mul' : 'add';
+        const names = synth.designs.filter((d) => d.cfg.kind === kind && d.cfg.width === W).map((d) => d.name);
+        const ex = exactName(cls, W);
+        return [ex, ...names.filter((n) => n !== ex)];
     }
     function cell(cls, W) {
         const key = { cmp: 'cmp', mux: 'mux', logic: 'xor' }[cls];
@@ -71,7 +93,7 @@ export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic' } = 
     }
     const reg = cells.register;
     return {
-        flow, target, unit, exactUnit, cell,
+        flow, target, unit, exactUnit, unitByName, candidates, cell,
         reg: { area: reg.area, energy: reg.energy, clkToQ: reg.clkToQ, setup: reg.setup, leakage: reg.leakage },
         /** Custo do multiplexador de n entradas por bit: (n - 1) multiplexadores de 2 entradas. */
         mux(n, W) {

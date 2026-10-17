@@ -58,6 +58,7 @@
                         <button type="button" class="btn sel" data-tab="report" data-i18n="hls.tab.report">Relatório</button>
                         <button type="button" class="btn" data-tab="sched" data-i18n="hls.tab.sched">Escalonamento</button>
                         <button type="button" class="btn" data-tab="dfg" data-i18n="hls.tab.dfg">DFG</button>
+                        <button type="button" class="btn" data-tab="approx" data-i18n="hls.tab.approx">Aproximação</button>
                         <button type="button" class="btn" data-tab="ir" data-i18n="hls.tab.ir">IR</button>
                     </div>
                     <div class="pane" id="pane-report">
@@ -83,6 +84,26 @@
                         <div class="row"><label style="margin:0"><span data-i18n="hls.segment">Trecho</span> <select id="segSel2"></select></label></div>
                         <p class="note" data-i18n="hls.dfgNote">Grafo de fluxo de dados do trecho, em camadas pelo ciclo de início (c0, c1, ...); as operações encadeadas no mesmo ciclo ficam em sub-linhas. A aresta tracejada é a recorrência (o valor que passa de uma iteração para a seguinte).</p>
                         <div class="fig-box" id="dfg"></div>
+                    </div>
+                    <div class="pane hidden" id="pane-approx">
+                        <div class="row">
+                            <label style="margin:0"><span data-i18n="hls.ap.input">Dados de entrada</span> <select id="apInput"><option value="image" data-i18n="hls.ap.input.image">imagem de teste</option><option value="uniform" data-i18n="hls.ap.input.uniform">uniformes na faixa do tipo</option></select></label>
+                            <label style="margin:0"><span data-i18n="hls.ap.model">Modelo de erro</span> <select id="apModel"><option value="sampled" data-i18n="hls.ap.model.sampled">por amostras</option><option value="analytic" data-i18n="hls.ap.model.analytic">analítico</option></select></label>
+                            <button type="button" class="btn" id="apReset" data-i18n="hls.ap.reset">Todas exatas</button>
+                            <span class="note" id="apStatus"></span>
+                        </div>
+                        <h3 data-i18n="hls.ap.outputs">Saídas: estimado e medido</h3>
+                        <div class="scroll-box"><table id="apOutputs" class="hls-table"></table></div>
+                        <p class="note" id="apOutNote"></p>
+                        <div class="ap-images" id="apImages"></div>
+                        <h3 data-i18n="hls.ap.ops">Operações</h3>
+                        <p class="note" data-i18n="hls.ap.opsNote">Cada soma e multiplicação do DFG (depois do desenrolamento) pode usar qualquer unidade da biblioteca da sua largura. A linha do grupo muda todas as operações da mesma linha do código. O erro próprio é o da unidade sobre os operandos reais daquela operação; a coluna seguinte é o erro que ela sozinha causaria na saída.</p>
+                        <div class="scroll-box ap-ops"><table id="apOps" class="hls-table"></table></div>
+                        <ul class="note" id="apFlags"></ul>
+                        <details class="hls-lang">
+                            <summary data-i18n="hls.ap.modelTitle">Modelo de erro e verificação</summary>
+                            <div data-i18n-html="hls.ap.modelHelp"></div>
+                        </details>
                     </div>
                     <div class="pane hidden" id="pane-ir">
                         <pre class="hls-ir" id="ir"></pre>

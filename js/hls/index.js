@@ -8,24 +8,35 @@ import { elaborate } from './elab.js';
 import { makeLibrary } from './lib.js';
 import { scheduleSegment, MODEL } from './sched.js';
 import { bindAndCost } from './cost.js';
+import { approxOps } from './approx.js';
 
 export { MODEL };
 
 /**
  * @param {string} src código do kernel
- * @param {{synth: object, cells: object, flow?: string, target?: string, clockNs?: number, ports?: number, model?: object}} o
+ * @param {{synth: object, cells: object, flow?: string, target?: string, clockNs?: number, ports?: number, model?: object,
+ *          assign?: Map<string, string>|object}} o assign: unidade aproximada de cada operação (id do nó -> nome)
  */
-export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic', clockNs = 5, ports = 2, model = MODEL } = {}) {
+export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic', clockNs = 5, ports = 2, model = MODEL, assign = null } = {}) {
     const clockPs = Math.round(clockNs * 1000);
     const ast = parse(src);
     const design = elaborate(ast, { ports });
     const lib = makeLibrary(synth, cells, { flow, target });
     const arrays = new Map(design.arrays.map((a) => [a.name, a]));
+    // Operações que aceitam unidade aproximada e a atribuição pedida (os ids que não existem mais são ignorados).
+    const ops = approxOps(design, lib);
+    const asg = new Map();
+    for (const [id, name] of assign instanceof Map ? assign : Object.entries(assign ?? {})) {
+        const op = ops.byId.get(id);
+        if (!op) continue;
+        if (!op.candidates.includes(name)) { design.warnings.push({ msg: `${id}: ${name} não serve para ${op.label} (ignorada)`, line: op.node.line }); continue; }
+        if (name !== op.candidates[0]) asg.set(id, name);
+    }
     const schedOf = new Map();
     for (const seg of design.segments) {
         const L = seg.region.loop;
         const pipelined = L?.mode === 'pipelined';
-        schedOf.set(seg, scheduleSegment(seg, { lib, clockPs, arrays, allocation: design.allocation, pipelined, II: L?.II ?? 1, model }));
+        schedOf.set(seg, scheduleSegment(seg, { lib, clockPs, arrays, allocation: design.allocation, pipelined, II: L?.II ?? 1, model, assign: asg }));
     }
     // Latência: trechos em sequência; laço sem pipeline repete o corpo; com pipeline, profundidade + (N - 1) II.
     const latency = (region) => region.items.reduce((s, it) => s + (it.k === 'seg' ? schedOf.get(it.seg).depth : loopLatency(it.region)), 0);
@@ -58,7 +69,7 @@ export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic',
     const critPs = Math.max(0, ...segs.map((s) => s.sch.critPs));
     const inner = design.loops.filter((l) => l.mode === 'pipelined');
     return {
-        design, lib, segs, cost, warnings: design.warnings, model,
+        design, lib, segs, cost, warnings: design.warnings, model, ops, assign: asg,
         totals: {
             cycles: totalCycles, clockPs, timeNs: (totalCycles * clockPs) / 1000, critPs,
             area: cost.area.total, luts: cost.fpga.luts, carry4: cost.fpga.carry4, ff: cost.fpga.ff, energy: cost.energy.total,
