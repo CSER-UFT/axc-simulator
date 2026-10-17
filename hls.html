@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Síntese de alto nível aproximada</title>
+        <meta name="description" content="Síntese de alto nível de kernels com unidades aritméticas caracterizadas na sky130: diretivas pipeline, unroll e array_partition, escalonamento com encadeamento, ligação, área, energia e latência." />
+        <link rel="icon" href="./svg/cpu.svg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" />
+        <link rel="stylesheet" type="text/css" href="./css/index.css" />
+        <link rel="stylesheet" type="text/css" href="./css/axc.css" />
+        <link rel="stylesheet" type="text/css" href="./css/hls.css" />
+        <script>
+            try {
+                const theme = localStorage.getItem('axc.theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.dataset.theme = theme;
+            } catch { document.documentElement.dataset.theme = 'light'; }
+        </script>
+    </head>
+    <body>
+        <header id="header">
+            <div class="brand"><span class="icon i-cpu brand-mark" aria-hidden="true"></span><span class="brand-name" data-i18n-html="ui.appTitle">Simulador de Computação <b>Aproximada</b></span></div>
+            <nav class="page-nav"><a href="./index.html" data-i18n="nav.units">Unidades</a><a href="./hls.html" class="sel" aria-current="page" data-i18n="nav.hls">Síntese de alto nível</a></nav>
+            <div class="tools">
+                <label class="lang"><span class="sr-only" data-i18n="ui.language">Idioma</span><select id="lang-select"></select></label>
+                <button type="button" id="theme-toggle" class="btn icon-btn" data-i18n-title="ui.theme"><span class="icon i-moon" aria-hidden="true"></span><span class="sr-only" data-i18n="ui.theme">Alternar contraste</span></button>
+            </div>
+        </header>
+        <main class="hls-main">
+            <div>
+                <section>
+                    <h2 data-i18n="hls.kernel">Kernel</h2>
+                    <div class="row">
+                        <label style="margin:0"><span data-i18n="hls.example">Exemplo</span> <select id="example"></select></label>
+                    </div>
+                    <textarea id="code" class="code-edit" spellcheck="false" autocomplete="off"></textarea>
+                    <div class="row">
+                        <label style="margin:0"><span data-i18n="hls.clock">Período (ns)</span> <input id="clock" type="number" min="0.6" max="50" step="0.1" value="5" style="width:5em" /></label>
+                        <label style="margin:0"><span data-i18n="hls.flow">Síntese das unidades</span> <select id="flow"><option value="delay" data-i18n="ds.flow.delay">atraso mínimo</option><option value="area" data-i18n="ds.flow.area">área mínima</option><option value="iso" data-i18n="ds.flow.iso">iso atraso (o da exata)</option></select></label>
+                        <label style="margin:0"><span data-i18n="hls.ports">Portas por banco</span> <select id="ports"><option value="1">1</option><option value="2" selected>2</option></select></label>
+                    </div>
+                    <div class="row" style="margin-top:8px">
+                        <button type="button" class="btn primary" id="run" data-i18n="hls.run">Sintetizar</button>
+                        <span class="note" data-i18n="hls.runHint">Ctrl+Enter no editor</span>
+                    </div>
+                    <p class="note warn" id="error"></p>
+                    <details class="hls-lang">
+                        <summary data-i18n="hls.langTitle">Linguagem e diretivas</summary>
+                        <div data-i18n-html="hls.langHelp"></div>
+                    </details>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <div class="tabs" id="tabs">
+                        <button type="button" class="btn sel" data-tab="report" data-i18n="hls.tab.report">Relatório</button>
+                        <button type="button" class="btn" data-tab="sched" data-i18n="hls.tab.sched">Escalonamento</button>
+                        <button type="button" class="btn" data-tab="dfg" data-i18n="hls.tab.dfg">DFG</button>
+                        <button type="button" class="btn" data-tab="ir" data-i18n="hls.tab.ir">IR</button>
+                    </div>
+                    <div class="pane" id="pane-report">
+                        <div class="metrics-grid" id="summary"></div>
+                        <h3 data-i18n="hls.loops">Laços</h3>
+                        <div class="scroll-box"><table id="loops" class="hls-table"></table></div>
+                        <h3 data-i18n="hls.resources">Recursos</h3>
+                        <div class="scroll-box"><table id="resources" class="hls-table"></table></div>
+                        <h3 data-i18n="hls.breakdown">Área e energia por parte</h3>
+                        <div class="scroll-box"><table id="breakdown" class="hls-table"></table></div>
+                        <ul class="note" id="warnings"></ul>
+                        <details class="hls-lang">
+                            <summary data-i18n="hls.modelTitle">Modelo e limitações</summary>
+                            <div id="modelNotes"></div>
+                        </details>
+                    </div>
+                    <div class="pane hidden" id="pane-sched">
+                        <div class="row"><label style="margin:0"><span data-i18n="hls.segment">Trecho</span> <select id="segSel"></select></label><span class="note" id="segInfo"></span></div>
+                        <p class="note" data-i18n="hls.schedNote">Cada coluna é um ciclo; as operações encadeadas aparecem em sequência dentro dele, na escala do tempo. A faixa clara no fim do ciclo é o tempo do registrador (relógio para a saída e setup). Com pipeline, as linhas verticais marcam o II.</p>
+                        <div class="fig-box" id="gantt"></div>
+                    </div>
+                    <div class="pane hidden" id="pane-dfg">
+                        <div class="row"><label style="margin:0"><span data-i18n="hls.segment">Trecho</span> <select id="segSel2"></select></label></div>
+                        <p class="note" data-i18n="hls.dfgNote">Grafo de fluxo de dados do trecho, em camadas pelo ciclo de início (c0, c1, ...); as operações encadeadas no mesmo ciclo ficam em sub-linhas. A aresta tracejada é a recorrência (o valor que passa de uma iteração para a seguinte).</p>
+                        <div class="fig-box" id="dfg"></div>
+                    </div>
+                    <div class="pane hidden" id="pane-ir">
+                        <pre class="hls-ir" id="ir"></pre>
+                    </div>
+                </section>
+            </div>
+        </main>
+        <script type="module" src="js/hls-app.js"></script>
+    </body>
+</html>

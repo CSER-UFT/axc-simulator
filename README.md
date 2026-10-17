@@ -32,6 +32,16 @@ Interface e ajuda em **português e inglês** (seletor no cabeçalho). O botão 
 * **Rede neural**: LeNet-5 treinada no MNIST e quantizada em 8 bits, com os produtos das camadas escolhidas feitos pela unidade aproximada; acurácia contra a rede exata, sensibilidade por camada, matriz de confusão e os dígitos que passaram a errar. A rede é treinada uma vez com `scripts/lenet5/train.py` (só NumPy): `python3 scripts/lenet5/train.py <pasta com os 4 .gz do MNIST> --epochs 8`. O subconjunto de teste incluído (1000 imagens, `data/mnist1000.bin`) é do MNIST, sob a licença CC BY-SA 3.0.
 * **Aplicação**: filtro gaussiano 3 × 3, bordas de Sobel, realce de bordas, ganho de brilho ou média de pares sobre uma imagem de teste sintética ou do usuário (formatos do navegador e também PPM, PGM e PBM), com a imagem exata, a aproximada, a diferença, PSNR e SSIM.
 
+## Síntese de alto nível (página hls.html)
+
+Uma segunda página leva as unidades caracterizadas para o nível do algoritmo: um kernel num subconjunto de C (tipos de largura explícita, vetores, `for` com limites constantes) com as diretivas do Vitis HLS (`pipeline II=n`, `unroll factor=n`, `array_partition`, `allocation`) passa por:
+
+* análise e elaboração: desenrolamento dos laços pedidos (e de todos os internos a um laço com pipeline), dobra de constantes, índices dos vetores como expressões afins (o que dá o banco de memória de cada acesso), eliminação de subexpressões comuns e análise de faixas de valores, que escolhe a unidade de 8, 16 ou 32 bits de cada operação;
+* escalonamento com encadeamento: as operações cabem num ciclo enquanto os atrasos da síntese sky130 somados não passam do período menos o tempo do registrador; sem pipeline, por lista; com pipeline, modular, com o II e o motivo (portas dos bancos de memória, limite de unidades ou recorrência);
+* ligação e custo: compartilhamento das unidades, multiplexadores de entrada, registradores pela vida de cada valor, contadores dos laços; área ASIC (µm²) e FPGA (LUTs, CARRY4, FF), energia por execução e latência.
+
+O relatório segue o do Vitis (latência, II por laço, recursos), com o diagrama de Gantt (as operações encadeadas aparecem dentro do ciclo), o DFG e a IR. A linha de comando roda o mesmo motor: `node bin/axc.mjs hls kernel.c --clock 5` (ou `--example gauss`). As peças além das unidades (multiplexador, lógica, comparador e o registrador dfxtp_1) foram medidas com o mesmo fluxo por `scripts/hls-cells.mjs` (`data/hls-cells.json`). As constantes do modelo (latência da memória, ciclos de controle) estão em `js/hls/sched.js` e serão calibradas contra o Vitis HLS e o Vivado. As próximas etapas são o erro do kernel (viés e variância propagados e a execução bit a bit) e a exploração do espaço de projeto.
+
 ## Executar
 
 ```

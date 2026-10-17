@@ -1,0 +1,180 @@
+{
+ "generated": "2026-10-17",
+ "library": "sky130_fd_sc_hd, tt_025C_1v80",
+ "tools": {
+  "yosys": "Yosys 0.33 (git sha1 2584903a060)",
+  "iverilog": "Icarus Verilog version 12.0 (stable) ()",
+  "opensta": "OpenSTA 3.1.0"
+ },
+ "flows": {
+  "delay": "+strash;dch;map,-D,1;topo;buffer,-p;upsize,-D,1;dnsize,-D,1;stime,-p",
+  "area": "+strash;dch;map,-D,100000;topo;buffer,-p;upsize,-D,100000;dnsize,-D,100000;stime,-p"
+ },
+ "units": {
+  "area": "µm²",
+  "delay": "ps",
+  "energy": "fJ por operação (registrador: por ciclo de relógio)",
+  "fpga": "LUTs e CARRY4 do synth_xilinx"
+ },
+ "note": "energia das peças combinacionais com atividade 0,5 nas entradas propagada pelo OpenSTA; registrador com o dado mudando em metade dos ciclos",
+ "cells": {
+  "mux": {
+   "8": {
+    "delay": {
+     "area": 180.17,
+     "delay": 370,
+     "energy": 213.18,
+     "luts": 8,
+     "carry4": 0
+    },
+    "area": {
+     "area": 90.09,
+     "delay": 462,
+     "energy": 167.12,
+     "luts": 8,
+     "carry4": 0
+    }
+   },
+   "16": {
+    "delay": {
+     "area": 360.35,
+     "delay": 577,
+     "energy": 428.58,
+     "luts": 16,
+     "carry4": 0
+    },
+    "area": {
+     "area": 180.17,
+     "delay": 576,
+     "energy": 333.95,
+     "luts": 16,
+     "carry4": 0
+    }
+   },
+   "32": {
+    "delay": {
+     "area": 720.69,
+     "delay": 967,
+     "energy": 870.37,
+     "luts": 32,
+     "carry4": 0
+    },
+    "area": {
+     "area": 360.35,
+     "delay": 781,
+     "energy": 668.87,
+     "luts": 32,
+     "carry4": 0
+    }
+   }
+  },
+  "xor": {
+   "8": {
+    "delay": {
+     "area": 130.12,
+     "delay": 222,
+     "energy": 192.78,
+     "luts": 8,
+     "carry4": 0
+    },
+    "area": {
+     "area": 70.07,
+     "delay": 197,
+     "energy": 133.54,
+     "luts": 8,
+     "carry4": 0
+    }
+   },
+   "16": {
+    "delay": {
+     "area": 260.25,
+     "delay": 222,
+     "energy": 385.55,
+     "luts": 16,
+     "carry4": 0
+    },
+    "area": {
+     "area": 140.13,
+     "delay": 197,
+     "energy": 267.07,
+     "luts": 16,
+     "carry4": 0
+    }
+   },
+   "32": {
+    "delay": {
+     "area": 520.5,
+     "delay": 222,
+     "energy": 771.11,
+     "luts": 32,
+     "carry4": 0
+    },
+    "area": {
+     "area": 280.27,
+     "delay": 197,
+     "energy": 534.15,
+     "luts": 32,
+     "carry4": 0
+    }
+   }
+  },
+  "cmp": {
+   "8": {
+    "delay": {
+     "area": 225.22,
+     "delay": 609,
+     "energy": 339.26,
+     "luts": 6,
+     "carry4": 1
+    },
+    "area": {
+     "area": 193.94,
+     "delay": 992,
+     "energy": 330.24,
+     "luts": 6,
+     "carry4": 1
+    }
+   },
+   "16": {
+    "delay": {
+     "area": 481.71,
+     "delay": 727,
+     "energy": 779.04,
+     "luts": 11,
+     "carry4": 2
+    },
+    "area": {
+     "area": 382.87,
+     "delay": 995,
+     "energy": 606.4,
+     "luts": 11,
+     "carry4": 2
+    }
+   },
+   "32": {
+    "delay": {
+     "area": 928.39,
+     "delay": 927,
+     "energy": 1429.49,
+     "luts": 22,
+     "carry4": 3
+    },
+    "area": {
+     "area": 800.77,
+     "delay": 1462,
+     "energy": 1259.25,
+     "luts": 22,
+     "carry4": 3
+    }
+   }
+  }
+ },
+ "register": {
+  "cell": "sky130_fd_sc_hd__dfxtp_1",
+  "area": 20.0192,
+  "clkToQ": 298,
+  "setup": 111,
+  "energy": 55.749,
+  "leakage": 0.0084
+ }
+}

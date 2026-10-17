@@ -15,14 +15,17 @@ const files = [];
 const walk = (d) => { for (const f of readdirSync(d)) { const p = join(d, f); if (statSync(p).isDirectory()) walk(p); else if (p.endsWith('.js')) files.push(p); } };
 walk(join(dir, 'js'));
 const imports = Object.fromEntries(files.map((f) => { const r = `./${relative(dir, f).split('\\').join('/')}`; return [r, `${r}?v=${version}`]; }));
-const index = join(dir, 'index.html');
-let html = readFileSync(index, 'utf8');
-html = html.replace(/(href="\.\/css\/[^"]+\.css)"/g, `$1?v=${version}"`);
-html = html.replace('<script type="module" src="js/app.js"></script>',
-    `<script type="importmap">${JSON.stringify({ imports })}</script>\n        <script type="module" src="./js/app.js?v=${version}"></script>`);
-html = html.replace("fetch('data/synth.json')", `fetch('data/synth.json?v=${version}')`);
-writeFileSync(index, html);
-// O app.js busca data/synth.json pelo próprio código: a versão vai no endereço.
-const app = join(dir, 'js', 'app.js');
-writeFileSync(app, readFileSync(app, 'utf8').replace("fetch('data/synth.json')", `fetch('data/synth.json?v=${version}')`));
+// Cada página com o seu módulo principal.
+for (const [page, main] of [['index.html', 'app.js'], ['hls.html', 'hls-app.js']]) {
+    const file = join(dir, page);
+    let html;
+    try { html = readFileSync(file, 'utf8'); } catch { continue; }
+    html = html.replace(/(href="\.\/css\/[^"]+\.css)"/g, `$1?v=${version}"`);
+    html = html.replace(`<script type="module" src="js/${main}"></script>`,
+        `<script type="importmap">${JSON.stringify({ imports })}</script>\n        <script type="module" src="./js/${main}?v=${version}"></script>`);
+    writeFileSync(file, html);
+    // Os dados buscados pelo próprio código levam a versão no endereço.
+    const js = join(dir, 'js', main);
+    writeFileSync(js, readFileSync(js, 'utf8').replace(/fetch\('data\/([\w.-]+)'\)/g, `fetch('data/$1?v=${version}')`));
+}
 console.log(`${files.length} módulos marcados com ?v=${version}`);

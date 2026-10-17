@@ -38,7 +38,7 @@ jobs:
       - name: Preparar site
         run: |
           mkdir _site
-          cp -r index.html js css svg data _site/
+          cp -r index.html hls.html js css svg data _site/
           node scripts/stamp.mjs _site "${GITHUB_SHA::8}"
       - uses: actions/upload-pages-artifact@v3
       - id: deployment
