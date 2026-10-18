@@ -1,0 +1,60 @@
+{
+ "case": "sharpen_kul_ir",
+ "kernel": "sharpen",
+ "kind": "ir",
+ "note": "mul8=MUL8 KUL",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "sharpen",
+ "assign": {
+  "S1.1": "MUL8 KUL"
+ },
+ "prediction": {
+  "cycles": 72960,
+  "timeNs": 364800,
+  "intervalNs": 10,
+  "critPs": 4865,
+  "luts": 245,
+  "carry4": 22,
+  "ff": 88,
+  "areaUm2": 9317.719599999999,
+  "energyFj": 755550312.34016,
+  "loops": [
+   {
+    "label": "rows",
+    "mode": "sequential",
+    "trip": 190,
+    "II": null,
+    "iterLatency": 384,
+    "latency": 72960
+   },
+   {
+    "label": "cols",
+    "mode": "pipelined",
+    "trip": 190,
+    "II": 2,
+    "iterLatency": 4,
+    "latency": 383
+   }
+  ],
+  "units": [
+   {
+    "unit": "MUL8 KUL",
+    "count": 1,
+    "luts": 79,
+    "carry4": 4
+   },
+   {
+    "unit": "ADD16 exato",
+    "count": 2,
+    "luts": 32,
+    "carry4": 10
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "pipelineOverhead": 1
+  }
+ }
+}

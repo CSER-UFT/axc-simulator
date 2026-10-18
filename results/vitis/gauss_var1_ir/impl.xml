@@ -1,0 +1,167 @@
+<profile>
+  <RunData>
+    <RUN_TYPE>impl</RUN_TYPE>
+    <VIVADO_VERSION>v.2022.2</VIVADO_VERSION>
+    <ROOT_MODULE_CELL>bd_0_i/hls_inst</ROOT_MODULE_CELL>
+  </RunData>
+  <TimingReport>
+    <TargetClockPeriod>5.000</TargetClockPeriod>
+    <AchievedClockPeriod>4.541</AchievedClockPeriod>
+    <CLOCK_NAME>ap_clk</CLOCK_NAME>
+    <CP_FINAL>4.541</CP_FINAL>
+    <CP_ROUTE>4.541</CP_ROUTE>
+    <CP_SYNTH>4.403</CP_SYNTH>
+    <CP_TARGET>5.000</CP_TARGET>
+    <SLACK_FINAL>0.459</SLACK_FINAL>
+    <SLACK_ROUTE>0.459</SLACK_ROUTE>
+    <SLACK_SYNTH>0.597</SLACK_SYNTH>
+    <TIMING_MET>TRUE</TIMING_MET>
+    <TNS_FINAL>0.000</TNS_FINAL>
+    <TNS_ROUTE>0.000</TNS_ROUTE>
+    <TNS_SYNTH>0.000</TNS_SYNTH>
+    <WNS_FINAL>0.459</WNS_FINAL>
+    <WNS_ROUTE>0.459</WNS_ROUTE>
+    <WNS_SYNTH>0.597</WNS_SYNTH>
+  </TimingReport>
+  <AreaReport>
+    <Resources>
+      <BRAM>0</BRAM>
+      <CLB>0</CLB>
+      <DSP>0</DSP>
+      <FF>424</FF>
+      <LATCH>0</LATCH>
+      <LUT>398</LUT>
+      <SLICE>181</SLICE>
+      <SRL>0</SRL>
+      <URAM>0</URAM>
+    </Resources>
+    <AvailableResources>
+      <BRAM>270</BRAM>
+      <CLB>0</CLB>
+      <DSP>240</DSP>
+      <FF>126800</FF>
+      <LUT>63400</LUT>
+      <SLICE>15850</SLICE>
+      <URAM>0</URAM>
+    </AvailableResources>
+  </AreaReport>
+  <RtlModules>
+    <RtlModule CELL="inst" DEPTH="0" IS_TOP="1" TYPE="function" MODULENAME="gauss" DISPNAME="inst" RTLNAME="gauss">
+      <SubModules count="6">flow_control_loop_pipe_U mul_8ns_6ns_13_1_1_U1 mul_8ns_6ns_13_1_1_U2 mul_8ns_6ns_13_1_1_U4 mul_8ns_6ns_13_1_1_U5 mul_8ns_7ns_14_1_1_U3</SubModules>
+      <Resources FF="424" LUT="398"/>
+      <LocalResources FF="423" LUT="226"/>
+    </RtlModule>
+    <RtlModule CELL="inst/flow_control_loop_pipe_U" BINDMODULE="gauss_flow_control_loop_pipe" DEPTH="1" TYPE="rtl" MODULENAME="flow_control_loop_pipe" DISPNAME="flow_control_loop_pipe_U" RTLNAME="gauss_flow_control_loop_pipe">
+      <Resources FF="1" LUT="75"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_6ns_13_1_1_U1" BINDMODULE="gauss_mul_8ns_6ns_13_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_6ns_13_1_1" DISPNAME="mul_8ns_6ns_13_1_1_U1" RTLNAME="gauss_mul_8ns_6ns_13_1_1">
+      <Resources LUT="22"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_6ns_13_1_1_U1" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_6ns_13_1_1_U2" BINDMODULE="gauss_mul_8ns_6ns_13_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_6ns_13_1_1" DISPNAME="mul_8ns_6ns_13_1_1_U2" RTLNAME="gauss_mul_8ns_6ns_13_1_1">
+      <Resources LUT="18"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_6ns_13_1_1_U2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_2"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_6ns_13_1_1_U4" BINDMODULE="gauss_mul_8ns_6ns_13_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_6ns_13_1_1" DISPNAME="mul_8ns_6ns_13_1_1_U4" RTLNAME="gauss_mul_8ns_6ns_13_1_1">
+      <Resources LUT="22"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_6ns_13_1_1_U4" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_4"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_6ns_13_1_1_U5" BINDMODULE="gauss_mul_8ns_6ns_13_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_6ns_13_1_1" DISPNAME="mul_8ns_6ns_13_1_1_U5" RTLNAME="gauss_mul_8ns_6ns_13_1_1">
+      <Resources LUT="22"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_6ns_13_1_1_U5" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_5"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_7ns_14_1_1_U3" BINDMODULE="gauss_mul_8ns_7ns_14_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_7ns_14_1_1" DISPNAME="mul_8ns_7ns_14_1_1_U3" RTLNAME="gauss_mul_8ns_7ns_14_1_1">
+      <Resources LUT="17"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7ns_14_1_1_U3" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_3"/>
+    </RtlModule>
+  </RtlModules>
+  <TimingPaths>
+    <TPATH DATAPATH_DELAY="4.519" DATAPATH_LOGIC_DELAY="1.688" DATAPATH_NET_DELAY="2.831" ENDPOINT_PIN="sub_ln15_reg_710_reg[14]/D" LOGIC_LEVELS="5" MAX_FANOUT="78" SLACK="0.459" STARTPOINT_PIN="flow_control_loop_pipe_U/ap_loop_init_reg/C">
+      <CELL NAME="flow_control_loop_pipe_U/ap_loop_init_reg" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
+      <CELL NAME="flow_control_loop_pipe_U/indvar_flatten_fu_88[15]_i_1" PRIMITIVE_TYPE="LUT.others.LUT3" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/select_ln11_reg_699[7]_i_3" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/select_ln11_1_reg_705[1]_i_1" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/sub_ln15_reg_710_reg[12]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/sub_ln15_reg_710_reg[15]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
+      <CELL NAME="sub_ln15_reg_710_reg[14]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="442"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="4.479" DATAPATH_LOGIC_DELAY="2.787" DATAPATH_NET_DELAY="1.692" ENDPOINT_PIN="ret_V_2_reg_841_reg[12]/D" LOGIC_LEVELS="6" MAX_FANOUT="14" SLACK="0.499" STARTPOINT_PIN="reg_191_reg[3]/C">
+      <CELL NAME="reg_191_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="392"/>
+      <CELL NAME="mul_8ns_6ns_13_1_1_U2/ret_V_2_reg_841[6]_i_9" PRIMITIVE_TYPE="LUT.others.LUT2" LINE_NUMBER="10"/>
+      <CELL NAME="mul_8ns_6ns_13_1_1_U2/ret_V_2_reg_841_reg[6]_i_3" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_6ns_13_1_1_U2/ret_V_2_reg_841_reg[12]_i_7" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="ret_V_2_reg_841[10]_i_4" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_6ns_13_1_1_U2/ret_V_2_reg_841_reg[10]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_6ns_13_1_1_U2/ret_V_2_reg_841_reg[12]_i_2" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="ret_V_2_reg_841_reg[12]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="484"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="4.424" DATAPATH_LOGIC_DELAY="1.593" DATAPATH_NET_DELAY="2.831" ENDPOINT_PIN="sub_ln15_reg_710_reg[15]/D" LOGIC_LEVELS="5" MAX_FANOUT="78" SLACK="0.554" STARTPOINT_PIN="flow_control_loop_pipe_U/ap_loop_init_reg/C">
+      <CELL NAME="flow_control_loop_pipe_U/ap_loop_init_reg" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
+      <CELL NAME="flow_control_loop_pipe_U/indvar_flatten_fu_88[15]_i_1" PRIMITIVE_TYPE="LUT.others.LUT3" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/select_ln11_reg_699[7]_i_3" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/select_ln11_1_reg_705[1]_i_1" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/sub_ln15_reg_710_reg[12]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/sub_ln15_reg_710_reg[15]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
+      <CELL NAME="sub_ln15_reg_710_reg[15]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="442"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="4.408" DATAPATH_LOGIC_DELAY="1.577" DATAPATH_NET_DELAY="2.831" ENDPOINT_PIN="sub_ln15_reg_710_reg[13]/D" LOGIC_LEVELS="5" MAX_FANOUT="78" SLACK="0.570" STARTPOINT_PIN="flow_control_loop_pipe_U/ap_loop_init_reg/C">
+      <CELL NAME="flow_control_loop_pipe_U/ap_loop_init_reg" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
+      <CELL NAME="flow_control_loop_pipe_U/indvar_flatten_fu_88[15]_i_1" PRIMITIVE_TYPE="LUT.others.LUT3" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/select_ln11_reg_699[7]_i_3" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/select_ln11_1_reg_705[1]_i_1" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/sub_ln15_reg_710_reg[12]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/sub_ln15_reg_710_reg[15]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
+      <CELL NAME="sub_ln15_reg_710_reg[13]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="442"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="4.368" DATAPATH_LOGIC_DELAY="2.676" DATAPATH_NET_DELAY="1.692" ENDPOINT_PIN="ret_V_2_reg_841_reg[11]/D" LOGIC_LEVELS="6" MAX_FANOUT="14" SLACK="0.610" STARTPOINT_PIN="reg_191_reg[3]/C">
+      <CELL NAME="reg_191_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="392"/>
+      <CELL NAME="mul_8ns_6ns_13_1_1_U2/ret_V_2_reg_841[6]_i_9" PRIMITIVE_TYPE="LUT.others.LUT2" LINE_NUMBER="10"/>
+      <CELL NAME="mul_8ns_6ns_13_1_1_U2/ret_V_2_reg_841_reg[6]_i_3" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_6ns_13_1_1_U2/ret_V_2_reg_841_reg[12]_i_7" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="ret_V_2_reg_841[10]_i_4" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_6ns_13_1_1_U2/ret_V_2_reg_841_reg[10]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_6ns_13_1_1_U2/ret_V_2_reg_841_reg[12]_i_2" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="ret_V_2_reg_841_reg[11]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="484"/>
+    </TPATH>
+  </TimingPaths>
+  <VivadoReportFiles>
+    <ReportFile TYPE="design_analysis" PATH="verilog/report/gauss_design_analysis_routed.rpt"/>
+    <ReportFile TYPE="failfast" PATH="verilog/report/gauss_failfast_routed.rpt"/>
+    <ReportFile TYPE="status" PATH="verilog/report/gauss_status_routed.rpt"/>
+    <ReportFile TYPE="timing" PATH="verilog/report/gauss_timing_routed.rpt"/>
+    <ReportFile TYPE="timing_paths" PATH="verilog/report/gauss_timing_paths_routed.rpt"/>
+    <ReportFile TYPE="utilization" PATH="verilog/report/gauss_utilization_routed.rpt"/>
+    <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/gauss_utilization_hierarchical_routed.rpt"/>
+  </VivadoReportFiles>
+  <GeneralInfo NAME="General Information">
+    <item NAME="Date" VALUE="Sun Oct 18 11:23:41 -03 2026"/>
+    <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
+    <item NAME="Project" VALUE="proj"/>
+    <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>
+    <item NAME="Product family" VALUE="artix7"/>
+    <item NAME="Target device" VALUE="xc7a100t-csg324-1"/>
+  </GeneralInfo>
+  <RunOptions NAME="Run Constraints &amp; Options">
+    <General NAME="Design Constraints &amp; Options">
+      <item NAME="Place &amp; Route target clock" VALUE="5 ns"/>
+      <item NAME="C-Synthesis target clock" VALUE="5 ns"/>
+      <item NAME="C-Synthesis uncertainty" VALUE="27%"/>
+      <item NAME="config_export -ip_xdc_file" VALUE=""/>
+      <item NAME="config_export -ip_xdc_ooc_file" VALUE=""/>
+    </General>
+    <Syn NAME="RTL Synthesis Options">
+      <item NAME="config_export -vivado_synth_strategy" VALUE="default"/>
+      <item NAME="config_export -vivado_synth_design_args" VALUE="-directive sdx_optimization_effort_high"/>
+    </Syn>
+    <Impl NAME="Place &amp; Route Options">
+      <item NAME="config_export -vivado_impl_strategy" VALUE="default"/>
+      <item NAME="config_export -vivado_phys_opt" VALUE="none"/>
+      <item NAME="config_export -vivado_pblock" VALUE=""/>
+    </Impl>
+    <Reporting NAME="Reporting Options">
+      <item NAME="config_export -vivado_report_level" VALUE="2"/>
+      <item NAME="config_export -vivado_max_timing_paths" VALUE="10"/>
+    </Reporting>
+  </RunOptions>
+</profile>
+

@@ -1,0 +1,108 @@
+{
+ "case": "gauss_dse_op40_ir",
+ "kernel": "gauss",
+ "kind": "ir",
+ "note": "exploração: eficiência por operação, PSNR >= 40 dB (2 × MUL8 T8 +C, 1 × ADD16 LOA7, 2 × ADD16 LOA8, 1 × ADD16 TRUNC8, 1 × ADD16 LOA9, 1 × MUL8 T6 A4c, 1 × ADD16 TRUNC7, 1 × ADD16 LOA10)",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "gauss",
+ "assign": {
+  "S1.1": "MUL8 T8 +C",
+  "S1.4": "ADD16 LOA7",
+  "S1.6": "MUL8 T8 +C",
+  "S1.7": "ADD16 LOA8",
+  "S1.10": "ADD16 TRUNC8",
+  "S1.12": "MUL8 T8 +C",
+  "S1.13": "ADD16 LOA9",
+  "S1.16": "ADD16 TRUNC7",
+  "S1.18": "MUL8 T6 A4c",
+  "S1.19": "ADD16 LOA10",
+  "S1.22": "ADD16 LOA8",
+  "S1.24": "MUL8 T8 +C",
+  "S1.25": "ADD16 LOA8"
+ },
+ "prediction": {
+  "cycles": 72960,
+  "timeNs": 364800,
+  "intervalNs": 10,
+  "critPs": 4979,
+  "luts": 355,
+  "carry4": 34,
+  "ff": 211,
+  "areaUm2": 13699.411199999999,
+  "energyFj": 1365040041.40032,
+  "loops": [
+   {
+    "label": "rows",
+    "mode": "sequential",
+    "trip": 190,
+    "II": null,
+    "iterLatency": 384,
+    "latency": 72960
+   },
+   {
+    "label": "cols",
+    "mode": "pipelined",
+    "trip": 190,
+    "II": 2,
+    "iterLatency": 4,
+    "latency": 383
+   }
+  ],
+  "units": [
+   {
+    "unit": "MUL8 T8 +C",
+    "count": 2,
+    "luts": 98,
+    "carry4": 8
+   },
+   {
+    "unit": "ADD16 LOA7",
+    "count": 1,
+    "luts": 17,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 LOA8",
+    "count": 2,
+    "luts": 34,
+    "carry4": 6
+   },
+   {
+    "unit": "ADD16 TRUNC8",
+    "count": 1,
+    "luts": 8,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 LOA9",
+    "count": 1,
+    "luts": 17,
+    "carry4": 2
+   },
+   {
+    "unit": "MUL8 T6 A4c",
+    "count": 1,
+    "luts": 61,
+    "carry4": 2
+   },
+   {
+    "unit": "ADD16 TRUNC7",
+    "count": 1,
+    "luts": 9,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 LOA10",
+    "count": 1,
+    "luts": 17,
+    "carry4": 2
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "pipelineOverhead": 1
+  }
+ }
+}

@@ -1,0 +1,58 @@
+{
+ "case": "sharpen_ir",
+ "kernel": "sharpen",
+ "kind": "ir",
+ "note": "projeto elaborado, exato",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "sharpen",
+ "assign": {},
+ "prediction": {
+  "cycles": 72960,
+  "timeNs": 364800,
+  "intervalNs": 10,
+  "critPs": 4949,
+  "luts": 267,
+  "carry4": 22,
+  "ff": 88,
+  "areaUm2": 10042.159599999999,
+  "energyFj": 772751043.86496,
+  "loops": [
+   {
+    "label": "rows",
+    "mode": "sequential",
+    "trip": 190,
+    "II": null,
+    "iterLatency": 384,
+    "latency": 72960
+   },
+   {
+    "label": "cols",
+    "mode": "pipelined",
+    "trip": 190,
+    "II": 2,
+    "iterLatency": 4,
+    "latency": 383
+   }
+  ],
+  "units": [
+   {
+    "unit": "MUL8 exato",
+    "count": 1,
+    "luts": 101,
+    "carry4": 4
+   },
+   {
+    "unit": "ADD16 exato",
+    "count": 2,
+    "luts": 32,
+    "carry4": 10
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "pipelineOverhead": 1
+  }
+ }
+}

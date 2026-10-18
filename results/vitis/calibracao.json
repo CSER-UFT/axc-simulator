@@ -1,0 +1,12 @@
+{
+ "loopOverhead": 35,
+ "pipelineOverhead": 71819,
+ "lutScale": 1.3278688524590163,
+ "ffScale": 2.3555555555555556,
+ "cycleRatio": 0.98984375,
+ "samples": {
+  "sequentialLoops": 8,
+  "pipelinedLoops": 21,
+  "cases": 23
+ }
+}

@@ -1,0 +1,2190 @@
+{
+ "part": "xc7a100tcsg324-1",
+ "collected": "2026-10-18T14:51:56.562Z",
+ "rows": [
+  {
+   "case": "gauss_src",
+   "kernel": "gauss",
+   "kind": "src",
+   "note": "código original, exato",
+   "clockNs": 5,
+   "model": {
+    "cycles": 73340,
+    "timeNs": 366700,
+    "intervalNs": 10,
+    "critPs": 4046,
+    "luts": 549,
+    "carry4": 37,
+    "ff": 309,
+    "areaUm2": 22576.6928,
+    "energyFj": 2164540027.3513203,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 386,
+      "latency": 73340
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 6,
+      "latency": 385
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 3,
+      "luts": 303,
+      "carry4": 12
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 4,
+      "luts": 64,
+      "carry4": 20
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72218,
+    "latencyWorst": 72218,
+    "intervalMin": 72219,
+    "lut": 2240,
+    "ff": 1321,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72216,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 19
+     }
+    ]
+   },
+   "impl": {
+    "lut": 731,
+    "ff": 618,
+    "dsp": 0,
+    "slice": 291,
+    "bram": 0,
+    "achievedNs": 5.348,
+    "timingMet": "FALSE",
+    "carry4": 138
+   }
+  },
+  {
+   "case": "gauss_ir",
+   "kernel": "gauss",
+   "kind": "ir",
+   "note": "projeto elaborado, exato",
+   "clockNs": 5,
+   "model": {
+    "cycles": 73340,
+    "timeNs": 366700,
+    "intervalNs": 10,
+    "critPs": 4046,
+    "luts": 549,
+    "carry4": 37,
+    "ff": 309,
+    "areaUm2": 22576.6928,
+    "energyFj": 2164540027.3513203,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 386,
+      "latency": 73340
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 6,
+      "latency": 385
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 3,
+      "luts": 303,
+      "carry4": 12
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 4,
+      "luts": 64,
+      "carry4": 20
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72218,
+    "latencyWorst": 72218,
+    "intervalMin": 72219,
+    "lut": 2192,
+    "ff": 1137,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72216,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 19
+     }
+    ]
+   },
+   "impl": {
+    "lut": 729,
+    "ff": 590,
+    "dsp": 0,
+    "slice": 276,
+    "bram": 0,
+    "achievedNs": 5.375,
+    "timingMet": "FALSE",
+    "carry4": 141
+   }
+  },
+  {
+   "case": "sobel_src",
+   "kernel": "sobel",
+   "kind": "src",
+   "note": "código original, exato",
+   "clockNs": 5,
+   "model": {
+    "cycles": 73150,
+    "timeNs": 365750,
+    "intervalNs": 10,
+    "critPs": 4623,
+    "luts": 401,
+    "carry4": 45,
+    "ff": 180,
+    "areaUm2": 16289.436,
+    "energyFj": 1389953800.6195,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 385,
+      "latency": 73150
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 5,
+      "latency": 384
+     }
+    ],
+    "units": [
+     {
+      "unit": "ADD16 exato",
+      "count": 7,
+      "luts": 112,
+      "carry4": 35
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72219,
+    "latencyWorst": 72219,
+    "intervalMin": 72220,
+    "lut": 1892,
+    "ff": 1206,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72217,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 20
+     }
+    ]
+   },
+   "impl": {
+    "lut": 655,
+    "ff": 565,
+    "dsp": 0,
+    "slice": 257,
+    "bram": 0,
+    "achievedNs": 5.791,
+    "timingMet": "FALSE",
+    "carry4": 118
+   }
+  },
+  {
+   "case": "sobel_ir",
+   "kernel": "sobel",
+   "kind": "ir",
+   "note": "projeto elaborado, exato",
+   "clockNs": 5,
+   "model": {
+    "cycles": 73150,
+    "timeNs": 365750,
+    "intervalNs": 10,
+    "critPs": 4623,
+    "luts": 401,
+    "carry4": 45,
+    "ff": 180,
+    "areaUm2": 16289.436,
+    "energyFj": 1389953800.6195,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 385,
+      "latency": 73150
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 5,
+      "latency": 384
+     }
+    ],
+    "units": [
+     {
+      "unit": "ADD16 exato",
+      "count": 7,
+      "luts": 112,
+      "carry4": 35
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72219,
+    "latencyWorst": 72219,
+    "intervalMin": 72220,
+    "lut": 1913,
+    "ff": 1288,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72217,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 20
+     }
+    ]
+   },
+   "impl": {
+    "lut": 674,
+    "ff": 567,
+    "dsp": 0,
+    "slice": 263,
+    "bram": 0,
+    "achievedNs": 5.89,
+    "timingMet": "FALSE",
+    "carry4": 118
+   }
+  },
+  {
+   "case": "sharpen_src",
+   "kernel": "sharpen",
+   "kind": "src",
+   "note": "código original, exato",
+   "clockNs": 5,
+   "model": {
+    "cycles": 72960,
+    "timeNs": 364800,
+    "intervalNs": 10,
+    "critPs": 4949,
+    "luts": 267,
+    "carry4": 22,
+    "ff": 88,
+    "areaUm2": 10042.159599999999,
+    "energyFj": 772751043.86496,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 384,
+      "latency": 72960
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 4,
+      "latency": 383
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 1,
+      "luts": 101,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 2,
+      "luts": 32,
+      "carry4": 10
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72218,
+    "latencyWorst": 72218,
+    "intervalMin": 72219,
+    "lut": 1655,
+    "ff": 979,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72216,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 19
+     }
+    ]
+   },
+   "impl": {
+    "lut": 493,
+    "ff": 431,
+    "dsp": 0,
+    "slice": 198,
+    "bram": 0,
+    "achievedNs": 5.793,
+    "timingMet": "FALSE",
+    "carry4": 94
+   }
+  },
+  {
+   "case": "sharpen_ir",
+   "kernel": "sharpen",
+   "kind": "ir",
+   "note": "projeto elaborado, exato",
+   "clockNs": 5,
+   "model": {
+    "cycles": 72960,
+    "timeNs": 364800,
+    "intervalNs": 10,
+    "critPs": 4949,
+    "luts": 267,
+    "carry4": 22,
+    "ff": 88,
+    "areaUm2": 10042.159599999999,
+    "energyFj": 772751043.86496,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 384,
+      "latency": 72960
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 4,
+      "latency": 383
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 1,
+      "luts": 101,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 2,
+      "luts": 32,
+      "carry4": 10
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72218,
+    "latencyWorst": 72218,
+    "intervalMin": 72219,
+    "lut": 1658,
+    "ff": 1015,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72216,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 19
+     }
+    ]
+   },
+   "impl": {
+    "lut": 496,
+    "ff": 468,
+    "dsp": 0,
+    "slice": 206,
+    "bram": 0,
+    "achievedNs": 5.307,
+    "timingMet": "FALSE",
+    "carry4": 94
+   }
+  },
+  {
+   "case": "fir_src",
+   "kernel": "fir",
+   "kind": "src",
+   "note": "código original, exato",
+   "clockNs": 5,
+   "model": {
+    "cycles": 1018,
+    "timeNs": 5090,
+    "intervalNs": 5,
+    "critPs": 4949,
+    "luts": 1740,
+    "carry4": 155,
+    "ff": 736,
+    "areaUm2": 71200.7512,
+    "energyFj": 101360967.231156,
+    "loops": [
+     {
+      "label": "samples",
+      "mode": "pipelined",
+      "trip": 1009,
+      "II": 1,
+      "iterLatency": 9,
+      "latency": 1018
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 14,
+      "luts": 1414,
+      "carry4": 56
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 11,
+      "luts": 176,
+      "carry4": 55
+     },
+     {
+      "unit": "ADD32 (2 × ADD16 exato)",
+      "count": 4,
+      "luts": 128,
+      "carry4": 40
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 6.362,
+    "latencyBest": 1019,
+    "latencyWorst": 1019,
+    "intervalMin": 1020,
+    "lut": 3454,
+    "ff": 1079,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1017,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 10
+     }
+    ]
+   },
+   "impl": {
+    "lut": 1108,
+    "ff": 946,
+    "dsp": 0,
+    "slice": 409,
+    "bram": 0,
+    "achievedNs": 4.488,
+    "timingMet": "TRUE",
+    "carry4": 125
+   }
+  },
+  {
+   "case": "fir_ir",
+   "kernel": "fir",
+   "kind": "ir",
+   "note": "projeto elaborado, exato",
+   "clockNs": 5,
+   "model": {
+    "cycles": 1018,
+    "timeNs": 5090,
+    "intervalNs": 5,
+    "critPs": 4949,
+    "luts": 1740,
+    "carry4": 155,
+    "ff": 736,
+    "areaUm2": 71200.7512,
+    "energyFj": 101360967.231156,
+    "loops": [
+     {
+      "label": "samples",
+      "mode": "pipelined",
+      "trip": 1009,
+      "II": 1,
+      "iterLatency": 9,
+      "latency": 1018
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 14,
+      "luts": 1414,
+      "carry4": 56
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 11,
+      "luts": 176,
+      "carry4": 55
+     },
+     {
+      "unit": "ADD32 (2 × ADD16 exato)",
+      "count": 4,
+      "luts": 128,
+      "carry4": 40
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 6.362,
+    "latencyBest": 1024,
+    "latencyWorst": 1024,
+    "intervalMin": 1025,
+    "lut": 3635,
+    "ff": 1392,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1022,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 15
+     }
+    ]
+   },
+   "impl": {
+    "lut": 940,
+    "ff": 857,
+    "dsp": 0,
+    "slice": 309,
+    "bram": 0,
+    "achievedNs": 4.61,
+    "timingMet": "TRUE",
+    "carry4": 107
+   }
+  },
+  {
+   "case": "dot_src",
+   "kernel": "dot",
+   "kind": "src",
+   "note": "código original, exato",
+   "clockNs": 5,
+   "model": {
+    "cycles": 259,
+    "timeNs": 1295,
+    "intervalNs": 5,
+    "critPs": 4949,
+    "luts": 155,
+    "carry4": 18,
+    "ff": 73,
+    "areaUm2": 6859.0716,
+    "energyFj": 2660854.2445139997,
+    "loops": [
+     {
+      "label": "acc",
+      "mode": "pipelined",
+      "trip": 256,
+      "II": 1,
+      "iterLatency": 2,
+      "latency": 258
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 1,
+      "luts": 101,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD32 (2 × ADD16 exato)",
+      "count": 1,
+      "luts": 32,
+      "carry4": 10
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 1
+   },
+   "hls": {
+    "estClockNs": 6.362,
+    "latencyBest": 260,
+    "latencyWorst": 260,
+    "intervalMin": 261,
+    "lut": 180,
+    "ff": 74,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "acc",
+      "trip": 256,
+      "latency": 258,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 4
+     }
+    ]
+   },
+   "impl": {
+    "lut": 111,
+    "ff": 76,
+    "dsp": 0,
+    "slice": 43,
+    "bram": 0,
+    "achievedNs": 5.761,
+    "timingMet": "FALSE",
+    "carry4": 18
+   }
+  },
+  {
+   "case": "dot_ir",
+   "kernel": "dot",
+   "kind": "ir",
+   "note": "projeto elaborado, exato",
+   "clockNs": 5,
+   "model": {
+    "cycles": 259,
+    "timeNs": 1295,
+    "intervalNs": 5,
+    "critPs": 4949,
+    "luts": 155,
+    "carry4": 18,
+    "ff": 73,
+    "areaUm2": 6859.0716,
+    "energyFj": 2660854.2445139997,
+    "loops": [
+     {
+      "label": "acc",
+      "mode": "pipelined",
+      "trip": 256,
+      "II": 1,
+      "iterLatency": 2,
+      "latency": 258
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 1,
+      "luts": 101,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD32 (2 × ADD16 exato)",
+      "count": 1,
+      "luts": 32,
+      "carry4": 10
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 1
+   },
+   "hls": {
+    "estClockNs": 6.362,
+    "latencyBest": 260,
+    "latencyWorst": 260,
+    "intervalMin": 261,
+    "lut": 180,
+    "ff": 74,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "acc",
+      "trip": 256,
+      "latency": 258,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 4
+     }
+    ]
+   },
+   "impl": {
+    "lut": 111,
+    "ff": 74,
+    "dsp": 0,
+    "slice": 39,
+    "bram": 0,
+    "achievedNs": 5.723,
+    "timingMet": "FALSE",
+    "carry4": 18
+   }
+  },
+  {
+   "case": "gauss_var1_ir",
+   "kernel": "gauss",
+   "kind": "ir",
+   "note": "sem array_partition (linha 6)",
+   "clockNs": 5,
+   "model": {
+    "cycles": 181070,
+    "timeNs": 905350,
+    "intervalNs": 25,
+    "critPs": 4716,
+    "luts": 259,
+    "carry4": 19,
+    "ff": 180,
+    "areaUm2": 14569.026,
+    "energyFj": 2864351845.6657996,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 953,
+      "latency": 181070
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 5,
+      "iterLatency": 6,
+      "latency": 952
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 1,
+      "luts": 101,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 2,
+      "luts": 32,
+      "carry4": 10
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 6.362,
+    "latencyBest": 180506,
+    "latencyWorst": 180506,
+    "intervalMin": 180507,
+    "lut": 1096,
+    "ff": 450,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 180504,
+      "iterLatency": null,
+      "II": 5,
+      "depth": 10
+     }
+    ]
+   },
+   "impl": {
+    "lut": 398,
+    "ff": 424,
+    "dsp": 0,
+    "slice": 181,
+    "bram": 0,
+    "achievedNs": 4.541,
+    "timingMet": "TRUE",
+    "carry4": 93
+   }
+  },
+  {
+   "case": "gauss_var2_ir",
+   "kernel": "gauss",
+   "kind": "ir",
+   "note": "sem pipeline (linha 12)",
+   "clockNs": 5,
+   "model": {
+    "cycles": 1155390,
+    "timeNs": 5776950,
+    "intervalNs": null,
+    "critPs": 3737,
+    "luts": 179,
+    "carry4": 18,
+    "ff": 59,
+    "areaUm2": 7091.832800000001,
+    "energyFj": 8182980025.36772,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 6081,
+      "latency": 1155390
+     },
+     {
+      "label": "cols",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 32,
+      "latency": 6080
+     },
+     {
+      "label": "L3",
+      "mode": "sequential",
+      "trip": 3,
+      "II": null,
+      "iterLatency": 10,
+      "latency": 30
+     },
+     {
+      "label": "L4",
+      "mode": "sequential",
+      "trip": 3,
+      "II": null,
+      "iterLatency": 3,
+      "latency": 9
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 1,
+      "luts": 101,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 1,
+      "luts": 16,
+      "carry4": 5
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 3899371,
+    "latencyWorst": 3899371,
+    "intervalMin": 3899372,
+    "lut": 670,
+    "ff": 356,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows",
+      "trip": 190,
+      "latency": 3899370,
+      "iterLatency": 20523,
+      "II": null,
+      "depth": null
+     },
+     {
+      "name": "cols",
+      "trip": 190,
+      "latency": 20520,
+      "iterLatency": 108,
+      "II": null,
+      "depth": null
+     },
+     {
+      "name": "L3",
+      "trip": 3,
+      "latency": 105,
+      "iterLatency": 35,
+      "II": null,
+      "depth": null
+     },
+     {
+      "name": "L4",
+      "trip": 3,
+      "latency": 21,
+      "iterLatency": 7,
+      "II": null,
+      "depth": null
+     }
+    ]
+   },
+   "impl": {
+    "lut": 177,
+    "ff": 281,
+    "dsp": 0,
+    "slice": 90,
+    "bram": 0,
+    "achievedNs": 5.391,
+    "timingMet": "FALSE",
+    "carry4": 35
+   }
+  },
+  {
+   "case": "gauss_var3_ir",
+   "kernel": "gauss",
+   "kind": "ir",
+   "note": "sem array_partition (linha 6), pipeline (linha 12)",
+   "clockNs": 5,
+   "model": {
+    "cycles": 1155390,
+    "timeNs": 5776950,
+    "intervalNs": null,
+    "critPs": 3737,
+    "luts": 179,
+    "carry4": 18,
+    "ff": 59,
+    "areaUm2": 7091.832800000001,
+    "energyFj": 8182980025.36772,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 6081,
+      "latency": 1155390
+     },
+     {
+      "label": "cols",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 32,
+      "latency": 6080
+     },
+     {
+      "label": "L3",
+      "mode": "sequential",
+      "trip": 3,
+      "II": null,
+      "iterLatency": 10,
+      "latency": 30
+     },
+     {
+      "label": "L4",
+      "mode": "sequential",
+      "trip": 3,
+      "II": null,
+      "iterLatency": 3,
+      "latency": 9
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 1,
+      "luts": 101,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 1,
+      "luts": 16,
+      "carry4": 5
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 6.362,
+    "latencyBest": 2383171,
+    "latencyWorst": 2383171,
+    "intervalMin": 2383172,
+    "lut": 433,
+    "ff": 203,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows",
+      "trip": 190,
+      "latency": 2383170,
+      "iterLatency": 12543,
+      "II": null,
+      "depth": null
+     },
+     {
+      "name": "cols",
+      "trip": 190,
+      "latency": 12540,
+      "iterLatency": 66,
+      "II": null,
+      "depth": null
+     },
+     {
+      "name": "L3",
+      "trip": 3,
+      "latency": 63,
+      "iterLatency": 21,
+      "II": null,
+      "depth": null
+     },
+     {
+      "name": "L4",
+      "trip": 3,
+      "latency": 18,
+      "iterLatency": 6,
+      "II": null,
+      "depth": null
+     }
+    ]
+   },
+   "impl": {
+    "lut": 117,
+    "ff": 196,
+    "dsp": 0,
+    "slice": 53,
+    "bram": 0,
+    "achievedNs": 4.544,
+    "timingMet": "TRUE",
+    "carry4": 24
+   }
+  },
+  {
+   "case": "gauss_2p5ns_ir",
+   "kernel": "gauss",
+   "kind": "ir",
+   "note": "período de 2.5 ns",
+   "clockNs": 2.5,
+   "model": {
+    "cycles": 74480,
+    "timeNs": 186200,
+    "intervalNs": 5,
+    "critPs": 2230,
+    "luts": 735,
+    "carry4": 45,
+    "ff": 703,
+    "areaUm2": 36049.6176,
+    "energyFj": 3821685922.18184,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 392,
+      "latency": 74480
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 12,
+      "latency": 391
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 5,
+      "luts": 505,
+      "carry4": 20
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 4,
+      "luts": 64,
+      "carry4": 20
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72222,
+    "latencyWorst": 72222,
+    "intervalMin": 72223,
+    "lut": 2285,
+    "ff": 3217,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72220,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 23
+     }
+    ]
+   },
+   "impl": {
+    "lut": 903,
+    "ff": 926,
+    "dsp": 0,
+    "slice": 349,
+    "bram": 0,
+    "achievedNs": 5.584,
+    "timingMet": "FALSE",
+    "carry4": 123
+   }
+  },
+  {
+   "case": "gauss_10ns_ir",
+   "kernel": "gauss",
+   "kind": "ir",
+   "note": "período de 10 ns",
+   "clockNs": 10,
+   "model": {
+    "cycles": 72960,
+    "timeNs": 729600,
+    "intervalNs": 20,
+    "critPs": 6237,
+    "luts": 549,
+    "carry4": 37,
+    "ff": 225,
+    "areaUm2": 20895.079999999998,
+    "energyFj": 1815815410.0064,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 384,
+      "latency": 72960
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 4,
+      "latency": 383
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 exato",
+      "count": 3,
+      "luts": 303,
+      "carry4": 12
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 4,
+      "luts": 64,
+      "carry4": 20
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.294,
+    "latencyBest": 72217,
+    "latencyWorst": 72217,
+    "intervalMin": 72218,
+    "lut": 2160,
+    "ff": 1159,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72215,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 18
+     }
+    ]
+   },
+   "impl": {
+    "lut": 700,
+    "ff": 480,
+    "dsp": 0,
+    "slice": 250,
+    "bram": 0,
+    "achievedNs": 7.469,
+    "timingMet": "TRUE",
+    "carry4": 135
+   }
+  },
+  {
+   "case": "gauss_drum6_ir",
+   "kernel": "gauss",
+   "kind": "ir",
+   "note": "mul8=MUL8 DRUM6",
+   "clockNs": 5,
+   "model": {
+    "cycles": 73340,
+    "timeNs": 366700,
+    "intervalNs": 10,
+    "critPs": 4046,
+    "luts": 555,
+    "carry4": 34,
+    "ff": 309,
+    "areaUm2": 20437.1528,
+    "energyFj": 2160536150.1161203,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 386,
+      "latency": 73340
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 6,
+      "latency": 385
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 DRUM6",
+      "count": 3,
+      "luts": 309,
+      "carry4": 9
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 4,
+      "luts": 64,
+      "carry4": 20
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72222,
+    "latencyWorst": 72222,
+    "intervalMin": 72223,
+    "lut": 4422,
+    "ff": 2651,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72220,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 23
+     }
+    ]
+   },
+   "impl": {
+    "lut": 886,
+    "ff": 845,
+    "dsp": 0,
+    "slice": 381,
+    "bram": 0,
+    "achievedNs": 5.666,
+    "timingMet": "FALSE",
+    "carry4": 147
+   }
+  },
+  {
+   "case": "gauss_t8c_loa6_ir",
+   "kernel": "gauss",
+   "kind": "ir",
+   "note": "mul8=MUL8 T8 +C;add16=ADD16 LOA6",
+   "clockNs": 5,
+   "model": {
+    "cycles": 73150,
+    "timeNs": 365750,
+    "intervalNs": 10,
+    "critPs": 4966,
+    "luts": 397,
+    "carry4": 29,
+    "ff": 234,
+    "areaUm2": 15488.632799999998,
+    "energyFj": 1504721749.2372,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 385,
+      "latency": 73150
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 5,
+      "latency": 384
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 3,
+      "luts": 147,
+      "carry4": 12
+     },
+     {
+      "unit": "ADD16 LOA6",
+      "count": 4,
+      "luts": 68,
+      "carry4": 12
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72237,
+    "latencyWorst": 72237,
+    "intervalMin": 72238,
+    "lut": 3879,
+    "ff": 2666,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72235,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 38
+     }
+    ]
+   },
+   "impl": {
+    "lut": 917,
+    "ff": 901,
+    "dsp": 0,
+    "slice": 388,
+    "bram": 0,
+    "achievedNs": 5.522,
+    "timingMet": "FALSE",
+    "carry4": 141
+   }
+  },
+  {
+   "case": "sobel_loa4_ir",
+   "kernel": "sobel",
+   "kind": "ir",
+   "note": "*=ADD16 LOA4",
+   "clockNs": 5,
+   "model": {
+    "cycles": 73150,
+    "timeNs": 365750,
+    "intervalNs": 10,
+    "critPs": 4545,
+    "luts": 404,
+    "carry4": 42,
+    "ff": 180,
+    "areaUm2": 15823.985999999999,
+    "energyFj": 1357490824.04875,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 385,
+      "latency": 73150
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 5,
+      "latency": 384
+     }
+    ],
+    "units": [
+     {
+      "unit": "ADD16 LOA4",
+      "count": 3,
+      "luts": 51,
+      "carry4": 12
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 4,
+      "luts": 64,
+      "carry4": 20
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72224,
+    "latencyWorst": 72224,
+    "intervalMin": 72225,
+    "lut": 2400,
+    "ff": 1807,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72222,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 25
+     }
+    ]
+   },
+   "impl": {
+    "lut": 758,
+    "ff": 776,
+    "dsp": 0,
+    "slice": 324,
+    "bram": 0,
+    "achievedNs": 5.74,
+    "timingMet": "FALSE",
+    "carry4": 117
+   }
+  },
+  {
+   "case": "sharpen_kul_ir",
+   "kernel": "sharpen",
+   "kind": "ir",
+   "note": "mul8=MUL8 KUL",
+   "clockNs": 5,
+   "model": {
+    "cycles": 72960,
+    "timeNs": 364800,
+    "intervalNs": 10,
+    "critPs": 4865,
+    "luts": 245,
+    "carry4": 22,
+    "ff": 88,
+    "areaUm2": 9317.719599999999,
+    "energyFj": 755550312.34016,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 384,
+      "latency": 72960
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 4,
+      "latency": 383
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 KUL",
+      "count": 1,
+      "luts": 79,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD16 exato",
+      "count": 2,
+      "luts": 32,
+      "carry4": 10
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72219,
+    "latencyWorst": 72219,
+    "intervalMin": 72220,
+    "lut": 1773,
+    "ff": 1128,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72217,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 20
+     }
+    ]
+   },
+   "impl": {
+    "lut": 590,
+    "ff": 487,
+    "dsp": 0,
+    "slice": 243,
+    "bram": 0,
+    "achievedNs": 5.38,
+    "timingMet": "FALSE",
+    "carry4": 101
+   }
+  },
+  {
+   "case": "fir_t8c_loa11_ir",
+   "kernel": "fir",
+   "kind": "ir",
+   "note": "mul8=MUL8 T8 +C;add16=ADD16 LOA11;add32=ADD32 (ADD16 LOA11 + ADD16 exato)",
+   "clockNs": 5,
+   "model": {
+    "cycles": 1015,
+    "timeNs": 5075,
+    "intervalNs": 5,
+    "critPs": 4534,
+    "luts": 1027,
+    "carry4": 110,
+    "ff": 469,
+    "areaUm2": 37927.684799999995,
+    "energyFj": 56777417.523245014,
+    "loops": [
+     {
+      "label": "samples",
+      "mode": "pipelined",
+      "trip": 1009,
+      "II": 1,
+      "iterLatency": 6,
+      "latency": 1015
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 14,
+      "luts": 686,
+      "carry4": 56
+     },
+     {
+      "unit": "ADD16 LOA11",
+      "count": 11,
+      "luts": 187,
+      "carry4": 22
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA11 + ADD16 exato)",
+      "count": 4,
+      "luts": 132,
+      "carry4": 28
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 3.733,
+    "latencyBest": 1058,
+    "latencyWorst": 1058,
+    "intervalMin": 1059,
+    "lut": 10117,
+    "ff": 4784,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1056,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 49
+     }
+    ]
+   },
+   "impl": {
+    "lut": 1255,
+    "ff": 806,
+    "dsp": 0,
+    "slice": 410,
+    "bram": 0,
+    "achievedNs": 4.447,
+    "timingMet": "TRUE"
+   }
+  },
+  {
+   "case": "dot_t4_ir",
+   "kernel": "dot",
+   "kind": "ir",
+   "note": "mul8=MUL8 T4",
+   "clockNs": 5,
+   "model": {
+    "cycles": 259,
+    "timeNs": 1295,
+    "intervalNs": 5,
+    "critPs": 4945,
+    "luts": 140,
+    "carry4": 17,
+    "ff": 73,
+    "areaUm2": 6630.101600000001,
+    "energyFj": 2617195.6561590005,
+    "loops": [
+     {
+      "label": "acc",
+      "mode": "pipelined",
+      "trip": 256,
+      "II": 1,
+      "iterLatency": 2,
+      "latency": 258
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 T4",
+      "count": 1,
+      "luts": 86,
+      "carry4": 3
+     },
+     {
+      "unit": "ADD32 (2 × ADD16 exato)",
+      "count": 1,
+      "luts": 32,
+      "carry4": 10
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 1
+   },
+   "hls": {
+    "estClockNs": 4.034,
+    "latencyBest": 264,
+    "latencyWorst": 264,
+    "intervalMin": 265,
+    "lut": 917,
+    "ff": 501,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "acc",
+      "trip": 256,
+      "latency": 262,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 8
+     }
+    ]
+   },
+   "impl": {
+    "lut": 167,
+    "ff": 169,
+    "dsp": 0,
+    "slice": 60,
+    "bram": 0,
+    "achievedNs": 3.343,
+    "timingMet": "TRUE",
+    "carry4": 28
+   }
+  },
+  {
+   "case": "gauss_dse_op40_ir",
+   "kernel": "gauss",
+   "kind": "ir",
+   "note": "exploração: eficiência por operação, PSNR >= 40 dB (2 × MUL8 T8 +C, 1 × ADD16 LOA7, 2 × ADD16 LOA8, 1 × ADD16 TRUNC8, 1 × ADD16 LOA9, 1 × MUL8 T6 A4c, 1 × ADD16 TRUNC7, 1 × ADD16 LOA10)",
+   "clockNs": 5,
+   "model": {
+    "cycles": 72960,
+    "timeNs": 364800,
+    "intervalNs": 10,
+    "critPs": 4979,
+    "luts": 355,
+    "carry4": 34,
+    "ff": 211,
+    "areaUm2": 13699.411199999999,
+    "energyFj": 1365040041.40032,
+    "loops": [
+     {
+      "label": "rows",
+      "mode": "sequential",
+      "trip": 190,
+      "II": null,
+      "iterLatency": 384,
+      "latency": 72960
+     },
+     {
+      "label": "cols",
+      "mode": "pipelined",
+      "trip": 190,
+      "II": 2,
+      "iterLatency": 4,
+      "latency": 383
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 2,
+      "luts": 98,
+      "carry4": 8
+     },
+     {
+      "unit": "ADD16 LOA7",
+      "count": 1,
+      "luts": 17,
+      "carry4": 3
+     },
+     {
+      "unit": "ADD16 LOA8",
+      "count": 2,
+      "luts": 34,
+      "carry4": 6
+     },
+     {
+      "unit": "ADD16 TRUNC8",
+      "count": 1,
+      "luts": 8,
+      "carry4": 3
+     },
+     {
+      "unit": "ADD16 LOA9",
+      "count": 1,
+      "luts": 17,
+      "carry4": 2
+     },
+     {
+      "unit": "MUL8 T6 A4c",
+      "count": 1,
+      "luts": 61,
+      "carry4": 2
+     },
+     {
+      "unit": "ADD16 TRUNC7",
+      "count": 1,
+      "luts": 9,
+      "carry4": 3
+     },
+     {
+      "unit": "ADD16 LOA10",
+      "count": 1,
+      "luts": 17,
+      "carry4": 2
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72233,
+    "latencyWorst": 72233,
+    "intervalMin": 72234,
+    "lut": 3564,
+    "ff": 2329,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72231,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 34
+     }
+    ]
+   },
+   "impl": {
+    "lut": 774,
+    "ff": 788,
+    "dsp": 0,
+    "slice": 316,
+    "bram": 0,
+    "achievedNs": 5.73,
+    "timingMet": "FALSE",
+    "carry4": 123
+   }
+  },
+  {
+   "case": "fir_dse_op60_ir",
+   "kernel": "fir",
+   "kind": "ir",
+   "note": "exploração: eficiência por operação, PSNR >= 60 dB (2 × MUL8 DRUM4, 1 × MUL8 DRUM2, 2 × MUL8 T16, 1 × ADD16 LOA15, 3 × MUL8 T8 +C, 1 × ADD16 LOA10, 4 × MUL8 T6 A10c, 1 × MUL8 DRUM3 +C, 5 × ADD16 LOA9, 4 × ADD16 LOA8, 2 × ADD32 (ADD16 LOA8 + ADD16 exato), 1 × MUL8 DRUM3, 1 × ADD32 (ADD16 LOA10 + ADD16 exato), 1 × ADD32 (ADD16 LOA15 + ADD16 exato))",
+   "clockNs": 5,
+   "model": {
+    "cycles": 1015,
+    "timeNs": 5075,
+    "intervalNs": 5,
+    "critPs": 4981,
+    "luts": 1161,
+    "carry4": 77,
+    "ff": 506,
+    "areaUm2": 33527.18519999999,
+    "energyFj": 53905994.08873001,
+    "loops": [
+     {
+      "label": "samples",
+      "mode": "pipelined",
+      "trip": 1009,
+      "II": 1,
+      "iterLatency": 6,
+      "latency": 1015
+     }
+    ],
+    "units": [
+     {
+      "unit": "MUL8 DRUM4",
+      "count": 2,
+      "luts": 202,
+      "carry4": 4
+     },
+     {
+      "unit": "MUL8 DRUM2",
+      "count": 1,
+      "luts": 83,
+      "carry4": 1
+     },
+     {
+      "unit": "MUL8 T16",
+      "count": 2,
+      "luts": 0,
+      "carry4": 0
+     },
+     {
+      "unit": "ADD16 LOA15",
+      "count": 1,
+      "luts": 17,
+      "carry4": 0
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 3,
+      "luts": 147,
+      "carry4": 12
+     },
+     {
+      "unit": "ADD16 LOA10",
+      "count": 1,
+      "luts": 17,
+      "carry4": 2
+     },
+     {
+      "unit": "MUL8 T6 A10c",
+      "count": 4,
+      "luts": 208,
+      "carry4": 0
+     },
+     {
+      "unit": "MUL8 DRUM3 +C",
+      "count": 1,
+      "luts": 90,
+      "carry4": 2
+     },
+     {
+      "unit": "ADD16 LOA9",
+      "count": 5,
+      "luts": 85,
+      "carry4": 10
+     },
+     {
+      "unit": "ADD16 LOA8",
+      "count": 4,
+      "luts": 68,
+      "carry4": 12
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
+      "count": 2,
+      "luts": 66,
+      "carry4": 16
+     },
+     {
+      "unit": "MUL8 DRUM3",
+      "count": 1,
+      "luts": 90,
+      "carry4": 2
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
+      "count": 1,
+      "luts": 33,
+      "carry4": 7
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
+      "count": 1,
+      "luts": 33,
+      "carry4": 5
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "pipelineOverhead": 1
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 3.733,
+    "latencyBest": 1052,
+    "latencyWorst": 1052,
+    "intervalMin": 1053,
+    "lut": 8715,
+    "ff": 4777,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1050,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 43
+     }
+    ]
+   },
+   "impl": {
+    "lut": 1399,
+    "ff": 1026,
+    "dsp": 0,
+    "slice": 504,
+    "bram": 0,
+    "achievedNs": 4.265,
+    "timingMet": "TRUE",
+    "carry4": 53
+   }
+  }
+ ]
+}

@@ -1,0 +1,154 @@
+% Tabelas da validação (scripts/vitis.mjs collect). Requer \usepackage[table]{xcolor} e a cor tabAzul definida.
+
+\begin{table}[htbp]
+\centering
+\caption{Execução: csim do Vitis contra a execução bit a bit do simulador}
+\begin{tabular}{|l|r|r|}
+\hline
+\rowcolor{tabAzul}\color{white}Caso & \color{white}Diferenças & \color{white}Posições \\
+\hline
+gauss\_src & 0 & 36100 \\ \hline
+gauss\_ir & 0 & 36100 \\ \hline
+sobel\_src & 0 & 36100 \\ \hline
+sobel\_ir & 0 & 36100 \\ \hline
+sharpen\_src & 0 & 36100 \\ \hline
+sharpen\_ir & 0 & 36100 \\ \hline
+fir\_src & 0 & 1009 \\ \hline
+fir\_ir & 0 & 1009 \\ \hline
+dot\_src & 0 & 1 \\ \hline
+dot\_ir & 0 & 1 \\ \hline
+gauss\_var1\_ir & 0 & 36100 \\ \hline
+gauss\_var2\_ir & 0 & 36100 \\ \hline
+gauss\_var3\_ir & 0 & 36100 \\ \hline
+gauss\_2p5ns\_ir & 0 & 36100 \\ \hline
+gauss\_10ns\_ir & 0 & 36100 \\ \hline
+gauss\_drum6\_ir & 0 & 36100 \\ \hline
+gauss\_t8c\_loa6\_ir & 0 & 36100 \\ \hline
+sobel\_loa4\_ir & 0 & 36100 \\ \hline
+sharpen\_kul\_ir & 0 & 36100 \\ \hline
+fir\_t8c\_loa11\_ir & 0 & 1009 \\ \hline
+dot\_t4\_ir & 0 & 1 \\ \hline
+gauss\_dse\_op40\_ir & 0 & 36100 \\ \hline
+fir\_dse\_op60\_ir & 0 & 1009 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Latência (ciclos) e período}
+\begin{tabular}{|l|r|r|r|r|r|r|}
+\hline
+\rowcolor{tabAzul}\color{white}Caso & \color{white}Modelo & \color{white}Vitis & \color{white}Razão & \color{white}Período mín. modelo (ns) & \color{white}Estimado Vitis (ns) & \color{white}Vivado (ns) \\
+\hline
+gauss\_src & 73340 & 72218 & 0,985 & 4,05 & 7,05 & 5,35 \\ \hline
+gauss\_ir & 73340 & 72218 & 0,985 & 4,05 & 7,05 & 5,38 \\ \hline
+sobel\_src & 73150 & 72219 & 0,987 & 4,62 & 7,05 & 5,79 \\ \hline
+sobel\_ir & 73150 & 72219 & 0,987 & 4,62 & 7,05 & 5,89 \\ \hline
+sharpen\_src & 72960 & 72218 & 0,990 & 4,95 & 7,05 & 5,79 \\ \hline
+sharpen\_ir & 72960 & 72218 & 0,990 & 4,95 & 7,05 & 5,31 \\ \hline
+fir\_src & 1018 & 1019 & 1,001 & 4,95 & 6,36 & 4,49 \\ \hline
+fir\_ir & 1018 & 1024 & 1,006 & 4,95 & 6,36 & 4,61 \\ \hline
+dot\_src & 259 & 260 & 1,004 & 4,95 & 6,36 & 5,76 \\ \hline
+dot\_ir & 259 & 260 & 1,004 & 4,95 & 6,36 & 5,72 \\ \hline
+gauss\_var1\_ir & 181070 & 180506 & 0,997 & 4,72 & 6,36 & 4,54 \\ \hline
+gauss\_var2\_ir & 1155390 & 3899371 & 3,375 & 3,74 & 7,05 & 5,39 \\ \hline
+gauss\_var3\_ir & 1155390 & 2383171 & 2,063 & 3,74 & 6,36 & 4,54 \\ \hline
+gauss\_2p5ns\_ir & 74480 & 72222 & 0,970 & 2,23 & 7,05 & 5,58 \\ \hline
+gauss\_10ns\_ir & 72960 & 72217 & 0,990 & 6,24 & 7,29 & 7,47 \\ \hline
+gauss\_drum6\_ir & 73340 & 72222 & 0,985 & 4,05 & 7,05 & 5,67 \\ \hline
+gauss\_t8c\_loa6\_ir & 73150 & 72237 & 0,988 & 4,97 & 7,05 & 5,52 \\ \hline
+sobel\_loa4\_ir & 73150 & 72224 & 0,987 & 4,54 & 7,05 & 5,74 \\ \hline
+sharpen\_kul\_ir & 72960 & 72219 & 0,990 & 4,87 & 7,05 & 5,38 \\ \hline
+fir\_t8c\_loa11\_ir & 1015 & 1058 & 1,042 & 4,53 & 3,73 & 4,45 \\ \hline
+dot\_t4\_ir & 259 & 264 & 1,019 & 4,95 & 4,03 & 3,34 \\ \hline
+gauss\_dse\_op40\_ir & 72960 & 72233 & 0,990 & 4,98 & 7,05 & 5,73 \\ \hline
+fir\_dse\_op60\_ir & 1015 & 1052 & 1,036 & 4,98 & 3,73 & 4,26 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Recursos de FPGA}
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|r|}
+\hline
+\rowcolor{tabAzul}\color{white}Caso & \color{white}LUT modelo & \color{white}LUT Vitis & \color{white}LUT Vivado & \color{white}CARRY4 modelo & \color{white}CARRY4 Vivado & \color{white}FF modelo & \color{white}FF Vitis & \color{white}FF Vivado & \color{white}DSP \\
+\hline
+gauss\_src & 549 & 2240 & 731 & 37 & 138 & 309 & 1321 & 618 & 0 \\ \hline
+gauss\_ir & 549 & 2192 & 729 & 37 & 141 & 309 & 1137 & 590 & 0 \\ \hline
+sobel\_src & 401 & 1892 & 655 & 45 & 118 & 180 & 1206 & 565 & 0 \\ \hline
+sobel\_ir & 401 & 1913 & 674 & 45 & 118 & 180 & 1288 & 567 & 0 \\ \hline
+sharpen\_src & 267 & 1655 & 493 & 22 & 94 & 88 & 979 & 431 & 0 \\ \hline
+sharpen\_ir & 267 & 1658 & 496 & 22 & 94 & 88 & 1015 & 468 & 0 \\ \hline
+fir\_src & 1740 & 3454 & 1108 & 155 & 125 & 736 & 1079 & 946 & 0 \\ \hline
+fir\_ir & 1740 & 3635 & 940 & 155 & 107 & 736 & 1392 & 857 & 0 \\ \hline
+dot\_src & 155 & 180 & 111 & 18 & 18 & 73 & 74 & 76 & 0 \\ \hline
+dot\_ir & 155 & 180 & 111 & 18 & 18 & 73 & 74 & 74 & 0 \\ \hline
+gauss\_var1\_ir & 259 & 1096 & 398 & 19 & 93 & 180 & 450 & 424 & 0 \\ \hline
+gauss\_var2\_ir & 179 & 670 & 177 & 18 & 35 & 59 & 356 & 281 & 0 \\ \hline
+gauss\_var3\_ir & 179 & 433 & 117 & 18 & 24 & 59 & 203 & 196 & 0 \\ \hline
+gauss\_2p5ns\_ir & 735 & 2285 & 903 & 45 & 123 & 703 & 3217 & 926 & 0 \\ \hline
+gauss\_10ns\_ir & 549 & 2160 & 700 & 37 & 135 & 225 & 1159 & 480 & 0 \\ \hline
+gauss\_drum6\_ir & 555 & 4422 & 886 & 34 & 147 & 309 & 2651 & 845 & 0 \\ \hline
+gauss\_t8c\_loa6\_ir & 397 & 3879 & 917 & 29 & 141 & 234 & 2666 & 901 & 0 \\ \hline
+sobel\_loa4\_ir & 404 & 2400 & 758 & 42 & 117 & 180 & 1807 & 776 & 0 \\ \hline
+sharpen\_kul\_ir & 245 & 1773 & 590 & 22 & 101 & 88 & 1128 & 487 & 0 \\ \hline
+fir\_t8c\_loa11\_ir & 1027 & 10117 & 1255 & 110 & - & 469 & 4784 & 806 & 0 \\ \hline
+dot\_t4\_ir & 140 & 917 & 167 & 17 & 28 & 73 & 501 & 169 & 0 \\ \hline
+gauss\_dse\_op40\_ir & 355 & 3564 & 774 & 34 & 123 & 211 & 2329 & 788 & 0 \\ \hline
+fir\_dse\_op60\_ir & 1161 & 8715 & 1399 & 77 & 53 & 506 & 4777 & 1026 & 0 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Laços: II e latência (ciclos)}
+\begin{tabular}{|l|r|r|r|r|r|r|r|}
+\hline
+\rowcolor{tabAzul}\color{white}Caso & \color{white}Laço & \color{white}Modo & \color{white}Iterações & \color{white}II modelo & \color{white}II Vitis & \color{white}Latência modelo & \color{white}Latência Vitis \\
+\hline
+gauss\_src & rows & sequencial & 190 & - & 2 & 73340 & 72216 \\ \hline
+gauss\_src & cols & pipeline & 190 & 2 & 2 & 385 & 72216 \\ \hline
+gauss\_ir & rows & sequencial & 190 & - & 2 & 73340 & 72216 \\ \hline
+gauss\_ir & cols & pipeline & 190 & 2 & 2 & 385 & 72216 \\ \hline
+sobel\_src & rows & sequencial & 190 & - & 2 & 73150 & 72217 \\ \hline
+sobel\_src & cols & pipeline & 190 & 2 & 2 & 384 & 72217 \\ \hline
+sobel\_ir & rows & sequencial & 190 & - & 2 & 73150 & 72217 \\ \hline
+sobel\_ir & cols & pipeline & 190 & 2 & 2 & 384 & 72217 \\ \hline
+sharpen\_src & rows & sequencial & 190 & - & 2 & 72960 & 72216 \\ \hline
+sharpen\_src & cols & pipeline & 190 & 2 & 2 & 383 & 72216 \\ \hline
+sharpen\_ir & rows & sequencial & 190 & - & 2 & 72960 & 72216 \\ \hline
+sharpen\_ir & cols & pipeline & 190 & 2 & 2 & 383 & 72216 \\ \hline
+fir\_src & samples & pipeline & 1009 & 1 & 1 & 1018 & 1017 \\ \hline
+fir\_ir & samples & pipeline & 1009 & 1 & 1 & 1018 & 1022 \\ \hline
+dot\_src & acc & pipeline & 256 & 1 & 1 & 258 & 258 \\ \hline
+dot\_ir & acc & pipeline & 256 & 1 & 1 & 258 & 258 \\ \hline
+gauss\_var1\_ir & rows & sequencial & 190 & - & 5 & 181070 & 180504 \\ \hline
+gauss\_var1\_ir & cols & pipeline & 190 & 5 & 5 & 952 & 180504 \\ \hline
+gauss\_var2\_ir & rows & sequencial & 190 & - & - & 1155390 & 3899370 \\ \hline
+gauss\_var2\_ir & cols & sequencial & 190 & - & - & 6080 & 20520 \\ \hline
+gauss\_var2\_ir & L3 & sequencial & 3 & - & - & 30 & 105 \\ \hline
+gauss\_var2\_ir & L4 & sequencial & 3 & - & - & 9 & 21 \\ \hline
+gauss\_var3\_ir & rows & sequencial & 190 & - & - & 1155390 & 2383170 \\ \hline
+gauss\_var3\_ir & cols & sequencial & 190 & - & - & 6080 & 12540 \\ \hline
+gauss\_var3\_ir & L3 & sequencial & 3 & - & - & 30 & 63 \\ \hline
+gauss\_var3\_ir & L4 & sequencial & 3 & - & - & 9 & 18 \\ \hline
+gauss\_2p5ns\_ir & rows & sequencial & 190 & - & 2 & 74480 & 72220 \\ \hline
+gauss\_2p5ns\_ir & cols & pipeline & 190 & 2 & 2 & 391 & 72220 \\ \hline
+gauss\_10ns\_ir & rows & sequencial & 190 & - & 2 & 72960 & 72215 \\ \hline
+gauss\_10ns\_ir & cols & pipeline & 190 & 2 & 2 & 383 & 72215 \\ \hline
+gauss\_drum6\_ir & rows & sequencial & 190 & - & 2 & 73340 & 72220 \\ \hline
+gauss\_drum6\_ir & cols & pipeline & 190 & 2 & 2 & 385 & 72220 \\ \hline
+gauss\_t8c\_loa6\_ir & rows & sequencial & 190 & - & 2 & 73150 & 72235 \\ \hline
+gauss\_t8c\_loa6\_ir & cols & pipeline & 190 & 2 & 2 & 384 & 72235 \\ \hline
+sobel\_loa4\_ir & rows & sequencial & 190 & - & 2 & 73150 & 72222 \\ \hline
+sobel\_loa4\_ir & cols & pipeline & 190 & 2 & 2 & 384 & 72222 \\ \hline
+sharpen\_kul\_ir & rows & sequencial & 190 & - & 2 & 72960 & 72217 \\ \hline
+sharpen\_kul\_ir & cols & pipeline & 190 & 2 & 2 & 383 & 72217 \\ \hline
+fir\_t8c\_loa11\_ir & samples & pipeline & 1009 & 1 & 1 & 1015 & 1056 \\ \hline
+dot\_t4\_ir & acc & pipeline & 256 & 1 & 1 & 258 & 262 \\ \hline
+gauss\_dse\_op40\_ir & rows & sequencial & 190 & - & 2 & 72960 & 72231 \\ \hline
+gauss\_dse\_op40\_ir & cols & pipeline & 190 & 2 & 2 & 383 & 72231 \\ \hline
+fir\_dse\_op60\_ir & samples & pipeline & 1009 & 1 & 1 & 1015 & 1050 \\ \hline
+\end{tabular}
+\end{table}
+

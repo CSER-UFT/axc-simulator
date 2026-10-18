@@ -1,0 +1,56 @@
+{
+ "case": "fir_ir",
+ "kernel": "fir",
+ "kind": "ir",
+ "note": "projeto elaborado, exato",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "fir",
+ "assign": {},
+ "prediction": {
+  "cycles": 1018,
+  "timeNs": 5090,
+  "intervalNs": 5,
+  "critPs": 4949,
+  "luts": 1740,
+  "carry4": 155,
+  "ff": 736,
+  "areaUm2": 71200.7512,
+  "energyFj": 101360967.231156,
+  "loops": [
+   {
+    "label": "samples",
+    "mode": "pipelined",
+    "trip": 1009,
+    "II": 1,
+    "iterLatency": 9,
+    "latency": 1018
+   }
+  ],
+  "units": [
+   {
+    "unit": "MUL8 exato",
+    "count": 14,
+    "luts": 1414,
+    "carry4": 56
+   },
+   {
+    "unit": "ADD16 exato",
+    "count": 11,
+    "luts": 176,
+    "carry4": 55
+   },
+   {
+    "unit": "ADD32 (2 × ADD16 exato)",
+    "count": 4,
+    "luts": 128,
+    "carry4": 40
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "pipelineOverhead": 1
+  }
+ }
+}

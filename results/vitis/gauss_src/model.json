@@ -1,0 +1,58 @@
+{
+ "case": "gauss_src",
+ "kernel": "gauss",
+ "kind": "src",
+ "note": "código original, exato",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "gauss",
+ "assign": {},
+ "prediction": {
+  "cycles": 73340,
+  "timeNs": 366700,
+  "intervalNs": 10,
+  "critPs": 4046,
+  "luts": 549,
+  "carry4": 37,
+  "ff": 309,
+  "areaUm2": 22576.6928,
+  "energyFj": 2164540027.3513203,
+  "loops": [
+   {
+    "label": "rows",
+    "mode": "sequential",
+    "trip": 190,
+    "II": null,
+    "iterLatency": 386,
+    "latency": 73340
+   },
+   {
+    "label": "cols",
+    "mode": "pipelined",
+    "trip": 190,
+    "II": 2,
+    "iterLatency": 6,
+    "latency": 385
+   }
+  ],
+  "units": [
+   {
+    "unit": "MUL8 exato",
+    "count": 3,
+    "luts": 303,
+    "carry4": 12
+   },
+   {
+    "unit": "ADD16 exato",
+    "count": 4,
+    "luts": 64,
+    "carry4": 20
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "pipelineOverhead": 1
+  }
+ }
+}

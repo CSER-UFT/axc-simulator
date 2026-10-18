@@ -1,0 +1,58 @@
+{
+ "case": "gauss_var1_ir",
+ "kernel": "gauss",
+ "kind": "ir",
+ "note": "sem array_partition (linha 6)",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "gauss",
+ "assign": {},
+ "prediction": {
+  "cycles": 181070,
+  "timeNs": 905350,
+  "intervalNs": 25,
+  "critPs": 4716,
+  "luts": 259,
+  "carry4": 19,
+  "ff": 180,
+  "areaUm2": 14569.026,
+  "energyFj": 2864351845.6657996,
+  "loops": [
+   {
+    "label": "rows",
+    "mode": "sequential",
+    "trip": 190,
+    "II": null,
+    "iterLatency": 953,
+    "latency": 181070
+   },
+   {
+    "label": "cols",
+    "mode": "pipelined",
+    "trip": 190,
+    "II": 5,
+    "iterLatency": 6,
+    "latency": 952
+   }
+  ],
+  "units": [
+   {
+    "unit": "MUL8 exato",
+    "count": 1,
+    "luts": 101,
+    "carry4": 4
+   },
+   {
+    "unit": "ADD16 exato",
+    "count": 2,
+    "luts": 32,
+    "carry4": 10
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "pipelineOverhead": 1
+  }
+ }
+}

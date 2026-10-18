@@ -1,0 +1,52 @@
+{
+ "case": "dot_t4_ir",
+ "kernel": "dot",
+ "kind": "ir",
+ "note": "mul8=MUL8 T4",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "dot",
+ "assign": {
+  "S1.3": "MUL8 T4"
+ },
+ "prediction": {
+  "cycles": 259,
+  "timeNs": 1295,
+  "intervalNs": 5,
+  "critPs": 4945,
+  "luts": 140,
+  "carry4": 17,
+  "ff": 73,
+  "areaUm2": 6630.101600000001,
+  "energyFj": 2617195.6561590005,
+  "loops": [
+   {
+    "label": "acc",
+    "mode": "pipelined",
+    "trip": 256,
+    "II": 1,
+    "iterLatency": 2,
+    "latency": 258
+   }
+  ],
+  "units": [
+   {
+    "unit": "MUL8 T4",
+    "count": 1,
+    "luts": 86,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD32 (2 × ADD16 exato)",
+    "count": 1,
+    "luts": 32,
+    "carry4": 10
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "pipelineOverhead": 1
+  }
+ }
+}
