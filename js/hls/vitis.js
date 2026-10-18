@@ -176,7 +176,7 @@ endmodule
                 { c_name: 'a', c_port_direction: 'in', rtl_ports: { data_read_in: 'a' } },
                 { c_name: 'b', c_port_direction: 'in', rtl_ports: { data_read_in: 'b' } },
             ],
-            c_return: { c_port_direction: 'out', rtl_ports: { data: 'ap_return' } },
+            c_return: { c_port_direction: 'out', rtl_ports: { data_write_out: 'ap_return' } },
             rtl_common_signal: {
                 module_clock: 'ap_clk', module_reset: 'ap_rst', module_clock_enable: 'ap_ce',
                 ap_ctrl_chain_protocol_idle: '', ap_ctrl_chain_protocol_start: '', ap_ctrl_chain_protocol_ready: '', ap_ctrl_chain_protocol_done: '', ap_ctrl_chain_protocol_continue: '',

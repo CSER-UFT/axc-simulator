@@ -61,6 +61,6 @@ test('caixa preta de RTL: JSON, Verilog com as portas do Vitis e modelo C para c
     assert.equal(j.rtl_performance.latency, '0');
     const v = bb.files['bb_mul8_t4.v'];
     for (const p of ['ap_clk', 'ap_rst', 'ap_ce', 'ap_return']) assert.ok(v.includes(p));
-    assert.equal(j.c_return.rtl_ports.data, 'ap_return');
+    assert.equal(j.c_return.rtl_ports.data_write_out, 'ap_return');
     assert.match(bb.files['u_MUL8_T4_bb.cpp'], /ap_uint<16> u_MUL8_T4_bb\(ap_uint<8> a, ap_uint<8> b\)/);
 });
