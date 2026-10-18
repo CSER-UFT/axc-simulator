@@ -25,7 +25,7 @@ import { synthesize, MODEL } from '../js/hls/index.js';
 import { KERNELS } from '../js/hls/kernels.js';
 import { parseAssign, opFunction } from '../js/hls/approx.js';
 import { execute, makeInputs } from '../js/hls/exec.js';
-import { exportIR, exportSource, kernelHeader, testbench, cName } from '../js/hls/vitis.js';
+import { exportIR, exportSource, kernelHeader, testbench, cName, blackboxFiles } from '../js/hls/vitis.js';
 import { explore, pragmaVariants } from '../js/hls/dse.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -78,11 +78,14 @@ function cases() {
     const approx = list.filter((x) => x.spec || x.dse);
     for (const c of approx) list.push({ ...c, id: c.id.replace(/_ir$/, '_lat0_ir'), inline: 'lat0', base: c.id, note: `${c.note}, unidades combinacionais` });
     for (const c of approx) list.push({ ...c, id: c.id.replace(/_ir$/, '_inl_ir'), inline: true, base: c.id, note: `${c.note}, unidades em linha` });
+    // E com as unidades como caixa preta de RTL (o Verilog exportado da netlist; na csim, o modelo C): o Vivado
+    // sintetiza o mesmo Verilog da caracterização das unidades.
+    for (const c of approx) list.push({ ...c, id: c.id.replace(/_ir$/, '_rtl_ir'), inline: 'rtl', base: c.id, note: `${c.note}, unidades em RTL (caixa preta)` });
     return list.filter((c) => !only || only.has(c.id) || only.has(c.kernel));
 }
 
 /** Tcl do Vitis HLS para um caso (caminhos relativos à pasta do caso). */
-function tcl(c, top, part, dataFiles) {
+function tcl(c, top, part, dataFiles, blackboxes = []) {
     return `# ${c.id}: ${c.note}. Gerado por scripts/vitis.mjs (Vitis HLS 2022.2).
 # Uso, da pasta do repositório: vitis_hls -f build/vitis/${c.id}/run.tcl
 # Variáveis de ambiente: AXC_IMPL=1 roda também o Vivado (export_design -flow impl); AXC_COSIM=1 roda a cosimulação.
@@ -90,6 +93,7 @@ set here [file dirname [file normalize [info script]]]
 cd $here
 open_project -reset proj
 set_top ${top}
+${blackboxes.map((j) => `add_files -blackbox ${j}`).join('\n')}
 add_files kernel.cpp -cflags "-I$here"
 add_files -tb tb.cpp -cflags "-I$here"
 ${dataFiles.map((f) => `add_files -tb ${f}`).join('\n')}
@@ -188,7 +192,9 @@ function doExport() {
         files['kernel.h'] = kernelHeader(r.design);
         files['kernel.cpp'] = c.kind === 'src' ? exportSource(c.src, r.design) : exportIR(r, { inline: c.inline ?? false });
         const data = Object.keys(files).filter((f) => f.endsWith('.dat'));
-        files['run.tcl'] = tcl(c, r.design.name, part, data);
+        let bbs = [];
+        if (c.inline === 'rtl') { const bb = blackboxFiles(r.lib, [...new Set(r.assign.values())]); Object.assign(files, bb.files); bbs = bb.jsons; }
+        files['run.tcl'] = tcl(c, r.design.name, part, data, bbs);
         files['model.json'] = `${JSON.stringify({ case: c.id, kernel: c.kernel, kind: c.kind, note: c.note, clockNs: c.clockNs, part, top: r.design.name, assign: Object.fromEntries(r.assign), prediction: prediction(r) }, null, 1)}\n`;
         for (const [f, text] of Object.entries(files)) writeFileSync(join(dir, f), text);
         index.push({ id: c.id, kernel: c.kernel, kind: c.kind, note: c.note, clockNs: c.clockNs, top: r.design.name });
@@ -208,7 +214,8 @@ function doCheck() {
     for (const c of index) {
         const dir = join(OUT, c.id);
         try {
-            execSync(`g++ -std=c++14 -O2 -w -I"${resolve(inc)}" -I. kernel.cpp tb.cpp -o tb_gxx`, { cwd: dir, stdio: 'pipe' });
+            const bb = readdirSync(dir).filter((f) => f.endsWith('_bb.cpp')).join(' ');
+            execSync(`g++ -std=c++14 -O2 -w -I"${resolve(inc)}" -I. kernel.cpp tb.cpp ${bb} -o tb_gxx`, { cwd: dir, stdio: 'pipe' });
             const out = execSync('./tb_gxx', { cwd: dir, stdio: 'pipe' }).toString().trim().split('\n').pop();
             console.log(`${c.id.padEnd(24)} ${out}`);
         } catch (e) {
@@ -397,11 +404,11 @@ function report(rows, meta) {
         ax.map((r) => {
             const e = exactOf.get(r.kernel);
             const sv = (a, b) => (a && b ? 100 * (1 - a / b) : null);
-            const round2 = /_lat0|_inl|dse2/.test(r.case);
+            const round2 = /_lat0|_inl|_rtl|dse2/.test(r.case);
             return [r.case, ...(two ? [round2 ? '-' : pct(sv(first(r).luts, first(e).luts))] : []), pct(sv(r.model.luts, e.model.luts)), pct(sv(r.impl?.lut, e.impl?.lut)), s(e.impl?.lut), s(r.impl?.lut)];
         }));
     // Economia prevista contra medida, por forma de exportação das unidades.
-    const styles = [['INLINE off (o Vitis divide a netlist em estágios)', (c) => !/_lat0|_inl/.test(c)], ['combinacional (INLINE off, LATENCY 0)', (c) => /_lat0/.test(c)], ['em linha (INLINE)', (c) => /_inl/.test(c)]];
+    const styles = [['INLINE off (o Vitis divide a netlist em estágios)', (c) => !/_lat0|_inl|_rtl/.test(c)], ['combinacional (INLINE off, LATENCY 0)', (c) => /_lat0/.test(c)], ['em linha (INLINE)', (c) => /_inl/.test(c)], ['RTL (caixa preta)', (c) => /_rtl/.test(c)]];
     const savRows = styles.map(([label, f]) => {
         const rs = ax.filter((r) => f(r.case) && exactOf.get(r.kernel)?.impl);
         const pairs = rs.map((r) => { const e = exactOf.get(r.kernel); return [100 * (1 - r.model.luts / e.model.luts), 100 * (1 - r.impl.lut / e.impl.lut)]; });

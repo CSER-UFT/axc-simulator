@@ -18,6 +18,7 @@
  */
 import { OP } from '../axc/netlist.js';
 import { buildUnit } from '../axc/units.js';
+import { toVerilog, moduleName } from '../axc/verilog.js';
 import { bitsFor, typeRange } from './elab.js';
 import { outputArrays, inputArrays } from './exec.js';
 
@@ -81,7 +82,7 @@ export function unitFunction(cfg, name, { inline = false } = {}) {
     return out.join('\n');
 }
 
-const pragmasOf = (inline) => (inline === true ? ['#pragma HLS INLINE'] : inline === 'lat0' ? ['#pragma HLS INLINE off', '#pragma HLS LATENCY min=0 max=0'] : ['#pragma HLS INLINE off']);
+const pragmasOf = (inline) => (inline === true || inline === 'rtl' ? ['#pragma HLS INLINE'] : inline === 'lat0' ? ['#pragma HLS INLINE off', '#pragma HLS LATENCY min=0 max=0'] : ['#pragma HLS INLINE off']);
 
 /** Funções das unidades usadas (inclusive o somador de 32 bits composto). */
 function unitFunctions(lib, names, inline = false) {
@@ -106,10 +107,89 @@ function unitFunctions(lib, names, inline = false) {
             ].join('\n'));
             return;
         }
+        if (inline === 'rtl') {
+            // RTL como caixa preta: a função do Vitis é a do JSON (blackboxFiles); aqui só a declaração e uma função em
+            // linha que devolve o valor, para o kernel chamar como nas outras formas.
+            const N = u.cfg.width, W = buildUnit(u.cfg).net.outputs.length, f = cName(name);
+            out.push([
+                `// ${name}: RTL do Verilog exportado (caixa preta do Vitis, ${f}_bb.json); na csim, o modelo C da mesma netlist.`,
+                `void ${f}_bb(ap_uint<${N}> a, ap_uint<${N}> b, ap_uint<${W}> &y);`,
+                `static ap_uint<${W}> ${f}(ap_uint<${N}> a, ap_uint<${N}> b) {`,
+                '#pragma HLS INLINE',
+                `    ap_uint<${W}> y;`,
+                `    ${f}_bb(a, b, y);`,
+                '    return y;',
+                '}',
+            ].join('\n'));
+            return;
+        }
         out.push(unitFunction(u.cfg, name, { inline }));
     };
     for (const n of names) add(n);
     return out.join('\n\n');
+}
+
+/** Unidades com netlist usadas (os somadores de 32 bits compostos entram pelo de baixo). */
+function netUnits(lib, names) {
+    const out = new Set();
+    for (const n of names) { const u = lib.unitByName(n); out.add(u.cfg.kind === 'add' && u.cfg.width === 32 ? u.low : n); }
+    return [...out];
+}
+
+/**
+ * Arquivos da caixa preta de RTL de cada unidade usada (Vitis 2022.2, add_files -blackbox): o Verilog da netlist com
+ * um invólucro que tem as portas que o Vitis exige (ap_clk, ap_rst, ap_ce, sem uso) e a saída com o sinal de válido;
+ * o modelo C (a mesma netlist em C++, para a csim) e o JSON que liga os dois, combinacional (latência 0, II 1).
+ * @returns {{files: Object<string, string>, jsons: string[]}}
+ */
+export function blackboxFiles(lib, names) {
+    const files = {}, jsons = [];
+    for (const name of netUnits(lib, names)) {
+        const u = lib.unitByName(name), unit = buildUnit(u.cfg);
+        const N = u.cfg.width, W = unit.net.outputs.length, f = cName(name), mod = moduleName(u.cfg), top = `bb_${mod}`;
+        files[`${f}_bb.cpp`] = `${HEADER(`${name}, modelo C da caixa preta`)}
+${unitFunction(u.cfg, name, { inline: true })}
+
+void ${f}_bb(ap_uint<${N}> a, ap_uint<${N}> b, ap_uint<${W}> &y) {
+    y = ${f}(a, b);
+}
+`;
+        files[`${top}.v`] = `${toVerilog(unit, mod)}
+// Invólucro para a caixa preta do Vitis: relógio, reset e habilitação exigidos pela ferramenta, sem uso (a unidade é
+// combinacional), e a saída sempre válida.
+module ${top} (
+    input  wire ap_clk,
+    input  wire ap_rst,
+    input  wire ap_ce,
+    input  wire [${N - 1}:0] a,
+    input  wire [${N - 1}:0] b,
+    output wire [${W - 1}:0] y,
+    output wire y_ap_vld
+);
+    ${mod} u (.a(a), .b(b), .y(y));
+    assign y_ap_vld = 1'b1;
+endmodule
+`;
+        files[`${f}_bb.json`] = `${JSON.stringify({
+            c_function_name: `${f}_bb`,
+            rtl_top_module_name: top,
+            c_files: [{ c_file: `${f}_bb.cpp`, cflag: '' }],
+            rtl_files: [`${top}.v`],
+            c_parameters: [
+                { c_name: 'a', c_port_direction: 'in', rtl_ports: { data_read_in: 'a' } },
+                { c_name: 'b', c_port_direction: 'in', rtl_ports: { data_read_in: 'b' } },
+                { c_name: 'y', c_port_direction: 'out', rtl_ports: { data_write_out: 'y', data_write_valid: 'y_ap_vld' } },
+            ],
+            rtl_common_signal: {
+                module_clock: 'ap_clk', module_reset: 'ap_rst', module_clock_enable: 'ap_ce',
+                ap_ctrl_chain_protocol_idle: '', ap_ctrl_chain_protocol_start: '', ap_ctrl_chain_protocol_ready: '', ap_ctrl_chain_protocol_done: '', ap_ctrl_chain_protocol_continue: '',
+            },
+            rtl_performance: { latency: '0', II: '1' },
+            rtl_resource_usage: { FF: '0', LUT: '0', BRAM: '0', URAM: '0', DSP: '0' },
+        }, null, 4)}\n`;
+        jsons.push(`${f}_bb.json`);
+    }
+    return { files, jsons };
 }
 
 const HEADER = (name) => `// ${name}: gerado pelo axc-simulator (scripts/vitis.mjs). Não editar: o export gera de novo.

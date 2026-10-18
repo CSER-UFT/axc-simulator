@@ -49,3 +49,17 @@ test('vitis: g++ com ap_int confere bit a bit (se houver os cabeçalhos)', { ski
         assert.match(execSync('./tb', { cwd: dir }).toString(), /AXC_MISMATCHES 0 OF/);
     }
 });
+
+test('caixa preta de RTL: JSON, Verilog com as portas do Vitis e modelo C para cada unidade', async () => {
+    const { blackboxFiles } = await import('../js/hls/vitis.js');
+    const { makeLibrary } = await import('../js/hls/lib.js');
+    const lib = makeLibrary(synth, cells);
+    const bb = blackboxFiles(lib, ['MUL8 T4', 'ADD32 (ADD16 LOA8 + ADD16 exato)']);
+    assert.deepEqual(bb.jsons.sort(), ['u_ADD16_LOA8_bb.json', 'u_MUL8_T4_bb.json']); // o de 32 bits entra pelo de baixo
+    const j = JSON.parse(bb.files['u_MUL8_T4_bb.json']);
+    assert.equal(j.rtl_top_module_name, 'bb_mul8_t4');
+    assert.equal(j.rtl_performance.latency, '0');
+    const v = bb.files['bb_mul8_t4.v'];
+    for (const p of ['ap_clk', 'ap_rst', 'ap_ce', 'y_ap_vld']) assert.ok(v.includes(p));
+    assert.match(bb.files['u_MUL8_T4_bb.cpp'], /void u_MUL8_T4_bb\(ap_uint<8> a, ap_uint<8> b, ap_uint<16> &y\)/);
+});
