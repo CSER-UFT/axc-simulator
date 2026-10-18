@@ -113,12 +113,10 @@ function unitFunctions(lib, names, inline = false) {
             const N = u.cfg.width, W = buildUnit(u.cfg).net.outputs.length, f = cName(name);
             out.push([
                 `// ${name}: RTL do Verilog exportado (caixa preta do Vitis, ${f}_bb.json); na csim, o modelo C da mesma netlist.`,
-                `void ${f}_bb(ap_uint<${N}> a, ap_uint<${N}> b, ap_uint<${W}> &y);`,
+                `ap_uint<${W}> ${f}_bb(ap_uint<${N}> a, ap_uint<${N}> b);`,
                 `static ap_uint<${W}> ${f}(ap_uint<${N}> a, ap_uint<${N}> b) {`,
                 '#pragma HLS INLINE',
-                `    ap_uint<${W}> y;`,
-                `    ${f}_bb(a, b, y);`,
-                '    return y;',
+                `    return ${f}_bb(a, b);`,
                 '}',
             ].join('\n'));
             return;
@@ -138,7 +136,8 @@ function netUnits(lib, names) {
 
 /**
  * Arquivos da caixa preta de RTL de cada unidade usada (Vitis 2022.2, add_files -blackbox): o Verilog da netlist com
- * um invólucro que tem as portas que o Vitis exige (ap_clk, ap_rst, ap_ce, sem uso) e a saída com o sinal de válido;
+ * um invólucro que tem as portas que o Vitis exige (ap_clk, ap_rst, ap_ce, sem uso), as entradas e o valor devolvido
+ * como fio (ap_return; uma saída por referência seria ap_vld, que o Vitis recusa dentro de um pipeline);
  * o modelo C (a mesma netlist em C++, para a csim) e o JSON que liga os dois, combinacional (latência 0, II 1).
  * @returns {{files: Object<string, string>, jsons: string[]}}
  */
@@ -150,24 +149,22 @@ export function blackboxFiles(lib, names) {
         files[`${f}_bb.cpp`] = `${HEADER(`${name}, modelo C da caixa preta`)}
 ${unitFunction(u.cfg, name, { inline: true })}
 
-void ${f}_bb(ap_uint<${N}> a, ap_uint<${N}> b, ap_uint<${W}> &y) {
-    y = ${f}(a, b);
+ap_uint<${W}> ${f}_bb(ap_uint<${N}> a, ap_uint<${N}> b) {
+    return ${f}(a, b);
 }
 `;
         files[`${top}.v`] = `${toVerilog(unit, mod)}
 // Invólucro para a caixa preta do Vitis: relógio, reset e habilitação exigidos pela ferramenta, sem uso (a unidade é
-// combinacional), e a saída sempre válida.
+// combinacional). Entradas e saída como fio (o Vitis 2022.2 só aceita caixa preta de fio dentro de um pipeline).
 module ${top} (
     input  wire ap_clk,
     input  wire ap_rst,
     input  wire ap_ce,
     input  wire [${N - 1}:0] a,
     input  wire [${N - 1}:0] b,
-    output wire [${W - 1}:0] y,
-    output wire y_ap_vld
+    output wire [${W - 1}:0] ap_return
 );
-    ${mod} u (.a(a), .b(b), .y(y));
-    assign y_ap_vld = 1'b1;
+    ${mod} u (.a(a), .b(b), .y(ap_return));
 endmodule
 `;
         files[`${f}_bb.json`] = `${JSON.stringify({
@@ -178,8 +175,8 @@ endmodule
             c_parameters: [
                 { c_name: 'a', c_port_direction: 'in', rtl_ports: { data_read_in: 'a' } },
                 { c_name: 'b', c_port_direction: 'in', rtl_ports: { data_read_in: 'b' } },
-                { c_name: 'y', c_port_direction: 'out', rtl_ports: { data_write_out: 'y', data_write_valid: 'y_ap_vld' } },
             ],
+            c_return: { c_port_direction: 'out', rtl_ports: { data: 'ap_return' } },
             rtl_common_signal: {
                 module_clock: 'ap_clk', module_reset: 'ap_rst', module_clock_enable: 'ap_ce',
                 ap_ctrl_chain_protocol_idle: '', ap_ctrl_chain_protocol_start: '', ap_ctrl_chain_protocol_ready: '', ap_ctrl_chain_protocol_done: '', ap_ctrl_chain_protocol_continue: '',
