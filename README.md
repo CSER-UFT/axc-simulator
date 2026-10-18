@@ -37,9 +37,9 @@ Uma segunda página leva as unidades caracterizadas para o nível do algoritmo: 
 
 * análise e elaboração: desenrolamento dos laços pedidos (e de todos os internos a um laço com pipeline), dobra de constantes, índices dos vetores como expressões afins (o que dá o banco de memória de cada acesso), eliminação de subexpressões comuns e análise de faixas de valores, que escolhe a unidade de 8, 16 ou 32 bits de cada operação;
 * escalonamento com encadeamento: as operações cabem num ciclo enquanto os atrasos da síntese sky130 somados não passam do período menos o tempo do registrador; sem pipeline, por lista; com pipeline, modular, com o II e o motivo (portas dos bancos de memória, limite de unidades ou recorrência);
-* ligação e custo: compartilhamento das unidades, multiplexadores de entrada, registradores pela vida de cada valor, contadores dos laços; área ASIC (µm²) e FPGA (LUTs, CARRY4, FF), energia por execução e latência.
+* ligação e custo: compartilhamento das unidades aproximadas (somadores exatos e multiplicações por constante, que viram somas de deslocamentos, ficam uma por operação, como no Vitis), propagação de constantes na netlist de cada instância, multiplexadores de entrada, registradores pela vida de cada valor, contadores dos laços, endereços e seleção de banco; área ASIC (µm²) e FPGA (LUTs, CARRY4, FF), energia por execução e latência. Um laço sem pipeline que só contém outro com pipeline é achatado, como no Vitis.
 
-O relatório segue o do Vitis (latência, II por laço, recursos), com o diagrama de Gantt (as operações encadeadas aparecem dentro do ciclo), o DFG e a IR. A linha de comando roda o mesmo motor: `node bin/axc.mjs hls kernel.c --clock 5` (ou `--example gauss`). As peças além das unidades (multiplexador, lógica, comparador e o registrador dfxtp_1) foram medidas com o mesmo fluxo por `scripts/hls-cells.mjs` (`data/hls-cells.json`). As constantes do modelo (latência da memória, ciclos de controle) estão em `js/hls/sched.js` e serão calibradas contra o Vitis HLS e o Vivado. Na aba Biblioteca ficam as unidades sintetizadas, o espaço de projeto e a exportação em Verilog; o editor e a IR têm destaque de sintaxe.
+O relatório segue o do Vitis (latência, II por laço, recursos), com o diagrama de Gantt (as operações encadeadas aparecem dentro do ciclo), o DFG e a IR. A linha de comando roda o mesmo motor: `node bin/axc.mjs hls kernel.c --clock 5` (ou `--example gauss`). As peças além das unidades (multiplexador, lógica, comparador e o registrador dfxtp_1) foram medidas com o mesmo fluxo por `scripts/hls-cells.mjs` (`data/hls-cells.json`). As constantes do modelo (latência da memória, ciclos de controle, achatamento, resto da divisão) estão em `js/hls/sched.js` e foram calibradas contra o Vitis HLS e o Vivado (abaixo). Na aba Biblioteca ficam as unidades sintetizadas, o espaço de projeto e a exportação em Verilog; o editor e a IR têm destaque de sintaxe.
 
 ### Aproximação no kernel e erro
 
@@ -61,7 +61,7 @@ O alvo de `--approx` é um nó (`S1.3`), um grupo linha:operação (`16:mul8`), 
 
 ### Validação com o Vitis HLS e o Vivado
 
-O modelo de custo é conferido contra o Vitis HLS e o Vivado 2022.2 em 23 casos: os cinco exemplos exatos (o código original e o projeto elaborado pelo simulador), as variantes de diretivas e os períodos de 2,5 e 10 ns do gaussiano, e projetos aproximados (atribuições fixas e os pontos escolhidos pela exploração). Para cada caso, `scripts/vitis.mjs` gera o C++ (com `ap_int`; no projeto elaborado, cada valor com a largura da nossa análise de faixas e cada operação aproximada chamando a função C++ da sua unidade, escrita a partir da mesma netlist do Verilog exportado), um testbench que compara a saída com a execução bit a bit do simulador, o Tcl do Vitis (parte `xc7a100tcsg324-1`, multiplicadores em LUT, sem pipeline automático de laços) e as previsões do modelo. Tudo roda da pasta do repositório:
+O modelo de custo é conferido contra o Vitis HLS e o Vivado 2022.2. Para cada caso, `scripts/vitis.mjs` gera o C++ (com `ap_int`; no projeto elaborado, cada valor com a largura da nossa análise de faixas e cada operação aproximada chamando a função C++ da sua unidade, escrita a partir da mesma netlist do Verilog exportado), um testbench que compara a saída com a execução bit a bit do simulador, o Tcl do Vitis (parte `xc7a100tcsg324-1`, multiplicadores em LUT, sem pipeline automático de laços) e as previsões do modelo. Tudo roda da pasta do repositório:
 
 ```
 npm run vitis:export                    # gera build/vitis/<caso>/ (cerca de 2 min)
@@ -69,9 +69,18 @@ npm run vitis:check                     # opcional: compila e roda cada caso com
 bash build/vitis/run_all.sh -j 4        # Vitis HLS: csim e csynth de todos os casos
 bash build/vitis/run_all.sh -j 2 --impl # também o Vivado (export_design -flow impl), bem mais demorado
 npm run vitis:collect                   # lê os relatórios e grava results/vitis/
+npm run vitis:compare                   # refaz a comparação com o modelo atual (sem o Vitis)
 ```
 
-O `run_all.sh` aceita `--only caso1,caso2` e `--cosim`. O coletor grava em `results/vitis/` a comparação (latência, II por laço, período, LUT, CARRY4, FF; a csim contra o simulador), as tabelas em Markdown e LaTeX, a calibração sugerida das constantes do modelo (`calibracao.json`) e uma cópia dos relatórios usados. O C++ dos 23 casos foi conferido aqui com g++ e os cabeçalhos abertos do `ap_int`: a saída é idêntica à execução bit a bit do simulador em todas as posições.
+Na primeira rodada (23 casos: os exemplos exatos, as variantes de diretivas e de período do gaussiano e oito projetos aproximados), a csim deu a mesma saída que o simulador em todas as posições, e a comparação levou a seis correções no modelo (achatamento de laços, multiplicação por constante como somas de deslocamentos, custo da partição com fator 3, endereços e contadores no pipeline, sem compartilhamento de somadores exatos, propagação de constantes nas unidades). Com elas, o erro médio da latência com pipeline caiu de 1,4% para 0,5%, o das LUTs do Vivado de 38% para 16% e o dos FFs de 54% para 25%. Os oito projetos aproximados ficaram maiores que o exato no Vivado: em parte porque o modelo superestimava a multiplicação exata por constante, em parte porque o Vitis divide em estágios as netlists das unidades exportadas com `INLINE off`. A segunda rodada acrescenta as unidades combinacionais (`_lat0_ir`) e em linha (`_inl_ir`), dois pontos da exploração com o modelo calibrado e a caracterização de cada unidade no próprio Vivado:
+
+```
+npm run vivado:units                         # build/vivado-units/: cada unidade entre registradores
+bash build/vivado-units/run_units.sh -j 4    # Vivado fora de contexto (--route para posicionar e rotear)
+npm run vivado:units:collect                 # data/vivado-units.json: LUT, CARRY4 e atraso no alvo FPGA
+```
+
+Os detalhes, as tabelas e as causas de cada diferença estão em [`results/vitis/RESULTADOS.md`](results/vitis/RESULTADOS.md) e na seção 6 de [`docs/METODOLOGIA.md`](docs/METODOLOGIA.md).
 
 ### Metodologia e estudos de caso
 
@@ -88,7 +97,7 @@ A aba Exploração (e o comando `dse`) procura as unidades, e opcionalmente as d
 * **verificação**: o ponto viável mais barato de cada heurística é executado bit a bit; se o erro medido passar do limite, o próximo viável em ordem de custo é verificado.
 * **passo a passo**: cada heurística registra as suas iterações (o que avaliou, o que escolheu e por quê, a poda, a ordem de custo da exaustiva, as verificações), e a página as anima sobre o gráfico de custo contra PSNR, com a explicação e a tabela do que foi avaliado em cada iteração.
 
-No gaussiano com PSNR de pelo menos 40 dB e área como objetivo, por classe as quatro heurísticas chegam ao mesmo ponto (3 × MUL8 T8 +C e 4 × ADD16 LOA6, 31% menos área, 40,2 dB medidos). Por operação, a eficiência mistura unidades e chega a 13.454 µm² (40% menos que o exato, 40,0 dB medidos), contra 16.228 µm² da sequencial: com o compartilhamento, aproximar uma operação isolada pode exigir uma unidade a mais, e a ordem do código faz a sequencial gastar o orçamento de erro primeiro nas operações que economizam menos.
+No gaussiano com PSNR de pelo menos 40 dB e área como objetivo, por classe as quatro heurísticas chegam ao mesmo ponto (3 × MUL8 T8 +C e 4 × ADD16 LOA6, 28% menos área, 40,2 dB medidos). Por operação, a eficiência mistura unidades e chega a 9.420 µm² (42% menos que o exato, 40,4 dB medidos), contra 10.019 µm² da sequencial: com o compartilhamento, aproximar uma operação isolada pode exigir uma unidade a mais, e a ordem do código faz a sequencial gastar o orçamento de erro primeiro nas operações que economizam menos. Esses são números de área ASIC; no FPGA, a validação com o Vivado mostra economias bem menores (seção 6 da metodologia).
 
 ```
 node bin/axc.mjs dse --example gauss --psnr 40 --heuristic all --granularity op
@@ -163,12 +172,13 @@ O arquivo `CITATION.cff` traz os mesmos metadados (o GitHub mostra "Cite this re
 | `scripts/evoapprox.mjs` | referência EvoApproxLib com o mesmo fluxo (`data/evoapprox.json`) |
 | `scripts/operands.mjs` | operandos reais da LeNet-5 e do filtro gaussiano (`data/operands.json` e `data/operands.bin`) |
 | `js/hls/lang.js`, `elab.js` | linguagem do kernel (análise) e elaboração: laços, diretivas, DFG por trecho, faixas, bancos de memória |
-| `js/hls/lib.js`, `sched.js`, `cost.js` | biblioteca de custos, escalonamento com encadeamento e pipeline, ligação, área, energia |
+| `js/hls/lib.js`, `sched.js`, `cost.js`, `constprop.js` | biblioteca de custos (com a multiplicação por constante e os números do Vivado, quando houver), escalonamento com encadeamento e pipeline, ligação, propagação de constantes nas netlists, área, energia |
 | `js/hls/approx.js` | operações aproximáveis, unidades candidatas e modelos funcionais das unidades |
 | `js/hls/exec.js` | execução bit a bit do projeto elaborado, perfil dos sinais, comparação das saídas (PSNR, SSIM) |
 | `js/hls/error.js` | modelo estático de erro (analítico e por amostras), recorrências, orçamento por operação |
 | `js/hls/dse.js`, `dse-worker.js` | exploração: avaliação, candidatas, heurísticas, fronteira, verificação (o worker roda na página sem travar) |
-| `js/hls/vitis.js`, `scripts/vitis.mjs` | exportação para o Vitis HLS (C++, testbench, Tcl), execução em lote e coleta dos relatórios com a calibração |
+| `js/hls/vitis.js`, `scripts/vitis.mjs` | exportação para o Vitis HLS (C++, testbench, Tcl), execução em lote, coleta dos relatórios e comparação com o modelo |
+| `scripts/vivado-units.mjs`, `results/vitis/` | caracterização das unidades no Vivado; relatórios e comparação da validação |
 | `scripts/experiments.mjs`, `docs/METODOLOGIA.md`, `results/` | estudos de caso reprodutíveis, metodologia e limitações, resultados (CSV, Markdown, LaTeX) |
 | `js/hls/highlight.js`, `js/ui/library.js` | destaque de sintaxe do kernel e da IR; aba Biblioteca (unidades sintetizadas, espaço de projeto, Verilog) |
 | `js/hls/index.js`, `kernels.js`, `ui.js`, `js/hls-app.js` | fluxo de síntese, exemplos, figuras (Gantt e DFG) e a página `hls.html` |

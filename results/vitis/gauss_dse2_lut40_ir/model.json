@@ -1,0 +1,112 @@
+{
+ "case": "gauss_dse2_lut40_ir",
+ "kernel": "gauss",
+ "kind": "ir",
+ "note": "exploração (modelo calibrado): LUTs, por operação, PSNR >= 40 dB (3 × MUL8 T8 +C, 1 × ADD16 TRUNC2, 1 × ADD16 TRUNC4, 1 × ADD16 TRUNC3, 1 × ADD16 TRUNC1, 1 × ADD16 TRUNC8, 1 × ADD16 TRUNC7, 1 × ADD16 TRUNC5, 1 × ADD16 TRUNC6)",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "gauss",
+ "assign": {
+  "S1.1": "MUL8 T8 +C",
+  "S1.4": "ADD16 TRUNC2",
+  "S1.6": "MUL8 T8 +C",
+  "S1.7": "ADD16 TRUNC4",
+  "S1.10": "ADD16 TRUNC3",
+  "S1.12": "MUL8 T8 +C",
+  "S1.13": "ADD16 TRUNC1",
+  "S1.16": "ADD16 TRUNC8",
+  "S1.18": "MUL8 T8 +C",
+  "S1.19": "ADD16 TRUNC7",
+  "S1.22": "ADD16 TRUNC5",
+  "S1.24": "MUL8 T8 +C",
+  "S1.25": "ADD16 TRUNC6"
+ },
+ "prediction": {
+  "cycles": 72217,
+  "timeNs": 361085,
+  "intervalNs": 10,
+  "critPs": 4673,
+  "luts": 618,
+  "carry4": 32,
+  "ff": 546,
+  "areaUm2": 11042.48400178079,
+  "energyFj": 1277495281.0637686,
+  "loops": [
+   {
+    "label": "rows_cols",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 36100,
+    "II": 2,
+    "iterLatency": 18,
+    "latency": 72217
+   }
+  ],
+  "addrLuts": 464,
+  "units": [
+   {
+    "unit": "MUL8 T8 +C",
+    "count": 3,
+    "luts": 26,
+    "carry4": 6
+   },
+   {
+    "unit": "ADD16 TRUNC2",
+    "count": 1,
+    "luts": 11,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 TRUNC4",
+    "count": 1,
+    "luts": 9,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 TRUNC3",
+    "count": 1,
+    "luts": 11,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 TRUNC1",
+    "count": 1,
+    "luts": 13,
+    "carry4": 4
+   },
+   {
+    "unit": "ADD16 TRUNC8",
+    "count": 1,
+    "luts": 6,
+    "carry4": 2
+   },
+   {
+    "unit": "ADD16 TRUNC7",
+    "count": 1,
+    "luts": 7,
+    "carry4": 2
+   },
+   {
+    "unit": "ADD16 TRUNC5",
+    "count": 1,
+    "luts": 9,
+    "carry4": 2
+   },
+   {
+    "unit": "ADD16 TRUNC6",
+    "count": 1,
+    "luts": 8,
+    "carry4": 2
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}

@@ -18,12 +18,17 @@
  *               II >= ciclo em que o novo valor fica pronto - ciclo em que o antigo é lido; se não couber, II sobe.
  */
 import { opClass, opWidth, SHARED } from './lib.js';
+import { magBits } from './elab.js';
 
 /** Constantes do modelo, a calibrar contra uma ferramenta de HLS (entrega de validação). */
 export const MODEL = {
-    memLatency: 1,      // ciclos da leitura da memória até o dado
-    loopOverhead: 1,    // ciclos por iteração de um laço sem pipeline (teste e incremento)
+    memLatency: 1,       // ciclos da leitura da memória até o dado
+    loopOverhead: 1,     // ciclos por iteração de um laço sem pipeline (teste e incremento)
+    subloopOverhead: 2,  // ciclos a mais por iteração para cada laço interno (entrada e saída; Vitis 2022.2)
     pipelineOverhead: 1, // ciclos de entrada e saída de um laço com pipeline
+    flatten: true,       // achatamento de laços perfeitos com o interno em pipeline (padrão do Vitis)
+    uremLatency: 4,      // o resto da divisão leva w + 4 ciclos (Vitis 2022.2, urem de w bits)
+    divAddrCycles: 1,    // ciclos do endereço (divisão por constante) antes do acesso a um banco de fator não potência de 2
 };
 
 /**
@@ -40,17 +45,27 @@ export function scheduleSegment(seg, ctx) {
     for (const n of seg.nodes) {
         const cls = opClass(n);
         const W = opWidth(n, rangeOf);
-        let delay = 0, unit = null;
+        let delay = 0, unit = null, noShare = false;
         if (SHARED.has(cls)) {
             const name = ctx.assign?.get(n.id);
-            unit = name ? lib.unitByName(name) : lib.exactUnit(cls, W);
+            const k = n.args.find((a) => a.c !== undefined);
+            const v = n.args.find((a) => a.c === undefined);
+            if (!name && cls === 'mul' && k && v) unit = lib.constMul(k.c, magBits(rangeOf(v.n)));
+            else unit = name ? lib.unitByName(name) : lib.exactUnit(cls, W);
             if (name && (unit.cfg.kind !== (cls === 'mul' ? 'mul' : 'add') || unit.cfg.width !== W)) throw new Error(`${n.id}: ${name} não serve para uma operação ${cls} de ${W} bits`);
             delay = unit.delay;
+            // Como no Vitis: somador exato e multiplicação exata por constante não são compartilhados (o multiplexador
+            // custaria quase o mesmo que a unidade), a não ser com allocation. As unidades aproximadas (funções) são.
+            noShare = !name && !ctx.allocation?.[cls] && (cls === 'add' || !!unit.constMul);
         } else if (['cmp', 'mux', 'logic'].includes(cls)) { unit = lib.cell(cls, W); delay = unit.delay; }
         const k = delay > Tc ? Math.ceil((delay + overhead) / clockPs) : 1;
         // Recurso: o banco de memória, ou o tipo de unidade (exatas e aproximadas da mesma largura não se misturam).
-        const key = cls === 'mem' ? n.bank?.key ?? n.array : SHARED.has(cls) ? unit.name : null;
-        info.set(n.id, { n, cls, W, delay, k, unit, key, multi: delay > Tc });
+        const key = cls === 'mem' ? n.bank?.key ?? n.array : SHARED.has(cls) && !noShare ? unit.name : null;
+        // Endereço de vetor particionado com fator que não é potência de 2: a divisão por constante vem antes do acesso.
+        const arr = cls === 'mem' ? ctx.arrays.get(n.array) : null;
+        const F = arr?.partition?.factor;
+        const minCycle = n.bank && !n.bank.exact && F > 1 && (F & (F - 1)) !== 0 ? model.divAddrCycles : 0;
+        info.set(n.id, { n, cls, W, delay, k, unit, key, noShare, minCycle, multi: delay > Tc });
     }
     // Prioridade: caminho mais longo (ps) do nó até o fim do trecho.
     const prio = new Map();
@@ -120,7 +135,7 @@ export function scheduleSegment(seg, ctx) {
             }
             const me = info.get(best);
             const n = me.n;
-            let c = 0, o = 0;
+            let c = me.minCycle, o = 0;
             for (const p of n.preds) {
                 const [pc, po] = avail(p);
                 if (pc > c) { c = pc; o = po; } else if (pc === c) o = Math.max(o, po);

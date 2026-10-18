@@ -15,7 +15,10 @@
     "vitis:export": "node scripts/vitis.mjs export",
     "vitis:check": "node scripts/vitis.mjs check",
     "vitis:run": "bash build/vitis/run_all.sh",
-    "vitis:collect": "node scripts/vitis.mjs collect"
+    "vitis:collect": "node scripts/vitis.mjs collect",
+    "vitis:compare": "node scripts/vitis.mjs compare",
+    "vivado:units": "node scripts/vivado-units.mjs export",
+    "vivado:units:collect": "node scripts/vivado-units.mjs collect"
   },
   "engines": {
     "node": ">=20"

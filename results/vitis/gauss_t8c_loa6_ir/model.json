@@ -22,51 +22,49 @@
   "S1.25": "ADD16 LOA6"
  },
  "prediction": {
-  "cycles": 73150,
-  "timeNs": 365750,
+  "cycles": 72217,
+  "timeNs": 361085,
   "intervalNs": 10,
   "critPs": 4966,
-  "luts": 397,
-  "carry4": 29,
-  "ff": 234,
-  "areaUm2": 15488.632799999998,
-  "energyFj": 1504721749.2372,
+  "luts": 730,
+  "carry4": 21,
+  "ff": 546,
+  "areaUm2": 11739.351714879791,
+  "energyFj": 1253852172.1162348,
   "loops": [
    {
-    "label": "rows",
-    "mode": "sequential",
-    "trip": 190,
-    "II": null,
-    "iterLatency": 385,
-    "latency": 73150
-   },
-   {
-    "label": "cols",
+    "label": "rows_cols",
     "mode": "pipelined",
-    "trip": 190,
+    "flattened": true,
+    "trip": 36100,
     "II": 2,
-    "iterLatency": 5,
-    "latency": 384
+    "iterLatency": 18,
+    "latency": 72217
    }
   ],
+  "addrLuts": 464,
   "units": [
    {
     "unit": "MUL8 T8 +C",
     "count": 3,
-    "luts": 147,
-    "carry4": 12
+    "luts": 26,
+    "carry4": 6
    },
    {
     "unit": "ADD16 LOA6",
     "count": 4,
-    "luts": 68,
-    "carry4": 12
+    "luts": 58,
+    "carry4": 10
    }
   ],
   "model": {
    "memLatency": 1,
    "loopOverhead": 1,
-   "pipelineOverhead": 1
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
   }
  }
 }

@@ -8,45 +8,43 @@
  "top": "sobel",
  "assign": {},
  "prediction": {
-  "cycles": 73150,
-  "timeNs": 365750,
+  "cycles": 72217,
+  "timeNs": 361085,
   "intervalNs": 10,
   "critPs": 4623,
-  "luts": 401,
-  "carry4": 45,
-  "ff": 180,
-  "areaUm2": 16289.436,
-  "energyFj": 1389953800.6195,
+  "luts": 644,
+  "carry4": 43,
+  "ff": 492,
+  "areaUm2": 11661.568467532468,
+  "energyFj": 1165326641.7230198,
   "loops": [
    {
-    "label": "rows",
-    "mode": "sequential",
-    "trip": 190,
-    "II": null,
-    "iterLatency": 385,
-    "latency": 73150
-   },
-   {
-    "label": "cols",
+    "label": "rows_cols",
     "mode": "pipelined",
-    "trip": 190,
+    "flattened": true,
+    "trip": 36100,
     "II": 2,
-    "iterLatency": 5,
-    "latency": 384
+    "iterLatency": 18,
+    "latency": 72217
    }
   ],
+  "addrLuts": 442,
   "units": [
    {
     "unit": "ADD16 exato",
-    "count": 7,
-    "luts": 112,
-    "carry4": 35
+    "count": 13,
+    "luts": 105,
+    "carry4": 33
    }
   ],
   "model": {
    "memLatency": 1,
    "loopOverhead": 1,
-   "pipelineOverhead": 1
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
   }
  }
 }

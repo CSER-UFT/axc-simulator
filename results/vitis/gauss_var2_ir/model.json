@@ -8,67 +8,72 @@
  "top": "gauss",
  "assign": {},
  "prediction": {
-  "cycles": 1155390,
-  "timeNs": 5776950,
+  "cycles": 3069070,
+  "timeNs": 15345350,
   "intervalNs": null,
   "critPs": 3737,
-  "luts": 179,
+  "luts": 241,
   "carry4": 18,
-  "ff": 59,
-  "areaUm2": 7091.832800000001,
-  "energyFj": 8182980025.36772,
+  "ff": 101,
+  "areaUm2": 6341.011193912338,
+  "energyFj": 19761360474.544525,
   "loops": [
    {
     "label": "rows",
     "mode": "sequential",
     "trip": 190,
     "II": null,
-    "iterLatency": 6081,
-    "latency": 1155390
+    "iterLatency": 16153,
+    "latency": 3069070
    },
    {
     "label": "cols",
     "mode": "sequential",
     "trip": 190,
     "II": null,
-    "iterLatency": 32,
-    "latency": 6080
+    "iterLatency": 85,
+    "latency": 16150
    },
    {
     "label": "L3",
     "mode": "sequential",
     "trip": 3,
     "II": null,
-    "iterLatency": 10,
-    "latency": 30
+    "iterLatency": 27,
+    "latency": 81
    },
    {
     "label": "L4",
     "mode": "sequential",
     "trip": 3,
     "II": null,
-    "iterLatency": 3,
-    "latency": 9
+    "iterLatency": 4,
+    "latency": 12
    }
   ],
+  "addrLuts": 88,
   "units": [
-   {
-    "unit": "MUL8 exato",
-    "count": 1,
-    "luts": 101,
-    "carry4": 4
-   },
    {
     "unit": "ADD16 exato",
     "count": 1,
-    "luts": 16,
+    "luts": 15,
     "carry4": 5
+   },
+   {
+    "unit": "MUL8 exato",
+    "count": 1,
+    "luts": 76,
+    "carry4": 4
    }
   ],
   "model": {
    "memLatency": 1,
    "loopOverhead": 1,
-   "pipelineOverhead": 1
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
   }
  }
 }

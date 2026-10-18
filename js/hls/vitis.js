@@ -9,7 +9,10 @@
  *                    operação aproximada chamando a função da sua unidade. É o mesmo caminho de dados que o modelo de
  *                    custo avalia; a diferença entre os números é a do modelo, não a da entrada;
  *   unidades         a mesma netlist do simulador (e do Verilog exportado), uma atribuição por porta, com as somas com
- *                    propagação de vai um escritas como + (o Vitis usa a cadeia de carry, como o Yosys);
+ *                    propagação de vai um escritas como + (o Vitis usa a cadeia de carry, como o Yosys). Por padrão
+ *                    com INLINE off (cada unidade é um módulo, compartilhável, como no modelo; o Vitis pode dividir a
+ *                    netlist em estágios, com registradores dentro do módulo); com 'lat0', também LATENCY max=0 (o
+ *                    módulo fica combinacional, como o modelo supõe); com inline, a lógica entra no caminho de dados;
  *   testbench        lê as entradas (a imagem de teste ou valores uniformes) e as saídas esperadas, calculadas pela
  *                    execução bit a bit do simulador, e conta as diferenças nas posições escritas pelo kernel.
  */
@@ -28,7 +31,8 @@ const cConst = (c) => (Number.isInteger(c) ? `${cType([c, c])}(${c < 0 ? `(long 
  * Função C++ de uma unidade da biblioteca, a partir da netlist.
  * @returns {string} código; a função recebe a e b sem sinal (N bits) e devolve os bits da saída
  */
-export function unitFunction(cfg, name) {
+export function unitFunction(cfg, name, { inline = false } = {}) {
+    // inline: true (INLINE), false (INLINE off) ou 'lat0' (INLINE off com LATENCY max=0: módulo combinacional).
     const unit = buildUnit(cfg);
     const net = unit.net, N = cfg.width, W = net.outputs.length;
     const A = net.inputs.a, B = net.inputs.b;
@@ -43,7 +47,7 @@ export function unitFunction(cfg, name) {
     };
     const ops = net.ops;
     const sym = { [OP.AND]: '&', [OP.OR]: '|', [OP.XOR]: '^' };
-    const out = [`// ${name}: ${net.gates} portas de duas entradas (netlist do axc-simulator).`, `static ap_uint<${W}> ${cName(name)}(ap_uint<${N}> a, ap_uint<${N}> b) {`, '#pragma HLS INLINE off'];
+    const out = [`// ${name}: ${net.gates} portas de duas entradas (netlist do axc-simulator).`, `static ap_uint<${W}> ${cName(name)}(ap_uint<${N}> a, ap_uint<${N}> b) {`, ...pragmasOf(inline)];
     // As somas com propagação de vai um viram um + de vetores (como no Verilog exportado), escrito no ponto da netlist
     // em que a cadeia começa; as portas de dentro da cadeia não são escritas.
     const inChain = new Uint8Array(ops.length / 4);
@@ -77,8 +81,10 @@ export function unitFunction(cfg, name) {
     return out.join('\n');
 }
 
+const pragmasOf = (inline) => (inline === true ? ['#pragma HLS INLINE'] : inline === 'lat0' ? ['#pragma HLS INLINE off', '#pragma HLS LATENCY min=0 max=0'] : ['#pragma HLS INLINE off']);
+
 /** Funções das unidades usadas (inclusive o somador de 32 bits composto). */
-function unitFunctions(lib, names) {
+function unitFunctions(lib, names, inline = false) {
     const done = new Set(), out = [];
     const add = (name) => {
         if (done.has(name)) return;
@@ -89,7 +95,7 @@ function unitFunctions(lib, names) {
             out.push([
                 `// ${name}: o somador de 16 bits de baixo aproximado, o de cima exato, o vai um passando de um para o outro.`,
                 `static ap_uint<33> ${cName(name)}(ap_uint<32> a, ap_uint<32> b) {`,
-                '#pragma HLS INLINE off',
+                ...pragmasOf(inline),
                 `    ap_uint<17> lo = ${cName(u.low)}(a.range(15, 0), b.range(15, 0));`,
                 '    ap_uint<17> hi = ap_uint<17>(a.range(31, 16)) + ap_uint<17>(b.range(31, 16)) + ap_uint<17>(lo[16]);',
                 '    ap_uint<33> y = 0;',
@@ -100,7 +106,7 @@ function unitFunctions(lib, names) {
             ].join('\n'));
             return;
         }
-        out.push(unitFunction(u.cfg, name));
+        out.push(unitFunction(u.cfg, name, { inline }));
     };
     for (const n of names) add(n);
     return out.join('\n\n');
@@ -149,7 +155,7 @@ ${body.replace(/^\s*\/\/.*\n/, '')}`.replace(/\n{3,}/g, '\n\n') + (params.length
  * Kernel do projeto elaborado (IR), com as unidades atribuídas.
  * @param {object} result síntese (design, ops, assign, lib)
  */
-export function exportIR(result) {
+export function exportIR(result, { inline = false } = {}) {
     const design = result.design;
     const asg = result.assign;
     const byId = new Map();
@@ -237,7 +243,7 @@ export function exportIR(result) {
         HEADER(`${design.name} (projeto elaborado${asg.size ? `, ${asg.size} operações aproximadas` : ''})`),
         '#include "kernel.h"',
         '',
-        unitFunctions(result.lib, [...unitsUsed]),
+        unitFunctions(result.lib, [...unitsUsed], inline),
         '',
         `${prototype(design)} {`,
         ...interfacePragmas(design),

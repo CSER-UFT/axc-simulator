@@ -1,7 +1,7 @@
 kernel,optimized_on,verified_on,psnr_min,area_saving,psnr_on_opt_data,psnr_on_other_data,units
-gauss,uniform,image,40,0.341885,41.5639,39.7218,3 × MUL8 T8 +C + 4 × ADD16 LOA9
-gauss,image,uniform,40,0.313955,40.1609,41.4665,3 × MUL8 T8 +C + 4 × ADD16 LOA6
-sobel,uniform,image,40,0.0285737,40.052,38.8604,3 × ADD16 LOA4 + 4 × ADD16 exato
-sobel,image,uniform,40,0.0218903,44.65,45.5255,3 × ADD16 LOA3 + 4 × ADD16 exato
-sharpen,uniform,image,40,0.0721399,Infinity,Infinity,1 × MUL8 KUL + 2 × ADD16 exato
-sharpen,image,uniform,40,0.0721399,Infinity,Infinity,1 × MUL8 KUL + 2 × ADD16 exato
+gauss,uniform,image,40,0.317458,41.5639,39.7218,3 × MUL8 T8 +C + 4 × ADD16 LOA9
+gauss,image,uniform,40,0.278909,40.1609,41.4665,3 × MUL8 T8 +C + 4 × ADD16 LOA6
+sobel,uniform,image,40,0,Infinity,Infinity,13 × ADD16 exato
+sobel,image,uniform,40,0,Infinity,Infinity,13 × ADD16 exato
+sharpen,uniform,image,40,0.00382504,Infinity,Infinity,4 × ADD16 exato + 1 × MUL8 KUL
+sharpen,image,uniform,40,0.00382504,Infinity,Infinity,4 × ADD16 exato + 1 × MUL8 KUL

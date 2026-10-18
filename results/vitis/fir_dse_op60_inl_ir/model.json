@@ -1,0 +1,157 @@
+{
+ "case": "fir_dse_op60_inl_ir",
+ "kernel": "fir",
+ "kind": "ir",
+ "note": "exploração: eficiência por operação, PSNR >= 60 dB, unidades em linha",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "fir",
+ "assign": {
+  "S1.1": "MUL8 T16",
+  "S1.3": "MUL8 DRUM2",
+  "S1.4": "ADD16 LOA15",
+  "S1.6": "MUL8 DRUM4",
+  "S1.7": "ADD16 LOA10",
+  "S1.9": "MUL8 T6 A10c",
+  "S1.10": "ADD16 LOA9",
+  "S1.12": "MUL8 T8 +C",
+  "S1.13": "ADD16 LOA8",
+  "S1.15": "MUL8 DRUM3 +C",
+  "S1.16": "ADD16 LOA8",
+  "S1.19": "ADD16 LOA9",
+  "S1.21": "MUL8 T6 A10c",
+  "S1.22": "ADD16 LOA9",
+  "S1.24": "MUL8 T6 A10c",
+  "S1.25": "ADD16 LOA9",
+  "S1.28": "ADD16 LOA9",
+  "S1.30": "MUL8 T8 +C",
+  "S1.31": "ADD16 LOA8",
+  "S1.33": "MUL8 T8 +C",
+  "S1.34": "ADD16 LOA8",
+  "S1.36": "MUL8 T6 A10c",
+  "S1.37": "ADD32 (ADD16 LOA8 + ADD16 exato)",
+  "S1.39": "MUL8 DRUM4",
+  "S1.40": "ADD32 (ADD16 LOA8 + ADD16 exato)",
+  "S1.42": "MUL8 DRUM3",
+  "S1.43": "ADD32 (ADD16 LOA10 + ADD16 exato)",
+  "S1.45": "MUL8 T16",
+  "S1.46": "ADD32 (ADD16 LOA15 + ADD16 exato)"
+ },
+ "prediction": {
+  "cycles": 1015,
+  "timeNs": 5075,
+  "intervalNs": 5,
+  "critPs": 4981,
+  "luts": 938,
+  "carry4": 38,
+  "ff": 556,
+  "areaUm2": 18852.125017724175,
+  "energyFj": 39018832.14205327,
+  "loops": [
+   {
+    "label": "samples",
+    "mode": "pipelined",
+    "trip": 1009,
+    "II": 1,
+    "iterLatency": 6,
+    "latency": 1015
+   }
+  ],
+  "addrLuts": 522,
+  "units": [
+   {
+    "unit": "MUL8 DRUM4",
+    "count": 2,
+    "luts": 70,
+    "carry4": 1
+   },
+   {
+    "unit": "MUL8 DRUM2",
+    "count": 1,
+    "luts": 29,
+    "carry4": 1
+   },
+   {
+    "unit": "MUL8 T16",
+    "count": 2,
+    "luts": 0,
+    "carry4": 0
+   },
+   {
+    "unit": "ADD16 LOA15",
+    "count": 1,
+    "luts": 8,
+    "carry4": 0
+   },
+   {
+    "unit": "MUL8 T8 +C",
+    "count": 3,
+    "luts": 32,
+    "carry4": 6
+   },
+   {
+    "unit": "ADD16 LOA10",
+    "count": 1,
+    "luts": 9,
+    "carry4": 1
+   },
+   {
+    "unit": "MUL8 T6 A10c",
+    "count": 4,
+    "luts": 5,
+    "carry4": 0
+   },
+   {
+    "unit": "MUL8 DRUM3 +C",
+    "count": 1,
+    "luts": 38,
+    "carry4": 2
+   },
+   {
+    "unit": "ADD16 LOA9",
+    "count": 5,
+    "luts": 66,
+    "carry4": 7
+   },
+   {
+    "unit": "ADD16 LOA8",
+    "count": 4,
+    "luts": 53,
+    "carry4": 9
+   },
+   {
+    "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
+    "count": 2,
+    "luts": 27,
+    "carry4": 4
+   },
+   {
+    "unit": "MUL8 DRUM3",
+    "count": 1,
+    "luts": 38,
+    "carry4": 2
+   },
+   {
+    "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
+    "count": 1,
+    "luts": 11,
+    "carry4": 1
+   },
+   {
+    "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
+    "count": 1,
+    "luts": 8,
+    "carry4": 0
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}

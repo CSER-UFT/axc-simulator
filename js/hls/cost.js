@@ -20,7 +20,7 @@
  *                ciclos do kernel (sem desligamento do relógio); mais a fuga das unidades durante o tempo do kernel.
  *                Memórias, a árvore de relógio e os multiplexadores de entrada não entram na energia.
  */
-import { bitsFor } from './elab.js';
+import { bitsFor, magBits } from './elab.js';
 import { SHARED, WIDTHS } from './lib.js';
 
 const leftEdge = (intervals) => {
@@ -38,7 +38,29 @@ const leftEdge = (intervals) => {
  * @param {object} design elaboração
  * @param {Array<{seg, sch, execs: number, pipelined: boolean}>} segs trechos escalonados
  */
-export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model }) {
+/** Bits conhecidos de um operando na entrada da unidade: a constante inteira, ou os bits altos que a faixa diz zero. */
+function knownBits(a, seg, n, unit) {
+    const W = unit.cfg?.width ?? unit.W ?? 16;
+    const full = W >= 32 ? 0xFFFFFFFF : (1 << W) - 1;
+    const isMul = n.op === 'mul';
+    if (a.c !== undefined) {
+        const v = isMul ? Math.abs(a.c) : a.c;
+        return v >= 0 && v <= full ? { mask: full, value: v } : { mask: 0, value: 0 };
+    }
+    const r = seg.byId.get(a.n).range;
+    if (!isMul && r[0] < 0) return { mask: 0, value: 0 };
+    const b = isMul ? magBits(r) : bitsFor(r);
+    if (b >= W) return { mask: 0, value: 0 };
+    return { mask: (full & ~((1 << b) - 1)) >>> 0, value: 0 };
+}
+/** Bits conhecidos comuns a todas as operações ligadas a uma instância (mesmo valor em todas). */
+function meet(x, y) {
+    if (!x) return y;
+    const mask = (x.mask & y.mask & ~(x.value ^ y.value)) >>> 0;
+    return { mask, value: (x.value & mask) >>> 0 };
+}
+
+export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, addr = null }) {
     // Unidades compartilhadas: instâncias por chave (classe e largura) em cada trecho.
     const units = new Map(); // chave -> { unit, count, sources: Array<[Set, Set]> }
     const opsCells = []; // operações com célula própria
@@ -49,11 +71,20 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model }) 
         const byKey = new Map();
         for (const [id, s] of sch.sched) {
             const me = sch.info.get(id);
-            if (SHARED.has(me.cls)) {
+            const opKnown = SHARED.has(me.cls) ? me.n.args.map((a) => knownBits(a, seg, me.n, me.unit)) : null;
+            if (me.noShare) {
+                // Uma unidade por operação (somador exato, multiplicação por constante), com os bits conhecidos dela.
+                const k = `${me.unit.name}·op`;
+                if (!units.has(k)) units.set(k, { key: k, cls: me.cls, W: me.W, unit: me.unit, count: 0, sources: [], perOp: true, known: [] });
+                const u = units.get(k);
+                u.count++;
+                u.known.push(opKnown);
+                me.binding = `${k}#${u.count - 1}`;
+            } else if (SHARED.has(me.cls)) {
                 if (!byKey.has(me.key)) byKey.set(me.key, []);
                 byKey.get(me.key).push({ id, s: s.cycle, e: s.cycle + me.k - 1, me, slots: Array.from({ length: me.k }, (_, j) => (pipelined ? (s.cycle + j) % sch.II : s.cycle + j)) });
             } else if (['cmp', 'mux', 'logic'].includes(me.cls)) opsCells.push({ me, execs });
-            if (me.unit) energyOps += me.unit.energy * execs;
+            if (me.unit) energyOps += (opKnown ? lib.effective(me.unit, { a: opKnown[0], b: opKnown[1] }) : me.unit).energy * execs;
         }
         for (const [key, list] of byKey) {
             let count;
@@ -69,7 +100,7 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model }) 
                 count = 1 + Math.max(...list.map((o) => o.slot));
             } else count = leftEdge(list);
             const me0 = list[0].me;
-            if (!units.has(key)) units.set(key, { key, cls: me0.cls, W: me0.W, unit: me0.unit, count: 0, sources: [] });
+            if (!units.has(key)) units.set(key, { key, cls: me0.cls, W: me0.W, unit: me0.unit, count: 0, sources: [], known: [] });
             const u = units.get(key);
             u.count = Math.max(u.count, count);
             for (const op of list) {
@@ -78,9 +109,12 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model }) 
                 const src = n.args.map((a) => (a.n !== undefined ? `${seg.id}:${a.n}` : `c${a.c}`));
                 // Operação comutativa: o operando vai para a entrada que já tem essa fonte, se houver.
                 const [A, B] = u.sources[op.slot];
-                if (['add', 'mul'].includes(n.op) && (A.has(src[1]) || B.has(src[0]))) src.reverse();
+                let kn = n.args.map((a) => knownBits(a, seg, n, u.unit));
+                if (['add', 'mul'].includes(n.op) && (A.has(src[1]) || B.has(src[0]))) { src.reverse(); kn = kn.reverse(); }
                 A.add(src[0]);
                 B.add(src[1]);
+                while (u.known.length <= op.slot) u.known.push(null);
+                u.known[op.slot] = u.known[op.slot] ? [meet(u.known[op.slot][0], kn[0]), meet(u.known[op.slot][1], kn[1])] : kn;
             }
             for (const op of list) op.me.binding = `${key}#${op.slot}`;
         }
@@ -137,7 +171,15 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model }) 
     }
     // Totais.
     const sum = (arr, f) => arr.reduce((s, x) => s + f(x), 0);
-    const unitList = [...units.values()].map((u) => ({ ...u, sources: undefined, area: u.count * u.unit.area, luts: u.count * u.unit.luts, carry4: u.count * u.unit.carry4, leakage: u.count * (u.unit.leakage ?? 0) }));
+    // Custo de cada instância com os bits conhecidos das operações ligadas a ela (propagação de constantes).
+    const unitList = [...units.values()].map((u) => {
+        const insts = Array.from({ length: u.count }, (_, k) => {
+            const kn = u.known?.[k];
+            return kn ? lib.effective(u.unit, { a: kn[0], b: kn[1] }) : u.unit;
+        });
+        const tot = (f) => insts.reduce((x, i) => x + (i[f] ?? 0), 0);
+        return { ...u, sources: undefined, known: undefined, area: tot('area'), luts: Math.round(tot('luts')), carry4: Math.round(tot('carry4')), leakage: tot('leakage'), fullLuts: u.count * u.unit.luts };
+    });
     const cellGroups = new Map();
     for (const { me } of opsCells) {
         const k = `${me.cls}${me.W}`;
@@ -160,9 +202,10 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model }) 
     };
     area.total = area.units + area.cells + area.mux + area.registers + area.control;
     const fpga = {
-        luts: sum(unitList, (u) => u.luts) + sum(cellList, (c) => c.luts) + sum(muxes, (m) => m.luts) + sum(control, (c) => c.luts),
+        luts: sum(unitList, (u) => u.luts) + sum(cellList, (c) => c.luts) + sum(muxes, (m) => m.luts) + sum(control, (c) => c.luts) + (addr?.luts ?? 0),
         carry4: sum(unitList, (u) => u.carry4) + sum(cellList, (c) => c.carry4) + sum(control, (c) => c.carry4),
-        ff: regBits,
+        ff: regBits + (addr?.ff ?? 0),
+        addrLuts: addr?.luts ?? 0,
     };
-    return { units: unitList, cells: cellList, muxes, regs, regBits, control, area, fpga, energy };
+    return { units: unitList, cells: cellList, muxes, regs, regBits, control, area, fpga, energy, addr };
 }

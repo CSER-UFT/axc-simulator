@@ -132,7 +132,7 @@ function render() {
     $('loops').innerHTML = `<tr><th>${t('hls.th.loop')}</th><th>${t('hls.th.line')}</th><th>${t('hls.th.trip')}</th><th>${t('hls.th.mode')}</th><th>unroll</th><th>II</th><th>${t('hls.th.limit')}</th><th>${t('hls.th.iter')}</th><th>${t('hls.th.latency')}</th></tr>`
         + r.design.loops.map((l) => `<tr><td class="mono">${esc(loopName(l))}</td><td>${l.line}</td><td>${nf(l.trip)}</td><td class="left">${esc(modeName(l.mode))}</td><td>${l.mode === 'unrolled' ? t('hls.full') : l.factor > 1 ? l.factor : '-'}</td>`
             + `<td>${l.mode === 'pipelined' ? `${l.IIachieved}${l.II && l.II !== l.IIachieved ? ` (${t('hls.target')} ${l.II})` : ''}` : '-'}</td><td class="left">${esc(l.mode === 'pipelined' ? whyText(l.why) : '')}</td>`
-            + `<td>${l.mode === 'unrolled' ? '-' : nf(l.iterLatency)}</td><td>${l.mode === 'unrolled' ? '-' : nf(l.latency)}</td></tr>`).join('');
+            + `<td>${l.mode === 'unrolled' ? '-' : nf(l.iterLatency)}</td><td>${l.mode === 'unrolled' ? '-' : l.flatInto ? esc(t('hls.flatInto', { l: loopName(r.design.loops.find((x) => x.id === l.flatInto)) })) : `${nf(l.latency)}${l.flatLabel ? ` (${esc(l.flatLabel)})` : ''}`}</td></tr>`).join('');
     const c = r.cost;
     const rowsRes = [
         ...c.units.map((u) => [u.unit.name, u.count, u.area, `${u.luts} / ${u.carry4}`, t('hls.res.unit', { d: nf(u.unit.delay), e: nf(u.unit.energy) })]),
@@ -140,6 +140,7 @@ function render() {
         ...c.muxes.length ? [[t('hls.res.mux'), c.muxes.length, c.area.mux, `${c.muxes.reduce((s, m) => s + m.luts, 0)} / 0`, t('hls.res.muxNote', { list: c.muxes.map((m) => `${m.key}#${m.inst + 1}:${m.side ? 'b' : 'a'} ${m.inputs}`).slice(0, 6).join(', ') })]] : [],
         [t('hls.res.regs'), `${nf(c.regBits)} bits`, c.area.registers, `${nf(c.fpga.ff)} FF`, t('hls.res.regsNote')],
         ...c.control.map((x) => [t('hls.res.control', { l: x.loop }), `${x.bits} bits`, x.area, `${x.luts} / ${x.carry4}`, '']),
+        ...c.addr && (c.addr.luts || c.addr.ff) ? [[t('hls.res.mem'), '-', 0, `${nf(c.addr.luts)} / 0`, t('hls.res.memNote', { a: nf(c.addr.addrLuts), b: nf(c.addr.bankLuts), p: nf(c.addr.pipeFf) })]] : [],
     ];
     $('resources').innerHTML = `<tr><th>${t('hls.th.resource')}</th><th>${t('hls.th.count')}</th><th>µm²</th><th>LUT / CARRY4</th><th class="left">${t('hls.th.note')}</th></tr>`
         + rowsRes.map(([a, b, ar, l, n]) => `<tr><td class="mono">${esc(a)}</td><td>${typeof b === 'number' ? nf(b) : esc(b)}</td><td>${nf(ar)}</td><td>${esc(l)}</td><td class="left note">${esc(n)}</td></tr>`).join('');
@@ -150,7 +151,7 @@ function render() {
             .map(([k, a, e]) => `<tr><td>${t(k)}</td><td>${a === null ? '-' : nf(a)}</td><td>${a === null ? '' : pct(a, A.total)}</td><td>${e === null ? (k === 'hls.part.cells' ? t('hls.inOps') : '-') : nf(e / 1000, 1)}</td><td>${e === null ? '' : pct(e, E.total)}</td></tr>`).join('')
         + `<tr><th>${t('hls.total')}</th><th>${nf(A.total)}</th><th></th><th>${nf(E.total / 1000, 1)}</th><th></th></tr>`;
     $('warnings').innerHTML = r.warnings.map((w) => `<li>${t('hls.lineN', { n: w.line })}: ${esc(w.msg)}</li>`).join('');
-    $('modelNotes').innerHTML = t('hls.modelNotes', { mem: MODEL.memLatency, loop: MODEL.loopOverhead, pipe: MODEL.pipelineOverhead, cq: r.lib.reg.clkToQ, su: r.lib.reg.setup, reg: nf(r.lib.reg.area, 1), ereg: nf(r.lib.reg.energy, 1) });
+    $('modelNotes').innerHTML = t('hls.modelNotes', { mem: MODEL.memLatency, loop: MODEL.loopOverhead, sub: MODEL.subloopOverhead, pipe: MODEL.pipelineOverhead, cq: r.lib.reg.clkToQ, su: r.lib.reg.setup, reg: nf(r.lib.reg.area, 1), ereg: nf(r.lib.reg.energy, 1) });
     renderTab();
 }
 

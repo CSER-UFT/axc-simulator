@@ -22,87 +22,85 @@
   "S1.25": "ADD16 LOA8"
  },
  "prediction": {
-  "cycles": 72960,
-  "timeNs": 364800,
+  "cycles": 72216,
+  "timeNs": 361080,
   "intervalNs": 10,
   "critPs": 4979,
-  "luts": 355,
-  "carry4": 34,
-  "ff": 211,
-  "areaUm2": 13699.411199999999,
-  "energyFj": 1365040041.40032,
+  "luts": 669,
+  "carry4": 23,
+  "ff": 507,
+  "areaUm2": 9877.518863006504,
+  "energyFj": 1123682856.3048003,
   "loops": [
    {
-    "label": "rows",
-    "mode": "sequential",
-    "trip": 190,
-    "II": null,
-    "iterLatency": 384,
-    "latency": 72960
-   },
-   {
-    "label": "cols",
+    "label": "rows_cols",
     "mode": "pipelined",
-    "trip": 190,
+    "flattened": true,
+    "trip": 36100,
     "II": 2,
-    "iterLatency": 4,
-    "latency": 383
+    "iterLatency": 17,
+    "latency": 72216
    }
   ],
+  "addrLuts": 464,
   "units": [
    {
     "unit": "MUL8 T8 +C",
     "count": 2,
-    "luts": 98,
-    "carry4": 8
+    "luts": 25,
+    "carry4": 4
    },
    {
     "unit": "ADD16 LOA7",
     "count": 1,
-    "luts": 17,
-    "carry4": 3
+    "luts": 12,
+    "carry4": 2
    },
    {
     "unit": "ADD16 LOA8",
     "count": 2,
-    "luts": 34,
-    "carry4": 6
+    "luts": 28,
+    "carry4": 5
    },
    {
     "unit": "ADD16 TRUNC8",
     "count": 1,
-    "luts": 8,
-    "carry4": 3
+    "luts": 6,
+    "carry4": 2
    },
    {
     "unit": "ADD16 LOA9",
     "count": 1,
-    "luts": 17,
+    "luts": 14,
     "carry4": 2
    },
    {
     "unit": "MUL8 T6 A4c",
     "count": 1,
-    "luts": 61,
-    "carry4": 2
+    "luts": 6,
+    "carry4": 0
    },
    {
     "unit": "ADD16 TRUNC7",
     "count": 1,
-    "luts": 9,
-    "carry4": 3
+    "luts": 7,
+    "carry4": 2
    },
    {
     "unit": "ADD16 LOA10",
     "count": 1,
-    "luts": 17,
-    "carry4": 2
+    "luts": 13,
+    "carry4": 1
    }
   ],
   "model": {
    "memLatency": 1,
    "loopOverhead": 1,
-   "pipelineOverhead": 1
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
   }
  }
 }

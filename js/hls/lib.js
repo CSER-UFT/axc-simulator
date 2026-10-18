@@ -13,12 +13,27 @@
  */
 import { HlsError } from './lang.js';
 import { bitsFor, magBits } from './elab.js';
+import { buildUnit } from '../axc/units.js';
+import { liveFraction } from './constprop.js';
 
 export const WIDTHS = [8, 16, 32];
+/** Netlists das unidades, construídas uma vez (a propagação de constantes as usa a cada síntese). */
+const NETS = new Map();
 const FREE = new Set(['shl', 'shr', 'trunc', 'iv', 'in', 'carry', 'carryout', 'out', 'const']);
 export const MEM = new Set(['load', 'store']);
 const CLASS = { add: 'add', sub: 'add', mul: 'mul', cmp: 'cmp', sel: 'mux', and: 'logic', or: 'logic', xor: 'logic', not: 'logic' };
 export const SHARED = new Set(['add', 'mul']);
+
+/** Dígitos não nulos da constante: o menor entre a forma binária e a CSD (dígitos -1, 0, 1 sem dois vizinhos). */
+export function digits(c) {
+    let bin = 0, csd = 0;
+    for (let x = c; x > 0; x = Math.floor(x / 2)) bin += x % 2;
+    for (let x = c; x !== 0;) {
+        if (x % 2 !== 0) { const r = 2 - (((x % 4) + 4) % 4); x -= r; csd++; }
+        x /= 2;
+    }
+    return Math.min(bin, csd);
+}
 
 export const opClass = (n) => (FREE.has(n.op) ? 'free' : MEM.has(n.op) ? 'mem' : CLASS[n.op]);
 
@@ -45,15 +60,24 @@ export function opWidth(n, rangeOf) {
  * @param {object} cells data/hls-cells.json
  * @param {{flow?: 'delay'|'area'|'iso', target?: 'asic'|'fpga'}} o
  */
-export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic' } = {}) {
+export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic', fpga = null } = {}) {
     const byName = new Map(synth.designs.map((d) => [d.name, d]));
     const cellFlow = flow === 'delay' ? 'delay' : 'area';
+    // Alvo FPGA com a caracterização do Vivado (data/vivado-units.json): LUT, CARRY4 e atraso do Vivado. As unidades
+    // exatas usam a operação nativa (a + b, a * b), como o Vitis escreve; o resto continua do Yosys e do sky130.
+    const viv = target === 'fpga' && fpga ? fpga.units : null;
+    const vivOf = (name) => {
+        if (!viv) return null;
+        const m = /^(ADD|MUL)(\d+) exato$/.exec(name);
+        return viv[m ? `${m[1]}${m[2]} nativo` : name] ?? null;
+    };
     /** Custo de uma unidade sintetizada pelo nome (MUL8 exato, ADD16 LOA8, ...). */
     function unit(name) {
         const d = byName.get(name);
         if (!d) throw new HlsError(`unidade ${name} não está na biblioteca sintetizada`);
         const f = d.asic.flows[flow] ?? d.asic.flows.delay;
-        return { name, short: name.replace(/ \(.*\)/, ''), cfg: d.cfg, area: f.area, delay: f.delay, energy: f.energy, leakage: f.leakage, luts: d.luts, carry4: d.carry4, err: d.err };
+        const v = vivOf(name);
+        return { name, short: name.replace(/ \(.*\)/, ''), cfg: d.cfg, area: f.area, delay: v?.delayPs ?? f.delay, energy: f.energy, leakage: f.leakage, luts: v?.luts ?? d.luts, carry4: v?.carry4 ?? d.carry4, err: d.err, vivado: !!v };
     }
     const exactName = (cls, W) => `${cls === 'mul' ? 'MUL' : 'ADD'}${W} exato`;
     /** Somador de 32 bits: a cascata de dois de 16 (o de baixo pode ser aproximado; o vai um passa para o de cima). */
@@ -89,11 +113,48 @@ export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic' } = 
     function cell(cls, W) {
         const key = { cmp: 'cmp', mux: 'mux', logic: 'xor' }[cls];
         const c = cells.cells[key][W][cellFlow];
-        return { name: `${cls}${W}`, area: c.area, delay: c.delay, energy: c.energy, luts: c.luts, carry4: c.carry4 };
+        const v = viv?.[`${cls}${W}`];
+        return { name: `${cls}${W}`, area: c.area, delay: v?.delayPs ?? c.delay, energy: c.energy, luts: v?.luts ?? c.luts, carry4: v?.carry4 ?? c.carry4 };
     }
-    const reg = cells.register;
+    /**
+     * Multiplicação exata por constante: somas de deslocamentos, com a representação de menos dígitos (binária ou
+     * CSD). Cada dígito além do primeiro é um somador da largura do operando mais um bit; no FPGA isso dá
+     * (d − 1)(w + 1) LUTs (o Vivado faz x·19 e x·52, w = 8, com 18 e 19 LUTs). Atraso: ceil(log2 d) somadores.
+     */
+    function constMul(c, w) {
+        const d = digits(Math.abs(c));
+        const adders = Math.max(0, d - 1);
+        const add = unit(`ADD${w + 1 <= 8 ? 8 : 16} exato`);
+        const scale = (w + 1) / (w + 1 <= 8 ? 8 : 16);
+        return {
+            name: `×${c} (${adders} soma${adders === 1 ? '' : 's'})`, short: `×${c}`, constMul: c, adders,
+            area: adders * add.area * scale, delay: Math.ceil(Math.log2(Math.max(1, d))) * add.delay, energy: adders * add.energy * scale,
+            leakage: adders * (add.leakage ?? 0) * scale, luts: adders * (w + 1), carry4: adders * Math.ceil((w + 1) / 4),
+        };
+    }
+    const netOf = (name) => { if (!NETS.has(name)) NETS.set(name, buildUnit(byName.get(name).cfg).net); return NETS.get(name); };
+    const NONE = { mask: 0, value: 0 };
+    const scaled = (u, f) => ({ luts: u.luts * f.gates, carry4: u.carry4 * f.chain, area: u.area * f.gates, energy: u.energy * f.gates, leakage: (u.leakage ?? 0) * f.gates });
+    /**
+     * Custo de uma instância com bits de entrada conhecidos (constantes, bits altos zero): a parte da netlist que
+     * sobra depois da propagação de constantes. known = {a, b}, cada um {mask, value} na largura da unidade.
+     */
+    function effective(u, known = { a: NONE, b: NONE }) {
+        if (u.constMul) return u;
+        if (u.composite) {
+            const lo = unit(u.low), hi = unit('ADD16 exato');
+            const part = (k, sh) => ({ mask: (k.mask >>> sh) & 0xFFFF, value: (k.value >>> sh) & 0xFFFF });
+            const a = scaled(lo, liveFraction(u.low, netOf(u.low), { a: part(known.a, 0), b: part(known.b, 0) }));
+            const b = scaled(hi, liveFraction('ADD16 exato', netOf('ADD16 exato'), { a: part(known.a, 16), b: part(known.b, 16) }));
+            return { ...u, luts: a.luts + b.luts, carry4: a.carry4 + b.carry4, area: a.area + b.area, energy: a.energy + b.energy, leakage: a.leakage + b.leakage };
+        }
+        if (!byName.has(u.name) || (!known.a.mask && !known.b.mask)) return u;
+        return { ...u, ...scaled(u, liveFraction(u.name, netOf(u.name), known)) };
+    }
+    // Registrador: no Vivado, o caminho direto entre dois registradores (relógio para a saída e fio; o setup fica de fora).
+    const reg = viv?.reg?.delayPs ? { ...cells.register, clkToQ: viv.reg.delayPs, setup: 0 } : cells.register;
     return {
-        flow, target, unit, exactUnit, unitByName, candidates, cell,
+        flow, target, unit, exactUnit, unitByName, candidates, cell, constMul, effective, vivado: !!viv,
         reg: { area: reg.area, energy: reg.energy, clkToQ: reg.clkToQ, setup: reg.setup, leakage: reg.leakage },
         /** Custo do multiplexador de n entradas por bit: (n - 1) multiplexadores de 2 entradas. */
         mux(n, W) {

@@ -65,7 +65,12 @@ test('atribuição: unidades por tipo, restrições e custo', () => {
     const units = Object.fromEntries(r.cost.units.map((u) => [u.unit.name, u.count]));
     assert.equal(units['MUL8 DRUM6'], 3);
     assert.equal(units['MUL8 exato'], undefined);
-    assert.ok(r.totals.area < base.totals.area);
+    // As multiplicações do gaussiano são por constante (somas de deslocamentos): o DRUM6 custa mais que elas,
+    // como no Vivado. Num produto de duas variáveis (dot), o truncado economiza.
+    assert.ok(r.totals.luts > base.totals.luts);
+    const dot = run(kernel('dot'));
+    const dt = run(kernel('dot'), { assign: parseAssign(dot.ops, 'mul8=MUL8 T4') });
+    assert.ok(dt.totals.area < dot.totals.area);
     const sob = run(kernel('sobel'));
     assert.throws(() => parseAssign(sob.ops, 'S1.7=ADD16 LOA4'), /não serve/); // subtração
     // Atribuição inválida na síntese vira aviso, não erro.

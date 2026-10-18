@@ -1,0 +1,58 @@
+{
+ "case": "sharpen_kul_lat0_ir",
+ "kernel": "sharpen",
+ "kind": "ir",
+ "note": "mul8=MUL8 KUL, unidades combinacionais",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "sharpen",
+ "assign": {
+  "S1.1": "MUL8 KUL"
+ },
+ "prediction": {
+  "cycles": 72216,
+  "timeNs": 361080,
+  "intervalNs": 10,
+  "critPs": 4865,
+  "luts": 530,
+  "carry4": 23,
+  "ff": 384,
+  "areaUm2": 6469.588188777635,
+  "energyFj": 633936485.0145844,
+  "loops": [
+   {
+    "label": "rows_cols",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 36100,
+    "II": 2,
+    "iterLatency": 17,
+    "latency": 72216
+   }
+  ],
+  "addrLuts": 404,
+  "units": [
+   {
+    "unit": "ADD16 exato",
+    "count": 4,
+    "luts": 42,
+    "carry4": 13
+   },
+   {
+    "unit": "MUL8 KUL",
+    "count": 1,
+    "luts": 14,
+    "carry4": 2
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}

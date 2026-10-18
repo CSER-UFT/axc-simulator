@@ -53,8 +53,8 @@ export function pragmaVariants(src, maxPragmas = 4) {
  * @param {string} src código
  * @param {object} o synth, cells, clockNs, flow, ports, input ('image'|'uniform'), method ('sampled'|'analytic'), label
  */
-export function prepare(src, { synth, cells, clockNs = 5, flow = 'delay', ports = 2, input = 'image', image = null, method = 'sampled', label = '' } = {}) {
-    const syn = { synth, cells, clockNs, flow, ports };
+export function prepare(src, { synth, cells, clockNs = 5, flow = 'delay', ports = 2, target = 'asic', fpga = null, input = 'image', image = null, method = 'sampled', label = '' } = {}) {
+    const syn = { synth, cells, clockNs, flow, ports, target, fpga };
     const base = synthesize(src, syn);
     const inputs = makeInputs(base.design, input, 2027, image);
     const prof = execute(base.design, inputs, { profile: true });

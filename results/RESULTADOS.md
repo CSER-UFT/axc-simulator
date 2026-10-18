@@ -1,6 +1,6 @@
 # Resultados dos estudos de caso
 
-Gerado por `scripts/experiments.mjs` em 2026-10-17 (commit 956c4f2, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
+Gerado por `scripts/experiments.mjs` em 2026-10-18 (commit 578da86, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
 
 ### E1. Precisão do modelo estático de erro
 
@@ -54,47 +54,47 @@ Objetivo: área ASIC; restrição: PSNR mínimo (estimado na busca, conferido bi
 
 | Kernel | Grupos | PSNR mín. | Sequencial | Eficiência | Exaustiva | Aleatória |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| gauss | classe | 30 | 36,4% (33,4) | 37,3% (32,0) | 36,4% (33,4) | 32,2% (38,1) |
-| gauss | classe | 40 | 31,4% (40,2) | 31,4% (40,2) | 31,4% (40,2) | 31,4% (40,2) |
-| gauss | classe | 50 | 21,0% (51,2) | 21,0% (51,2) | 21,0% (51,2) | 20,0% (52,1) |
-| gauss | operação | 30 | 38,9% (30,9) | 49,4% (32,2) | - | 22,2% (37,1) |
-| gauss | operação | 40 | 28,1% (40,7) | 39,3% (40,6) | - | 9,2% (41,8) |
-| gauss | operação | 50 | 13,4% (50,0) | 25,4% (50,6) | - | 8,2% (51,3) |
-| sobel | classe | 30 | 2,9% (38,9) | 2,9% (38,9) | 2,9% (38,9) | 2,9% (38,9) |
-| sobel | classe | 40 | 2,2% (44,7) | 2,2% (44,7) | 2,2% (44,7) | 2,2% (44,7) |
-| sobel | classe | 50 | 1,8% (50,9) | 1,8% (50,9) | 1,8% (50,9) | 1,8% (50,9) |
-| sobel | operação | 30 | 5,5% (30,2) | 5,5% (31,0) | 5,5% (30,9) | 3,9% (30,8) |
-| sobel | operação | 40 | 4,4% (41,6) | 4,4% (42,2) | 4,4% (42,1) | 3,2% (41,6) |
-| sobel | operação | 50 | 2,0% (50,2) | 2,5% (51,2) | 2,5% (51,8) | 1,9% (51,7) |
-| sharpen | classe | 30 | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) |
-| sharpen | classe | 40 | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) |
-| sharpen | classe | 50 | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) |
-| sharpen | operação | 30 | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) |
-| sharpen | operação | 40 | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) |
-| sharpen | operação | 50 | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) | 7,2% (∞) |
-| fir | classe | 50 | 46,7% (54,0) | 46,7% (54,0) | 46,7% (54,0) | 36,2% (54,3) |
-| fir | classe | 60 | 36,3% (60,1) | 36,0% (60,9) | 36,3% (60,1) | 32,3% (60,7) |
-| fir | classe | 70 | 24,4% (72,4) | 24,4% (72,4) | 24,8% (70,5) | 24,8% (70,5) |
-| fir | operação | 50 | 64,7% (50,1) | 68,5% (50,1) | - | 32,1% (50,1) |
-| fir | operação | 60 | 49,3% (60,0) | 52,9% (60,0) | - | 0,0% (∞) |
-| fir | operação | 70 | 36,2% (70,1) | 38,4% (70,0) | - | 0,0% (∞) |
+| gauss | classe | 30 | 33,5% (33,4) | 34,7% (32,0) | 33,5% (33,4) | 29,0% (38,1) |
+| gauss | classe | 40 | 27,9% (40,2) | 27,9% (40,2) | 27,9% (40,2) | 27,9% (40,2) |
+| gauss | classe | 50 | 22,7% (51,2) | 22,7% (51,2) | 22,7% (51,2) | 21,9% (53,2) |
+| gauss | operação | 30 | 48,4% (30,0) | 49,4% (30,2) | - | 29,8% (32,0) |
+| gauss | operação | 40 | 38,5% (40,3) | 42,1% (40,4) | - | 19,1% (41,8) |
+| gauss | operação | 50 | 25,8% (50,2) | 27,4% (50,2) | - | 12,2% (51,3) |
+| sobel | classe | 30 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
+| sobel | classe | 40 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
+| sobel | classe | 50 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
+| sobel | operação | 30 | 7,3% (30,2) | 7,3% (30,9) | 7,3% (31,1) | 5,0% (30,8) |
+| sobel | operação | 40 | 5,6% (42,0) | 5,6% (41,8) | 5,6% (42,1) | 4,0% (41,6) |
+| sobel | operação | 50 | 2,3% (51,6) | 2,5% (51,6) | 2,5% (51,6) | 2,4% (51,7) |
+| sharpen | classe | 30 | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) |
+| sharpen | classe | 40 | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) |
+| sharpen | classe | 50 | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) |
+| sharpen | operação | 30 | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) |
+| sharpen | operação | 40 | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) |
+| sharpen | operação | 50 | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) | 0,4% (∞) |
+| fir | classe | 50 | 49,8% (54,0) | 49,8% (54,0) | 49,8% (54,0) | 35,7% (51,3) |
+| fir | classe | 60 | 32,1% (60,1) | 32,6% (63,3) | 32,6% (63,3) | 25,9% (64,8) |
+| fir | classe | 70 | 22,2% (70,9) | 26,8% (71,1) | 26,8% (71,1) | 24,1% (70,5) |
+| fir | operação | 50 | 56,4% (50,1) | 64,1% (50,0) | - | 30,9% (50,1) |
+| fir | operação | 60 | 44,3% (60,0) | 47,6% (60,1) | - | 0,0% (∞) |
+| fir | operação | 70 | 32,3% (70,0) | 33,6% (70,1) | - | 0,0% (∞) |
 
 #### E2: avaliações e tempo (média por configuração)
 
 | Heurística | Grupos | Avaliações | Tempo (s) |
 | --- | --- | ---: | ---: |
-| Sequencial | classe | 31 | 0,2 |
-| Sequencial | operação | 189 | 1,0 |
-| Eficiência | classe | 182 | 1,1 |
-| Eficiência | operação | 2735 | 16,5 |
-| Exaustiva | classe | 378 | 2,4 |
-| Exaustiva | operação | 1184 | 6,3 |
-| Aleatória | classe | 74 | 0,4 |
-| Aleatória | operação | 153 | 0,8 |
+| Sequencial | classe | 31 | 0,3 |
+| Sequencial | operação | 189 | 1,4 |
+| Eficiência | classe | 145 | 1,7 |
+| Eficiência | operação | 2062 | 21,2 |
+| Exaustiva | classe | 378 | 3,8 |
+| Exaustiva | operação | 1180 | 12,0 |
+| Aleatória | classe | 74 | 0,7 |
+| Aleatória | operação | 153 | 1,3 |
 
-Verificação: o primeiro ponto (o mais barato estimado como viável) passou na execução bit a bit em 89 de 90 casos; nos outros, a busca verificou em média 20,0 pontos até achar um que passa (no máximo 20).
+Verificação: o primeiro ponto (o mais barato estimado como viável) passou na execução bit a bit em 90 de 90 casos; nos outros, a busca verificou em média 0,0 pontos até achar um que passa (no máximo 1).
 
-Eficiência contra sequencial: melhor em 9 de 24 configurações, igual em 14, pior em 1; maior ganho 17,3% de área a menos que a sequencial.
+Eficiência contra sequencial: melhor em 11 de 24 configurações, igual em 12, pior em 1; maior ganho 17,7% de área a menos que a sequencial.
 
 ### E3. Fronteiras de Pareto verificadas
 
@@ -104,10 +104,10 @@ Eficiência contra sequencial: melhor em 9 de 24 configurações, igual em 14, p
 
 | Kernel | Grupos | Heurística | Pontos | Verificados | Diferença média (dB) | Maior diferença (dB) | Erros de decisão a 40 dB |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| gauss | classe | exaustiva | 26 | 25 | 0,22 | 1,64 | 0 / 0 |
-| gauss | operação | eficiência | 78 | 70 | 0,22 | 4,61 | 0 / 1 |
-| fir | classe | exaustiva | 37 | 36 | 0,00 | 0,00 | 0 / 0 |
-| sobel | operação | eficiência | 30 | 27 | 0,20 | 0,76 | 0 / 0 |
+| gauss | classe | exaustiva | 25 | 24 | 0,22 | 1,64 | 0 / 0 |
+| gauss | operação | eficiência | 81 | 74 | 0,23 | 4,70 | 0 / 0 |
+| fir | classe | exaustiva | 49 | 48 | 0,00 | 0,00 | 0 / 0 |
+| sobel | operação | eficiência | 29 | 26 | 0,23 | 0,72 | 0 / 0 |
 
 ### E4. Diretivas e período junto com as unidades
 
@@ -117,9 +117,9 @@ Gaussiano, PSNR de pelo menos 40 dB, grupos por classe, heurística de eficiênc
 
 | Objetivo | Variante | Área (µm²) | Energia (nJ) | Latência (µs) | PSNR medido | Unidades |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| ponderado | diretivas do código, 2.5 ns | 18191 | 2064 | 183,8 | 40,2 | 3 × MUL8 T8 +C + 4 × ADD16 LOA6 |
-| latência | diretivas do código, 2.5 ns | 23012 | 2373 | 183,8 | 52,9 | 3 × MUL8 KUL6 + 4 × ADD16 TRUNC2 |
-| área | sem pipeline (linha 12), 2.5 ns | 5731 | 9709 | 3700,7 | 43,8 | 1 × MUL8 T6 + 1 × ADD16 LOA8 |
+| ponderado | diretivas do código, 2.5 ns | 14406 | 1797 | 180,5 | 40,2 | 3 × MUL8 T8 +C + 4 × ADD16 LOA6 |
+| latência | diretivas do código, 2.5 ns | 16565 | 1955 | 180,5 | 52,9 | 3 × MUL8 KUL6 + 4 × ADD16 TRUNC2 |
+| área | sem array_partition (linha 6), pipeline (linha 12), 2.5 ns | 4986 | 11199 | 4423,7 | 43,8 | 1 × MUL8 T6 + 1 × ADD16 LOA8 |
 
 ### E5. Sensibilidade aos dados de entrada
 
@@ -129,12 +129,12 @@ O projeto escolhido (exaustiva por classe, área, PSNR de pelo menos 40 dB) com 
 
 | Kernel | Otimizado com | Economia de área | PSNR nos mesmos dados | PSNR nos outros dados | Mantém 40 dB |
 | --- | --- | ---: | ---: | ---: | --- |
-| gauss | uniformes | 34,2% | 41,6 | 39,7 | não |
-| gauss | imagem | 31,4% | 40,2 | 41,5 | sim |
-| sobel | uniformes | 2,9% | 40,1 | 38,9 | não |
-| sobel | imagem | 2,2% | 44,7 | 45,5 | sim |
-| sharpen | uniformes | 7,2% | ∞ | ∞ | sim |
-| sharpen | imagem | 7,2% | ∞ | ∞ | sim |
+| gauss | uniformes | 31,7% | 41,6 | 39,7 | não |
+| gauss | imagem | 27,9% | 40,2 | 41,5 | sim |
+| sobel | uniformes | 0,0% | ∞ | ∞ | sim |
+| sobel | imagem | 0,0% | ∞ | ∞ | sim |
+| sharpen | uniformes | 0,4% | ∞ | ∞ | sim |
+| sharpen | imagem | 0,4% | ∞ | ∞ | sim |
 
-Tempo total: 499 s.
+Tempo total: 748 s.
 

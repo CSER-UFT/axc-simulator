@@ -42,11 +42,11 @@
   "timeNs": 5075,
   "intervalNs": 5,
   "critPs": 4981,
-  "luts": 1161,
-  "carry4": 77,
-  "ff": 506,
-  "areaUm2": 33527.18519999999,
-  "energyFj": 53905994.08873001,
+  "luts": 938,
+  "carry4": 38,
+  "ff": 556,
+  "areaUm2": 18852.125017724175,
+  "energyFj": 39018832.14205327,
   "loops": [
    {
     "label": "samples",
@@ -57,17 +57,18 @@
     "latency": 1015
    }
   ],
+  "addrLuts": 522,
   "units": [
    {
     "unit": "MUL8 DRUM4",
     "count": 2,
-    "luts": 202,
-    "carry4": 4
+    "luts": 70,
+    "carry4": 1
    },
    {
     "unit": "MUL8 DRUM2",
     "count": 1,
-    "luts": 83,
+    "luts": 29,
     "carry4": 1
    },
    {
@@ -79,74 +80,78 @@
    {
     "unit": "ADD16 LOA15",
     "count": 1,
-    "luts": 17,
+    "luts": 8,
     "carry4": 0
    },
    {
     "unit": "MUL8 T8 +C",
     "count": 3,
-    "luts": 147,
-    "carry4": 12
+    "luts": 32,
+    "carry4": 6
    },
    {
     "unit": "ADD16 LOA10",
     "count": 1,
-    "luts": 17,
-    "carry4": 2
+    "luts": 9,
+    "carry4": 1
    },
    {
     "unit": "MUL8 T6 A10c",
     "count": 4,
-    "luts": 208,
+    "luts": 5,
     "carry4": 0
    },
    {
     "unit": "MUL8 DRUM3 +C",
     "count": 1,
-    "luts": 90,
+    "luts": 38,
     "carry4": 2
    },
    {
     "unit": "ADD16 LOA9",
     "count": 5,
-    "luts": 85,
-    "carry4": 10
+    "luts": 66,
+    "carry4": 7
    },
    {
     "unit": "ADD16 LOA8",
     "count": 4,
-    "luts": 68,
-    "carry4": 12
+    "luts": 53,
+    "carry4": 9
    },
    {
     "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
     "count": 2,
-    "luts": 66,
-    "carry4": 16
+    "luts": 27,
+    "carry4": 4
    },
    {
     "unit": "MUL8 DRUM3",
     "count": 1,
-    "luts": 90,
+    "luts": 38,
     "carry4": 2
    },
    {
     "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
     "count": 1,
-    "luts": 33,
-    "carry4": 7
+    "luts": 11,
+    "carry4": 1
    },
    {
     "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
     "count": 1,
-    "luts": 33,
-    "carry4": 5
+    "luts": 8,
+    "carry4": 0
    }
   ],
   "model": {
    "memLatency": 1,
    "loopOverhead": 1,
-   "pipelineOverhead": 1
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
   }
  }
 }

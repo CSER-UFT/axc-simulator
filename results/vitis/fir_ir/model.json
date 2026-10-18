@@ -11,12 +11,12 @@
   "cycles": 1018,
   "timeNs": 5090,
   "intervalNs": 5,
-  "critPs": 4949,
-  "luts": 1740,
-  "carry4": 155,
-  "ff": 736,
-  "areaUm2": 71200.7512,
-  "energyFj": 101360967.231156,
+  "critPs": 4046,
+  "luts": 888,
+  "carry4": 114,
+  "ff": 816,
+  "areaUm2": 31383.877174025976,
+  "energyFj": 63370328.42326458,
   "loops": [
    {
     "label": "samples",
@@ -27,30 +27,71 @@
     "latency": 1018
    }
   ],
+  "addrLuts": 522,
   "units": [
    {
-    "unit": "MUL8 exato",
-    "count": 14,
-    "luts": 1414,
-    "carry4": 56
+    "unit": "×3 (1 soma)",
+    "count": 2,
+    "luts": 18,
+    "carry4": 6
+   },
+   {
+    "unit": "×7 (1 soma)",
+    "count": 2,
+    "luts": 18,
+    "carry4": 6
    },
    {
     "unit": "ADD16 exato",
     "count": 11,
-    "luts": 176,
-    "carry4": 55
+    "luts": 147,
+    "carry4": 46
+   },
+   {
+    "unit": "×12 (1 soma)",
+    "count": 2,
+    "luts": 18,
+    "carry4": 6
+   },
+   {
+    "unit": "×18 (1 soma)",
+    "count": 2,
+    "luts": 18,
+    "carry4": 6
+   },
+   {
+    "unit": "×24 (1 soma)",
+    "count": 2,
+    "luts": 18,
+    "carry4": 6
+   },
+   {
+    "unit": "×29 (2 somas)",
+    "count": 2,
+    "luts": 36,
+    "carry4": 12
+   },
+   {
+    "unit": "×33 (1 soma)",
+    "count": 2,
+    "luts": 18,
+    "carry4": 6
    },
    {
     "unit": "ADD32 (2 × ADD16 exato)",
     "count": 4,
-    "luts": 128,
-    "carry4": 40
+    "luts": 53,
+    "carry4": 16
    }
   ],
   "model": {
    "memLatency": 1,
    "loopOverhead": 1,
-   "pipelineOverhead": 1
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
   }
  }
 }
