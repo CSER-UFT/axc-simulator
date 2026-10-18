@@ -1,0 +1,97 @@
+kernel,granularity,psnr_min,heuristic,evaluations,verify_tries,ms,area_um2,area_saving,energy_saving,psnr_est,psnr_measured,verified,error,units
+gauss,class,30,sequential,38,1,409,14358.8,0.363998,0.357025,33.3924,33.4178,true,,3 × MUL8 T6 A4c + 4 × ADD16 LOA9
+gauss,class,30,efficiency,196,1,1380,14152.4,0.373142,0.365544,31.9537,31.971,true,,3 × MUL8 T8 A2c + 4 × ADD16 LOA9
+gauss,class,30,exhaustive,122,1,975,14358.8,0.363998,0.357025,33.3924,33.4178,true,,3 × MUL8 T6 A4c + 4 × ADD16 LOA9
+gauss,class,30,random,102,1,674,15298.5,0.322378,0.312763,38.1773,38.1056,true,,3 × MUL8 T8 +C + 4 × ADD16 LOA7
+gauss,class,40,sequential,38,1,295,15488.6,0.313955,0.304831,40.2146,40.1609,true,,3 × MUL8 T8 +C + 4 × ADD16 LOA6
+gauss,class,40,efficiency,180,1,1212,15488.6,0.313955,0.304831,40.2146,40.1609,true,,3 × MUL8 T8 +C + 4 × ADD16 LOA6
+gauss,class,40,exhaustive,92,1,684,15488.6,0.313955,0.304831,40.2146,40.1609,true,,3 × MUL8 T8 +C + 4 × ADD16 LOA6
+gauss,class,40,random,102,1,751,15488.6,0.313955,0.304831,40.2146,40.1609,true,,3 × MUL8 T8 +C + 4 × ADD16 LOA6
+gauss,class,50,sequential,38,1,297,17842.1,0.20971,0.229653,51.0696,51.1669,true,,3 × MUL8 T6 +C + 4 × ADD16 LOA6
+gauss,class,50,efficiency,132,1,850,17842.1,0.20971,0.229653,51.0696,51.1669,true,,3 × MUL8 T6 +C + 4 × ADD16 LOA6
+gauss,class,50,exhaustive,47,1,426,17842.1,0.20971,0.229653,51.0696,51.1669,true,,3 × MUL8 T6 +C + 4 × ADD16 LOA6
+gauss,class,50,random,102,1,627,18062.4,0.199956,0.222267,51.9092,52.0671,true,,3 × MUL8 T6 +C + 4 × ADD16 LOA4
+gauss,op,30,sequential,214,1,1044,13802,0.388661,0.360138,30.9182,30.8886,true,,1 × MUL8 T10 A4c + 1 × ADD16 LOA11 + 1 × ADD16 LOA12 + 1 × MUL8 T10 +C + 1 × ADD16 LOA10 + 2 × ADD16 exato + 1 × MUL8 exato + 1 × ADD16 LOA9 + 1 × ADD16 TRUNC7
+gauss,op,30,efficiency,4350,1,26629,11418.5,0.494236,0.433793,32.0353,32.159,true,,1 × MUL8 T8 +C + 1 × ADD16 TRUNC8 + 1 × MUL8 T8 A8c + 1 × ADD16 LOA7 + 1 × MUL8 T10 +C + 1 × ADD16 LOA11 + 1 × ADD16 LOA9 + 1 × ADD16 LOA12 + 1 × ADD16 LOA10 + 1 × ADD16 TRUNC7 + 1 × ADD16 LOA8
+gauss,op,30,exhaustive,186,1,810,,,,,,true,exaustiva: 861923212001280 combinações depois da poda (limite 20000); use outra heurística ou grupos por classe,
+gauss,op,30,random,201,1,1152,17558.1,0.22229,0.235006,37.0309,37.113,true,,1 × MUL8 T6 A4c + 2 × ADD16 exato + 1 × MUL8 exato + 1 × ADD16 LOA9 + 1 × ADD16 LOA11 + 1 × MUL8 DRUM6 +C + 1 × ADD16 LOA10 + 1 × ADD16 LOA4
+gauss,op,40,sequential,214,1,1054,16228.1,0.281202,0.269318,40.7659,40.7134,true,,2 × MUL8 exato + 1 × MUL8 T8 A8c + 1 × ADD16 LOA11 + 1 × ADD16 LOA9 + 1 × ADD16 LOA8 + 1 × ADD16 LOA7 + 1 × ADD16 LOA10 + 1 × ADD16 LOA6 + 1 × ADD16 LOA4 + 1 × ADD16 LOA3
+gauss,op,40,efficiency,3993,1,24006,13699.4,0.393206,0.369363,40.5641,40.6179,true,,2 × MUL8 T8 +C + 1 × ADD16 LOA7 + 2 × ADD16 LOA8 + 1 × ADD16 TRUNC8 + 1 × ADD16 LOA9 + 1 × MUL8 T6 A4c + 1 × ADD16 TRUNC7 + 1 × ADD16 LOA10
+gauss,op,40,exhaustive,161,1,853,,,,,,true,exaustiva: 120270458880000 combinações depois da poda (limite 20000); use outra heurística ou grupos por classe,
+gauss,op,40,random,201,1,1266,20506,0.0917198,0.190758,41.7225,41.7519,true,,1 × MUL8 exato + 2 × ADD16 exato + 1 × MUL8 T6 A10c + 1 × ADD16 LOA9 + 1 × MUL8 A2c + 1 × ADD16 LOA7 + 1 × ADD16 LOA10 + 1 × MUL8 KUL6
+gauss,op,50,sequential,214,20,2835,19547.5,0.134172,0.141577,50.1416,50.0418,true,,1 × MUL8 T8 +C + 2 × MUL8 exato + 1 × ADD16 LOA9 + 1 × ADD16 LOA6 + 3 × ADD16 exato
+gauss,op,50,efficiency,3124,1,18424,16833.7,0.254379,0.232977,50.5179,50.5811,true,,1 × MUL8 T6 +C + 1 × MUL8 DRUM5 + 1 × ADD16 LOA7 + 1 × ADD16 LOA3 + 1 × MUL8 T6 + 2 × ADD16 LOA4 + 1 × ADD16 LOA2 + 1 × ADD16 LOA6 + 1 × ADD16 LOA8
+gauss,op,50,exhaustive,117,1,544,,,,,,true,exaustiva: 2045267840000 combinações depois da poda (limite 20000); use outra heurística ou grupos por classe,
+gauss,op,50,random,201,1,1087,20732.4,0.0816894,0.101643,51.1453,51.2569,true,,1 × MUL8 A2c + 2 × MUL8 exato + 1 × ADD16 LOA9 + 2 × ADD16 exato + 1 × ADD16 LOA6 + 1 × ADD16 LOA8 + 1 × ADD16 LOA3
+sobel,class,30,sequential,12,1,110,15824,0.0285737,0.0233554,38.6215,38.8604,true,,3 × ADD16 LOA4 + 4 × ADD16 exato
+sobel,class,30,efficiency,12,1,116,15824,0.0285737,0.0233554,38.6215,38.8604,true,,3 × ADD16 LOA4 + 4 × ADD16 exato
+sobel,class,30,exhaustive,6,1,84,15824,0.0285737,0.0233554,38.6215,38.8604,true,,3 × ADD16 LOA4 + 4 × ADD16 exato
+sobel,class,30,random,12,1,116,15824,0.0285737,0.0233554,38.6215,38.8604,true,,3 × ADD16 LOA4 + 4 × ADD16 exato
+sobel,class,40,sequential,12,1,135,15932.9,0.0218903,0.0171325,44.5028,44.65,true,,3 × ADD16 LOA3 + 4 × ADD16 exato
+sobel,class,40,efficiency,12,1,152,15932.9,0.0218903,0.0171325,44.5028,44.65,true,,3 × ADD16 LOA3 + 4 × ADD16 exato
+sobel,class,40,exhaustive,5,1,120,15932.9,0.0218903,0.0171325,44.5028,44.65,true,,3 × ADD16 LOA3 + 4 × ADD16 exato
+sobel,class,40,random,12,1,165,15932.9,0.0218903,0.0171325,44.5028,44.65,true,,3 × ADD16 LOA3 + 4 × ADD16 exato
+sobel,class,50,sequential,12,1,133,15996.7,0.017973,0.0135289,50.9584,50.8654,true,,3 × ADD16 LOA2 + 4 × ADD16 exato
+sobel,class,50,efficiency,12,1,123,15996.7,0.017973,0.0135289,50.9584,50.8654,true,,3 × ADD16 LOA2 + 4 × ADD16 exato
+sobel,class,50,exhaustive,4,1,84,15996.7,0.017973,0.0135289,50.9584,50.8654,true,,3 × ADD16 LOA2 + 4 × ADD16 exato
+sobel,class,50,random,12,1,116,15996.7,0.017973,0.0135289,50.9584,50.8654,true,,3 × ADD16 LOA2 + 4 × ADD16 exato
+sobel,op,30,sequential,48,1,242,15399.8,0.0546127,0.027308,30.164,30.2301,true,,1 × ADD16 LOA3 + 1 × ADD16 LOA7 + 1 × ADD16 LOA4 + 1 × ADD16 LOA2 + 4 × ADD16 exato + 1 × ADD16 LOA8
+sobel,op,30,efficiency,251,1,1277,15394.8,0.0549203,0.027308,30.7577,31.0413,true,,1 × ADD16 LOA3 + 1 × ADD16 LOA6 + 1 × ADD16 LOA4 + 1 × ADD16 LOA2 + 4 × ADD16 exato + 1 × ADD16 LOA9
+sobel,op,30,exhaustive,3035,1,18526,15394.8,0.0549203,0.027308,30.5263,30.9453,true,,1 × ADD16 LOA2 + 1 × ADD16 LOA4 + 1 × ADD16 LOA3 + 1 × ADD16 LOA6 + 4 × ADD16 exato + 1 × ADD16 LOA9
+sobel,op,30,random,196,1,791,15658.8,0.0387128,0.0192105,30.9121,30.8209,true,,5 × ADD16 exato + 1 × ADD16 LOA6 + 1 × ADD16 LOA2 + 1 × ADD16 LOA9
+sobel,op,40,sequential,48,1,238,15578.7,0.0436289,0.0213835,42.2121,41.5757,true,,1 × ADD16 LOA4 + 1 × ADD16 LOA2 + 1 × ADD16 LOA3 + 1 × ADD16 SEG L12 P6 + 4 × ADD16 exato + 1 × ADD16 LOA7
+sobel,op,40,efficiency,206,1,999,15578.7,0.0436289,0.0213835,42.8954,42.23,true,,1 × ADD16 LOA2 + 1 × ADD16 LOA3 + 1 × ADD16 LOA4 + 1 × ADD16 SEG L12 P6 + 4 × ADD16 exato + 1 × ADD16 LOA7
+sobel,op,40,exhaustive,3026,1,13826,15578.7,0.0436289,0.0213835,42.7144,42.1026,true,,1 × ADD16 LOA3 + 1 × ADD16 SEG L12 P6 + 1 × ADD16 LOA4 + 1 × ADD16 LOA2 + 4 × ADD16 exato + 1 × ADD16 LOA7
+sobel,op,40,random,196,1,926,15762.7,0.0323375,0.0161172,42.2382,41.5918,true,,5 × ADD16 exato + 1 × ADD16 LOA4 + 1 × ADD16 LOA3 + 1 × ADD16 LOA7
+sobel,op,50,sequential,48,1,267,15956.6,0.0204318,-0.143501,50.1754,50.2114,true,,1 × ADD16 LOA3 + 1 × ADD16 SEG L12 P6 + 1 × ADD16 LOA2 + 4 × ADD16 exato
+sobel,op,50,efficiency,133,1,705,15890.3,0.0245024,0.013814,51.4259,51.2284,true,,1 × ADD16 LOA3 + 2 × ADD16 SEG L12 P6 + 1 × ADD16 LOA2 + 4 × ADD16 exato
+sobel,op,50,exhaustive,1029,1,5372,15886.5,0.0247332,-0.0294484,51.7747,51.7875,true,,5 × ADD16 exato + 1 × ADD16 LOA2 + 1 × ADD16 SEG L12 P6 + 1 × ADD16 LOA3
+sobel,op,50,random,196,1,830,15986.6,0.0185881,0.00869279,51.5968,51.6944,true,,5 × ADD16 exato + 1 × ADD16 SEG L12 P6 + 1 × ADD16 LOA3 + 1 × ADD16 LOA2
+sharpen,class,30,sequential,15,1,64,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,30,efficiency,15,1,71,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,30,exhaustive,4,1,55,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,30,random,15,1,74,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,40,sequential,15,1,68,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,40,efficiency,15,1,71,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,40,exhaustive,4,1,47,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,40,random,15,1,70,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,50,sequential,15,1,63,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,50,efficiency,15,1,67,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,50,exhaustive,4,1,41,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,class,50,random,15,1,62,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,30,sequential,15,1,77,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,30,efficiency,15,1,81,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,30,exhaustive,4,1,51,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,30,random,15,1,98,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,40,sequential,15,1,58,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,40,efficiency,15,1,68,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,40,exhaustive,4,1,60,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,40,random,15,1,70,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,50,sequential,15,1,88,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,50,efficiency,15,1,66,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,50,exhaustive,4,1,41,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+sharpen,op,50,random,15,1,61,9317.72,0.0721399,0.0222591,Infinity,Infinity,true,,1 × MUL8 KUL + 2 × ADD16 exato
+fir,class,50,sequential,60,1,269,37927.7,0.467313,0.439849,53.9842,53.9842,true,,14 × MUL8 T8 +C + 11 × ADD16 LOA11 + 4 × ADD32 (ADD16 LOA11 + ADD16 exato)
+fir,class,50,efficiency,582,1,3297,37927.7,0.467313,0.439849,53.9842,53.9842,true,,14 × MUL8 T8 +C + 11 × ADD16 LOA11 + 4 × ADD32 (ADD16 LOA11 + ADD16 exato)
+fir,class,50,exhaustive,2148,1,12931,37927.7,0.467313,0.439849,53.9842,53.9842,true,,14 × MUL8 T8 +C + 11 × ADD16 LOA11 + 4 × ADD32 (ADD16 LOA11 + ADD16 exato)
+fir,class,50,random,167,1,798,45411.1,0.362211,0.291016,54.2762,54.2762,true,,14 × MUL8 T8 +C + 11 × ADD16 LOA2 + 4 × ADD32 (ADD16 LOA4 + ADD16 exato)
+fir,class,60,sequential,60,1,326,45331.1,0.363334,0.301044,60.0546,60.0546,true,,14 × MUL8 MITCHELL + 11 × ADD16 LOA9 + 4 × ADD32 (ADD16 LOA9 + ADD16 exato)
+fir,class,60,efficiency,549,1,3563,45591.3,0.359679,0.297963,60.8638,60.8638,true,,14 × MUL8 MITCHELL + 11 × ADD16 LOA9 + 4 × ADD32 (ADD16 LOA7 + ADD16 exato)
+fir,class,60,exhaustive,1323,1,8399,45331.1,0.363334,0.301044,60.0546,60.0546,true,,14 × MUL8 MITCHELL + 11 × ADD16 LOA9 + 4 × ADD32 (ADD16 LOA9 + ADD16 exato)
+fir,class,60,random,167,1,809,48183.8,0.323268,0.241982,60.7004,60.7004,true,,14 × MUL8 MITCHELL + 11 × ADD16 LOA9 + 4 × ADD32 (2 × ADD16 exato)
+fir,class,70,sequential,60,1,260,53859.1,0.24356,0.208717,72.3779,72.3779,true,,14 × MUL8 T6 +C + 11 × ADD16 LOA6 + 4 × ADD32 (ADD16 LOA8 + ADD16 exato)
+fir,class,70,efficiency,462,1,2583,53859.1,0.24356,0.208717,72.3779,72.3779,true,,14 × MUL8 T6 +C + 11 × ADD16 LOA6 + 4 × ADD32 (ADD16 LOA8 + ADD16 exato)
+fir,class,70,exhaustive,773,1,4852,53576.3,0.247531,0.212146,70.4779,70.4779,true,,14 × MUL8 T6 +C + 11 × ADD16 LOA7 + 4 × ADD32 (ADD16 LOA6 + ADD16 exato)
+fir,class,70,random,167,1,804,53576.3,0.247531,0.212146,70.4779,70.4779,true,,14 × MUL8 T6 +C + 11 × ADD16 LOA7 + 4 × ADD32 (ADD16 LOA6 + ADD16 exato)
+fir,op,50,sequential,478,1,1902,25157.9,0.646662,0.603312,50.0764,50.0764,true,,3 × MUL8 T10 +C + 3 × MUL8 T8 A8c + 3 × MUL8 T16 + 2 × ADD16 TRUNC16 + 1 × ADD16 LOA15 + 2 × ADD16 LOA10 + 4 × ADD16 LOA12 + 1 × MUL8 DRUM5 + 2 × MUL8 T6 A10c + 2 × ADD16 LOA11 + 1 × MUL8 DRUM4 + 2 × ADD32 (ADD16 LOA11 + ADD16 exato) + 1 × ADD32 (ADD16 LOA10 + ADD16 exato) + 1 × MUL8 DRUM3 + 1 × ADD32 (ADD16 LOA8 + ADD16 exato)
+fir,op,50,efficiency,7910,1,50613,22392.7,0.685498,0.624638,50.0896,50.0896,true,,1 × MUL8 DRUM2 + 4 × MUL8 T8 A8c + 4 × MUL8 T10 +C + 4 × MUL8 T16 + 2 × ADD16 LOA15 + 3 × ADD16 LOA11 + 4 × ADD16 LOA10 + 1 × ADD16 LOA12 + 1 × MUL8 T10 A4c + 1 × ADD16 TRUNC8 + 1 × ADD32 (ADD16 LOA10 + ADD16 exato) + 3 × ADD32 (ADD16 LOA15 + ADD16 exato)
+fir,op,50,exhaustive,447,1,1643,,,,,,true,exaustiva: 3.970365427685799e+34 combinações depois da poda (limite 20000); use outra heurística ou grupos por classe,
+fir,op,50,random,201,1,1034,48370.1,0.320651,0.308422,50.137,50.137,true,,6 × MUL8 exato + 1 × MUL8 T4 A12c + 1 × MUL8 DRUM2 +C + 2 × ADD16 LOA3 + 1 × ADD16 LOA8 + 1 × MUL8 T10 A4c + 2 × ADD16 LOA11 + 1 × ADD16 LOA13 + 1 × ADD16 TRUNC8 + 1 × MUL8 T6 A10c + 1 × ADD16 SEG L6 P14 + 1 × MUL8 DRUM5 + 1 × MUL8 T8 A8c + 1 × ADD16 LOA12 + 1 × ADD16 LOA10 + 1 × MUL8 T6 +C + 1 × ADD16 exato + 1 × ADD32 (ADD16 LOA2 + ADD16 exato) + 1 × ADD32 (ADD16 LOA9 + ADD16 exato) + 1 × MUL8 DRUM3 + 1 × ADD32 (ADD16 LOA8 + ADD16 exato) + 1 × ADD32 (2 × ADD16 exato)
+fir,op,60,sequential,478,1,1868,36127.2,0.492601,0.456738,60.0073,60.0073,true,,1 × MUL8 DRUM2 + 1 × MUL8 T8 A8c + 1 × MUL8 T6 A10c + 1 × MUL8 T10 +C + 1 × MUL8 T16 + 2 × ADD16 LOA15 + 2 × MUL8 MITCHELL + 2 × ADD16 LOA11 + 7 × ADD16 LOA10 + 2 × MUL8 T6 +C + 1 × MUL8 T8 +C + 1 × MUL8 T4 A12c + 1 × MUL8 DRUM4 + 2 × ADD32 (ADD16 LOA10 + ADD16 exato) + 1 × MUL8 DRUM6 + 1 × ADD32 (ADD16 LOA9 + ADD16 exato) + 1 × MUL8 DRUM4 +C + 1 × ADD32 (ADD16 TRUNC7 + ADD16 exato)
+fir,op,60,efficiency,6729,1,40386,33527.2,0.529118,0.468178,60.0194,60.0194,true,,2 × MUL8 DRUM4 + 1 × MUL8 DRUM2 + 2 × MUL8 T16 + 1 × ADD16 LOA15 + 3 × MUL8 T8 +C + 1 × ADD16 LOA10 + 4 × MUL8 T6 A10c + 1 × MUL8 DRUM3 +C + 5 × ADD16 LOA9 + 4 × ADD16 LOA8 + 2 × ADD32 (ADD16 LOA8 + ADD16 exato) + 1 × MUL8 DRUM3 + 1 × ADD32 (ADD16 LOA10 + ADD16 exato) + 1 × ADD32 (ADD16 LOA15 + ADD16 exato)
+fir,op,60,exhaustive,402,1,1371,,,,,,true,exaustiva: 8.754940775775424e+32 combinações depois da poda (limite 20000); use outra heurística ou grupos por classe,
+fir,op,60,random,201,1,1095,71200.8,0,0,Infinity,Infinity,true,,14 × MUL8 exato + 11 × ADD16 exato + 4 × ADD32 (2 × ADD16 exato)
+fir,op,70,sequential,478,1,1922,45391,0.362492,0.311258,70.0645,70.0645,true,,1 × MUL8 DRUM3 + 4 × MUL8 DRUM4 + 1 × MUL8 T8 A8c + 2 × ADD16 LOA9 + 1 × MUL8 T8 +C + 2 × MUL8 MITCHELL + 2 × ADD16 LOA8 + 3 × ADD16 LOA7 + 3 × MUL8 T6 +C + 4 × ADD16 LOA6 + 2 × MUL8 DRUM6 + 1 × ADD32 (ADD16 LOA8 + ADD16 exato) + 1 × ADD32 (ADD16 LOA6 + ADD16 exato) + 2 × ADD32 (ADD16 LOA7 + ADD16 exato)
+fir,op,70,efficiency,6074,1,34402,43868.3,0.383878,0.310782,70.0151,70.0151,true,,1 × MUL8 DRUM3 + 2 × MUL8 DRUM4 + 2 × MUL8 T4 A12c + 2 × MUL8 DRUM5 + 11 × ADD16 LOA7 + 2 × MUL8 T6 +C + 2 × MUL8 T6 A10c + 1 × MUL8 MITCHELL + 1 × MUL8 T6 + 4 × ADD32 (ADD16 LOA7 + ADD16 exato) + 1 × MUL8 DRUM4 +C
+fir,op,70,exhaustive,346,1,1189,,,,,,true,exaustiva: 9.684912449698006e+30 combinações depois da poda (limite 20000); use outra heurística ou grupos por classe,
+fir,op,70,random,201,1,953,71200.8,0,0,Infinity,Infinity,true,,14 × MUL8 exato + 11 × ADD16 exato + 4 × ADD32 (2 × ADD16 exato)

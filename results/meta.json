@@ -1,0 +1,19 @@
+{
+ "date": "2026-10-17T23:53:45.792Z",
+ "node": "v22.22.0",
+ "quick": false,
+ "commit": "956c4f2",
+ "synth": {
+  "generated": "2026-10-16",
+  "tools": {
+   "yosys": "Yosys 0.33 (git sha1 2584903a060)",
+   "iverilog": "Icarus Verilog version 12.0 (stable) ()",
+   "opensta": "OpenSTA 3.1.0"
+  },
+  "library": "sky130_fd_sc_hd, tt_025C_1v80"
+ },
+ "clockNs": 5,
+ "flow": "delay",
+ "ports": 2,
+ "seconds": 499
+}
