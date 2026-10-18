@@ -353,7 +353,8 @@ function report(rows, meta) {
     const pct = (v) => (v === null ? '-' : `${br(v, 1)}%`);
     const first = (r) => r.modelFirst ?? r.model;
     const two = rows.some((r) => r.modelFirst);
-    const md = ['# Validação contra o Vitis HLS e o Vivado', '', `Gerado por \`node scripts/vitis.mjs ${two ? 'compare' : 'collect'}\` em ${new Date().toISOString().slice(0, 10)}; parte ${meta.part}. Cada caso é o mesmo projeto no simulador e no Vitis HLS 2022.2 (o C++ exportado do projeto elaborado, \`_ir\`, ou o código original, \`_src\`), com multiplicadores na lógica (sem DSP). LUT e FF do modelo vêm da síntese das unidades com o Yosys (\`synth_xilinx\`), mais as peças do modelo (multiplexadores, comparadores, registradores, contadores e a seleção de banco). A referência de recursos e de período é o Vivado depois do roteamento; a estimativa do csynth fica na tabela só para comparação.${two ? ' "Modelo 1" é o modelo antes desta validação (o que gerou os casos); "modelo" é o atual, calibrado com estes relatórios, para as mesmas atribuições de unidades.' : ''}`, ''];
+    const exportNote = ` "Exportação" é a previsão feita quando o caso foi gerado (o modelo antes da primeira rodada, nos 23 primeiros casos; o calibrado com a primeira rodada, nos da segunda); "modelo" é o atual, para as mesmas atribuições de unidades${FPGA ? ', com LUT, CARRY4 e atrasos das unidades caracterizadas no Vivado (data/vivado-units.json)' : ''}.`;
+    const md = ['# Validação contra o Vitis HLS e o Vivado', '', `Gerado por \`node scripts/vitis.mjs ${two ? 'compare' : 'collect'}\` em ${new Date().toISOString().slice(0, 10)}; parte ${meta.part}. Cada caso é o mesmo projeto no simulador e no Vitis HLS 2022.2 (o C++ exportado do projeto elaborado, \`_ir\`, ou o código original, \`_src\`), com multiplicadores na lógica (sem DSP). LUT e FF do modelo vêm da síntese das unidades (Yosys \`synth_xilinx\`, ou o Vivado quando há data/vivado-units.json), mais as peças do modelo (multiplexadores, comparadores, registradores, contadores e a seleção de banco). A referência de recursos e de período é o Vivado depois do roteamento; a estimativa do csynth fica na tabela só para comparação.${two ? exportNote : ''}`, ''];
     const tex = ['% Tabelas da validação (scripts/vitis.mjs). Requer \\usepackage[table]{xcolor} e a cor tabAzul definida.', ''];
     const table = (title, head, body) => {
         md.push(`#### ${title}`, '', `| ${head.join(' | ')} |`, `| ${head.map((_, i) => (i ? '---:' : '---')).join(' | ')} |`, ...body.map((r) => `| ${r.join(' | ')} |`), '');
@@ -374,7 +375,7 @@ function report(rows, meta) {
     const errFf = (f) => mape(impl.map((r) => ratio(f(r).ff, r.impl.ff)));
     const pipeCases = done.filter((r) => r.model.loops.some((l) => l.mode === 'pipelined'));
     const seqCases = done.filter((r) => !r.model.loops.some((l) => l.mode === 'pipelined'));
-    table('Erro médio do modelo (desvio relativo médio entre o modelo e a medida)', ['Grandeza', 'Casos', ...(two ? ['Modelo 1'] : []), 'Modelo'], [
+    table('Erro médio do modelo (desvio relativo médio entre o modelo e a medida)', ['Grandeza', 'Casos', ...(two ? ['Exportação'] : []), 'Modelo'], [
         ['Latência (ciclos), com pipeline', String(pipeCases.length), ...(two ? [pct(mape(pipeCases.map((r) => ratio(first(r).cycles, r.hls.latencyWorst))))] : []), pct(mape(pipeCases.map((r) => ratio(r.model.cycles, r.hls.latencyWorst))))],
         ['Latência (ciclos), sem pipeline', String(seqCases.length), ...(two ? [pct(mape(seqCases.map((r) => ratio(first(r).cycles, r.hls.latencyWorst))))] : []), pct(mape(seqCases.map((r) => ratio(r.model.cycles, r.hls.latencyWorst))))],
         ['Latência (ciclos), todos', String(done.length), ...(two ? [pct(errCyc(first))] : []), pct(errCyc((r) => r.model))],
@@ -384,20 +385,32 @@ function report(rows, meta) {
     ]);
 
     table('Execução: csim do Vitis contra a execução bit a bit do simulador', ['Caso', 'Diferenças', 'Posições'], rows.map((r) => [r.case, r.csim ? String(r.csim.mismatches) : '-', r.csim ? String(r.csim.total) : '-']));
-    table('Latência (ciclos) e período', ['Caso', ...(two ? ['Modelo 1'] : []), 'Modelo', 'Vitis', 'Razão', 'Período modelo (ns)', 'csynth (ns)', 'Vivado (ns)'],
+    table('Latência (ciclos) e período', ['Caso', ...(two ? ['Exportação'] : []), 'Modelo', 'Vitis', 'Razão', 'Período modelo (ns)', 'csynth (ns)', 'Vivado (ns)'],
         rows.map((r) => [r.case, ...(two ? [String(first(r).cycles)] : []), String(r.model.cycles), r.hls ? String(r.hls.latencyWorst) : '-', br(ratio(r.model.cycles, r.hls?.latencyWorst), 3), br(r.model.critPs / 1000, 2), br(r.hls?.estClockNs, 2), br(r.impl?.achievedNs, 2)]));
-    table('Recursos de FPGA', ['Caso', ...(two ? ['LUT modelo 1'] : []), 'LUT modelo', 'LUT csynth', 'LUT Vivado', 'CARRY4 modelo', 'CARRY4 Vivado', ...(two ? ['FF modelo 1'] : []), 'FF modelo', 'FF csynth', 'FF Vivado'],
+    table('Recursos de FPGA', ['Caso', ...(two ? ['LUT exportação'] : []), 'LUT modelo', 'LUT csynth', 'LUT Vivado', 'CARRY4 modelo', 'CARRY4 Vivado', ...(two ? ['FF exportação'] : []), 'FF modelo', 'FF csynth', 'FF Vivado'],
         rows.map((r) => [r.case, ...(two ? [String(first(r).luts)] : []), String(r.model.luts), s(r.hls?.lut), s(r.impl?.lut), String(r.model.carry4), s(r.impl?.carry4), ...(two ? [String(first(r).ff)] : []), String(r.model.ff), s(r.hls?.ff), s(r.impl?.ff)]));
 
     // Efeito da aproximação: economia prevista e medida contra o projeto exato do mesmo kernel.
     const exactOf = new Map(rows.filter((r) => r.kind === 'ir' && r.case === `${r.kernel}_ir`).map((r) => [r.kernel, r]));
     const ax = rows.filter((r) => /_(drum|t8c|loa|kul|t4|dse)/.test(r.case) && r.impl);
-    table('Efeito da aproximação: LUTs contra o projeto exato do mesmo kernel', ['Caso', ...(two ? ['Economia modelo 1'] : []), 'Economia modelo', 'Economia Vivado', 'LUT Vivado exato', 'LUT Vivado aprox.'],
+    table('Efeito da aproximação: LUTs contra o projeto exato do mesmo kernel', ['Caso', ...(two ? ['Economia na exportação'] : []), 'Economia modelo', 'Economia Vivado', 'LUT Vivado exato', 'LUT Vivado aprox.'],
         ax.map((r) => {
             const e = exactOf.get(r.kernel);
             const sv = (a, b) => (a && b ? 100 * (1 - a / b) : null);
-            return [r.case, ...(two ? [pct(sv(first(r).luts, first(e).luts))] : []), pct(sv(r.model.luts, e.model.luts)), pct(sv(r.impl?.lut, e.impl?.lut)), s(e.impl?.lut), s(r.impl?.lut)];
+            const round2 = /_lat0|_inl|dse2/.test(r.case);
+            return [r.case, ...(two ? [round2 ? '-' : pct(sv(first(r).luts, first(e).luts))] : []), pct(sv(r.model.luts, e.model.luts)), pct(sv(r.impl?.lut, e.impl?.lut)), s(e.impl?.lut), s(r.impl?.lut)];
         }));
+    // Economia prevista contra medida, por forma de exportação das unidades.
+    const styles = [['INLINE off (o Vitis divide a netlist em estágios)', (c) => !/_lat0|_inl/.test(c)], ['combinacional (INLINE off, LATENCY 0)', (c) => /_lat0/.test(c)], ['em linha (INLINE)', (c) => /_inl/.test(c)]];
+    const savRows = styles.map(([label, f]) => {
+        const rs = ax.filter((r) => f(r.case) && exactOf.get(r.kernel)?.impl);
+        const pairs = rs.map((r) => { const e = exactOf.get(r.kernel); return [100 * (1 - r.model.luts / e.model.luts), 100 * (1 - r.impl.lut / e.impl.lut)]; });
+        const mae = pairs.length ? pairs.reduce((a, [m, v]) => a + Math.abs(m - v), 0) / pairs.length : null;
+        const sign = pairs.filter(([m, v]) => Math.sign(Math.round(m)) === Math.sign(Math.round(v)) || Math.abs(m - v) < 3).length;
+        const best = pairs.length ? Math.max(...pairs.map(([, v]) => v)) : null;
+        return [label, String(pairs.length), mae === null ? '-' : `${br(mae, 1)} p.p.`, `${sign} de ${pairs.length}`, best === null ? '-' : pct(best)];
+    });
+    table('Economia de LUTs prevista contra a medida, por forma de exportação das unidades', ['Exportação', 'Casos', 'Erro médio', 'Mesmo sentido', 'Maior economia medida'], savRows);
     // Unidades aproximadas como módulos no Vivado.
     const unitRows = [];
     for (const r of ax) for (const m of r.impl?.modules ?? []) if (/^u_/.test(m.module)) {

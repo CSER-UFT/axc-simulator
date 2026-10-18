@@ -64,7 +64,7 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
     // Unidades compartilhadas: instâncias por chave (classe e largura) em cada trecho.
     const units = new Map(); // chave -> { unit, count, sources: Array<[Set, Set]> }
     const opsCells = []; // operações com célula própria
-    let regBits = 0;
+    let regBits = 0, srlFf = 0, srlLuts = 0;
     const regs = [];
     let energyOps = 0;
     for (const { seg, sch, execs, pipelined } of segs) {
@@ -137,6 +137,9 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
             if (pipelined) {
                 const stages = last - regStart + 1;
                 regBits += stages * bits;
+                // No FPGA, uma cadeia de 3 ou mais estágios vira SRL (uma LUT por bit a cada 32 estágios e o
+                // registrador de saída), como o Vivado faz com os atrasos sem reset.
+                if (stages >= 3) { srlFf += bits * (stages - 1); srlLuts += bits * Math.ceil((stages - 1) / 32); }
                 regs.push({ seg: seg.id, name: n.name ?? n.id, bits, stages, kind: 'pipeline' });
             } else vals.push({ s: regStart, e: last, bits, id: n.id });
         }
@@ -202,9 +205,10 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
     };
     area.total = area.units + area.cells + area.mux + area.registers + area.control;
     const fpga = {
-        luts: sum(unitList, (u) => u.luts) + sum(cellList, (c) => c.luts) + sum(muxes, (m) => m.luts) + sum(control, (c) => c.luts) + (addr?.luts ?? 0),
+        luts: sum(unitList, (u) => u.luts) + sum(cellList, (c) => c.luts) + sum(muxes, (m) => m.luts) + sum(control, (c) => c.luts) + (addr?.luts ?? 0) + srlLuts,
         carry4: sum(unitList, (u) => u.carry4) + sum(cellList, (c) => c.carry4) + sum(control, (c) => c.carry4),
-        ff: regBits + (addr?.ff ?? 0),
+        ff: regBits - srlFf + (addr?.ff ?? 0),
+        srlLuts,
         addrLuts: addr?.luts ?? 0,
     };
     return { units: unitList, cells: cellList, muxes, regs, regBits, control, area, fpga, energy, addr };

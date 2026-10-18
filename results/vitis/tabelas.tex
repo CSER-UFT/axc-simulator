@@ -5,14 +5,14 @@
 \caption{Erro médio do modelo (desvio relativo médio entre o modelo e a medida)}
 \begin{tabular}{|l|r|r|r|}
 \hline
-\rowcolor{tabAzul}\color{white}Grandeza & \color{white}Casos & \color{white}Modelo 1 & \color{white}Modelo \\
+\rowcolor{tabAzul}\color{white}Grandeza & \color{white}Casos & \color{white}Exportação & \color{white}Modelo \\
 \hline
-Latência (ciclos), com pipeline & 43 & 1,0\% & 0,5\% \\ \hline
-Latência (ciclos), sem pipeline & 2 & 60,9\% & 30,3\% \\ \hline
-Latência (ciclos), todos & 45 & 3,6\% & 1,9\% \\ \hline
-LUT (Vivado) & 45 & 27,5\% & 16,3\% \\ \hline
-FF (Vivado) & 45 & 36,7\% & 22,0\% \\ \hline
-Período (Vivado) & 45 & - & 16,6\% \\ \hline
+Latência (ciclos), com pipeline & 43 & 1,0\% & 0,4\% \\ \hline
+Latência (ciclos), sem pipeline & 2 & 60,9\% & 8,4\% \\ \hline
+Latência (ciclos), todos & 45 & 3,6\% & 0,7\% \\ \hline
+LUT (Vivado) & 45 & 27,5\% & 14,1\% \\ \hline
+FF (Vivado) & 45 & 36,7\% & 19,4\% \\ \hline
+Período (Vivado) & 45 & - & 18,9\% \\ \hline
 \end{tabular}
 \end{table}
 
@@ -76,53 +76,53 @@ fir\_dse2\_lut60\_inl\_ir & 0 & 1009 \\ \hline
 \caption{Latência (ciclos) e período}
 \begin{tabular}{|l|r|r|r|r|r|r|r|}
 \hline
-\rowcolor{tabAzul}\color{white}Caso & \color{white}Modelo 1 & \color{white}Modelo & \color{white}Vitis & \color{white}Razão & \color{white}Período modelo (ns) & \color{white}csynth (ns) & \color{white}Vivado (ns) \\
+\rowcolor{tabAzul}\color{white}Caso & \color{white}Exportação & \color{white}Modelo & \color{white}Vitis & \color{white}Razão & \color{white}Período modelo (ns) & \color{white}csynth (ns) & \color{white}Vivado (ns) \\
 \hline
-gauss\_src & 73340 & 72217 & 72218 & 1,000 & 4,05 & 7,05 & 5,35 \\ \hline
-gauss\_ir & 73340 & 72217 & 72218 & 1,000 & 4,05 & 7,05 & 5,38 \\ \hline
-sobel\_src & 73150 & 72217 & 72219 & 1,000 & 4,62 & 7,05 & 5,79 \\ \hline
-sobel\_ir & 73150 & 72217 & 72219 & 1,000 & 4,62 & 7,05 & 5,89 \\ \hline
-sharpen\_src & 72960 & 72216 & 72218 & 1,000 & 4,87 & 7,05 & 5,79 \\ \hline
-sharpen\_ir & 72960 & 72216 & 72218 & 1,000 & 4,87 & 7,05 & 5,31 \\ \hline
-fir\_src & 1018 & 1018 & 1019 & 0,999 & 4,05 & 6,36 & 4,49 \\ \hline
-fir\_ir & 1018 & 1018 & 1024 & 0,994 & 4,05 & 6,36 & 4,61 \\ \hline
-dot\_src & 259 & 259 & 260 & 0,996 & 4,95 & 6,36 & 5,76 \\ \hline
-dot\_ir & 259 & 259 & 260 & 0,996 & 4,95 & 6,36 & 5,72 \\ \hline
-gauss\_var1\_ir & 181070 & 180502 & 180506 & 1,000 & 3,81 & 6,36 & 4,54 \\ \hline
-gauss\_var2\_ir & 1155390 & 3069070 & 3899371 & 0,787 & 3,74 & 7,05 & 5,39 \\ \hline
-gauss\_var3\_ir & 1155390 & 1444570 & 2383171 & 0,606 & 3,74 & 6,36 & 4,54 \\ \hline
-gauss\_2p5ns\_ir & 74480 & 72224 & 72222 & 1,000 & 2,23 & 7,05 & 5,58 \\ \hline
-gauss\_10ns\_ir & 72960 & 72216 & 72217 & 1,000 & 8,89 & 7,29 & 7,47 \\ \hline
-gauss\_drum6\_ir & 73340 & 72217 & 72222 & 1,000 & 4,05 & 7,05 & 5,67 \\ \hline
-gauss\_t8c\_loa6\_ir & 73150 & 72217 & 72237 & 1,000 & 4,97 & 7,05 & 5,52 \\ \hline
-sobel\_loa4\_ir & 73150 & 72217 & 72224 & 1,000 & 4,54 & 7,05 & 5,74 \\ \hline
-sharpen\_kul\_ir & 72960 & 72216 & 72219 & 1,000 & 4,87 & 7,05 & 5,38 \\ \hline
-fir\_t8c\_loa11\_ir & 1015 & 1015 & 1058 & 0,959 & 4,53 & 3,73 & 4,45 \\ \hline
-dot\_t4\_ir & 259 & 259 & 264 & 0,981 & 4,95 & 4,03 & 3,34 \\ \hline
-gauss\_dse\_op40\_ir & 72960 & 72216 & 72233 & 1,000 & 4,98 & 7,05 & 5,73 \\ \hline
-fir\_dse\_op60\_ir & 1015 & 1015 & 1052 & 0,965 & 4,98 & 3,73 & 4,26 \\ \hline
-gauss\_dse2\_lut40\_ir & 72217 & 72217 & 72224 & 1,000 & 4,67 & 7,05 & 5,64 \\ \hline
-fir\_dse2\_lut60\_ir & 1016 & 1016 & 1034 & 0,983 & 4,66 & 3,73 & 4,29 \\ \hline
-gauss\_drum6\_lat0\_ir & 72217 & 72217 & 72218 & 1,000 & 4,05 & 12,41 & 6,10 \\ \hline
-gauss\_t8c\_loa6\_lat0\_ir & 72217 & 72217 & 72224 & 1,000 & 4,97 & 11,49 & 5,50 \\ \hline
-sobel\_loa4\_lat0\_ir & 72217 & 72217 & 72220 & 1,000 & 4,54 & 7,05 & 5,52 \\ \hline
-sharpen\_kul\_lat0\_ir & 72216 & 72216 & 72218 & 1,000 & 4,87 & 7,05 & 5,33 \\ \hline
-fir\_t8c\_loa11\_lat0\_ir & 1015 & 1015 & 1030 & 0,985 & 4,53 & 11,49 & 4,14 \\ \hline
-dot\_t4\_lat0\_ir & 259 & 259 & 260 & 0,996 & 4,95 & 9,95 & 4,86 \\ \hline
-gauss\_dse\_op40\_lat0\_ir & 72216 & 72216 & 72224 & 1,000 & 4,98 & 11,49 & 5,21 \\ \hline
-fir\_dse\_op60\_lat0\_ir & 1015 & 1015 & 1030 & 0,985 & 4,98 & 12,39 & 4,57 \\ \hline
-gauss\_dse2\_lut40\_lat0\_ir & 72217 & 72217 & 72220 & 1,000 & 4,67 & 11,49 & 5,47 \\ \hline
-fir\_dse2\_lut60\_lat0\_ir & 1016 & 1016 & 1030 & 0,986 & 4,66 & 10,42 & 4,54 \\ \hline
-gauss\_drum6\_inl\_ir & 72217 & 72217 & 72218 & 1,000 & 4,05 & 7,05 & 5,53 \\ \hline
-gauss\_t8c\_loa6\_inl\_ir & 72217 & 72217 & 72222 & 1,000 & 4,97 & 7,05 & 5,82 \\ \hline
-sobel\_loa4\_inl\_ir & 72217 & 72217 & 72220 & 1,000 & 4,54 & 7,05 & 5,42 \\ \hline
-sharpen\_kul\_inl\_ir & 72216 & 72216 & 72218 & 1,000 & 4,87 & 7,05 & 5,37 \\ \hline
-fir\_t8c\_loa11\_inl\_ir & 1015 & 1015 & 1030 & 0,985 & 4,53 & 3,73 & 4,40 \\ \hline
-dot\_t4\_inl\_ir & 259 & 259 & 262 & 0,989 & 4,95 & 4,03 & 3,66 \\ \hline
-gauss\_dse\_op40\_inl\_ir & 72216 & 72216 & 72222 & 1,000 & 4,98 & 7,05 & 5,74 \\ \hline
-fir\_dse\_op60\_inl\_ir & 1015 & 1015 & 1036 & 0,980 & 4,98 & 3,73 & 4,42 \\ \hline
-gauss\_dse2\_lut40\_inl\_ir & 72217 & 72217 & 72220 & 1,000 & 4,67 & 7,05 & 5,71 \\ \hline
-fir\_dse2\_lut60\_inl\_ir & 1016 & 1016 & 1030 & 0,986 & 4,66 & 3,73 & 4,51 \\ \hline
+gauss\_src & 73340 & 72219 & 72218 & 1,000 & 4,03 & 7,05 & 5,35 \\ \hline
+gauss\_ir & 73340 & 72219 & 72218 & 1,000 & 4,03 & 7,05 & 5,38 \\ \hline
+sobel\_src & 73150 & 72218 & 72219 & 1,000 & 4,77 & 7,05 & 5,79 \\ \hline
+sobel\_ir & 73150 & 72218 & 72219 & 1,000 & 4,77 & 7,05 & 5,89 \\ \hline
+sharpen\_src & 72960 & 72217 & 72218 & 1,000 & 4,62 & 7,05 & 5,79 \\ \hline
+sharpen\_ir & 72960 & 72217 & 72218 & 1,000 & 4,62 & 7,05 & 5,31 \\ \hline
+fir\_src & 1018 & 1020 & 1019 & 1,001 & 4,03 & 6,36 & 4,49 \\ \hline
+fir\_ir & 1018 & 1020 & 1024 & 0,996 & 4,03 & 6,36 & 4,61 \\ \hline
+dot\_src & 259 & 261 & 260 & 1,004 & 4,03 & 6,36 & 5,76 \\ \hline
+dot\_ir & 259 & 261 & 260 & 1,004 & 4,03 & 6,36 & 5,72 \\ \hline
+gauss\_var1\_ir & 181070 & 180503 & 180506 & 1,000 & 4,03 & 6,36 & 4,54 \\ \hline
+gauss\_var2\_ir & 1155390 & 3718870 & 3899371 & 0,954 & 2,94 & 7,05 & 5,39 \\ \hline
+gauss\_var3\_ir & 1155390 & 2094370 & 2383171 & 0,879 & 2,94 & 6,36 & 4,54 \\ \hline
+gauss\_2p5ns\_ir & 74480 & 72225 & 72222 & 1,000 & 2,42 & 7,05 & 5,58 \\ \hline
+gauss\_10ns\_ir & 72960 & 72216 & 72217 & 1,000 & 8,85 & 7,29 & 7,47 \\ \hline
+gauss\_drum6\_ir & 73340 & 72220 & 72222 & 1,000 & 4,03 & 7,05 & 5,67 \\ \hline
+gauss\_t8c\_loa6\_ir & 73150 & 72220 & 72237 & 1,000 & 4,22 & 7,05 & 5,52 \\ \hline
+sobel\_loa4\_ir & 73150 & 72218 & 72224 & 1,000 & 4,93 & 7,05 & 5,74 \\ \hline
+sharpen\_kul\_ir & 72960 & 72218 & 72219 & 1,000 & 4,77 & 7,05 & 5,38 \\ \hline
+fir\_t8c\_loa11\_ir & 1015 & 1027 & 1058 & 0,971 & 4,52 & 3,73 & 4,45 \\ \hline
+dot\_t4\_ir & 259 & 260 & 264 & 0,985 & 4,98 & 4,03 & 3,34 \\ \hline
+gauss\_dse\_op40\_ir & 72960 & 72219 & 72233 & 1,000 & 4,87 & 7,05 & 5,73 \\ \hline
+fir\_dse\_op60\_ir & 1015 & 1021 & 1052 & 0,971 & 4,98 & 3,73 & 4,26 \\ \hline
+gauss\_dse2\_lut40\_ir & 72217 & 72219 & 72224 & 1,000 & 4,95 & 7,05 & 5,64 \\ \hline
+fir\_dse2\_lut60\_ir & 1016 & 1020 & 1034 & 0,986 & 5,00 & 3,73 & 4,29 \\ \hline
+gauss\_drum6\_lat0\_ir & 72217 & 72220 & 72218 & 1,000 & 4,03 & 12,41 & 6,10 \\ \hline
+gauss\_t8c\_loa6\_lat0\_ir & 72217 & 72220 & 72224 & 1,000 & 4,22 & 11,49 & 5,50 \\ \hline
+sobel\_loa4\_lat0\_ir & 72217 & 72218 & 72220 & 1,000 & 4,93 & 7,05 & 5,52 \\ \hline
+sharpen\_kul\_lat0\_ir & 72216 & 72218 & 72218 & 1,000 & 4,77 & 7,05 & 5,33 \\ \hline
+fir\_t8c\_loa11\_lat0\_ir & 1015 & 1027 & 1030 & 0,997 & 4,52 & 11,49 & 4,14 \\ \hline
+dot\_t4\_lat0\_ir & 259 & 260 & 260 & 1,000 & 4,98 & 9,95 & 4,86 \\ \hline
+gauss\_dse\_op40\_lat0\_ir & 72216 & 72219 & 72224 & 1,000 & 4,87 & 11,49 & 5,21 \\ \hline
+fir\_dse\_op60\_lat0\_ir & 1015 & 1021 & 1030 & 0,991 & 4,98 & 12,39 & 4,57 \\ \hline
+gauss\_dse2\_lut40\_lat0\_ir & 72217 & 72219 & 72220 & 1,000 & 4,95 & 11,49 & 5,47 \\ \hline
+fir\_dse2\_lut60\_lat0\_ir & 1016 & 1020 & 1030 & 0,990 & 5,00 & 10,42 & 4,54 \\ \hline
+gauss\_drum6\_inl\_ir & 72217 & 72220 & 72218 & 1,000 & 4,03 & 7,05 & 5,53 \\ \hline
+gauss\_t8c\_loa6\_inl\_ir & 72217 & 72220 & 72222 & 1,000 & 4,22 & 7,05 & 5,82 \\ \hline
+sobel\_loa4\_inl\_ir & 72217 & 72218 & 72220 & 1,000 & 4,93 & 7,05 & 5,42 \\ \hline
+sharpen\_kul\_inl\_ir & 72216 & 72218 & 72218 & 1,000 & 4,77 & 7,05 & 5,37 \\ \hline
+fir\_t8c\_loa11\_inl\_ir & 1015 & 1027 & 1030 & 0,997 & 4,52 & 3,73 & 4,40 \\ \hline
+dot\_t4\_inl\_ir & 259 & 260 & 262 & 0,992 & 4,98 & 4,03 & 3,66 \\ \hline
+gauss\_dse\_op40\_inl\_ir & 72216 & 72219 & 72222 & 1,000 & 4,87 & 7,05 & 5,74 \\ \hline
+fir\_dse\_op60\_inl\_ir & 1015 & 1021 & 1036 & 0,986 & 4,98 & 3,73 & 4,42 \\ \hline
+gauss\_dse2\_lut40\_inl\_ir & 72217 & 72219 & 72220 & 1,000 & 4,95 & 7,05 & 5,71 \\ \hline
+fir\_dse2\_lut60\_inl\_ir & 1016 & 1020 & 1030 & 0,990 & 5,00 & 3,73 & 4,51 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -131,53 +131,53 @@ fir\_dse2\_lut60\_inl\_ir & 1016 & 1016 & 1030 & 0,986 & 4,66 & 3,73 & 4,51 \\ \
 \caption{Recursos de FPGA}
 \begin{tabular}{|l|r|r|r|r|r|r|r|r|r|r|}
 \hline
-\rowcolor{tabAzul}\color{white}Caso & \color{white}LUT modelo 1 & \color{white}LUT modelo & \color{white}LUT csynth & \color{white}LUT Vivado & \color{white}CARRY4 modelo & \color{white}CARRY4 Vivado & \color{white}FF modelo 1 & \color{white}FF modelo & \color{white}FF csynth & \color{white}FF Vivado \\
+\rowcolor{tabAzul}\color{white}Caso & \color{white}LUT exportação & \color{white}LUT modelo & \color{white}LUT csynth & \color{white}LUT Vivado & \color{white}CARRY4 modelo & \color{white}CARRY4 Vivado & \color{white}FF exportação & \color{white}FF modelo & \color{white}FF csynth & \color{white}FF Vivado \\
 \hline
-gauss\_src & 549 & 703 & 2240 & 731 & 70 & 138 & 309 & 602 & 1321 & 618 \\ \hline
-gauss\_ir & 549 & 703 & 2192 & 729 & 70 & 141 & 309 & 602 & 1137 & 590 \\ \hline
-sobel\_src & 401 & 644 & 1892 & 655 & 43 & 118 & 180 & 492 & 1206 & 565 \\ \hline
-sobel\_ir & 401 & 644 & 1913 & 674 & 43 & 118 & 180 & 492 & 1288 & 567 \\ \hline
-sharpen\_src & 267 & 525 & 1655 & 493 & 24 & 94 & 88 & 384 & 979 & 431 \\ \hline
-sharpen\_ir & 267 & 525 & 1658 & 496 & 24 & 94 & 88 & 384 & 1015 & 468 \\ \hline
-fir\_src & 1740 & 888 & 3454 & 1108 & 114 & 125 & 736 & 816 & 1079 & 946 \\ \hline
-fir\_ir & 1740 & 888 & 3635 & 940 & 114 & 107 & 736 & 816 & 1392 & 857 \\ \hline
-dot\_src & 155 & 139 & 180 & 111 & 13 & 18 & 73 & 73 & 74 & 76 \\ \hline
-dot\_ir & 155 & 139 & 180 & 111 & 13 & 18 & 73 & 73 & 74 & 74 \\ \hline
-gauss\_var1\_ir & 259 & 447 & 1096 & 398 & 70 & 93 & 180 & 281 & 450 & 424 \\ \hline
-gauss\_var2\_ir & 179 & 241 & 670 & 177 & 18 & 35 & 59 & 101 & 356 & 281 \\ \hline
-gauss\_var3\_ir & 179 & 153 & 433 & 117 & 18 & 24 & 59 & 59 & 203 & 196 \\ \hline
-gauss\_2p5ns\_ir & 735 & 703 & 2285 & 903 & 70 & 123 & 703 & 1127 & 3217 & 926 \\ \hline
-gauss\_10ns\_ir & 549 & 703 & 2160 & 700 & 70 & 135 & 225 & 492 & 1159 & 480 \\ \hline
-gauss\_drum6\_ir & 555 & 749 & 4422 & 886 & 46 & 147 & 309 & 592 & 2651 & 845 \\ \hline
-gauss\_t8c\_loa6\_ir & 397 & 730 & 3879 & 917 & 21 & 141 & 234 & 546 & 2666 & 901 \\ \hline
-sobel\_loa4\_ir & 404 & 691 & 2400 & 758 & 35 & 117 & 180 & 492 & 1807 & 776 \\ \hline
-sharpen\_kul\_ir & 245 & 530 & 1773 & 590 & 23 & 101 & 88 & 384 & 1128 & 487 \\ \hline
-fir\_t8c\_loa11\_ir & 1027 & 782 & 10117 & 1255 & 33 & - & 469 & 519 & 4784 & 806 \\ \hline
-dot\_t4\_ir & 140 & 124 & 917 & 167 & 12 & 28 & 73 & 73 & 501 & 169 \\ \hline
-gauss\_dse\_op40\_ir & 355 & 669 & 3564 & 774 & 23 & 123 & 211 & 507 & 2329 & 788 \\ \hline
-fir\_dse\_op60\_ir & 1161 & 938 & 8715 & 1399 & 38 & 53 & 506 & 556 & 4777 & 1026 \\ \hline
-gauss\_dse2\_lut40\_ir & 618 & 618 & 4143 & 861 & 32 & 173 & 546 & 546 & 2084 & 687 \\ \hline
-fir\_dse2\_lut60\_ir & 709 & 709 & 7919 & 987 & 44 & 128 & 656 & 656 & 2444 & 648 \\ \hline
-gauss\_drum6\_lat0\_ir & 749 & 749 & 3834 & 856 & 46 & 150 & 592 & 592 & 1181 & 621 \\ \hline
-gauss\_t8c\_loa6\_lat0\_ir & 730 & 730 & 3775 & 789 & 21 & 137 & 546 & 546 & 1682 & 616 \\ \hline
-sobel\_loa4\_lat0\_ir & 691 & 691 & 2247 & 727 & 35 & 114 & 492 & 492 & 1390 & 607 \\ \hline
-sharpen\_kul\_lat0\_ir & 530 & 530 & 1840 & 526 & 23 & 101 & 384 & 384 & 1015 & 458 \\ \hline
-fir\_t8c\_loa11\_lat0\_ir & 782 & 782 & 9442 & 632 & 33 & - & 519 & 519 & 1785 & 489 \\ \hline
-dot\_t4\_lat0\_ir & 124 & 124 & 757 & 174 & 12 & 28 & 73 & 73 & 74 & 65 \\ \hline
-gauss\_dse\_op40\_lat0\_ir & 669 & 669 & 3550 & 727 & 23 & 123 & 507 & 507 & 1722 & 610 \\ \hline
-fir\_dse\_op60\_lat0\_ir & 938 & 938 & 7811 & 806 & 38 & 50 & 556 & 556 & 1683 & 552 \\ \hline
-gauss\_dse2\_lut40\_lat0\_ir & 618 & 618 & 3933 & 826 & 32 & 173 & 546 & 546 & 1465 & 574 \\ \hline
-fir\_dse2\_lut60\_lat0\_ir & 709 & 709 & 7855 & 934 & 44 & 129 & 656 & 656 & 1785 & 531 \\ \hline
-gauss\_drum6\_inl\_ir & 749 & 749 & 4044 & 1000 & 46 & 169 & 592 & 592 & 1275 & 645 \\ \hline
-gauss\_t8c\_loa6\_inl\_ir & 730 & 730 & 4133 & 867 & 21 & 162 & 546 & 546 & 2259 & 753 \\ \hline
-sobel\_loa4\_inl\_ir & 691 & 691 & 2305 & 692 & 35 & 112 & 492 & 492 & 1508 & 613 \\ \hline
-sharpen\_kul\_inl\_ir & 530 & 530 & 1847 & 531 & 23 & 101 & 384 & 384 & 1025 & 464 \\ \hline
-fir\_t8c\_loa11\_inl\_ir & 782 & 782 & 8789 & 686 & 33 & - & 519 & 519 & 6899 & 770 \\ \hline
-dot\_t4\_inl\_ir & 124 & 124 & 821 & 166 & 12 & 30 & 73 & 73 & 409 & 143 \\ \hline
-gauss\_dse\_op40\_inl\_ir & 669 & 669 & 3519 & 727 & 23 & 125 & 507 & 507 & 1880 & 712 \\ \hline
-fir\_dse\_op60\_inl\_ir & 938 & 938 & 10762 & 1063 & 38 & 35 & 556 & 556 & 10844 & 1062 \\ \hline
-gauss\_dse2\_lut40\_inl\_ir & 618 & 618 & 3772 & 815 & 32 & 160 & 546 & 546 & 1670 & 646 \\ \hline
-fir\_dse2\_lut60\_inl\_ir & 709 & 709 & 8958 & 1025 & 44 & 85 & 656 & 656 & 7508 & 935 \\ \hline
+gauss\_src & 549 & 752 & 2240 & 731 & 70 & 138 & 309 & 632 & 1321 & 618 \\ \hline
+gauss\_ir & 549 & 752 & 2192 & 729 & 70 & 141 & 309 & 632 & 1137 & 590 \\ \hline
+sobel\_src & 401 & 683 & 1892 & 655 & 43 & 118 & 180 & 516 & 1206 & 565 \\ \hline
+sobel\_ir & 401 & 683 & 1913 & 674 & 43 & 118 & 180 & 516 & 1288 & 567 \\ \hline
+sharpen\_src & 267 & 543 & 1655 & 493 & 24 & 94 & 88 & 427 & 979 & 431 \\ \hline
+sharpen\_ir & 267 & 543 & 1658 & 496 & 24 & 94 & 88 & 427 & 1015 & 468 \\ \hline
+fir\_src & 1740 & 1024 & 3454 & 1108 & 114 & 125 & 736 & 582 & 1079 & 946 \\ \hline
+fir\_ir & 1740 & 1024 & 3635 & 940 & 114 & 107 & 736 & 582 & 1392 & 857 \\ \hline
+dot\_src & 155 & 137 & 180 & 111 & 19 & 18 & 73 & 89 & 74 & 76 \\ \hline
+dot\_ir & 155 & 137 & 180 & 111 & 19 & 18 & 73 & 89 & 74 & 74 \\ \hline
+gauss\_var1\_ir & 259 & 457 & 1096 & 398 & 70 & 93 & 180 & 305 & 450 & 424 \\ \hline
+gauss\_var2\_ir & 179 & 250 & 670 & 177 & 23 & 35 & 59 & 101 & 356 & 281 \\ \hline
+gauss\_var3\_ir & 179 & 162 & 433 & 117 & 23 & 24 & 59 & 59 & 203 & 196 \\ \hline
+gauss\_2p5ns\_ir & 735 & 792 & 2285 & 903 & 70 & 123 & 703 & 784 & 3217 & 926 \\ \hline
+gauss\_10ns\_ir & 549 & 713 & 2160 & 700 & 70 & 135 & 225 & 518 & 1159 & 480 \\ \hline
+gauss\_drum6\_ir & 555 & 877 & 4422 & 886 & 51 & 147 & 309 & 635 & 2651 & 845 \\ \hline
+gauss\_t8c\_loa6\_ir & 397 & 795 & 3879 & 917 & 19 & 141 & 234 & 635 & 2666 & 901 \\ \hline
+sobel\_loa4\_ir & 404 & 728 & 2400 & 758 & 35 & 117 & 180 & 516 & 1807 & 776 \\ \hline
+sharpen\_kul\_ir & 245 & 556 & 1773 & 590 & 23 & 101 & 88 & 455 & 1128 & 487 \\ \hline
+fir\_t8c\_loa11\_ir & 1027 & 978 & 10117 & 1255 & 12 & - & 469 & 733 & 4784 & 806 \\ \hline
+dot\_t4\_ir & 140 & 124 & 917 & 167 & 12 & 28 & 73 & 89 & 501 & 169 \\ \hline
+gauss\_dse\_op40\_ir & 355 & 709 & 3564 & 774 & 23 & 123 & 211 & 624 & 2329 & 788 \\ \hline
+fir\_dse\_op60\_ir & 1161 & 1046 & 8715 & 1399 & 30 & 53 & 506 & 626 & 4777 & 1026 \\ \hline
+gauss\_dse2\_lut40\_ir & 618 & 674 & 4143 & 861 & 30 & 173 & 546 & 616 & 2084 & 687 \\ \hline
+fir\_dse2\_lut60\_ir & 709 & 845 & 7919 & 987 & 39 & 128 & 656 & 610 & 2444 & 648 \\ \hline
+gauss\_drum6\_lat0\_ir & 749 & 877 & 3834 & 856 & 51 & 150 & 592 & 635 & 1181 & 621 \\ \hline
+gauss\_t8c\_loa6\_lat0\_ir & 730 & 795 & 3775 & 789 & 19 & 137 & 546 & 635 & 1682 & 616 \\ \hline
+sobel\_loa4\_lat0\_ir & 691 & 728 & 2247 & 727 & 35 & 114 & 492 & 516 & 1390 & 607 \\ \hline
+sharpen\_kul\_lat0\_ir & 530 & 556 & 1840 & 526 & 23 & 101 & 384 & 455 & 1015 & 458 \\ \hline
+fir\_t8c\_loa11\_lat0\_ir & 782 & 978 & 9442 & 632 & 12 & - & 519 & 733 & 1785 & 489 \\ \hline
+dot\_t4\_lat0\_ir & 124 & 124 & 757 & 174 & 12 & 28 & 73 & 89 & 74 & 65 \\ \hline
+gauss\_dse\_op40\_lat0\_ir & 669 & 709 & 3550 & 727 & 23 & 123 & 507 & 624 & 1722 & 610 \\ \hline
+fir\_dse\_op60\_lat0\_ir & 938 & 1046 & 7811 & 806 & 30 & 50 & 556 & 626 & 1683 & 552 \\ \hline
+gauss\_dse2\_lut40\_lat0\_ir & 618 & 674 & 3933 & 826 & 30 & 173 & 546 & 616 & 1465 & 574 \\ \hline
+fir\_dse2\_lut60\_lat0\_ir & 709 & 845 & 7855 & 934 & 39 & 129 & 656 & 610 & 1785 & 531 \\ \hline
+gauss\_drum6\_inl\_ir & 749 & 877 & 4044 & 1000 & 51 & 169 & 592 & 635 & 1275 & 645 \\ \hline
+gauss\_t8c\_loa6\_inl\_ir & 730 & 795 & 4133 & 867 & 19 & 162 & 546 & 635 & 2259 & 753 \\ \hline
+sobel\_loa4\_inl\_ir & 691 & 728 & 2305 & 692 & 35 & 112 & 492 & 516 & 1508 & 613 \\ \hline
+sharpen\_kul\_inl\_ir & 530 & 556 & 1847 & 531 & 23 & 101 & 384 & 455 & 1025 & 464 \\ \hline
+fir\_t8c\_loa11\_inl\_ir & 782 & 978 & 8789 & 686 & 12 & - & 519 & 733 & 6899 & 770 \\ \hline
+dot\_t4\_inl\_ir & 124 & 124 & 821 & 166 & 12 & 30 & 73 & 89 & 409 & 143 \\ \hline
+gauss\_dse\_op40\_inl\_ir & 669 & 709 & 3519 & 727 & 23 & 125 & 507 & 624 & 1880 & 712 \\ \hline
+fir\_dse\_op60\_inl\_ir & 938 & 1046 & 10762 & 1063 & 30 & 35 & 556 & 626 & 10844 & 1062 \\ \hline
+gauss\_dse2\_lut40\_inl\_ir & 618 & 674 & 3772 & 815 & 30 & 160 & 546 & 616 & 1670 & 646 \\ \hline
+fir\_dse2\_lut60\_inl\_ir & 709 & 845 & 8958 & 1025 & 39 & 85 & 656 & 610 & 7508 & 935 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -186,38 +186,51 @@ fir\_dse2\_lut60\_inl\_ir & 709 & 709 & 8958 & 1025 & 44 & 85 & 656 & 656 & 7508
 \caption{Efeito da aproximação: LUTs contra o projeto exato do mesmo kernel}
 \begin{tabular}{|l|r|r|r|r|r|}
 \hline
-\rowcolor{tabAzul}\color{white}Caso & \color{white}Economia modelo 1 & \color{white}Economia modelo & \color{white}Economia Vivado & \color{white}LUT Vivado exato & \color{white}LUT Vivado aprox. \\
+\rowcolor{tabAzul}\color{white}Caso & \color{white}Economia na exportação & \color{white}Economia modelo & \color{white}Economia Vivado & \color{white}LUT Vivado exato & \color{white}LUT Vivado aprox. \\
 \hline
-gauss\_drum6\_ir & -1,1\% & -6,5\% & -21,5\% & 729 & 886 \\ \hline
-gauss\_t8c\_loa6\_ir & 27,7\% & -3,8\% & -25,8\% & 729 & 917 \\ \hline
-sobel\_loa4\_ir & -0,7\% & -7,3\% & -12,5\% & 674 & 758 \\ \hline
-sharpen\_kul\_ir & 8,2\% & -1,0\% & -19,0\% & 496 & 590 \\ \hline
-fir\_t8c\_loa11\_ir & 41,0\% & 11,9\% & -33,5\% & 940 & 1255 \\ \hline
-dot\_t4\_ir & 9,7\% & 10,8\% & -50,5\% & 111 & 167 \\ \hline
-gauss\_dse\_op40\_ir & 35,3\% & 4,8\% & -6,2\% & 729 & 774 \\ \hline
-fir\_dse\_op60\_ir & 33,3\% & -5,6\% & -48,8\% & 940 & 1399 \\ \hline
-gauss\_dse2\_lut40\_ir & -12,6\% & 12,1\% & -18,1\% & 729 & 861 \\ \hline
-fir\_dse2\_lut60\_ir & 59,3\% & 20,2\% & -5,0\% & 940 & 987 \\ \hline
-gauss\_drum6\_lat0\_ir & -36,4\% & -6,5\% & -17,4\% & 729 & 856 \\ \hline
-gauss\_t8c\_loa6\_lat0\_ir & -33,0\% & -3,8\% & -8,2\% & 729 & 789 \\ \hline
-sobel\_loa4\_lat0\_ir & -72,3\% & -7,3\% & -7,9\% & 674 & 727 \\ \hline
-sharpen\_kul\_lat0\_ir & -98,5\% & -1,0\% & -6,0\% & 496 & 526 \\ \hline
-fir\_t8c\_loa11\_lat0\_ir & 55,1\% & 11,9\% & 32,8\% & 940 & 632 \\ \hline
-dot\_t4\_lat0\_ir & 20,0\% & 10,8\% & -56,8\% & 111 & 174 \\ \hline
-gauss\_dse\_op40\_lat0\_ir & -21,9\% & 4,8\% & 0,3\% & 729 & 727 \\ \hline
-fir\_dse\_op60\_lat0\_ir & 46,1\% & -5,6\% & 14,3\% & 940 & 806 \\ \hline
-gauss\_dse2\_lut40\_lat0\_ir & -12,6\% & 12,1\% & -13,3\% & 729 & 826 \\ \hline
-fir\_dse2\_lut60\_lat0\_ir & 59,3\% & 20,2\% & 0,6\% & 940 & 934 \\ \hline
-gauss\_drum6\_inl\_ir & -36,4\% & -6,5\% & -37,2\% & 729 & 1000 \\ \hline
-gauss\_t8c\_loa6\_inl\_ir & -33,0\% & -3,8\% & -18,9\% & 729 & 867 \\ \hline
-sobel\_loa4\_inl\_ir & -72,3\% & -7,3\% & -2,7\% & 674 & 692 \\ \hline
-sharpen\_kul\_inl\_ir & -98,5\% & -1,0\% & -7,1\% & 496 & 531 \\ \hline
-fir\_t8c\_loa11\_inl\_ir & 55,1\% & 11,9\% & 27,0\% & 940 & 686 \\ \hline
-dot\_t4\_inl\_ir & 20,0\% & 10,8\% & -49,5\% & 111 & 166 \\ \hline
-gauss\_dse\_op40\_inl\_ir & -21,9\% & 4,8\% & 0,3\% & 729 & 727 \\ \hline
-fir\_dse\_op60\_inl\_ir & 46,1\% & -5,6\% & -13,1\% & 940 & 1063 \\ \hline
-gauss\_dse2\_lut40\_inl\_ir & -12,6\% & 12,1\% & -11,8\% & 729 & 815 \\ \hline
-fir\_dse2\_lut60\_inl\_ir & 59,3\% & 20,2\% & -9,0\% & 940 & 1025 \\ \hline
+gauss\_drum6\_ir & -1,1\% & -16,6\% & -21,5\% & 729 & 886 \\ \hline
+gauss\_t8c\_loa6\_ir & 27,7\% & -5,7\% & -25,8\% & 729 & 917 \\ \hline
+sobel\_loa4\_ir & -0,7\% & -6,6\% & -12,5\% & 674 & 758 \\ \hline
+sharpen\_kul\_ir & 8,2\% & -2,4\% & -19,0\% & 496 & 590 \\ \hline
+fir\_t8c\_loa11\_ir & 41,0\% & 4,5\% & -33,5\% & 940 & 1255 \\ \hline
+dot\_t4\_ir & 9,7\% & 9,5\% & -50,5\% & 111 & 167 \\ \hline
+gauss\_dse\_op40\_ir & 35,3\% & 5,7\% & -6,2\% & 729 & 774 \\ \hline
+fir\_dse\_op60\_ir & 33,3\% & -2,1\% & -48,8\% & 940 & 1399 \\ \hline
+gauss\_dse2\_lut40\_ir & - & 10,4\% & -18,1\% & 729 & 861 \\ \hline
+fir\_dse2\_lut60\_ir & - & 17,5\% & -5,0\% & 940 & 987 \\ \hline
+gauss\_drum6\_lat0\_ir & - & -16,6\% & -17,4\% & 729 & 856 \\ \hline
+gauss\_t8c\_loa6\_lat0\_ir & - & -5,7\% & -8,2\% & 729 & 789 \\ \hline
+sobel\_loa4\_lat0\_ir & - & -6,6\% & -7,9\% & 674 & 727 \\ \hline
+sharpen\_kul\_lat0\_ir & - & -2,4\% & -6,0\% & 496 & 526 \\ \hline
+fir\_t8c\_loa11\_lat0\_ir & - & 4,5\% & 32,8\% & 940 & 632 \\ \hline
+dot\_t4\_lat0\_ir & - & 9,5\% & -56,8\% & 111 & 174 \\ \hline
+gauss\_dse\_op40\_lat0\_ir & - & 5,7\% & 0,3\% & 729 & 727 \\ \hline
+fir\_dse\_op60\_lat0\_ir & - & -2,1\% & 14,3\% & 940 & 806 \\ \hline
+gauss\_dse2\_lut40\_lat0\_ir & - & 10,4\% & -13,3\% & 729 & 826 \\ \hline
+fir\_dse2\_lut60\_lat0\_ir & - & 17,5\% & 0,6\% & 940 & 934 \\ \hline
+gauss\_drum6\_inl\_ir & - & -16,6\% & -37,2\% & 729 & 1000 \\ \hline
+gauss\_t8c\_loa6\_inl\_ir & - & -5,7\% & -18,9\% & 729 & 867 \\ \hline
+sobel\_loa4\_inl\_ir & - & -6,6\% & -2,7\% & 674 & 692 \\ \hline
+sharpen\_kul\_inl\_ir & - & -2,4\% & -7,1\% & 496 & 531 \\ \hline
+fir\_t8c\_loa11\_inl\_ir & - & 4,5\% & 27,0\% & 940 & 686 \\ \hline
+dot\_t4\_inl\_ir & - & 9,5\% & -49,5\% & 111 & 166 \\ \hline
+gauss\_dse\_op40\_inl\_ir & - & 5,7\% & 0,3\% & 729 & 727 \\ \hline
+fir\_dse\_op60\_inl\_ir & - & -2,1\% & -13,1\% & 940 & 1063 \\ \hline
+gauss\_dse2\_lut40\_inl\_ir & - & 10,4\% & -11,8\% & 729 & 815 \\ \hline
+fir\_dse2\_lut60\_inl\_ir & - & 17,5\% & -9,0\% & 940 & 1025 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Economia de LUTs prevista contra a medida, por forma de exportação das unidades}
+\begin{tabular}{|l|r|r|r|r|}
+\hline
+\rowcolor{tabAzul}\color{white}Exportação & \color{white}Casos & \color{white}Erro médio & \color{white}Mesmo sentido & \color{white}Maior economia medida \\
+\hline
+INLINE off (o Vitis divide a netlist em estágios) & 10 & 25,5 p.p. & 5 de 10 & -5,0\% \\ \hline
+combinacional (INLINE off, LATENCY 0) & 10 & 16,5 p.p. & 6 de 10 & 32,8\% \\ \hline
+em linha (INLINE) & 10 & 18,9 p.p. & 6 de 10 & 27,0\% \\ \hline
 \end{tabular}
 \end{table}
 
@@ -228,39 +241,39 @@ fir\_dse2\_lut60\_inl\_ir & 59,3\% & 20,2\% & -9,0\% & 940 & 1025 \\ \hline
 \hline
 \rowcolor{tabAzul}\color{white}Caso & \color{white}Unidade & \color{white}Inst. Vivado & \color{white}Inst. modelo & \color{white}LUT Vivado & \color{white}LUT modelo & \color{white}FF Vivado \\
 \hline
-gauss\_drum6\_ir & MUL8\_DRUM6 & 3 & 3 & 87 & 40 & 53 \\ \hline
-gauss\_t8c\_loa6\_ir & ADD16\_LOA6 & 4 & 4 & 65 & 15 & 43 \\ \hline
-gauss\_t8c\_loa6\_ir & MUL8\_T8\_C & 3 & 3 & 26 & 9 & 33 \\ \hline
-sobel\_loa4\_ir & ADD16\_LOA4 & 3 & 3 & 40 & 9 & 30 \\ \hline
+gauss\_drum6\_ir & MUL8\_DRUM6 & 3 & 5 & 87 & 38 & 53 \\ \hline
+gauss\_t8c\_loa6\_ir & ADD16\_LOA6 & 4 & 4 & 65 & 14 & 43 \\ \hline
+gauss\_t8c\_loa6\_ir & MUL8\_T8\_C & 3 & 5 & 26 & 7 & 33 \\ \hline
+sobel\_loa4\_ir & ADD16\_LOA4 & 3 & 3 & 40 & 8 & 30 \\ \hline
 sharpen\_kul\_ir & MUL8\_KUL & 1 & 1 & 46 & 14 & 20 \\ \hline
-fir\_t8c\_loa11\_ir & ADD16\_LOA11 & 14 & 11 & 6 & 11 & 9 \\ \hline
-fir\_t8c\_loa11\_ir & ADD32\_ADD16\_LOA11\_ADD16\_exato & 4 & 4 & 12 & 10 & 15 \\ \hline
-fir\_t8c\_loa11\_ir & MUL8\_T8\_C & 14 & 14 & 14 & 5 & 15 \\ \hline
-dot\_t4\_ir & MUL8\_T4 & 1 & 1 & 120 & 86 & 102 \\ \hline
-gauss\_dse\_op40\_ir & ADD16\_LOA10 & 1 & 1 & 32 & 13 & 16 \\ \hline
-gauss\_dse\_op40\_ir & ADD16\_LOA7 & 1 & 1 & 15 & 12 & 15 \\ \hline
-gauss\_dse\_op40\_ir & ADD16\_LOA8 & 2 & 2 & 38 & 14 & 34 \\ \hline
-gauss\_dse\_op40\_ir & ADD16\_LOA9 & 1 & 1 & 27 & 14 & 16 \\ \hline
-gauss\_dse\_op40\_ir & MUL8\_T6\_A4c & 1 & 1 & 4 & 6 & 6 \\ \hline
-gauss\_dse\_op40\_ir & MUL8\_T8\_C & 2 & 2 & 26 & 13 & 38 \\ \hline
-fir\_dse\_op60\_ir & ADD16\_LOA10 & 2 & 1 & 5 & 9 & 7 \\ \hline
+fir\_t8c\_loa11\_ir & ADD16\_LOA11 & 14 & 11 & 6 & 12 & 9 \\ \hline
+fir\_t8c\_loa11\_ir & ADD32\_ADD16\_LOA11\_ADD16\_exato & 4 & 4 & 12 & 11 & 15 \\ \hline
+fir\_t8c\_loa11\_ir & MUL8\_T8\_C & 14 & 14 & 14 & 6 & 15 \\ \hline
+dot\_t4\_ir & MUL8\_T4 & 1 & 1 & 120 & 76 & 102 \\ \hline
+gauss\_dse\_op40\_ir & ADD16\_LOA10 & 1 & 1 & 32 & 12 & 16 \\ \hline
+gauss\_dse\_op40\_ir & ADD16\_LOA7 & 1 & 1 & 15 & 11 & 15 \\ \hline
+gauss\_dse\_op40\_ir & ADD16\_LOA8 & 2 & 2 & 38 & 13 & 34 \\ \hline
+gauss\_dse\_op40\_ir & ADD16\_LOA9 & 1 & 1 & 27 & 13 & 16 \\ \hline
+gauss\_dse\_op40\_ir & MUL8\_T6\_A4c & 1 & 1 & 4 & 7 & 6 \\ \hline
+gauss\_dse\_op40\_ir & MUL8\_T8\_C & 2 & 4 & 26 & 8 & 38 \\ \hline
+fir\_dse\_op60\_ir & ADD16\_LOA10 & 2 & 1 & 5 & 8 & 7 \\ \hline
 fir\_dse\_op60\_ir & ADD16\_LOA8 & 6 & 4 & 22 & 13 & 24 \\ \hline
 fir\_dse\_op60\_ir & ADD16\_LOA9 & 5 & 5 & 13 & 13 & 15 \\ \hline
-fir\_dse\_op60\_ir & ADD32\_ADD16\_LOA10\_ADD16\_exato & 1 & 1 & 21 & 11 & 25 \\ \hline
-fir\_dse\_op60\_ir & ADD32\_ADD16\_LOA8\_ADD16\_exato & 2 & 2 & 30 & 14 & 48 \\ \hline
-fir\_dse\_op60\_ir & MUL8\_DRUM2 & 1 & 1 & 17 & 29 & 27 \\ \hline
-fir\_dse\_op60\_ir & MUL8\_DRUM3\_C & 1 & 1 & 27 & 38 & 40 \\ \hline
-fir\_dse\_op60\_ir & MUL8\_DRUM3 & 1 & 1 & 22 & 38 & 40 \\ \hline
-fir\_dse\_op60\_ir & MUL8\_DRUM4 & 2 & 2 & 47 & 35 & 51 \\ \hline
+fir\_dse\_op60\_ir & ADD32\_ADD16\_LOA10\_ADD16\_exato & 1 & 1 & 21 & 10 & 25 \\ \hline
+fir\_dse\_op60\_ir & ADD32\_ADD16\_LOA8\_ADD16\_exato & 2 & 2 & 30 & 13 & 48 \\ \hline
+fir\_dse\_op60\_ir & MUL8\_DRUM2 & 1 & 1 & 17 & 23 & 27 \\ \hline
+fir\_dse\_op60\_ir & MUL8\_DRUM3\_C & 1 & 1 & 27 & 36 & 40 \\ \hline
+fir\_dse\_op60\_ir & MUL8\_DRUM3 & 1 & 1 & 22 & 36 & 40 \\ \hline
+fir\_dse\_op60\_ir & MUL8\_DRUM4 & 2 & 2 & 47 & 31 & 51 \\ \hline
 fir\_dse\_op60\_ir & MUL8\_T6\_A10c & 4 & 4 & 13 & 1 & 2 \\ \hline
 fir\_dse\_op60\_ir & MUL8\_T8\_C & 3 & 3 & 9 & 11 & 21 \\ \hline
-gauss\_dse2\_lut40\_ir & MUL8\_T8\_C & 3 & 3 & 26 & 9 & 34 \\ \hline
+gauss\_dse2\_lut40\_ir & MUL8\_T8\_C & 3 & 5 & 26 & 7 & 34 \\ \hline
 fir\_dse2\_lut60\_ir & MUL8\_T6\_A10c & 6 & 6 & 9 & 2 & 3 \\ \hline
 fir\_dse2\_lut60\_ir & MUL8\_T6\_A2c & 1 & 1 & 6 & 6 & 8 \\ \hline
-fir\_dse2\_lut60\_ir & MUL8\_T8\_C & 6 & 6 & 9 & 8 & 19 \\ \hline
+fir\_dse2\_lut60\_ir & MUL8\_T8\_C & 6 & 6 & 9 & 9 & 19 \\ \hline
 fir\_dse2\_lut60\_ir & ADD32\_ADD16\_TRUNC7\_ADD16\_exato & 2 & 4 & 4 & 6 & 0 \\ \hline
 fir\_dse2\_lut60\_ir & ADD16\_TRUNC7 & 2 & 5 & 4 & 5 & 0 \\ \hline
-gauss\_dse\_op40\_lat0\_ir & MUL8\_T6\_A4c & 1 & 1 & 2 & 6 & 0 \\ \hline
+gauss\_dse\_op40\_lat0\_ir & MUL8\_T6\_A4c & 1 & 1 & 2 & 7 & 0 \\ \hline
 fir\_dse2\_lut60\_lat0\_ir & ADD32\_ADD16\_TRUNC7\_ADD16\_exato & 2 & 4 & 4 & 6 & 0 \\ \hline
 fir\_dse2\_lut60\_lat0\_ir & ADD16\_TRUNC7 & 2 & 5 & 4 & 5 & 0 \\ \hline
 \end{tabular}
@@ -273,57 +286,57 @@ fir\_dse2\_lut60\_lat0\_ir & ADD16\_TRUNC7 & 2 & 5 & 4 & 5 & 0 \\ \hline
 \hline
 \rowcolor{tabAzul}\color{white}Caso & \color{white}Laço & \color{white}Modo & \color{white}Iterações & \color{white}II modelo & \color{white}II Vitis & \color{white}Iteração modelo & \color{white}Iteração Vitis & \color{white}Latência modelo & \color{white}Latência Vitis \\
 \hline
-gauss\_src & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 19 & 72217 & 72216 \\ \hline
-gauss\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 19 & 72217 & 72216 \\ \hline
-sobel\_src & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 20 & 72217 & 72217 \\ \hline
-sobel\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 20 & 72217 & 72217 \\ \hline
-sharpen\_src & rows\_cols & achatado & 36100 & 2 & 2 & 17 & 19 & 72216 & 72216 \\ \hline
-sharpen\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 17 & 19 & 72216 & 72216 \\ \hline
-fir\_src & samples & pipeline & 1009 & 1 & 1 & 9 & 10 & 1018 & 1017 \\ \hline
-fir\_ir & samples & pipeline & 1009 & 1 & 1 & 9 & 15 & 1018 & 1022 \\ \hline
-dot\_src & acc & pipeline & 256 & 1 & 1 & 2 & 4 & 258 & 258 \\ \hline
-dot\_ir & acc & pipeline & 256 & 1 & 1 & 2 & 4 & 258 & 258 \\ \hline
-gauss\_var1\_ir & rows\_cols & achatado & 36100 & 5 & 5 & 6 & 10 & 180502 & 180504 \\ \hline
-gauss\_var2\_ir & rows & sequencial & 190 & - & - & 16153 & 20523 & 3069070 & 3899370 \\ \hline
-gauss\_var2\_ir & cols & sequencial & 190 & - & - & 85 & 108 & 16150 & 20520 \\ \hline
-gauss\_var2\_ir & L3 & sequencial & 3 & - & - & 27 & 35 & 81 & 105 \\ \hline
-gauss\_var2\_ir & L4 & sequencial & 3 & - & - & 4 & 7 & 12 & 21 \\ \hline
-gauss\_var3\_ir & rows & sequencial & 190 & - & - & 7603 & 12543 & 1444570 & 2383170 \\ \hline
-gauss\_var3\_ir & cols & sequencial & 190 & - & - & 40 & 66 & 7600 & 12540 \\ \hline
-gauss\_var3\_ir & L3 & sequencial & 3 & - & - & 12 & 21 & 36 & 63 \\ \hline
-gauss\_var3\_ir & L4 & sequencial & 3 & - & - & 3 & 6 & 9 & 18 \\ \hline
-gauss\_2p5ns\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 25 & 23 & 72224 & 72220 \\ \hline
+gauss\_src & rows\_cols & achatado & 36100 & 2 & 2 & 20 & 19 & 72219 & 72216 \\ \hline
+gauss\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 20 & 19 & 72219 & 72216 \\ \hline
+sobel\_src & rows\_cols & achatado & 36100 & 2 & 2 & 19 & 20 & 72218 & 72217 \\ \hline
+sobel\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 19 & 20 & 72218 & 72217 \\ \hline
+sharpen\_src & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 19 & 72217 & 72216 \\ \hline
+sharpen\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 19 & 72217 & 72216 \\ \hline
+fir\_src & samples & pipeline & 1009 & 1 & 1 & 11 & 10 & 1020 & 1017 \\ \hline
+fir\_ir & samples & pipeline & 1009 & 1 & 1 & 11 & 15 & 1020 & 1022 \\ \hline
+dot\_src & acc & pipeline & 256 & 1 & 1 & 4 & 4 & 260 & 258 \\ \hline
+dot\_ir & acc & pipeline & 256 & 1 & 1 & 4 & 4 & 260 & 258 \\ \hline
+gauss\_var1\_ir & rows\_cols & achatado & 36100 & 5 & 5 & 7 & 10 & 180503 & 180504 \\ \hline
+gauss\_var2\_ir & rows & sequencial & 190 & - & - & 19573 & 20523 & 3718870 & 3899370 \\ \hline
+gauss\_var2\_ir & cols & sequencial & 190 & - & - & 103 & 108 & 19570 & 20520 \\ \hline
+gauss\_var2\_ir & L3 & sequencial & 3 & - & - & 33 & 35 & 99 & 105 \\ \hline
+gauss\_var2\_ir & L4 & sequencial & 3 & - & - & 6 & 7 & 18 & 21 \\ \hline
+gauss\_var3\_ir & rows & sequencial & 190 & - & - & 11023 & 12543 & 2094370 & 2383170 \\ \hline
+gauss\_var3\_ir & cols & sequencial & 190 & - & - & 58 & 66 & 11020 & 12540 \\ \hline
+gauss\_var3\_ir & L3 & sequencial & 3 & - & - & 18 & 21 & 54 & 63 \\ \hline
+gauss\_var3\_ir & L4 & sequencial & 3 & - & - & 5 & 6 & 15 & 18 \\ \hline
+gauss\_2p5ns\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 26 & 23 & 72225 & 72220 \\ \hline
 gauss\_10ns\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 17 & 18 & 72216 & 72215 \\ \hline
-gauss\_drum6\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 23 & 72217 & 72220 \\ \hline
-gauss\_t8c\_loa6\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 38 & 72217 & 72235 \\ \hline
-sobel\_loa4\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 25 & 72217 & 72222 \\ \hline
-sharpen\_kul\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 17 & 20 & 72216 & 72217 \\ \hline
-fir\_t8c\_loa11\_ir & samples & pipeline & 1009 & 1 & 1 & 6 & 49 & 1015 & 1056 \\ \hline
-dot\_t4\_ir & acc & pipeline & 256 & 1 & 1 & 2 & 8 & 258 & 262 \\ \hline
-gauss\_dse\_op40\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 17 & 34 & 72216 & 72231 \\ \hline
-fir\_dse\_op60\_ir & samples & pipeline & 1009 & 1 & 1 & 6 & 43 & 1015 & 1050 \\ \hline
-gauss\_dse2\_lut40\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 25 & 72217 & 72222 \\ \hline
-fir\_dse2\_lut60\_ir & samples & pipeline & 1009 & 1 & 1 & 7 & 25 & 1016 & 1032 \\ \hline
-gauss\_drum6\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 19 & 72217 & 72216 \\ \hline
-gauss\_t8c\_loa6\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 25 & 72217 & 72222 \\ \hline
-sobel\_loa4\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 21 & 72217 & 72218 \\ \hline
-sharpen\_kul\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 17 & 19 & 72216 & 72216 \\ \hline
-fir\_t8c\_loa11\_lat0\_ir & samples & pipeline & 1009 & 1 & 1 & 6 & 21 & 1015 & 1028 \\ \hline
-dot\_t4\_lat0\_ir & acc & pipeline & 256 & 1 & 1 & 2 & 4 & 258 & 258 \\ \hline
-gauss\_dse\_op40\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 17 & 25 & 72216 & 72222 \\ \hline
-fir\_dse\_op60\_lat0\_ir & samples & pipeline & 1009 & 1 & 1 & 6 & 21 & 1015 & 1028 \\ \hline
-gauss\_dse2\_lut40\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 21 & 72217 & 72218 \\ \hline
-fir\_dse2\_lut60\_lat0\_ir & samples & pipeline & 1009 & 1 & 1 & 7 & 21 & 1016 & 1028 \\ \hline
-gauss\_drum6\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 19 & 72217 & 72216 \\ \hline
-gauss\_t8c\_loa6\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 23 & 72217 & 72220 \\ \hline
-sobel\_loa4\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 21 & 72217 & 72218 \\ \hline
-sharpen\_kul\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 17 & 19 & 72216 & 72216 \\ \hline
-fir\_t8c\_loa11\_inl\_ir & samples & pipeline & 1009 & 1 & 1 & 6 & 21 & 1015 & 1028 \\ \hline
-dot\_t4\_inl\_ir & acc & pipeline & 256 & 1 & 1 & 2 & 6 & 258 & 260 \\ \hline
-gauss\_dse\_op40\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 17 & 23 & 72216 & 72220 \\ \hline
-fir\_dse\_op60\_inl\_ir & samples & pipeline & 1009 & 1 & 1 & 6 & 27 & 1015 & 1034 \\ \hline
-gauss\_dse2\_lut40\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 18 & 21 & 72217 & 72218 \\ \hline
-fir\_dse2\_lut60\_inl\_ir & samples & pipeline & 1009 & 1 & 1 & 7 & 21 & 1016 & 1028 \\ \hline
+gauss\_drum6\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 21 & 23 & 72220 & 72220 \\ \hline
+gauss\_t8c\_loa6\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 21 & 38 & 72220 & 72235 \\ \hline
+sobel\_loa4\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 19 & 25 & 72218 & 72222 \\ \hline
+sharpen\_kul\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 19 & 20 & 72218 & 72217 \\ \hline
+fir\_t8c\_loa11\_ir & samples & pipeline & 1009 & 1 & 1 & 18 & 49 & 1027 & 1056 \\ \hline
+dot\_t4\_ir & acc & pipeline & 256 & 1 & 1 & 3 & 8 & 259 & 262 \\ \hline
+gauss\_dse\_op40\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 20 & 34 & 72219 & 72231 \\ \hline
+fir\_dse\_op60\_ir & samples & pipeline & 1009 & 1 & 1 & 12 & 43 & 1021 & 1050 \\ \hline
+gauss\_dse2\_lut40\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 20 & 25 & 72219 & 72222 \\ \hline
+fir\_dse2\_lut60\_ir & samples & pipeline & 1009 & 1 & 1 & 11 & 25 & 1020 & 1032 \\ \hline
+gauss\_drum6\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 21 & 19 & 72220 & 72216 \\ \hline
+gauss\_t8c\_loa6\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 21 & 25 & 72220 & 72222 \\ \hline
+sobel\_loa4\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 19 & 21 & 72218 & 72218 \\ \hline
+sharpen\_kul\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 19 & 19 & 72218 & 72216 \\ \hline
+fir\_t8c\_loa11\_lat0\_ir & samples & pipeline & 1009 & 1 & 1 & 18 & 21 & 1027 & 1028 \\ \hline
+dot\_t4\_lat0\_ir & acc & pipeline & 256 & 1 & 1 & 3 & 4 & 259 & 258 \\ \hline
+gauss\_dse\_op40\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 20 & 25 & 72219 & 72222 \\ \hline
+fir\_dse\_op60\_lat0\_ir & samples & pipeline & 1009 & 1 & 1 & 12 & 21 & 1021 & 1028 \\ \hline
+gauss\_dse2\_lut40\_lat0\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 20 & 21 & 72219 & 72218 \\ \hline
+fir\_dse2\_lut60\_lat0\_ir & samples & pipeline & 1009 & 1 & 1 & 11 & 21 & 1020 & 1028 \\ \hline
+gauss\_drum6\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 21 & 19 & 72220 & 72216 \\ \hline
+gauss\_t8c\_loa6\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 21 & 23 & 72220 & 72220 \\ \hline
+sobel\_loa4\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 19 & 21 & 72218 & 72218 \\ \hline
+sharpen\_kul\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 19 & 19 & 72218 & 72216 \\ \hline
+fir\_t8c\_loa11\_inl\_ir & samples & pipeline & 1009 & 1 & 1 & 18 & 21 & 1027 & 1028 \\ \hline
+dot\_t4\_inl\_ir & acc & pipeline & 256 & 1 & 1 & 3 & 6 & 259 & 260 \\ \hline
+gauss\_dse\_op40\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 20 & 23 & 72219 & 72220 \\ \hline
+fir\_dse\_op60\_inl\_ir & samples & pipeline & 1009 & 1 & 1 & 12 & 27 & 1021 & 1034 \\ \hline
+gauss\_dse2\_lut40\_inl\_ir & rows\_cols & achatado & 36100 & 2 & 2 & 20 & 21 & 72219 & 72218 \\ \hline
+fir\_dse2\_lut60\_inl\_ir & samples & pipeline & 1009 & 1 & 1 & 11 & 21 & 1020 & 1028 \\ \hline
 \end{tabular}
 \end{table}
 

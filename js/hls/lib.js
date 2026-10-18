@@ -65,7 +65,13 @@ export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic', fpg
     const cellFlow = flow === 'delay' ? 'delay' : 'area';
     // Alvo FPGA com a caracterização do Vivado (data/vivado-units.json): LUT, CARRY4 e atraso do Vivado. As unidades
     // exatas usam a operação nativa (a + b, a * b), como o Vitis escreve; o resto continua do Yosys e do sky130.
-    const viv = target === 'fpga' && fpga ? fpga.units : null;
+    // LUT e CARRY4 do Vivado em qualquer alvo (são números de FPGA); o atraso do Vivado só no alvo FPGA.
+    const viv = fpga ? fpga.units : null;
+    const fpgaDelay = target === 'fpga' && !!viv;
+    // O atraso medido é de registrador a registrador (inclui o relógio para a saída e o fio do registrador de
+    // entrada); o da unidade é esse menos o do caminho direto entre dois registradores (peça "reg").
+    const regPs = viv?.reg?.delayPs ?? 0;
+    const vDelay = (v) => (fpgaDelay && v?.delayPs ? Math.max(0, v.delayPs - regPs) : null);
     const vivOf = (name) => {
         if (!viv) return null;
         const m = /^(ADD|MUL)(\d+) exato$/.exec(name);
@@ -77,7 +83,7 @@ export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic', fpg
         if (!d) throw new HlsError(`unidade ${name} não está na biblioteca sintetizada`);
         const f = d.asic.flows[flow] ?? d.asic.flows.delay;
         const v = vivOf(name);
-        return { name, short: name.replace(/ \(.*\)/, ''), cfg: d.cfg, area: f.area, delay: v?.delayPs ?? f.delay, energy: f.energy, leakage: f.leakage, luts: v?.luts ?? d.luts, carry4: v?.carry4 ?? d.carry4, err: d.err, vivado: !!v };
+        return { name, short: name.replace(/ \(.*\)/, ''), cfg: d.cfg, area: f.area, delay: vDelay(v) ?? f.delay, energy: f.energy, leakage: f.leakage, luts: v?.luts ?? d.luts, carry4: v?.carry4 ?? d.carry4, err: d.err, vivado: !!v };
     }
     const exactName = (cls, W) => `${cls === 'mul' ? 'MUL' : 'ADD'}${W} exato`;
     /** Somador de 32 bits: a cascata de dois de 16 (o de baixo pode ser aproximado; o vai um passa para o de cima). */
@@ -114,7 +120,7 @@ export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic', fpg
         const key = { cmp: 'cmp', mux: 'mux', logic: 'xor' }[cls];
         const c = cells.cells[key][W][cellFlow];
         const v = viv?.[`${cls}${W}`];
-        return { name: `${cls}${W}`, area: c.area, delay: v?.delayPs ?? c.delay, energy: c.energy, luts: v?.luts ?? c.luts, carry4: v?.carry4 ?? c.carry4 };
+        return { name: `${cls}${W}`, area: c.area, delay: vDelay(v) ?? c.delay, energy: c.energy, luts: v?.luts ?? c.luts, carry4: v?.carry4 ?? c.carry4 };
     }
     /**
      * Multiplicação exata por constante: somas de deslocamentos, com a representação de menos dígitos (binária ou
@@ -152,7 +158,7 @@ export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic', fpg
         return { ...u, ...scaled(u, liveFraction(u.name, netOf(u.name), known)) };
     }
     // Registrador: no Vivado, o caminho direto entre dois registradores (relógio para a saída e fio; o setup fica de fora).
-    const reg = viv?.reg?.delayPs ? { ...cells.register, clkToQ: viv.reg.delayPs, setup: 0 } : cells.register;
+    const reg = fpgaDelay && viv.reg?.delayPs ? { ...cells.register, clkToQ: viv.reg.delayPs, setup: 0 } : cells.register;
     return {
         flow, target, unit, exactUnit, unitByName, candidates, cell, constMul, effective, vivado: !!viv,
         reg: { area: reg.area, energy: reg.energy, clkToQ: reg.clkToQ, setup: reg.setup, leakage: reg.leakage },

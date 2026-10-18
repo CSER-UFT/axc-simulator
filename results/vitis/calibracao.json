@@ -1,10 +1,10 @@
 {
- "sequentialIterResidual": 23,
+ "sequentialIterResidual": 5,
  "pipelineOverheadVitis": -1,
- "lutScale": 1.086696562032885,
- "ffScale": 1.2031558185404339,
- "cycleRatio": 1.0000969300857139,
- "periodScale": 1.1508335007029524,
+ "lutScale": 1.0102622576966933,
+ "ffScale": 1.0960187353629978,
+ "cycleRatio": 1.0000276939267219,
+ "periodScale": 1.139135702746365,
  "model": {
   "memLatency": 1,
   "loopOverhead": 1,

@@ -72,13 +72,15 @@ npm run vitis:collect                   # lê os relatórios e grava results/vit
 npm run vitis:compare                   # refaz a comparação com o modelo atual (sem o Vitis)
 ```
 
-Na primeira rodada (23 casos: os exemplos exatos, as variantes de diretivas e de período do gaussiano e oito projetos aproximados), a csim deu a mesma saída que o simulador em todas as posições, e a comparação levou a seis correções no modelo (achatamento de laços, multiplicação por constante como somas de deslocamentos, custo da partição com fator 3, endereços e contadores no pipeline, sem compartilhamento de somadores exatos, propagação de constantes nas unidades). Com elas, o erro médio da latência com pipeline caiu de 1,4% para 0,5%, o das LUTs do Vivado de 38% para 16% e o dos FFs de 54% para 25%. Os oito projetos aproximados ficaram maiores que o exato no Vivado: em parte porque o modelo superestimava a multiplicação exata por constante, em parte porque o Vitis divide em estágios as netlists das unidades exportadas com `INLINE off`. A segunda rodada acrescenta as unidades combinacionais (`_lat0_ir`) e em linha (`_inl_ir`), dois pontos da exploração com o modelo calibrado e a caracterização de cada unidade no próprio Vivado:
+Na primeira rodada (23 casos: os exemplos exatos, as variantes de diretivas e de período do gaussiano e oito projetos aproximados), a comparação levou a seis correções no modelo (achatamento de laços, multiplicação por constante como somas de deslocamentos, custo da partição com fator 3, endereços e contadores no pipeline, sem compartilhamento de somadores exatos, propagação de constantes nas unidades). A segunda rodada (mais 22 casos: os projetos aproximados com as unidades combinacionais e em linha, e dois pontos da exploração) veio com a caracterização de cada unidade no próprio Vivado:
 
 ```
 npm run vivado:units                         # build/vivado-units/: cada unidade entre registradores
 bash build/vivado-units/run_units.sh -j 4    # Vivado fora de contexto (--route para posicionar e rotear)
 npm run vivado:units:collect                 # data/vivado-units.json: LUT, CARRY4 e atraso no alvo FPGA
 ```
+
+Com esses dados (a página tem a escolha dos atrasos, sky130 ou Vivado), o erro médio do modelo nos 45 casos é de 0,4% na latência com pipeline, 8% sem pipeline, 14% nas LUTs e 19% nos FFs; a csim deu a mesma saída que o simulador em todos. O resultado principal é sobre o FPGA: o somador nativo usa a cadeia de carry e só 16 dos 95 somadores aproximados de 16 bits são menores que ele, e as multiplicações por constante já são baratas; por isso, dos projetos aproximados medidos com as unidades combinacionais, só os do FIR economizam LUTs de forma apreciável (até 33%; o ponto da exploração do gaussiano empata com o exato). A economia prevista erra em média 16 pontos percentuais: no FPGA, o modelo serve para descartar aproximações que não economizam, e o ponto escolhido deve ser medido no Vivado.
 
 Os detalhes, as tabelas e as causas de cada diferença estão em [`results/vitis/RESULTADOS.md`](results/vitis/RESULTADOS.md) e na seção 6 de [`docs/METODOLOGIA.md`](docs/METODOLOGIA.md).
 

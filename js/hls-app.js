@@ -21,7 +21,7 @@ const store = {
 };
 const nf = (v, d = 0) => (v === null || v === undefined || Number.isNaN(v) ? '-' : v.toLocaleString(locale(), { maximumFractionDigits: d, minimumFractionDigits: 0 }));
 
-let synthData = null, cellsData = null, result = null, tab = store.get('hls.tab') ?? 'report';
+let synthData = null, cellsData = null, fpgaData = null, result = null, tab = store.get('hls.tab') ?? 'report';
 // Unidade aproximada de cada operação (id do nó -> nome), guardada por exemplo.
 const assignKey = () => `hls.assign.${$('example').value || 'custom'}`;
 let assign = new Map();
@@ -62,7 +62,7 @@ $('code').addEventListener('keydown', (e) => {
         paintCode();
     }
 });
-for (const id of ['clock', 'flow', 'ports']) {
+for (const id of ['clock', 'flow', 'target', 'ports']) {
     const v = store.get(`hls.${id}`);
     if (v) $(id).value = v;
     $(id).addEventListener('change', () => { store.set(`hls.${id}`, $(id).value); run(); });
@@ -74,7 +74,7 @@ function run() {
     if (!synthData || !cellsData) return;
     $('error').textContent = '';
     try {
-        result = synthesize($('code').value, { synth: synthData, cells: cellsData, clockNs: +$('clock').value, flow: $('flow').value, ports: +$('ports').value, assign });
+        result = synthesize($('code').value, { synth: synthData, cells: cellsData, clockNs: +$('clock').value, flow: $('flow').value, ports: +$('ports').value, assign, target: $('target').value, fpga: fpgaData });
     } catch (e) {
         result = null;
         $('error').textContent = e.message;
@@ -184,7 +184,7 @@ for (const id of ['dseObj', 'dseMetric', 'dseValue', 'dseGran', 'dseHeur', 'dseC
 function syncDse() { $('dseWeights').style.display = $('dseObj').value === 'weighted' ? '' : 'none'; }
 syncDse();
 const dseOptions = () => ({
-    flow: $('flow').value, ports: +$('ports').value, input: $('apInput').value, image: $('apInput').value === 'own' ? ownImage : null, method: $('apModel').value,
+    flow: $('flow').value, ports: +$('ports').value, target: $('target').value, fpga: fpgaData, input: $('apInput').value, image: $('apInput').value === 'own' ? ownImage : null, method: $('apModel').value,
     objective: $('dseObj').value, weights: { area: +$('dseWa').value, energy: +$('dseWe').value, latency: +$('dseWl').value },
     constraint: { metric: $('dseMetric').value, value: +$('dseValue').value }, granularity: $('dseGran').value, heuristic: $('dseHeur').value,
     clocks: $('dseClocks').value.split(/[,; ]+/).map(Number).filter((x) => x > 0), directives: $('dseDir').checked, allUnits: $('dseAll').checked,
@@ -563,6 +563,7 @@ const savedCode = store.get('hls.code');
 loadAssign();
 $('code').value = $('example').value === 'custom' && savedCode ? savedCode : (KERNELS.find((k) => k.id === $('example').value) ?? KERNELS[0]).code;
 paintCode();
-Promise.all([fetch('data/synth.json').then((r) => r.json()), fetch('data/hls-cells.json').then((r) => r.json())])
-    .then(([s, c]) => { synthData = s; cellsData = c; initLibrary(s, () => tab === 'lib'); run(); })
+// data/vivado-units.json (caracterização no Vivado) é opcional: sem ele, LUTs do Yosys e só os atrasos do sky130.
+Promise.all([fetch('data/synth.json').then((r) => r.json()), fetch('data/hls-cells.json').then((r) => r.json()), fetch('data/vivado-units.json').then((r) => (r.ok ? r.json() : null)).catch(() => null)])
+    .then(([s, c, v]) => { synthData = s; cellsData = c; fpgaData = v; $('target').disabled = !v; initLibrary(s, () => tab === 'lib'); run(); })
     .catch(() => { $('error').textContent = t('hls.noData'); });

@@ -114,3 +114,17 @@ test('lógica de memória e registradores do pipeline: o gaussiano perto do Viva
     assert.ok(Math.abs(r.totals.ff / 590 - 1) < 0.15, `FF ${r.totals.ff}`);
     assert.ok(r.cost.addr.addrLuts > 0 && r.cost.addr.bankLuts > 0 && r.cost.addr.pipeFf > 0);
 });
+
+test('caracterização no Vivado: LUTs em qualquer alvo, atrasos só no FPGA', async (t) => {
+    const { existsSync, readFileSync } = await import('node:fs');
+    const f = new URL('../data/vivado-units.json', import.meta.url);
+    if (!existsSync(f)) return t.skip('sem data/vivado-units.json');
+    const fpga = JSON.parse(readFileSync(f, 'utf8'));
+    const { makeLibrary } = await import('../js/hls/lib.js');
+    const asic = makeLibrary(synth, cells, { fpga }), viv = makeLibrary(synth, cells, { target: 'fpga', fpga });
+    assert.equal(asic.unit('MUL8 exato').luts, fpga.units['MUL8 nativo'].luts); // a exata é a operação nativa
+    assert.equal(asic.unit('MUL8 exato').delay, makeLibrary(synth, cells).unit('MUL8 exato').delay);
+    assert.equal(viv.unit('MUL8 exato').delay, fpga.units['MUL8 nativo'].delayPs - fpga.units.reg.delayPs);
+    const r = run(kernel('gauss'), { target: 'fpga', fpga });
+    assert.ok(Math.abs(r.totals.luts / 729 - 1) < 0.15);
+});

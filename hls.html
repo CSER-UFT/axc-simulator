@@ -39,6 +39,7 @@
                     <div class="row">
                         <label style="margin:0"><span data-i18n="hls.clock">Período (ns)</span> <input id="clock" type="number" min="0.6" max="50" step="0.1" value="5" style="width:5em" /></label>
                         <label style="margin:0"><span data-i18n="hls.flow">Síntese das unidades</span> <select id="flow"><option value="delay" data-i18n="ds.flow.delay">atraso mínimo</option><option value="area" data-i18n="ds.flow.area">área mínima</option><option value="iso" data-i18n="ds.flow.iso">iso atraso (o da exata)</option></select></label>
+                        <label style="margin:0"><span data-i18n="hls.delays">Atrasos</span> <select id="target"><option value="asic" data-i18n="hls.delays.asic">sky130 (ASIC)</option><option value="fpga" data-i18n="hls.delays.fpga">Vivado (FPGA)</option></select></label>
                         <label style="margin:0"><span data-i18n="hls.ports">Portas por banco</span> <select id="ports"><option value="1">1</option><option value="2" selected>2</option></select></label>
                     </div>
                     <div class="row" style="margin-top:8px">
