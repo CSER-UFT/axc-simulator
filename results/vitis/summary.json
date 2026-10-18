@@ -1,6 +1,6 @@
 {
  "part": "xc7a100tcsg324-1",
- "collected": "2026-10-18T15:41:26.167Z",
+ "collected": "2026-10-18T18:44:20.331Z",
  "rows": [
   {
    "case": "gauss_src",
@@ -4245,9 +4245,66 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72224,
+    "latencyWorst": 72224,
+    "intervalMin": 72225,
+    "lut": 4143,
+    "ff": 2084,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72222,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 25
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 86,
+      "ff": 2
+     },
+     {
+      "module": "u_MUL8_T8_C",
+      "count": 3,
+      "lut": 78,
+      "ff": 101
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 184,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 861,
+    "ff": 687,
+    "dsp": 0,
+    "slice": 348,
+    "bram": 0,
+    "achievedNs": 5.641,
+    "timingMet": "FALSE",
+    "carry4": 173
+   }
   },
   {
    "case": "fir_dse2_lut60_ir",
@@ -4330,9 +4387,78 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 3.733,
+    "latencyBest": 1034,
+    "latencyWorst": 1034,
+    "intervalMin": 1035,
+    "lut": 7919,
+    "ff": 2444,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1032,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 25
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 108,
+      "ff": 1
+     },
+     {
+      "module": "u_MUL8_T6_A10c",
+      "count": 6,
+      "lut": 54,
+      "ff": 20
+     },
+     {
+      "module": "u_MUL8_T6_A2c",
+      "count": 1,
+      "lut": 6,
+      "ff": 8
+     },
+     {
+      "module": "u_MUL8_T8_C",
+      "count": 6,
+      "lut": 52,
+      "ff": 116
+     },
+     {
+      "module": "u_ADD32_ADD16_TRUNC7_ADD16_exato",
+      "count": 2,
+      "lut": 8,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC7",
+      "count": 2,
+      "lut": 8,
+      "ff": 0
+     }
+    ],
+    "lut": 987,
+    "ff": 648,
+    "dsp": 0,
+    "slice": 362,
+    "bram": 0,
+    "achievedNs": 4.288,
+    "timingMet": "TRUE",
+    "carry4": 128
+   }
   },
   {
    "case": "gauss_drum6_lat0_ir",
@@ -4386,9 +4512,60 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 12.407,
+    "latencyBest": 72218,
+    "latencyWorst": 72218,
+    "intervalMin": 72219,
+    "lut": 3834,
+    "ff": 1181,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72216,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 19
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 43,
+      "ff": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 195,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 856,
+    "ff": 621,
+    "dsp": 0,
+    "slice": 341,
+    "bram": 0,
+    "achievedNs": 6.098,
+    "timingMet": "FALSE",
+    "carry4": 150
+   }
   },
   {
    "case": "gauss_t8c_loa6_lat0_ir",
@@ -4442,9 +4619,60 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 11.487,
+    "latencyBest": 72224,
+    "latencyWorst": 72224,
+    "intervalMin": 72225,
+    "lut": 3775,
+    "ff": 1682,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72222,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 25
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 77,
+      "ff": 2
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 186,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 789,
+    "ff": 616,
+    "dsp": 0,
+    "slice": 313,
+    "bram": 0,
+    "achievedNs": 5.501,
+    "timingMet": "FALSE",
+    "carry4": 137
+   }
   },
   {
    "case": "sobel_loa4_lat0_ir",
@@ -4498,9 +4726,60 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72220,
+    "latencyWorst": 72220,
+    "intervalMin": 72221,
+    "lut": 2247,
+    "ff": 1390,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72218,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 108,
+      "ff": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 157,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 727,
+    "ff": 607,
+    "dsp": 0,
+    "slice": 292,
+    "bram": 0,
+    "achievedNs": 5.517,
+    "timingMet": "FALSE",
+    "carry4": 114
+   }
   },
   {
    "case": "sharpen_kul_lat0_ir",
@@ -4554,9 +4833,60 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72218,
+    "latencyWorst": 72218,
+    "intervalMin": 72219,
+    "lut": 1840,
+    "ff": 1015,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72216,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 19
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 45,
+      "ff": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 183,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 526,
+    "ff": 458,
+    "dsp": 0,
+    "slice": 220,
+    "bram": 0,
+    "achievedNs": 5.325,
+    "timingMet": "FALSE",
+    "carry4": 101
+   }
   },
   {
    "case": "fir_t8c_loa11_lat0_ir",
@@ -4615,9 +4945,47 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 11.487,
+    "latencyBest": 1030,
+    "latencyWorst": 1030,
+    "intervalMin": 1031,
+    "lut": 9442,
+    "ff": 1785,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1028,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 108,
+      "ff": 1
+     }
+    ],
+    "lut": 632,
+    "ff": 489,
+    "dsp": 0,
+    "slice": 202,
+    "bram": 0,
+    "achievedNs": 4.139,
+    "timingMet": "TRUE"
+   }
   },
   {
    "case": "dot_t4_lat0_ir",
@@ -4670,9 +5038,48 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 1
+   },
+   "hls": {
+    "estClockNs": 9.951,
+    "latencyBest": 260,
+    "latencyWorst": 260,
+    "intervalMin": 261,
+    "lut": 757,
+    "ff": 74,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "acc",
+      "trip": 256,
+      "latency": 258,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 4
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 18,
+      "ff": 1
+     }
+    ],
+    "lut": 174,
+    "ff": 65,
+    "dsp": 0,
+    "slice": 57,
+    "bram": 0,
+    "achievedNs": 4.859,
+    "timingMet": "TRUE",
+    "carry4": 28
+   }
   },
   {
    "case": "gauss_dse_op40_lat0_ir",
@@ -4762,9 +5169,66 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 11.487,
+    "latencyBest": 72224,
+    "latencyWorst": 72224,
+    "intervalMin": 72225,
+    "lut": 3550,
+    "ff": 1722,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72222,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 25
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 77,
+      "ff": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 183,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     },
+     {
+      "module": "u_MUL8_T6_A4c",
+      "count": 1,
+      "lut": 2,
+      "ff": 0
+     }
+    ],
+    "lut": 727,
+    "ff": 610,
+    "dsp": 0,
+    "slice": 296,
+    "bram": 0,
+    "achievedNs": 5.207,
+    "timingMet": "FALSE",
+    "carry4": 123
+   }
   },
   {
    "case": "fir_dse_op60_lat0_ir",
@@ -4889,9 +5353,48 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 12.392,
+    "latencyBest": 1030,
+    "latencyWorst": 1030,
+    "intervalMin": 1031,
+    "lut": 7811,
+    "ff": 1683,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1028,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 98,
+      "ff": 1
+     }
+    ],
+    "lut": 806,
+    "ff": 552,
+    "dsp": 0,
+    "slice": 298,
+    "bram": 0,
+    "achievedNs": 4.574,
+    "timingMet": "TRUE",
+    "carry4": 50
+   }
   },
   {
    "case": "gauss_dse2_lut40_lat0_ir",
@@ -4987,9 +5490,60 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 11.487,
+    "latencyBest": 72220,
+    "latencyWorst": 72220,
+    "intervalMin": 72221,
+    "lut": 3933,
+    "ff": 1465,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72218,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 77,
+      "ff": 2
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 185,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 826,
+    "ff": 574,
+    "dsp": 0,
+    "slice": 326,
+    "bram": 0,
+    "achievedNs": 5.47,
+    "timingMet": "FALSE",
+    "carry4": 173
+   }
   },
   {
    "case": "fir_dse2_lut60_lat0_ir",
@@ -5072,9 +5626,60 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 10.424,
+    "latencyBest": 1030,
+    "latencyWorst": 1030,
+    "intervalMin": 1031,
+    "lut": 7855,
+    "ff": 1785,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1028,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 108,
+      "ff": 1
+     },
+     {
+      "module": "u_ADD32_ADD16_TRUNC7_ADD16_exato",
+      "count": 2,
+      "lut": 8,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC7",
+      "count": 2,
+      "lut": 8,
+      "ff": 0
+     }
+    ],
+    "lut": 934,
+    "ff": 531,
+    "dsp": 0,
+    "slice": 342,
+    "bram": 0,
+    "achievedNs": 4.545,
+    "timingMet": "TRUE",
+    "carry4": 129
+   }
   },
   {
    "case": "gauss_drum6_inl_ir",
@@ -5128,9 +5733,60 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72218,
+    "latencyWorst": 72218,
+    "intervalMin": 72219,
+    "lut": 4044,
+    "ff": 1275,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72216,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 19
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 50,
+      "ff": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 201,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 1000,
+    "ff": 645,
+    "dsp": 0,
+    "slice": 365,
+    "bram": 0,
+    "achievedNs": 5.525,
+    "timingMet": "FALSE",
+    "carry4": 169
+   }
   },
   {
    "case": "gauss_t8c_loa6_inl_ir",
@@ -5184,9 +5840,60 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72222,
+    "latencyWorst": 72222,
+    "intervalMin": 72223,
+    "lut": 4133,
+    "ff": 2259,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72220,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 23
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 89,
+      "ff": 2
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 168,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 867,
+    "ff": 753,
+    "dsp": 0,
+    "slice": 353,
+    "bram": 0,
+    "achievedNs": 5.817,
+    "timingMet": "FALSE",
+    "carry4": 162
+   }
   },
   {
    "case": "sobel_loa4_inl_ir",
@@ -5240,9 +5947,60 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72220,
+    "latencyWorst": 72220,
+    "intervalMin": 72221,
+    "lut": 2305,
+    "ff": 1508,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72218,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 91,
+      "ff": 2
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 169,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 692,
+    "ff": 613,
+    "dsp": 0,
+    "slice": 284,
+    "bram": 0,
+    "achievedNs": 5.416,
+    "timingMet": "FALSE",
+    "carry4": 112
+   }
   },
   {
    "case": "sharpen_kul_inl_ir",
@@ -5296,9 +6054,60 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72218,
+    "latencyWorst": 72218,
+    "intervalMin": 72219,
+    "lut": 1847,
+    "ff": 1025,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72216,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 19
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 44,
+      "ff": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 183,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 531,
+    "ff": 464,
+    "dsp": 0,
+    "slice": 216,
+    "bram": 0,
+    "achievedNs": 5.367,
+    "timingMet": "FALSE",
+    "carry4": 101
+   }
   },
   {
    "case": "fir_t8c_loa11_inl_ir",
@@ -5357,9 +6166,53 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 3.733,
+    "latencyBest": 1030,
+    "latencyWorst": 1030,
+    "intervalMin": 1031,
+    "lut": 8789,
+    "ff": 6899,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1028,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 109,
+      "ff": 1
+     },
+     {
+      "module": "mux_164_8_1_1",
+      "count": 15,
+      "lut": 165,
+      "ff": 0
+     }
+    ],
+    "lut": 686,
+    "ff": 770,
+    "dsp": 0,
+    "slice": 260,
+    "bram": 0,
+    "achievedNs": 4.399,
+    "timingMet": "TRUE"
+   }
   },
   {
    "case": "dot_t4_inl_ir",
@@ -5412,9 +6265,48 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 1
+   },
+   "hls": {
+    "estClockNs": 4.034,
+    "latencyBest": 262,
+    "latencyWorst": 262,
+    "intervalMin": 263,
+    "lut": 821,
+    "ff": 409,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "acc",
+      "trip": 256,
+      "latency": 260,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 6
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 18,
+      "ff": 1
+     }
+    ],
+    "lut": 166,
+    "ff": 143,
+    "dsp": 0,
+    "slice": 58,
+    "bram": 0,
+    "achievedNs": 3.658,
+    "timingMet": "TRUE",
+    "carry4": 30
+   }
   },
   {
    "case": "gauss_dse_op40_inl_ir",
@@ -5504,9 +6396,66 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72222,
+    "latencyWorst": 72222,
+    "intervalMin": 72223,
+    "lut": 3519,
+    "ff": 1880,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72220,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 23
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 90,
+      "ff": 2
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 169,
+      "ff": 0
+     },
+     {
+      "module": "mux_32_8_1_1",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 727,
+    "ff": 712,
+    "dsp": 0,
+    "slice": 320,
+    "bram": 0,
+    "achievedNs": 5.739,
+    "timingMet": "FALSE",
+    "carry4": 125
+   }
   },
   {
    "case": "fir_dse_op60_inl_ir",
@@ -5631,9 +6580,54 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 3.733,
+    "latencyBest": 1036,
+    "latencyWorst": 1036,
+    "intervalMin": 1037,
+    "lut": 10762,
+    "ff": 10844,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1034,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 27
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 98,
+      "ff": 1
+     },
+     {
+      "module": "mux_164_8_1_1",
+      "count": 14,
+      "lut": 231,
+      "ff": 0
+     }
+    ],
+    "lut": 1063,
+    "ff": 1062,
+    "dsp": 0,
+    "slice": 385,
+    "bram": 0,
+    "achievedNs": 4.417,
+    "timingMet": "TRUE",
+    "carry4": 35
+   }
   },
   {
    "case": "gauss_dse2_lut40_inl_ir",
@@ -5729,9 +6723,66 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72220,
+    "latencyWorst": 72220,
+    "intervalMin": 72221,
+    "lut": 3772,
+    "ff": 1670,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72218,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 102,
+      "ff": 2
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 158,
+      "ff": 0
+     },
+     {
+      "module": "mux_32_8_1_1",
+      "count": 2,
+      "lut": 12,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 815,
+    "ff": 646,
+    "dsp": 0,
+    "slice": 331,
+    "bram": 0,
+    "achievedNs": 5.713,
+    "timingMet": "FALSE",
+    "carry4": 160
+   }
   },
   {
    "case": "fir_dse2_lut60_inl_ir",
@@ -5814,10 +6865,54 @@
      "divAddrCycles": 1
     }
    },
-   "csim": null,
-   "hls": null,
-   "impl": null
+   "csim": {
+    "mismatches": 0,
+    "total": 1009
+   },
+   "hls": {
+    "estClockNs": 3.733,
+    "latencyBest": 1030,
+    "latencyWorst": 1030,
+    "intervalMin": 1031,
+    "lut": 8958,
+    "ff": 7508,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1028,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 108,
+      "ff": 1
+     },
+     {
+      "module": "mux_164_8_1_1",
+      "count": 16,
+      "lut": 208,
+      "ff": 0
+     }
+    ],
+    "lut": 1025,
+    "ff": 935,
+    "dsp": 0,
+    "slice": 359,
+    "bram": 0,
+    "achievedNs": 4.514,
+    "timingMet": "TRUE",
+    "carry4": 85
+   }
   }
- ],
- "compared": "2026-10-18T15:45:32.464Z"
+ ]
 }

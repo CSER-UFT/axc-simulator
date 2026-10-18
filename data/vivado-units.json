@@ -1,0 +1,3921 @@
+{
+ "part": "xc7a100tcsg324-1",
+ "generated": "2026-10-18T18:44:20.476Z",
+ "tool": "Vivado 2022.2",
+ "flow": "síntese fora de contexto",
+ "units": {
+  "MUL8 exato": {
+   "module": "mul8_exact",
+   "luts": 88,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 4942
+  },
+  "MUL8 T2": {
+   "module": "mul8_t2",
+   "luts": 84,
+   "carry4": 4,
+   "ff": 30,
+   "delayPs": 5293
+  },
+  "MUL8 T4": {
+   "module": "mul8_t4",
+   "luts": 76,
+   "carry4": 3,
+   "ff": 28,
+   "delayPs": 4983
+  },
+  "MUL8 T6": {
+   "module": "mul8_t6",
+   "luts": 61,
+   "carry4": 3,
+   "ff": 26,
+   "delayPs": 5063
+  },
+  "MUL8 T8": {
+   "module": "mul8_t8",
+   "luts": 38,
+   "carry4": 2,
+   "ff": 22,
+   "delayPs": 4868
+  },
+  "MUL8 A4c": {
+   "module": "mul8_a4c",
+   "luts": 85,
+   "carry4": 3,
+   "ff": 32,
+   "delayPs": 4993
+  },
+  "MUL8 A6c": {
+   "module": "mul8_a6c",
+   "luts": 91,
+   "carry4": 3,
+   "ff": 32,
+   "delayPs": 5185
+  },
+  "MUL8 A8c": {
+   "module": "mul8_a8c",
+   "luts": 83,
+   "carry4": 2,
+   "ff": 32,
+   "delayPs": 4999
+  },
+  "MUL8 A10c": {
+   "module": "mul8_a10c",
+   "luts": 85,
+   "carry4": 0,
+   "ff": 32,
+   "delayPs": 5237
+  },
+  "MUL8 A12c": {
+   "module": "mul8_a12c",
+   "luts": 76,
+   "carry4": 0,
+   "ff": 32,
+   "delayPs": 4362
+  },
+  "MUL8 T2 A6c": {
+   "module": "mul8_t2_a6c",
+   "luts": 81,
+   "carry4": 2,
+   "ff": 30,
+   "delayPs": 4999
+  },
+  "MUL8 T4 A4c": {
+   "module": "mul8_t4_a4c",
+   "luts": 77,
+   "carry4": 2,
+   "ff": 28,
+   "delayPs": 4999
+  },
+  "MUL8 T4 +C": {
+   "module": "mul8_t4_c",
+   "luts": 76,
+   "carry4": 3,
+   "ff": 28,
+   "delayPs": 4983
+  },
+  "MUL8 T6 +C": {
+   "module": "mul8_t6_c",
+   "luts": 77,
+   "carry4": 3,
+   "ff": 27,
+   "delayPs": 6967
+  },
+  "MUL8 BOOTH": {
+   "module": "mul8_booth",
+   "luts": 85,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 4693
+  },
+  "MUL8 BOOTH T4": {
+   "module": "mul8_booth_t4",
+   "luts": 71,
+   "carry4": 3,
+   "ff": 28,
+   "delayPs": 4942
+  },
+  "MUL8 BOOTH T4 +C": {
+   "module": "mul8_booth_t4_c",
+   "luts": 71,
+   "carry4": 3,
+   "ff": 28,
+   "delayPs": 4942
+  },
+  "MUL8 KUL": {
+   "module": "mul8_kul",
+   "luts": 80,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 4766
+  },
+  "MUL8 KUL8": {
+   "module": "mul8_kul8",
+   "luts": 94,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 4826
+  },
+  "MUL8 DRUM3": {
+   "module": "mul8_drum3",
+   "luts": 84,
+   "carry4": 0,
+   "ff": 32,
+   "delayPs": 5782
+  },
+  "MUL8 DRUM4": {
+   "module": "mul8_drum4",
+   "luts": 90,
+   "carry4": 2,
+   "ff": 32,
+   "delayPs": 7258
+  },
+  "MUL8 DRUM6": {
+   "module": "mul8_drum6",
+   "luts": 97,
+   "carry4": 3,
+   "ff": 32,
+   "delayPs": 7214
+  },
+  "MUL8 MITCHELL": {
+   "module": "mul8_mitchell",
+   "luts": 76,
+   "carry4": 2,
+   "ff": 32,
+   "delayPs": 6594
+  },
+  "MUL16 exato": {
+   "module": "mul16_exact",
+   "luts": 411,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6407
+  },
+  "MUL16 T8": {
+   "module": "mul16_t8",
+   "luts": 366,
+   "carry4": 6,
+   "ff": 56,
+   "delayPs": 6622
+  },
+  "MUL16 T12": {
+   "module": "mul16_t12",
+   "luts": 290,
+   "carry4": 5,
+   "ff": 52,
+   "delayPs": 6638
+  },
+  "MUL16 A12c": {
+   "module": "mul16_a12c",
+   "luts": 391,
+   "carry4": 5,
+   "ff": 64,
+   "delayPs": 6486
+  },
+  "MUL16 A16c": {
+   "module": "mul16_a16c",
+   "luts": 376,
+   "carry4": 4,
+   "ff": 64,
+   "delayPs": 6299
+  },
+  "MUL16 T8 A8c": {
+   "module": "mul16_t8_a8c",
+   "luts": 338,
+   "carry4": 4,
+   "ff": 56,
+   "delayPs": 6255
+  },
+  "MUL16 BOOTH": {
+   "module": "mul16_booth",
+   "luts": 387,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6082
+  },
+  "MUL16 BOOTH T12 +C": {
+   "module": "mul16_booth_t12_c",
+   "luts": 269,
+   "carry4": 10,
+   "ff": 52,
+   "delayPs": 7788
+  },
+  "MUL16 KUL": {
+   "module": "mul16_kul",
+   "luts": 358,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6373
+  },
+  "MUL16 DRUM6": {
+   "module": "mul16_drum6",
+   "luts": 323,
+   "carry4": 3,
+   "ff": 64,
+   "delayPs": 10939
+  },
+  "MUL16 DRUM8": {
+   "module": "mul16_drum8",
+   "luts": 441,
+   "carry4": 4,
+   "ff": 64,
+   "delayPs": 11240
+  },
+  "MUL16 MITCHELL": {
+   "module": "mul16_mitchell",
+   "luts": 260,
+   "carry4": 4,
+   "ff": 64,
+   "delayPs": 8589
+  },
+  "ADD8 exato": {
+   "module": "add8_exact",
+   "luts": 8,
+   "carry4": 3,
+   "ff": 25,
+   "delayPs": 2185
+  },
+  "ADD8 TRUNC2": {
+   "module": "add8_trunc2",
+   "luts": 6,
+   "carry4": 2,
+   "ff": 19,
+   "delayPs": 2124
+  },
+  "ADD8 TRUNC4": {
+   "module": "add8_trunc4",
+   "luts": 6,
+   "carry4": 0,
+   "ff": 13,
+   "delayPs": 2333
+  },
+  "ADD8 LOA2": {
+   "module": "add8_loa2",
+   "luts": 8,
+   "carry4": 2,
+   "ff": 25,
+   "delayPs": 2397
+  },
+  "ADD8 LOA4": {
+   "module": "add8_loa4",
+   "luts": 10,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 2340
+  },
+  "ADD8 LOA6": {
+   "module": "add8_loa6",
+   "luts": 9,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 1756
+  },
+  "ADD8 SEG L4 P0": {
+   "module": "add8_seg_l4_p0",
+   "luts": 11,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 2333
+  },
+  "ADD8 SEG L4 P2": {
+   "module": "add8_seg_l4_p2",
+   "luts": 12,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 2929
+  },
+  "ADD8 SEG L2 P2": {
+   "module": "add8_seg_l2_p2",
+   "luts": 12,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 2346
+  },
+  "ADD16 exato": {
+   "module": "add16_exact",
+   "luts": 16,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 2419
+  },
+  "ADD16 LOA4": {
+   "module": "add16_loa4",
+   "luts": 16,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 2575
+  },
+  "ADD16 LOA8": {
+   "module": "add16_loa8",
+   "luts": 16,
+   "carry4": 3,
+   "ff": 49,
+   "delayPs": 2458
+  },
+  "ADD16 SEG L4 P4": {
+   "module": "add16_seg_l4_p4",
+   "luts": 26,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 3499
+  },
+  "ADD16 SEG L8 P4": {
+   "module": "add16_seg_l8_p4",
+   "luts": 17,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 3233
+  },
+  "MUL8 A2c": {
+   "module": "mul8_a2c",
+   "luts": 87,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 5293
+  },
+  "MUL8 A14c": {
+   "module": "mul8_a14c",
+   "luts": 75,
+   "carry4": 0,
+   "ff": 32,
+   "delayPs": 3318
+  },
+  "MUL8 A16c": {
+   "module": "mul8_a16c",
+   "luts": 71,
+   "carry4": 0,
+   "ff": 31,
+   "delayPs": 3318
+  },
+  "MUL8 T2 A2c": {
+   "module": "mul8_t2_a2c",
+   "luts": 83,
+   "carry4": 3,
+   "ff": 30,
+   "delayPs": 4991
+  },
+  "MUL8 T2 A4c": {
+   "module": "mul8_t2_a4c",
+   "luts": 88,
+   "carry4": 3,
+   "ff": 30,
+   "delayPs": 5181
+  },
+  "MUL8 T2 A8c": {
+   "module": "mul8_t2_a8c",
+   "luts": 83,
+   "carry4": 0,
+   "ff": 30,
+   "delayPs": 5237
+  },
+  "MUL8 T2 A10c": {
+   "module": "mul8_t2_a10c",
+   "luts": 76,
+   "carry4": 0,
+   "ff": 30,
+   "delayPs": 4351
+  },
+  "MUL8 T2 A12c": {
+   "module": "mul8_t2_a12c",
+   "luts": 73,
+   "carry4": 0,
+   "ff": 30,
+   "delayPs": 3318
+  },
+  "MUL8 T2 A14c": {
+   "module": "mul8_t2_a14c",
+   "luts": 69,
+   "carry4": 0,
+   "ff": 29,
+   "delayPs": 3316
+  },
+  "MUL8 T2 +C": {
+   "module": "mul8_t2_c",
+   "luts": 84,
+   "carry4": 4,
+   "ff": 30,
+   "delayPs": 5293
+  },
+  "MUL8 T4 A2c": {
+   "module": "mul8_t4_a2c",
+   "luts": 81,
+   "carry4": 3,
+   "ff": 28,
+   "delayPs": 5173
+  },
+  "MUL8 T4 A6c": {
+   "module": "mul8_t4_a6c",
+   "luts": 80,
+   "carry4": 0,
+   "ff": 28,
+   "delayPs": 5233
+  },
+  "MUL8 T4 A8c": {
+   "module": "mul8_t4_a8c",
+   "luts": 71,
+   "carry4": 0,
+   "ff": 28,
+   "delayPs": 4362
+  },
+  "MUL8 T4 A10c": {
+   "module": "mul8_t4_a10c",
+   "luts": 70,
+   "carry4": 0,
+   "ff": 28,
+   "delayPs": 3398
+  },
+  "MUL8 T4 A12c": {
+   "module": "mul8_t4_a12c",
+   "luts": 67,
+   "carry4": 0,
+   "ff": 27,
+   "delayPs": 3313
+  },
+  "MUL8 T6 A2c": {
+   "module": "mul8_t6_a2c",
+   "luts": 62,
+   "carry4": 2,
+   "ff": 26,
+   "delayPs": 4999
+  },
+  "MUL8 T6 A4c": {
+   "module": "mul8_t6_a4c",
+   "luts": 66,
+   "carry4": 0,
+   "ff": 26,
+   "delayPs": 5229
+  },
+  "MUL8 T6 A6c": {
+   "module": "mul8_t6_a6c",
+   "luts": 59,
+   "carry4": 0,
+   "ff": 26,
+   "delayPs": 4328
+  },
+  "MUL8 T6 A8c": {
+   "module": "mul8_t6_a8c",
+   "luts": 51,
+   "carry4": 0,
+   "ff": 26,
+   "delayPs": 3494
+  },
+  "MUL8 T6 A10c": {
+   "module": "mul8_t6_a10c",
+   "luts": 49,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 3494
+  },
+  "MUL8 T8 A2c": {
+   "module": "mul8_t8_a2c",
+   "luts": 46,
+   "carry4": 0,
+   "ff": 22,
+   "delayPs": 4883
+  },
+  "MUL8 T8 A4c": {
+   "module": "mul8_t8_a4c",
+   "luts": 43,
+   "carry4": 0,
+   "ff": 22,
+   "delayPs": 4087
+  },
+  "MUL8 T8 A6c": {
+   "module": "mul8_t8_a6c",
+   "luts": 33,
+   "carry4": 0,
+   "ff": 22,
+   "delayPs": 3043
+  },
+  "MUL8 T8 A8c": {
+   "module": "mul8_t8_a8c",
+   "luts": 30,
+   "carry4": 0,
+   "ff": 21,
+   "delayPs": 3003
+  },
+  "MUL8 T8 +C": {
+   "module": "mul8_t8_c",
+   "luts": 50,
+   "carry4": 2,
+   "ff": 23,
+   "delayPs": 6983
+  },
+  "MUL8 T10": {
+   "module": "mul8_t10",
+   "luts": 26,
+   "carry4": 0,
+   "ff": 16,
+   "delayPs": 3859
+  },
+  "MUL8 T10 A2c": {
+   "module": "mul8_t10_a2c",
+   "luts": 23,
+   "carry4": 0,
+   "ff": 16,
+   "delayPs": 3992
+  },
+  "MUL8 T10 A4c": {
+   "module": "mul8_t10_a4c",
+   "luts": 17,
+   "carry4": 0,
+   "ff": 16,
+   "delayPs": 2673
+  },
+  "MUL8 T10 A6c": {
+   "module": "mul8_t10_a6c",
+   "luts": 15,
+   "carry4": 0,
+   "ff": 15,
+   "delayPs": 2673
+  },
+  "MUL8 T10 +C": {
+   "module": "mul8_t10_c",
+   "luts": 32,
+   "carry4": 0,
+   "ff": 16,
+   "delayPs": 4137
+  },
+  "MUL8 T12": {
+   "module": "mul8_t12",
+   "luts": 4,
+   "carry4": 0,
+   "ff": 10,
+   "delayPs": 1762
+  },
+  "MUL8 T12 A2c": {
+   "module": "mul8_t12_a2c",
+   "luts": 4,
+   "carry4": 0,
+   "ff": 10,
+   "delayPs": 1756
+  },
+  "MUL8 T12 A4c": {
+   "module": "mul8_t12_a4c",
+   "luts": 3,
+   "carry4": 0,
+   "ff": 9,
+   "delayPs": 1749
+  },
+  "MUL8 T12 +C": {
+   "module": "mul8_t12_c",
+   "luts": 4,
+   "carry4": 0,
+   "ff": 10,
+   "delayPs": 1762
+  },
+  "MUL8 T14": {
+   "module": "mul8_t14",
+   "luts": 1,
+   "carry4": 0,
+   "ff": 3,
+   "delayPs": 1243
+  },
+  "MUL8 T14 A2c": {
+   "module": "mul8_t14_a2c",
+   "luts": 1,
+   "carry4": 0,
+   "ff": 3,
+   "delayPs": 1243
+  },
+  "MUL8 T14 +C": {
+   "module": "mul8_t14_c",
+   "luts": 1,
+   "carry4": 0,
+   "ff": 3,
+   "delayPs": 1243
+  },
+  "MUL8 T16": {
+   "module": "mul8_t16",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 0,
+   "delayPs": null
+  },
+  "MUL8 T16 +C": {
+   "module": "mul8_t16_c",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 0,
+   "delayPs": null
+  },
+  "MUL8 BOOTH T1": {
+   "module": "mul8_booth_t1",
+   "luts": 85,
+   "carry4": 4,
+   "ff": 31,
+   "delayPs": 4836
+  },
+  "MUL8 BOOTH T2": {
+   "module": "mul8_booth_t2",
+   "luts": 82,
+   "carry4": 4,
+   "ff": 30,
+   "delayPs": 4730
+  },
+  "MUL8 BOOTH T3": {
+   "module": "mul8_booth_t3",
+   "luts": 78,
+   "carry4": 4,
+   "ff": 29,
+   "delayPs": 4615
+  },
+  "MUL8 BOOTH T5": {
+   "module": "mul8_booth_t5",
+   "luts": 62,
+   "carry4": 3,
+   "ff": 27,
+   "delayPs": 4809
+  },
+  "MUL8 BOOTH T6": {
+   "module": "mul8_booth_t6",
+   "luts": 59,
+   "carry4": 3,
+   "ff": 26,
+   "delayPs": 4675
+  },
+  "MUL8 BOOTH T7": {
+   "module": "mul8_booth_t7",
+   "luts": 48,
+   "carry4": 3,
+   "ff": 25,
+   "delayPs": 4252
+  },
+  "MUL8 BOOTH T8": {
+   "module": "mul8_booth_t8",
+   "luts": 41,
+   "carry4": 2,
+   "ff": 23,
+   "delayPs": 4424
+  },
+  "MUL8 BOOTH T9": {
+   "module": "mul8_booth_t9",
+   "luts": 27,
+   "carry4": 2,
+   "ff": 21,
+   "delayPs": 4029
+  },
+  "MUL8 BOOTH T10": {
+   "module": "mul8_booth_t10",
+   "luts": 21,
+   "carry4": 2,
+   "ff": 19,
+   "delayPs": 4023
+  },
+  "MUL8 BOOTH T11": {
+   "module": "mul8_booth_t11",
+   "luts": 21,
+   "carry4": 0,
+   "ff": 17,
+   "delayPs": 3580
+  },
+  "MUL8 BOOTH T12": {
+   "module": "mul8_booth_t12",
+   "luts": 10,
+   "carry4": 0,
+   "ff": 15,
+   "delayPs": 2719
+  },
+  "MUL8 BOOTH T13": {
+   "module": "mul8_booth_t13",
+   "luts": 8,
+   "carry4": 0,
+   "ff": 13,
+   "delayPs": 2712
+  },
+  "MUL8 BOOTH T14": {
+   "module": "mul8_booth_t14",
+   "luts": 6,
+   "carry4": 0,
+   "ff": 11,
+   "delayPs": 2403
+  },
+  "MUL8 BOOTH T15": {
+   "module": "mul8_booth_t15",
+   "luts": 2,
+   "carry4": 0,
+   "ff": 10,
+   "delayPs": 2322
+  },
+  "MUL8 BOOTH T16": {
+   "module": "mul8_booth_t16",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 0,
+   "delayPs": null
+  },
+  "MUL8 KUL0": {
+   "module": "mul8_kul0",
+   "luts": 134,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 5530
+  },
+  "MUL8 KUL2": {
+   "module": "mul8_kul2",
+   "luts": 139,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 5582
+  },
+  "MUL8 KUL4": {
+   "module": "mul8_kul4",
+   "luts": 126,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 5531
+  },
+  "MUL8 KUL6": {
+   "module": "mul8_kul6",
+   "luts": 112,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 5448
+  },
+  "MUL8 KUL10": {
+   "module": "mul8_kul10",
+   "luts": 83,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 4758
+  },
+  "MUL8 KUL12": {
+   "module": "mul8_kul12",
+   "luts": 80,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 4766
+  },
+  "MUL8 KUL14": {
+   "module": "mul8_kul14",
+   "luts": 80,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 4766
+  },
+  "MUL8 DRUM2": {
+   "module": "mul8_drum2",
+   "luts": 67,
+   "carry4": 0,
+   "ff": 32,
+   "delayPs": 4980
+  },
+  "MUL8 DRUM5": {
+   "module": "mul8_drum5",
+   "luts": 103,
+   "carry4": 3,
+   "ff": 32,
+   "delayPs": 7833
+  },
+  "MUL8 DRUM7": {
+   "module": "mul8_drum7",
+   "luts": 110,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 6516
+  },
+  "MUL8 BOOTH T1 +C": {
+   "module": "mul8_booth_t1_c",
+   "luts": 85,
+   "carry4": 4,
+   "ff": 31,
+   "delayPs": 4836
+  },
+  "MUL8 BOOTH T2 +C": {
+   "module": "mul8_booth_t2_c",
+   "luts": 82,
+   "carry4": 4,
+   "ff": 30,
+   "delayPs": 4730
+  },
+  "MUL8 BOOTH T3 +C": {
+   "module": "mul8_booth_t3_c",
+   "luts": 78,
+   "carry4": 4,
+   "ff": 29,
+   "delayPs": 4615
+  },
+  "MUL8 BOOTH T5 +C": {
+   "module": "mul8_booth_t5_c",
+   "luts": 78,
+   "carry4": 3,
+   "ff": 27,
+   "delayPs": 6234
+  },
+  "MUL8 BOOTH T6 +C": {
+   "module": "mul8_booth_t6_c",
+   "luts": 71,
+   "carry4": 3,
+   "ff": 26,
+   "delayPs": 6513
+  },
+  "MUL8 BOOTH T7 +C": {
+   "module": "mul8_booth_t7_c",
+   "luts": 65,
+   "carry4": 3,
+   "ff": 25,
+   "delayPs": 6299
+  },
+  "MUL8 BOOTH T8 +C": {
+   "module": "mul8_booth_t8_c",
+   "luts": 55,
+   "carry4": 2,
+   "ff": 23,
+   "delayPs": 6024
+  },
+  "MUL8 BOOTH T9 +C": {
+   "module": "mul8_booth_t9_c",
+   "luts": 44,
+   "carry4": 2,
+   "ff": 21,
+   "delayPs": 5600
+  },
+  "MUL8 BOOTH T10 +C": {
+   "module": "mul8_booth_t10_c",
+   "luts": 31,
+   "carry4": 2,
+   "ff": 19,
+   "delayPs": 5233
+  },
+  "MUL8 BOOTH T11 +C": {
+   "module": "mul8_booth_t11_c",
+   "luts": 24,
+   "carry4": 0,
+   "ff": 17,
+   "delayPs": 4244
+  },
+  "MUL8 BOOTH T12 +C": {
+   "module": "mul8_booth_t12_c",
+   "luts": 10,
+   "carry4": 0,
+   "ff": 15,
+   "delayPs": 2716
+  },
+  "MUL8 BOOTH T13 +C": {
+   "module": "mul8_booth_t13_c",
+   "luts": 8,
+   "carry4": 0,
+   "ff": 13,
+   "delayPs": 2712
+  },
+  "MUL8 BOOTH T14 +C": {
+   "module": "mul8_booth_t14_c",
+   "luts": 6,
+   "carry4": 0,
+   "ff": 11,
+   "delayPs": 2403
+  },
+  "MUL8 BOOTH T15 +C": {
+   "module": "mul8_booth_t15_c",
+   "luts": 2,
+   "carry4": 0,
+   "ff": 10,
+   "delayPs": 2322
+  },
+  "MUL8 BOOTH T16 +C": {
+   "module": "mul8_booth_t16_c",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 0,
+   "delayPs": null
+  },
+  "MUL8 KUL0 +C": {
+   "module": "mul8_kul0_c",
+   "luts": 134,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 5530
+  },
+  "MUL8 KUL2 +C": {
+   "module": "mul8_kul2_c",
+   "luts": 139,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 5582
+  },
+  "MUL8 KUL4 +C": {
+   "module": "mul8_kul4_c",
+   "luts": 127,
+   "carry4": 8,
+   "ff": 32,
+   "delayPs": 8079
+  },
+  "MUL8 KUL6 +C": {
+   "module": "mul8_kul6_c",
+   "luts": 115,
+   "carry4": 8,
+   "ff": 32,
+   "delayPs": 7996
+  },
+  "MUL8 KUL8 +C": {
+   "module": "mul8_kul8_c",
+   "luts": 100,
+   "carry4": 8,
+   "ff": 32,
+   "delayPs": 7195
+  },
+  "MUL8 KUL10 +C": {
+   "module": "mul8_kul10_c",
+   "luts": 87,
+   "carry4": 8,
+   "ff": 32,
+   "delayPs": 7307
+  },
+  "MUL8 KUL12 +C": {
+   "module": "mul8_kul12_c",
+   "luts": 85,
+   "carry4": 8,
+   "ff": 32,
+   "delayPs": 7315
+  },
+  "MUL8 KUL14 +C": {
+   "module": "mul8_kul14_c",
+   "luts": 86,
+   "carry4": 8,
+   "ff": 32,
+   "delayPs": 7315
+  },
+  "MUL8 KUL +C": {
+   "module": "mul8_kul_c",
+   "luts": 86,
+   "carry4": 8,
+   "ff": 32,
+   "delayPs": 7315
+  },
+  "MUL8 DRUM2 +C": {
+   "module": "mul8_drum2_c",
+   "luts": 67,
+   "carry4": 0,
+   "ff": 32,
+   "delayPs": 4980
+  },
+  "MUL8 DRUM3 +C": {
+   "module": "mul8_drum3_c",
+   "luts": 84,
+   "carry4": 0,
+   "ff": 32,
+   "delayPs": 5782
+  },
+  "MUL8 DRUM4 +C": {
+   "module": "mul8_drum4_c",
+   "luts": 90,
+   "carry4": 2,
+   "ff": 32,
+   "delayPs": 7258
+  },
+  "MUL8 DRUM5 +C": {
+   "module": "mul8_drum5_c",
+   "luts": 103,
+   "carry4": 3,
+   "ff": 32,
+   "delayPs": 7833
+  },
+  "MUL8 DRUM6 +C": {
+   "module": "mul8_drum6_c",
+   "luts": 97,
+   "carry4": 3,
+   "ff": 32,
+   "delayPs": 7214
+  },
+  "MUL8 DRUM7 +C": {
+   "module": "mul8_drum7_c",
+   "luts": 110,
+   "carry4": 4,
+   "ff": 32,
+   "delayPs": 6516
+  },
+  "MUL8 MITCHELL +C": {
+   "module": "mul8_mitchell_c",
+   "luts": 85,
+   "carry4": 7,
+   "ff": 32,
+   "delayPs": 9409
+  },
+  "ADD8 TRUNC1": {
+   "module": "add8_trunc1",
+   "luts": 7,
+   "carry4": 2,
+   "ff": 22,
+   "delayPs": 1904
+  },
+  "ADD8 TRUNC3": {
+   "module": "add8_trunc3",
+   "luts": 7,
+   "carry4": 0,
+   "ff": 16,
+   "delayPs": 2340
+  },
+  "ADD8 TRUNC5": {
+   "module": "add8_trunc5",
+   "luts": 4,
+   "carry4": 0,
+   "ff": 10,
+   "delayPs": 1762
+  },
+  "ADD8 TRUNC6": {
+   "module": "add8_trunc6",
+   "luts": 3,
+   "carry4": 0,
+   "ff": 7,
+   "delayPs": 1571
+  },
+  "ADD8 TRUNC7": {
+   "module": "add8_trunc7",
+   "luts": 2,
+   "carry4": 0,
+   "ff": 4,
+   "delayPs": 1280
+  },
+  "ADD8 TRUNC8": {
+   "module": "add8_trunc8",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 0,
+   "delayPs": null
+  },
+  "ADD8 LOA1": {
+   "module": "add8_loa1",
+   "luts": 8,
+   "carry4": 2,
+   "ff": 25,
+   "delayPs": 2177
+  },
+  "ADD8 LOA3": {
+   "module": "add8_loa3",
+   "luts": 11,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 2916
+  },
+  "ADD8 LOA5": {
+   "module": "add8_loa5",
+   "luts": 10,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 2333
+  },
+  "ADD8 LOA7": {
+   "module": "add8_loa7",
+   "luts": 9,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 1578
+  },
+  "ADD8 LOA8": {
+   "module": "add8_loa8",
+   "luts": 9,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 1280
+  },
+  "ADD8 SEG L2 P0": {
+   "module": "add8_seg_l2_p0",
+   "luts": 9,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 1571
+  },
+  "ADD8 SEG L2 P4": {
+   "module": "add8_seg_l2_p4",
+   "luts": 13,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 2916
+  },
+  "ADD8 SEG L2 P6": {
+   "module": "add8_seg_l2_p6",
+   "luts": 17,
+   "carry4": 2,
+   "ff": 25,
+   "delayPs": 2934
+  },
+  "ADD8 SEG L2 P8": {
+   "module": "add8_seg_l2_p8",
+   "luts": 17,
+   "carry4": 2,
+   "ff": 25,
+   "delayPs": 2934
+  },
+  "ADD8 SEG L4 P4": {
+   "module": "add8_seg_l4_p4",
+   "luts": 12,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 3499
+  },
+  "ADD8 SEG L4 P6": {
+   "module": "add8_seg_l4_p6",
+   "luts": 12,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 3499
+  },
+  "ADD8 SEG L4 P8": {
+   "module": "add8_seg_l4_p8",
+   "luts": 12,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 3499
+  },
+  "ADD8 SEG L6 P0": {
+   "module": "add8_seg_l6_p0",
+   "luts": 9,
+   "carry4": 2,
+   "ff": 25,
+   "delayPs": 2124
+  },
+  "ADD8 SEG L6 P2": {
+   "module": "add8_seg_l6_p2",
+   "luts": 10,
+   "carry4": 2,
+   "ff": 25,
+   "delayPs": 2340
+  },
+  "ADD8 SEG L6 P4": {
+   "module": "add8_seg_l6_p4",
+   "luts": 11,
+   "carry4": 2,
+   "ff": 25,
+   "delayPs": 2909
+  },
+  "ADD8 SEG L6 P6": {
+   "module": "add8_seg_l6_p6",
+   "luts": 15,
+   "carry4": 4,
+   "ff": 25,
+   "delayPs": 2641
+  },
+  "ADD8 SEG L6 P8": {
+   "module": "add8_seg_l6_p8",
+   "luts": 15,
+   "carry4": 4,
+   "ff": 25,
+   "delayPs": 2641
+  },
+  "MUL16 A2c": {
+   "module": "mul16_a2c",
+   "luts": 410,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6505
+  },
+  "MUL16 A4c": {
+   "module": "mul16_a4c",
+   "luts": 421,
+   "carry4": 7,
+   "ff": 64,
+   "delayPs": 6640
+  },
+  "MUL16 A6c": {
+   "module": "mul16_a6c",
+   "luts": 403,
+   "carry4": 7,
+   "ff": 64,
+   "delayPs": 6505
+  },
+  "MUL16 A8c": {
+   "module": "mul16_a8c",
+   "luts": 415,
+   "carry4": 6,
+   "ff": 64,
+   "delayPs": 6632
+  },
+  "MUL16 A10c": {
+   "module": "mul16_a10c",
+   "luts": 408,
+   "carry4": 6,
+   "ff": 64,
+   "delayPs": 6869
+  },
+  "MUL16 A14c": {
+   "module": "mul16_a14c",
+   "luts": 378,
+   "carry4": 5,
+   "ff": 64,
+   "delayPs": 6518
+  },
+  "MUL16 A18c": {
+   "module": "mul16_a18c",
+   "luts": 386,
+   "carry4": 4,
+   "ff": 64,
+   "delayPs": 6305
+  },
+  "MUL16 A20c": {
+   "module": "mul16_a20c",
+   "luts": 383,
+   "carry4": 3,
+   "ff": 64,
+   "delayPs": 6203
+  },
+  "MUL16 A22c": {
+   "module": "mul16_a22c",
+   "luts": 399,
+   "carry4": 3,
+   "ff": 64,
+   "delayPs": 6024
+  },
+  "MUL16 A24c": {
+   "module": "mul16_a24c",
+   "luts": 371,
+   "carry4": 2,
+   "ff": 64,
+   "delayPs": 5077
+  },
+  "MUL16 A26c": {
+   "module": "mul16_a26c",
+   "luts": 354,
+   "carry4": 0,
+   "ff": 64,
+   "delayPs": 5491
+  },
+  "MUL16 A28c": {
+   "module": "mul16_a28c",
+   "luts": 371,
+   "carry4": 0,
+   "ff": 64,
+   "delayPs": 4888
+  },
+  "MUL16 A30c": {
+   "module": "mul16_a30c",
+   "luts": 355,
+   "carry4": 0,
+   "ff": 64,
+   "delayPs": 4684
+  },
+  "MUL16 A32c": {
+   "module": "mul16_a32c",
+   "luts": 351,
+   "carry4": 0,
+   "ff": 63,
+   "delayPs": 4684
+  },
+  "MUL16 T2": {
+   "module": "mul16_t2",
+   "luts": 407,
+   "carry4": 8,
+   "ff": 62,
+   "delayPs": 6505
+  },
+  "MUL16 T2 A2c": {
+   "module": "mul16_t2_a2c",
+   "luts": 419,
+   "carry4": 7,
+   "ff": 62,
+   "delayPs": 6639
+  },
+  "MUL16 T2 A4c": {
+   "module": "mul16_t2_a4c",
+   "luts": 401,
+   "carry4": 7,
+   "ff": 62,
+   "delayPs": 6504
+  },
+  "MUL16 T2 A6c": {
+   "module": "mul16_t2_a6c",
+   "luts": 413,
+   "carry4": 6,
+   "ff": 62,
+   "delayPs": 6631
+  },
+  "MUL16 T2 A8c": {
+   "module": "mul16_t2_a8c",
+   "luts": 406,
+   "carry4": 6,
+   "ff": 62,
+   "delayPs": 6868
+  },
+  "MUL16 T2 A10c": {
+   "module": "mul16_t2_a10c",
+   "luts": 389,
+   "carry4": 5,
+   "ff": 62,
+   "delayPs": 6486
+  },
+  "MUL16 T2 A12c": {
+   "module": "mul16_t2_a12c",
+   "luts": 376,
+   "carry4": 5,
+   "ff": 62,
+   "delayPs": 6518
+  },
+  "MUL16 T2 A14c": {
+   "module": "mul16_t2_a14c",
+   "luts": 374,
+   "carry4": 4,
+   "ff": 62,
+   "delayPs": 6299
+  },
+  "MUL16 T2 A16c": {
+   "module": "mul16_t2_a16c",
+   "luts": 384,
+   "carry4": 4,
+   "ff": 62,
+   "delayPs": 6305
+  },
+  "MUL16 T2 A18c": {
+   "module": "mul16_t2_a18c",
+   "luts": 381,
+   "carry4": 3,
+   "ff": 62,
+   "delayPs": 6203
+  },
+  "MUL16 T2 A20c": {
+   "module": "mul16_t2_a20c",
+   "luts": 397,
+   "carry4": 3,
+   "ff": 62,
+   "delayPs": 6024
+  },
+  "MUL16 T2 A22c": {
+   "module": "mul16_t2_a22c",
+   "luts": 369,
+   "carry4": 2,
+   "ff": 62,
+   "delayPs": 5077
+  },
+  "MUL16 T2 A24c": {
+   "module": "mul16_t2_a24c",
+   "luts": 352,
+   "carry4": 0,
+   "ff": 62,
+   "delayPs": 5491
+  },
+  "MUL16 T2 A26c": {
+   "module": "mul16_t2_a26c",
+   "luts": 369,
+   "carry4": 0,
+   "ff": 62,
+   "delayPs": 4888
+  },
+  "MUL16 T2 A28c": {
+   "module": "mul16_t2_a28c",
+   "luts": 355,
+   "carry4": 0,
+   "ff": 62,
+   "delayPs": 4679
+  },
+  "MUL16 T2 A30c": {
+   "module": "mul16_t2_a30c",
+   "luts": 351,
+   "carry4": 0,
+   "ff": 61,
+   "delayPs": 4678
+  },
+  "MUL16 T2 +C": {
+   "module": "mul16_t2_c",
+   "luts": 407,
+   "carry4": 8,
+   "ff": 62,
+   "delayPs": 6505
+  },
+  "MUL16 T4": {
+   "module": "mul16_t4",
+   "luts": 402,
+   "carry4": 7,
+   "ff": 60,
+   "delayPs": 6404
+  },
+  "MUL16 T4 A2c": {
+   "module": "mul16_t4_a2c",
+   "luts": 397,
+   "carry4": 7,
+   "ff": 60,
+   "delayPs": 6502
+  },
+  "MUL16 T4 A4c": {
+   "module": "mul16_t4_a4c",
+   "luts": 410,
+   "carry4": 6,
+   "ff": 60,
+   "delayPs": 6631
+  },
+  "MUL16 T4 A6c": {
+   "module": "mul16_t4_a6c",
+   "luts": 402,
+   "carry4": 6,
+   "ff": 60,
+   "delayPs": 6866
+  },
+  "MUL16 T4 A8c": {
+   "module": "mul16_t4_a8c",
+   "luts": 386,
+   "carry4": 5,
+   "ff": 60,
+   "delayPs": 6485
+  },
+  "MUL16 T4 A10c": {
+   "module": "mul16_t4_a10c",
+   "luts": 372,
+   "carry4": 5,
+   "ff": 60,
+   "delayPs": 6518
+  },
+  "MUL16 T4 A12c": {
+   "module": "mul16_t4_a12c",
+   "luts": 370,
+   "carry4": 4,
+   "ff": 60,
+   "delayPs": 6298
+  },
+  "MUL16 T4 A14c": {
+   "module": "mul16_t4_a14c",
+   "luts": 380,
+   "carry4": 4,
+   "ff": 60,
+   "delayPs": 6305
+  },
+  "MUL16 T4 A16c": {
+   "module": "mul16_t4_a16c",
+   "luts": 377,
+   "carry4": 3,
+   "ff": 60,
+   "delayPs": 6201
+  },
+  "MUL16 T4 A18c": {
+   "module": "mul16_t4_a18c",
+   "luts": 393,
+   "carry4": 3,
+   "ff": 60,
+   "delayPs": 6022
+  },
+  "MUL16 T4 A20c": {
+   "module": "mul16_t4_a20c",
+   "luts": 365,
+   "carry4": 2,
+   "ff": 60,
+   "delayPs": 5077
+  },
+  "MUL16 T4 A22c": {
+   "module": "mul16_t4_a22c",
+   "luts": 350,
+   "carry4": 0,
+   "ff": 60,
+   "delayPs": 5491
+  },
+  "MUL16 T4 A24c": {
+   "module": "mul16_t4_a24c",
+   "luts": 365,
+   "carry4": 0,
+   "ff": 60,
+   "delayPs": 4888
+  },
+  "MUL16 T4 A26c": {
+   "module": "mul16_t4_a26c",
+   "luts": 353,
+   "carry4": 0,
+   "ff": 60,
+   "delayPs": 4682
+  },
+  "MUL16 T4 A28c": {
+   "module": "mul16_t4_a28c",
+   "luts": 349,
+   "carry4": 0,
+   "ff": 59,
+   "delayPs": 4682
+  },
+  "MUL16 T4 +C": {
+   "module": "mul16_t4_c",
+   "luts": 402,
+   "carry4": 7,
+   "ff": 60,
+   "delayPs": 6404
+  },
+  "MUL16 T6": {
+   "module": "mul16_t6",
+   "luts": 387,
+   "carry4": 7,
+   "ff": 58,
+   "delayPs": 6527
+  },
+  "MUL16 T6 A2c": {
+   "module": "mul16_t6_a2c",
+   "luts": 381,
+   "carry4": 6,
+   "ff": 58,
+   "delayPs": 6478
+  },
+  "MUL16 T6 A4c": {
+   "module": "mul16_t6_a4c",
+   "luts": 379,
+   "carry4": 6,
+   "ff": 58,
+   "delayPs": 6527
+  },
+  "MUL16 T6 A6c": {
+   "module": "mul16_t6_a6c",
+   "luts": 371,
+   "carry4": 5,
+   "ff": 58,
+   "delayPs": 6475
+  },
+  "MUL16 T6 A8c": {
+   "module": "mul16_t6_a8c",
+   "luts": 359,
+   "carry4": 5,
+   "ff": 58,
+   "delayPs": 6518
+  },
+  "MUL16 T6 A10c": {
+   "module": "mul16_t6_a10c",
+   "luts": 357,
+   "carry4": 4,
+   "ff": 58,
+   "delayPs": 6295
+  },
+  "MUL16 T6 A12c": {
+   "module": "mul16_t6_a12c",
+   "luts": 367,
+   "carry4": 4,
+   "ff": 58,
+   "delayPs": 6305
+  },
+  "MUL16 T6 A14c": {
+   "module": "mul16_t6_a14c",
+   "luts": 364,
+   "carry4": 3,
+   "ff": 58,
+   "delayPs": 6198
+  },
+  "MUL16 T6 A16c": {
+   "module": "mul16_t6_a16c",
+   "luts": 380,
+   "carry4": 3,
+   "ff": 58,
+   "delayPs": 6019
+  },
+  "MUL16 T6 A18c": {
+   "module": "mul16_t6_a18c",
+   "luts": 352,
+   "carry4": 2,
+   "ff": 58,
+   "delayPs": 5077
+  },
+  "MUL16 T6 A20c": {
+   "module": "mul16_t6_a20c",
+   "luts": 335,
+   "carry4": 0,
+   "ff": 58,
+   "delayPs": 5490
+  },
+  "MUL16 T6 A22c": {
+   "module": "mul16_t6_a22c",
+   "luts": 352,
+   "carry4": 0,
+   "ff": 58,
+   "delayPs": 4888
+  },
+  "MUL16 T6 A24c": {
+   "module": "mul16_t6_a24c",
+   "luts": 338,
+   "carry4": 0,
+   "ff": 58,
+   "delayPs": 4679
+  },
+  "MUL16 T6 A26c": {
+   "module": "mul16_t6_a26c",
+   "luts": 334,
+   "carry4": 0,
+   "ff": 57,
+   "delayPs": 4679
+  },
+  "MUL16 T6 +C": {
+   "module": "mul16_t6_c",
+   "luts": 388,
+   "carry4": 14,
+   "ff": 59,
+   "delayPs": 9217
+  },
+  "MUL16 T8 A2c": {
+   "module": "mul16_t8_a2c",
+   "luts": 359,
+   "carry4": 6,
+   "ff": 56,
+   "delayPs": 6493
+  },
+  "MUL16 T8 A4c": {
+   "module": "mul16_t8_a4c",
+   "luts": 363,
+   "carry4": 5,
+   "ff": 56,
+   "delayPs": 6189
+  },
+  "MUL16 T8 A6c": {
+   "module": "mul16_t8_a6c",
+   "luts": 340,
+   "carry4": 5,
+   "ff": 56,
+   "delayPs": 6525
+  },
+  "MUL16 T8 A10c": {
+   "module": "mul16_t8_a10c",
+   "luts": 356,
+   "carry4": 4,
+   "ff": 56,
+   "delayPs": 6383
+  },
+  "MUL16 T8 A12c": {
+   "module": "mul16_t8_a12c",
+   "luts": 339,
+   "carry4": 3,
+   "ff": 56,
+   "delayPs": 5644
+  },
+  "MUL16 T8 A14c": {
+   "module": "mul16_t8_a14c",
+   "luts": 360,
+   "carry4": 3,
+   "ff": 56,
+   "delayPs": 6013
+  },
+  "MUL16 T8 A16c": {
+   "module": "mul16_t8_a16c",
+   "luts": 330,
+   "carry4": 2,
+   "ff": 56,
+   "delayPs": 5074
+  },
+  "MUL16 T8 A18c": {
+   "module": "mul16_t8_a18c",
+   "luts": 316,
+   "carry4": 0,
+   "ff": 56,
+   "delayPs": 5490
+  },
+  "MUL16 T8 A20c": {
+   "module": "mul16_t8_a20c",
+   "luts": 332,
+   "carry4": 0,
+   "ff": 56,
+   "delayPs": 4888
+  },
+  "MUL16 T8 A22c": {
+   "module": "mul16_t8_a22c",
+   "luts": 317,
+   "carry4": 0,
+   "ff": 56,
+   "delayPs": 4679
+  },
+  "MUL16 T8 A24c": {
+   "module": "mul16_t8_a24c",
+   "luts": 311,
+   "carry4": 0,
+   "ff": 55,
+   "delayPs": 4678
+  },
+  "MUL16 T8 +C": {
+   "module": "mul16_t8_c",
+   "luts": 367,
+   "carry4": 13,
+   "ff": 57,
+   "delayPs": 9349
+  },
+  "MUL16 T10": {
+   "module": "mul16_t10",
+   "luts": 332,
+   "carry4": 6,
+   "ff": 54,
+   "delayPs": 6874
+  },
+  "MUL16 T10 A2c": {
+   "module": "mul16_t10_a2c",
+   "luts": 332,
+   "carry4": 5,
+   "ff": 54,
+   "delayPs": 6620
+  },
+  "MUL16 T10 A4c": {
+   "module": "mul16_t10_a4c",
+   "luts": 325,
+   "carry4": 5,
+   "ff": 54,
+   "delayPs": 6557
+  },
+  "MUL16 T10 A6c": {
+   "module": "mul16_t10_a6c",
+   "luts": 319,
+   "carry4": 4,
+   "ff": 54,
+   "delayPs": 6288
+  },
+  "MUL16 T10 A8c": {
+   "module": "mul16_t10_a8c",
+   "luts": 318,
+   "carry4": 4,
+   "ff": 54,
+   "delayPs": 6306
+  },
+  "MUL16 T10 A10c": {
+   "module": "mul16_t10_a10c",
+   "luts": 315,
+   "carry4": 3,
+   "ff": 54,
+   "delayPs": 6188
+  },
+  "MUL16 T10 A12c": {
+   "module": "mul16_t10_a12c",
+   "luts": 331,
+   "carry4": 3,
+   "ff": 54,
+   "delayPs": 6009
+  },
+  "MUL16 T10 A14c": {
+   "module": "mul16_t10_a14c",
+   "luts": 303,
+   "carry4": 2,
+   "ff": 54,
+   "delayPs": 5077
+  },
+  "MUL16 T10 A16c": {
+   "module": "mul16_t10_a16c",
+   "luts": 288,
+   "carry4": 0,
+   "ff": 54,
+   "delayPs": 5490
+  },
+  "MUL16 T10 A18c": {
+   "module": "mul16_t10_a18c",
+   "luts": 303,
+   "carry4": 0,
+   "ff": 54,
+   "delayPs": 4888
+  },
+  "MUL16 T10 A20c": {
+   "module": "mul16_t10_a20c",
+   "luts": 292,
+   "carry4": 0,
+   "ff": 54,
+   "delayPs": 4679
+  },
+  "MUL16 T10 A22c": {
+   "module": "mul16_t10_a22c",
+   "luts": 286,
+   "carry4": 0,
+   "ff": 53,
+   "delayPs": 4678
+  },
+  "MUL16 T10 +C": {
+   "module": "mul16_t10_c",
+   "luts": 333,
+   "carry4": 12,
+   "ff": 55,
+   "delayPs": 9422
+  },
+  "MUL16 T12 A2c": {
+   "module": "mul16_t12_a2c",
+   "luts": 285,
+   "carry4": 5,
+   "ff": 52,
+   "delayPs": 6516
+  },
+  "MUL16 T12 A4c": {
+   "module": "mul16_t12_a4c",
+   "luts": 279,
+   "carry4": 4,
+   "ff": 52,
+   "delayPs": 6280
+  },
+  "MUL16 T12 A6c": {
+   "module": "mul16_t12_a6c",
+   "luts": 287,
+   "carry4": 4,
+   "ff": 52,
+   "delayPs": 6305
+  },
+  "MUL16 T12 A8c": {
+   "module": "mul16_t12_a8c",
+   "luts": 284,
+   "carry4": 3,
+   "ff": 52,
+   "delayPs": 6184
+  },
+  "MUL16 T12 A10c": {
+   "module": "mul16_t12_a10c",
+   "luts": 300,
+   "carry4": 3,
+   "ff": 52,
+   "delayPs": 6005
+  },
+  "MUL16 T12 A12c": {
+   "module": "mul16_t12_a12c",
+   "luts": 272,
+   "carry4": 2,
+   "ff": 52,
+   "delayPs": 5077
+  },
+  "MUL16 T12 A14c": {
+   "module": "mul16_t12_a14c",
+   "luts": 255,
+   "carry4": 0,
+   "ff": 52,
+   "delayPs": 5490
+  },
+  "MUL16 T12 A16c": {
+   "module": "mul16_t12_a16c",
+   "luts": 272,
+   "carry4": 0,
+   "ff": 52,
+   "delayPs": 4887
+  },
+  "MUL16 T12 A18c": {
+   "module": "mul16_t12_a18c",
+   "luts": 263,
+   "carry4": 0,
+   "ff": 52,
+   "delayPs": 4884
+  },
+  "MUL16 T12 A20c": {
+   "module": "mul16_t12_a20c",
+   "luts": 257,
+   "carry4": 0,
+   "ff": 51,
+   "delayPs": 4666
+  },
+  "MUL16 T12 +C": {
+   "module": "mul16_t12_c",
+   "luts": 291,
+   "carry4": 11,
+   "ff": 53,
+   "delayPs": 9427
+  },
+  "MUL16 T14": {
+   "module": "mul16_t14",
+   "luts": 230,
+   "carry4": 5,
+   "ff": 50,
+   "delayPs": 6519
+  },
+  "MUL16 T14 A2c": {
+   "module": "mul16_t14_a2c",
+   "luts": 240,
+   "carry4": 4,
+   "ff": 50,
+   "delayPs": 5964
+  },
+  "MUL16 T14 A4c": {
+   "module": "mul16_t14_a4c",
+   "luts": 244,
+   "carry4": 4,
+   "ff": 50,
+   "delayPs": 6376
+  },
+  "MUL16 T14 A6c": {
+   "module": "mul16_t14_a6c",
+   "luts": 238,
+   "carry4": 3,
+   "ff": 50,
+   "delayPs": 6176
+  },
+  "MUL16 T14 A8c": {
+   "module": "mul16_t14_a8c",
+   "luts": 254,
+   "carry4": 3,
+   "ff": 50,
+   "delayPs": 5997
+  },
+  "MUL16 T14 A10c": {
+   "module": "mul16_t14_a10c",
+   "luts": 226,
+   "carry4": 2,
+   "ff": 50,
+   "delayPs": 5072
+  },
+  "MUL16 T14 A12c": {
+   "module": "mul16_t14_a12c",
+   "luts": 219,
+   "carry4": 0,
+   "ff": 50,
+   "delayPs": 5487
+  },
+  "MUL16 T14 A14c": {
+   "module": "mul16_t14_a14c",
+   "luts": 226,
+   "carry4": 0,
+   "ff": 50,
+   "delayPs": 4873
+  },
+  "MUL16 T14 A16c": {
+   "module": "mul16_t14_a16c",
+   "luts": 217,
+   "carry4": 0,
+   "ff": 50,
+   "delayPs": 4873
+  },
+  "MUL16 T14 A18c": {
+   "module": "mul16_t14_a18c",
+   "luts": 210,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 4677
+  },
+  "MUL16 T14 +C": {
+   "module": "mul16_t14_c",
+   "luts": 232,
+   "carry4": 10,
+   "ff": 51,
+   "delayPs": 9150
+  },
+  "MUL16 T16": {
+   "module": "mul16_t16",
+   "luts": 197,
+   "carry4": 4,
+   "ff": 46,
+   "delayPs": 6010
+  },
+  "MUL16 T16 A2c": {
+   "module": "mul16_t16_a2c",
+   "luts": 198,
+   "carry4": 4,
+   "ff": 46,
+   "delayPs": 6550
+  },
+  "MUL16 T16 A4c": {
+   "module": "mul16_t16_a4c",
+   "luts": 186,
+   "carry4": 3,
+   "ff": 46,
+   "delayPs": 5603
+  },
+  "MUL16 T16 A6c": {
+   "module": "mul16_t16_a6c",
+   "luts": 197,
+   "carry4": 3,
+   "ff": 46,
+   "delayPs": 5918
+  },
+  "MUL16 T16 A8c": {
+   "module": "mul16_t16_a8c",
+   "luts": 173,
+   "carry4": 2,
+   "ff": 46,
+   "delayPs": 5065
+  },
+  "MUL16 T16 A10c": {
+   "module": "mul16_t16_a10c",
+   "luts": 176,
+   "carry4": 0,
+   "ff": 46,
+   "delayPs": 5482
+  },
+  "MUL16 T16 A12c": {
+   "module": "mul16_t16_a12c",
+   "luts": 173,
+   "carry4": 0,
+   "ff": 46,
+   "delayPs": 4518
+  },
+  "MUL16 T16 A14c": {
+   "module": "mul16_t16_a14c",
+   "luts": 161,
+   "carry4": 0,
+   "ff": 46,
+   "delayPs": 4594
+  },
+  "MUL16 T16 A16c": {
+   "module": "mul16_t16_a16c",
+   "luts": 159,
+   "carry4": 0,
+   "ff": 45,
+   "delayPs": 4621
+  },
+  "MUL16 T16 +C": {
+   "module": "mul16_t16_c",
+   "luts": 199,
+   "carry4": 9,
+   "ff": 47,
+   "delayPs": 8697
+  },
+  "MUL16 T18": {
+   "module": "mul16_t18",
+   "luts": 145,
+   "carry4": 4,
+   "ff": 40,
+   "delayPs": 5846
+  },
+  "MUL16 T18 A2c": {
+   "module": "mul16_t18_a2c",
+   "luts": 135,
+   "carry4": 3,
+   "ff": 40,
+   "delayPs": 5590
+  },
+  "MUL16 T18 A4c": {
+   "module": "mul16_t18_a4c",
+   "luts": 150,
+   "carry4": 3,
+   "ff": 40,
+   "delayPs": 5566
+  },
+  "MUL16 T18 A6c": {
+   "module": "mul16_t18_a6c",
+   "luts": 131,
+   "carry4": 2,
+   "ff": 40,
+   "delayPs": 4986
+  },
+  "MUL16 T18 A8c": {
+   "module": "mul16_t18_a8c",
+   "luts": 135,
+   "carry4": 0,
+   "ff": 40,
+   "delayPs": 5481
+  },
+  "MUL16 T18 A10c": {
+   "module": "mul16_t18_a10c",
+   "luts": 132,
+   "carry4": 0,
+   "ff": 40,
+   "delayPs": 4064
+  },
+  "MUL16 T18 A12c": {
+   "module": "mul16_t18_a12c",
+   "luts": 119,
+   "carry4": 0,
+   "ff": 40,
+   "delayPs": 4224
+  },
+  "MUL16 T18 A14c": {
+   "module": "mul16_t18_a14c",
+   "luts": 117,
+   "carry4": 0,
+   "ff": 39,
+   "delayPs": 4224
+  },
+  "MUL16 T18 +C": {
+   "module": "mul16_t18_c",
+   "luts": 147,
+   "carry4": 8,
+   "ff": 41,
+   "delayPs": 8471
+  },
+  "MUL16 T20": {
+   "module": "mul16_t20",
+   "luts": 99,
+   "carry4": 3,
+   "ff": 34,
+   "delayPs": 5180
+  },
+  "MUL16 T20 A2c": {
+   "module": "mul16_t20_a2c",
+   "luts": 99,
+   "carry4": 3,
+   "ff": 34,
+   "delayPs": 5348
+  },
+  "MUL16 T20 A4c": {
+   "module": "mul16_t20_a4c",
+   "luts": 91,
+   "carry4": 2,
+   "ff": 34,
+   "delayPs": 5006
+  },
+  "MUL16 T20 A6c": {
+   "module": "mul16_t20_a6c",
+   "luts": 103,
+   "carry4": 0,
+   "ff": 34,
+   "delayPs": 5480
+  },
+  "MUL16 T20 A8c": {
+   "module": "mul16_t20_a8c",
+   "luts": 90,
+   "carry4": 0,
+   "ff": 34,
+   "delayPs": 4046
+  },
+  "MUL16 T20 A10c": {
+   "module": "mul16_t20_a10c",
+   "luts": 86,
+   "carry4": 0,
+   "ff": 34,
+   "delayPs": 3798
+  },
+  "MUL16 T20 A12c": {
+   "module": "mul16_t20_a12c",
+   "luts": 85,
+   "carry4": 0,
+   "ff": 33,
+   "delayPs": 3797
+  },
+  "MUL16 T20 +C": {
+   "module": "mul16_t20_c",
+   "luts": 101,
+   "carry4": 7,
+   "ff": 35,
+   "delayPs": 7818
+  },
+  "MUL16 T22": {
+   "module": "mul16_t22",
+   "luts": 66,
+   "carry4": 3,
+   "ff": 28,
+   "delayPs": 5264
+  },
+  "MUL16 T22 A2c": {
+   "module": "mul16_t22_a2c",
+   "luts": 61,
+   "carry4": 2,
+   "ff": 28,
+   "delayPs": 5000
+  },
+  "MUL16 T22 A4c": {
+   "module": "mul16_t22_a4c",
+   "luts": 69,
+   "carry4": 0,
+   "ff": 28,
+   "delayPs": 5224
+  },
+  "MUL16 T22 A6c": {
+   "module": "mul16_t22_a6c",
+   "luts": 61,
+   "carry4": 0,
+   "ff": 28,
+   "delayPs": 3803
+  },
+  "MUL16 T22 A8c": {
+   "module": "mul16_t22_a8c",
+   "luts": 55,
+   "carry4": 0,
+   "ff": 28,
+   "delayPs": 3274
+  },
+  "MUL16 T22 A10c": {
+   "module": "mul16_t22_a10c",
+   "luts": 51,
+   "carry4": 0,
+   "ff": 27,
+   "delayPs": 3270
+  },
+  "MUL16 T22 +C": {
+   "module": "mul16_t22_c",
+   "luts": 77,
+   "carry4": 3,
+   "ff": 29,
+   "delayPs": 7439
+  },
+  "MUL16 T24": {
+   "module": "mul16_t24",
+   "luts": 38,
+   "carry4": 2,
+   "ff": 22,
+   "delayPs": 4868
+  },
+  "MUL16 T24 A2c": {
+   "module": "mul16_t24_a2c",
+   "luts": 46,
+   "carry4": 0,
+   "ff": 22,
+   "delayPs": 4883
+  },
+  "MUL16 T24 A4c": {
+   "module": "mul16_t24_a4c",
+   "luts": 43,
+   "carry4": 0,
+   "ff": 22,
+   "delayPs": 4087
+  },
+  "MUL16 T24 A6c": {
+   "module": "mul16_t24_a6c",
+   "luts": 33,
+   "carry4": 0,
+   "ff": 22,
+   "delayPs": 3043
+  },
+  "MUL16 T24 A8c": {
+   "module": "mul16_t24_a8c",
+   "luts": 30,
+   "carry4": 0,
+   "ff": 21,
+   "delayPs": 3003
+  },
+  "MUL16 T24 +C": {
+   "module": "mul16_t24_c",
+   "luts": 49,
+   "carry4": 2,
+   "ff": 23,
+   "delayPs": 7014
+  },
+  "MUL16 T26": {
+   "module": "mul16_t26",
+   "luts": 26,
+   "carry4": 0,
+   "ff": 16,
+   "delayPs": 3859
+  },
+  "MUL16 T26 A2c": {
+   "module": "mul16_t26_a2c",
+   "luts": 23,
+   "carry4": 0,
+   "ff": 16,
+   "delayPs": 3992
+  },
+  "MUL16 T26 A4c": {
+   "module": "mul16_t26_a4c",
+   "luts": 17,
+   "carry4": 0,
+   "ff": 16,
+   "delayPs": 2673
+  },
+  "MUL16 T26 A6c": {
+   "module": "mul16_t26_a6c",
+   "luts": 15,
+   "carry4": 0,
+   "ff": 15,
+   "delayPs": 2673
+  },
+  "MUL16 T26 +C": {
+   "module": "mul16_t26_c",
+   "luts": 32,
+   "carry4": 0,
+   "ff": 16,
+   "delayPs": 4137
+  },
+  "MUL16 T28": {
+   "module": "mul16_t28",
+   "luts": 4,
+   "carry4": 0,
+   "ff": 10,
+   "delayPs": 1762
+  },
+  "MUL16 T28 A2c": {
+   "module": "mul16_t28_a2c",
+   "luts": 4,
+   "carry4": 0,
+   "ff": 10,
+   "delayPs": 1756
+  },
+  "MUL16 T28 A4c": {
+   "module": "mul16_t28_a4c",
+   "luts": 3,
+   "carry4": 0,
+   "ff": 9,
+   "delayPs": 1749
+  },
+  "MUL16 T28 +C": {
+   "module": "mul16_t28_c",
+   "luts": 4,
+   "carry4": 0,
+   "ff": 10,
+   "delayPs": 1762
+  },
+  "MUL16 T30": {
+   "module": "mul16_t30",
+   "luts": 1,
+   "carry4": 0,
+   "ff": 3,
+   "delayPs": 1243
+  },
+  "MUL16 T30 A2c": {
+   "module": "mul16_t30_a2c",
+   "luts": 1,
+   "carry4": 0,
+   "ff": 3,
+   "delayPs": 1243
+  },
+  "MUL16 T30 +C": {
+   "module": "mul16_t30_c",
+   "luts": 1,
+   "carry4": 0,
+   "ff": 3,
+   "delayPs": 1243
+  },
+  "MUL16 T32": {
+   "module": "mul16_t32",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 0,
+   "delayPs": null
+  },
+  "MUL16 T32 +C": {
+   "module": "mul16_t32_c",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 0,
+   "delayPs": null
+  },
+  "MUL16 BOOTH T1": {
+   "module": "mul16_booth_t1",
+   "luts": 397,
+   "carry4": 8,
+   "ff": 63,
+   "delayPs": 6189
+  },
+  "MUL16 BOOTH T2": {
+   "module": "mul16_booth_t2",
+   "luts": 395,
+   "carry4": 8,
+   "ff": 62,
+   "delayPs": 6261
+  },
+  "MUL16 BOOTH T3": {
+   "module": "mul16_booth_t3",
+   "luts": 352,
+   "carry4": 8,
+   "ff": 61,
+   "delayPs": 6151
+  },
+  "MUL16 BOOTH T4": {
+   "module": "mul16_booth_t4",
+   "luts": 350,
+   "carry4": 7,
+   "ff": 60,
+   "delayPs": 6119
+  },
+  "MUL16 BOOTH T5": {
+   "module": "mul16_booth_t5",
+   "luts": 339,
+   "carry4": 7,
+   "ff": 59,
+   "delayPs": 6107
+  },
+  "MUL16 BOOTH T6": {
+   "module": "mul16_booth_t6",
+   "luts": 333,
+   "carry4": 7,
+   "ff": 58,
+   "delayPs": 6087
+  },
+  "MUL16 BOOTH T7": {
+   "module": "mul16_booth_t7",
+   "luts": 322,
+   "carry4": 7,
+   "ff": 57,
+   "delayPs": 6150
+  },
+  "MUL16 BOOTH T8": {
+   "module": "mul16_booth_t8",
+   "luts": 319,
+   "carry4": 6,
+   "ff": 56,
+   "delayPs": 6118
+  },
+  "MUL16 BOOTH T9": {
+   "module": "mul16_booth_t9",
+   "luts": 302,
+   "carry4": 6,
+   "ff": 55,
+   "delayPs": 6105
+  },
+  "MUL16 BOOTH T10": {
+   "module": "mul16_booth_t10",
+   "luts": 300,
+   "carry4": 6,
+   "ff": 54,
+   "delayPs": 6100
+  },
+  "MUL16 BOOTH T11": {
+   "module": "mul16_booth_t11",
+   "luts": 292,
+   "carry4": 6,
+   "ff": 53,
+   "delayPs": 6047
+  },
+  "MUL16 BOOTH T12": {
+   "module": "mul16_booth_t12",
+   "luts": 268,
+   "carry4": 5,
+   "ff": 52,
+   "delayPs": 6039
+  },
+  "MUL16 BOOTH T13": {
+   "module": "mul16_booth_t13",
+   "luts": 262,
+   "carry4": 5,
+   "ff": 51,
+   "delayPs": 6043
+  },
+  "MUL16 BOOTH T14": {
+   "module": "mul16_booth_t14",
+   "luts": 248,
+   "carry4": 5,
+   "ff": 50,
+   "delayPs": 6041
+  },
+  "MUL16 BOOTH T15": {
+   "module": "mul16_booth_t15",
+   "luts": 224,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 5865
+  },
+  "MUL16 BOOTH T16": {
+   "module": "mul16_booth_t16",
+   "luts": 201,
+   "carry4": 4,
+   "ff": 47,
+   "delayPs": 6005
+  },
+  "MUL16 BOOTH T17": {
+   "module": "mul16_booth_t17",
+   "luts": 197,
+   "carry4": 4,
+   "ff": 45,
+   "delayPs": 5842
+  },
+  "MUL16 BOOTH T18": {
+   "module": "mul16_booth_t18",
+   "luts": 162,
+   "carry4": 4,
+   "ff": 43,
+   "delayPs": 5957
+  },
+  "MUL16 BOOTH T19": {
+   "module": "mul16_booth_t19",
+   "luts": 142,
+   "carry4": 4,
+   "ff": 41,
+   "delayPs": 5849
+  },
+  "MUL16 BOOTH T20": {
+   "module": "mul16_booth_t20",
+   "luts": 124,
+   "carry4": 3,
+   "ff": 39,
+   "delayPs": 5597
+  },
+  "MUL16 BOOTH T21": {
+   "module": "mul16_booth_t21",
+   "luts": 115,
+   "carry4": 3,
+   "ff": 37,
+   "delayPs": 5756
+  },
+  "MUL16 BOOTH T22": {
+   "module": "mul16_booth_t22",
+   "luts": 97,
+   "carry4": 3,
+   "ff": 35,
+   "delayPs": 5912
+  },
+  "MUL16 BOOTH T23": {
+   "module": "mul16_booth_t23",
+   "luts": 83,
+   "carry4": 3,
+   "ff": 33,
+   "delayPs": 5850
+  },
+  "MUL16 BOOTH T24": {
+   "module": "mul16_booth_t24",
+   "luts": 65,
+   "carry4": 2,
+   "ff": 31,
+   "delayPs": 5719
+  },
+  "MUL16 BOOTH T25": {
+   "module": "mul16_booth_t25",
+   "luts": 60,
+   "carry4": 2,
+   "ff": 29,
+   "delayPs": 5326
+  },
+  "MUL16 BOOTH T26": {
+   "module": "mul16_booth_t26",
+   "luts": 48,
+   "carry4": 2,
+   "ff": 27,
+   "delayPs": 5113
+  },
+  "MUL16 BOOTH T27": {
+   "module": "mul16_booth_t27",
+   "luts": 44,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 5187
+  },
+  "MUL16 BOOTH T28": {
+   "module": "mul16_booth_t28",
+   "luts": 40,
+   "carry4": 0,
+   "ff": 23,
+   "delayPs": 4838
+  },
+  "MUL16 BOOTH T29": {
+   "module": "mul16_booth_t29",
+   "luts": 23,
+   "carry4": 0,
+   "ff": 21,
+   "delayPs": 3864
+  },
+  "MUL16 BOOTH T30": {
+   "module": "mul16_booth_t30",
+   "luts": 13,
+   "carry4": 0,
+   "ff": 19,
+   "delayPs": 3161
+  },
+  "MUL16 BOOTH T31": {
+   "module": "mul16_booth_t31",
+   "luts": 8,
+   "carry4": 0,
+   "ff": 18,
+   "delayPs": 3026
+  },
+  "MUL16 BOOTH T32": {
+   "module": "mul16_booth_t32",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 0,
+   "delayPs": null
+  },
+  "MUL16 KUL0": {
+   "module": "mul16_kul0",
+   "luts": 579,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 7006
+  },
+  "MUL16 KUL2": {
+   "module": "mul16_kul2",
+   "luts": 576,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 7007
+  },
+  "MUL16 KUL4": {
+   "module": "mul16_kul4",
+   "luts": 568,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6951
+  },
+  "MUL16 KUL6": {
+   "module": "mul16_kul6",
+   "luts": 556,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6903
+  },
+  "MUL16 KUL8": {
+   "module": "mul16_kul8",
+   "luts": 544,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6908
+  },
+  "MUL16 KUL10": {
+   "module": "mul16_kul10",
+   "luts": 523,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 7483
+  },
+  "MUL16 KUL12": {
+   "module": "mul16_kul12",
+   "luts": 504,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 7760
+  },
+  "MUL16 KUL14": {
+   "module": "mul16_kul14",
+   "luts": 482,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6906
+  },
+  "MUL16 KUL16": {
+   "module": "mul16_kul16",
+   "luts": 458,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6599
+  },
+  "MUL16 KUL18": {
+   "module": "mul16_kul18",
+   "luts": 422,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6348
+  },
+  "MUL16 KUL20": {
+   "module": "mul16_kul20",
+   "luts": 409,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6406
+  },
+  "MUL16 KUL22": {
+   "module": "mul16_kul22",
+   "luts": 391,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6405
+  },
+  "MUL16 KUL24": {
+   "module": "mul16_kul24",
+   "luts": 373,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6402
+  },
+  "MUL16 KUL26": {
+   "module": "mul16_kul26",
+   "luts": 362,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6402
+  },
+  "MUL16 KUL28": {
+   "module": "mul16_kul28",
+   "luts": 359,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6373
+  },
+  "MUL16 KUL30": {
+   "module": "mul16_kul30",
+   "luts": 358,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 6373
+  },
+  "MUL16 DRUM2": {
+   "module": "mul16_drum2",
+   "luts": 227,
+   "carry4": 0,
+   "ff": 64,
+   "delayPs": 7048
+  },
+  "MUL16 DRUM3": {
+   "module": "mul16_drum3",
+   "luts": 233,
+   "carry4": 0,
+   "ff": 64,
+   "delayPs": 8083
+  },
+  "MUL16 DRUM4": {
+   "module": "mul16_drum4",
+   "luts": 303,
+   "carry4": 2,
+   "ff": 64,
+   "delayPs": 9956
+  },
+  "MUL16 DRUM5": {
+   "module": "mul16_drum5",
+   "luts": 326,
+   "carry4": 3,
+   "ff": 64,
+   "delayPs": 10182
+  },
+  "MUL16 DRUM7": {
+   "module": "mul16_drum7",
+   "luts": 411,
+   "carry4": 4,
+   "ff": 64,
+   "delayPs": 10878
+  },
+  "MUL16 DRUM9": {
+   "module": "mul16_drum9",
+   "luts": 416,
+   "carry4": 5,
+   "ff": 64,
+   "delayPs": 11349
+  },
+  "MUL16 DRUM10": {
+   "module": "mul16_drum10",
+   "luts": 391,
+   "carry4": 5,
+   "ff": 64,
+   "delayPs": 11104
+  },
+  "MUL16 DRUM11": {
+   "module": "mul16_drum11",
+   "luts": 409,
+   "carry4": 6,
+   "ff": 64,
+   "delayPs": 10913
+  },
+  "MUL16 DRUM12": {
+   "module": "mul16_drum12",
+   "luts": 425,
+   "carry4": 6,
+   "ff": 64,
+   "delayPs": 10782
+  },
+  "MUL16 DRUM13": {
+   "module": "mul16_drum13",
+   "luts": 488,
+   "carry4": 7,
+   "ff": 64,
+   "delayPs": 10375
+  },
+  "MUL16 DRUM14": {
+   "module": "mul16_drum14",
+   "luts": 408,
+   "carry4": 7,
+   "ff": 64,
+   "delayPs": 8907
+  },
+  "MUL16 DRUM15": {
+   "module": "mul16_drum15",
+   "luts": 445,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 8609
+  },
+  "MUL16 BOOTH T1 +C": {
+   "module": "mul16_booth_t1_c",
+   "luts": 397,
+   "carry4": 8,
+   "ff": 63,
+   "delayPs": 6189
+  },
+  "MUL16 BOOTH T2 +C": {
+   "module": "mul16_booth_t2_c",
+   "luts": 395,
+   "carry4": 8,
+   "ff": 62,
+   "delayPs": 6261
+  },
+  "MUL16 BOOTH T3 +C": {
+   "module": "mul16_booth_t3_c",
+   "luts": 352,
+   "carry4": 8,
+   "ff": 61,
+   "delayPs": 6151
+  },
+  "MUL16 BOOTH T4 +C": {
+   "module": "mul16_booth_t4_c",
+   "luts": 350,
+   "carry4": 7,
+   "ff": 60,
+   "delayPs": 6119
+  },
+  "MUL16 BOOTH T5 +C": {
+   "module": "mul16_booth_t5_c",
+   "luts": 340,
+   "carry4": 14,
+   "ff": 59,
+   "delayPs": 7854
+  },
+  "MUL16 BOOTH T6 +C": {
+   "module": "mul16_booth_t6_c",
+   "luts": 334,
+   "carry4": 14,
+   "ff": 58,
+   "delayPs": 7834
+  },
+  "MUL16 BOOTH T7 +C": {
+   "module": "mul16_booth_t7_c",
+   "luts": 323,
+   "carry4": 14,
+   "ff": 57,
+   "delayPs": 8002
+  },
+  "MUL16 BOOTH T8 +C": {
+   "module": "mul16_booth_t8_c",
+   "luts": 320,
+   "carry4": 13,
+   "ff": 56,
+   "delayPs": 7851
+  },
+  "MUL16 BOOTH T9 +C": {
+   "module": "mul16_booth_t9_c",
+   "luts": 303,
+   "carry4": 12,
+   "ff": 55,
+   "delayPs": 7879
+  },
+  "MUL16 BOOTH T10 +C": {
+   "module": "mul16_booth_t10_c",
+   "luts": 301,
+   "carry4": 12,
+   "ff": 54,
+   "delayPs": 7874
+  },
+  "MUL16 BOOTH T11 +C": {
+   "module": "mul16_booth_t11_c",
+   "luts": 293,
+   "carry4": 12,
+   "ff": 53,
+   "delayPs": 7821
+  },
+  "MUL16 BOOTH T13 +C": {
+   "module": "mul16_booth_t13_c",
+   "luts": 264,
+   "carry4": 10,
+   "ff": 51,
+   "delayPs": 7790
+  },
+  "MUL16 BOOTH T14 +C": {
+   "module": "mul16_booth_t14_c",
+   "luts": 250,
+   "carry4": 10,
+   "ff": 50,
+   "delayPs": 7788
+  },
+  "MUL16 BOOTH T15 +C": {
+   "module": "mul16_booth_t15_c",
+   "luts": 226,
+   "carry4": 10,
+   "ff": 49,
+   "delayPs": 7716
+  },
+  "MUL16 BOOTH T16 +C": {
+   "module": "mul16_booth_t16_c",
+   "luts": 202,
+   "carry4": 9,
+   "ff": 47,
+   "delayPs": 7804
+  },
+  "MUL16 BOOTH T17 +C": {
+   "module": "mul16_booth_t17_c",
+   "luts": 199,
+   "carry4": 8,
+   "ff": 45,
+   "delayPs": 7460
+  },
+  "MUL16 BOOTH T18 +C": {
+   "module": "mul16_booth_t18_c",
+   "luts": 164,
+   "carry4": 8,
+   "ff": 43,
+   "delayPs": 7389
+  },
+  "MUL16 BOOTH T19 +C": {
+   "module": "mul16_booth_t19_c",
+   "luts": 144,
+   "carry4": 8,
+   "ff": 41,
+   "delayPs": 7372
+  },
+  "MUL16 BOOTH T20 +C": {
+   "module": "mul16_booth_t20_c",
+   "luts": 126,
+   "carry4": 7,
+   "ff": 39,
+   "delayPs": 7256
+  },
+  "MUL16 BOOTH T21 +C": {
+   "module": "mul16_booth_t21_c",
+   "luts": 128,
+   "carry4": 3,
+   "ff": 37,
+   "delayPs": 7070
+  },
+  "MUL16 BOOTH T22 +C": {
+   "module": "mul16_booth_t22_c",
+   "luts": 105,
+   "carry4": 3,
+   "ff": 35,
+   "delayPs": 7050
+  },
+  "MUL16 BOOTH T23 +C": {
+   "module": "mul16_booth_t23_c",
+   "luts": 93,
+   "carry4": 3,
+   "ff": 33,
+   "delayPs": 6809
+  },
+  "MUL16 BOOTH T24 +C": {
+   "module": "mul16_booth_t24_c",
+   "luts": 74,
+   "carry4": 2,
+   "ff": 31,
+   "delayPs": 7050
+  },
+  "MUL16 BOOTH T25 +C": {
+   "module": "mul16_booth_t25_c",
+   "luts": 68,
+   "carry4": 2,
+   "ff": 29,
+   "delayPs": 6360
+  },
+  "MUL16 BOOTH T26 +C": {
+   "module": "mul16_booth_t26_c",
+   "luts": 54,
+   "carry4": 2,
+   "ff": 27,
+   "delayPs": 6029
+  },
+  "MUL16 BOOTH T27 +C": {
+   "module": "mul16_booth_t27_c",
+   "luts": 49,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 5272
+  },
+  "MUL16 BOOTH T28 +C": {
+   "module": "mul16_booth_t28_c",
+   "luts": 40,
+   "carry4": 0,
+   "ff": 23,
+   "delayPs": 4752
+  },
+  "MUL16 BOOTH T29 +C": {
+   "module": "mul16_booth_t29_c",
+   "luts": 28,
+   "carry4": 0,
+   "ff": 21,
+   "delayPs": 4232
+  },
+  "MUL16 BOOTH T30 +C": {
+   "module": "mul16_booth_t30_c",
+   "luts": 13,
+   "carry4": 0,
+   "ff": 19,
+   "delayPs": 3161
+  },
+  "MUL16 BOOTH T31 +C": {
+   "module": "mul16_booth_t31_c",
+   "luts": 8,
+   "carry4": 0,
+   "ff": 18,
+   "delayPs": 3026
+  },
+  "MUL16 BOOTH T32 +C": {
+   "module": "mul16_booth_t32_c",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 0,
+   "delayPs": null
+  },
+  "MUL16 KUL0 +C": {
+   "module": "mul16_kul0_c",
+   "luts": 579,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 7006
+  },
+  "MUL16 KUL2 +C": {
+   "module": "mul16_kul2_c",
+   "luts": 576,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 7007
+  },
+  "MUL16 KUL4 +C": {
+   "module": "mul16_kul4_c",
+   "luts": 569,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 9567
+  },
+  "MUL16 KUL6 +C": {
+   "module": "mul16_kul6_c",
+   "luts": 558,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 9516
+  },
+  "MUL16 KUL8 +C": {
+   "module": "mul16_kul8_c",
+   "luts": 546,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 9477
+  },
+  "MUL16 KUL10 +C": {
+   "module": "mul16_kul10_c",
+   "luts": 527,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 10099
+  },
+  "MUL16 KUL12 +C": {
+   "module": "mul16_kul12_c",
+   "luts": 509,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 10291
+  },
+  "MUL16 KUL14 +C": {
+   "module": "mul16_kul14_c",
+   "luts": 488,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 9522
+  },
+  "MUL16 KUL16 +C": {
+   "module": "mul16_kul16_c",
+   "luts": 466,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 9215
+  },
+  "MUL16 KUL18 +C": {
+   "module": "mul16_kul18_c",
+   "luts": 431,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 8964
+  },
+  "MUL16 KUL20 +C": {
+   "module": "mul16_kul20_c",
+   "luts": 418,
+   "carry4": 17,
+   "ff": 64,
+   "delayPs": 8972
+  },
+  "MUL16 KUL22 +C": {
+   "module": "mul16_kul22_c",
+   "luts": 403,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 9021
+  },
+  "MUL16 KUL24 +C": {
+   "module": "mul16_kul24_c",
+   "luts": 385,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 9018
+  },
+  "MUL16 KUL26 +C": {
+   "module": "mul16_kul26_c",
+   "luts": 375,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 9018
+  },
+  "MUL16 KUL28 +C": {
+   "module": "mul16_kul28_c",
+   "luts": 373,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 8989
+  },
+  "MUL16 KUL30 +C": {
+   "module": "mul16_kul30_c",
+   "luts": 370,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 8989
+  },
+  "MUL16 KUL +C": {
+   "module": "mul16_kul_c",
+   "luts": 370,
+   "carry4": 16,
+   "ff": 64,
+   "delayPs": 8989
+  },
+  "MUL16 DRUM2 +C": {
+   "module": "mul16_drum2_c",
+   "luts": 227,
+   "carry4": 0,
+   "ff": 64,
+   "delayPs": 7048
+  },
+  "MUL16 DRUM3 +C": {
+   "module": "mul16_drum3_c",
+   "luts": 233,
+   "carry4": 0,
+   "ff": 64,
+   "delayPs": 8083
+  },
+  "MUL16 DRUM4 +C": {
+   "module": "mul16_drum4_c",
+   "luts": 303,
+   "carry4": 2,
+   "ff": 64,
+   "delayPs": 9956
+  },
+  "MUL16 DRUM5 +C": {
+   "module": "mul16_drum5_c",
+   "luts": 314,
+   "carry4": 11,
+   "ff": 64,
+   "delayPs": 12889
+  },
+  "MUL16 DRUM6 +C": {
+   "module": "mul16_drum6_c",
+   "luts": 340,
+   "carry4": 11,
+   "ff": 64,
+   "delayPs": 13678
+  },
+  "MUL16 DRUM7 +C": {
+   "module": "mul16_drum7_c",
+   "luts": 411,
+   "carry4": 4,
+   "ff": 64,
+   "delayPs": 10878
+  },
+  "MUL16 DRUM8 +C": {
+   "module": "mul16_drum8_c",
+   "luts": 441,
+   "carry4": 4,
+   "ff": 64,
+   "delayPs": 11240
+  },
+  "MUL16 DRUM9 +C": {
+   "module": "mul16_drum9_c",
+   "luts": 416,
+   "carry4": 5,
+   "ff": 64,
+   "delayPs": 11349
+  },
+  "MUL16 DRUM10 +C": {
+   "module": "mul16_drum10_c",
+   "luts": 391,
+   "carry4": 5,
+   "ff": 64,
+   "delayPs": 11104
+  },
+  "MUL16 DRUM11 +C": {
+   "module": "mul16_drum11_c",
+   "luts": 409,
+   "carry4": 6,
+   "ff": 64,
+   "delayPs": 10913
+  },
+  "MUL16 DRUM12 +C": {
+   "module": "mul16_drum12_c",
+   "luts": 425,
+   "carry4": 6,
+   "ff": 64,
+   "delayPs": 10782
+  },
+  "MUL16 DRUM13 +C": {
+   "module": "mul16_drum13_c",
+   "luts": 488,
+   "carry4": 7,
+   "ff": 64,
+   "delayPs": 10375
+  },
+  "MUL16 DRUM14 +C": {
+   "module": "mul16_drum14_c",
+   "luts": 408,
+   "carry4": 7,
+   "ff": 64,
+   "delayPs": 8907
+  },
+  "MUL16 DRUM15 +C": {
+   "module": "mul16_drum15_c",
+   "luts": 445,
+   "carry4": 8,
+   "ff": 64,
+   "delayPs": 8609
+  },
+  "MUL16 MITCHELL +C": {
+   "module": "mul16_mitchell_c",
+   "luts": 275,
+   "carry4": 13,
+   "ff": 64,
+   "delayPs": 11361
+  },
+  "ADD16 TRUNC1": {
+   "module": "add16_trunc1",
+   "luts": 15,
+   "carry4": 4,
+   "ff": 46,
+   "delayPs": 2138
+  },
+  "ADD16 TRUNC2": {
+   "module": "add16_trunc2",
+   "luts": 14,
+   "carry4": 4,
+   "ff": 43,
+   "delayPs": 2358
+  },
+  "ADD16 TRUNC3": {
+   "module": "add16_trunc3",
+   "luts": 13,
+   "carry4": 4,
+   "ff": 40,
+   "delayPs": 2253
+  },
+  "ADD16 TRUNC4": {
+   "module": "add16_trunc4",
+   "luts": 12,
+   "carry4": 4,
+   "ff": 37,
+   "delayPs": 2302
+  },
+  "ADD16 TRUNC5": {
+   "module": "add16_trunc5",
+   "luts": 11,
+   "carry4": 3,
+   "ff": 34,
+   "delayPs": 2021
+  },
+  "ADD16 TRUNC6": {
+   "module": "add16_trunc6",
+   "luts": 10,
+   "carry4": 3,
+   "ff": 31,
+   "delayPs": 2241
+  },
+  "ADD16 TRUNC7": {
+   "module": "add16_trunc7",
+   "luts": 9,
+   "carry4": 3,
+   "ff": 28,
+   "delayPs": 2136
+  },
+  "ADD16 TRUNC8": {
+   "module": "add16_trunc8",
+   "luts": 8,
+   "carry4": 3,
+   "ff": 25,
+   "delayPs": 2185
+  },
+  "ADD16 TRUNC9": {
+   "module": "add16_trunc9",
+   "luts": 7,
+   "carry4": 2,
+   "ff": 22,
+   "delayPs": 1904
+  },
+  "ADD16 TRUNC10": {
+   "module": "add16_trunc10",
+   "luts": 6,
+   "carry4": 2,
+   "ff": 19,
+   "delayPs": 2124
+  },
+  "ADD16 TRUNC11": {
+   "module": "add16_trunc11",
+   "luts": 7,
+   "carry4": 0,
+   "ff": 16,
+   "delayPs": 2340
+  },
+  "ADD16 TRUNC12": {
+   "module": "add16_trunc12",
+   "luts": 6,
+   "carry4": 0,
+   "ff": 13,
+   "delayPs": 2333
+  },
+  "ADD16 TRUNC13": {
+   "module": "add16_trunc13",
+   "luts": 4,
+   "carry4": 0,
+   "ff": 10,
+   "delayPs": 1762
+  },
+  "ADD16 TRUNC14": {
+   "module": "add16_trunc14",
+   "luts": 3,
+   "carry4": 0,
+   "ff": 7,
+   "delayPs": 1571
+  },
+  "ADD16 TRUNC15": {
+   "module": "add16_trunc15",
+   "luts": 2,
+   "carry4": 0,
+   "ff": 4,
+   "delayPs": 1280
+  },
+  "ADD16 TRUNC16": {
+   "module": "add16_trunc16",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 0,
+   "delayPs": null
+  },
+  "ADD16 LOA1": {
+   "module": "add16_loa1",
+   "luts": 16,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 2411
+  },
+  "ADD16 LOA2": {
+   "module": "add16_loa2",
+   "luts": 16,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 2631
+  },
+  "ADD16 LOA3": {
+   "module": "add16_loa3",
+   "luts": 16,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 2526
+  },
+  "ADD16 LOA5": {
+   "module": "add16_loa5",
+   "luts": 16,
+   "carry4": 3,
+   "ff": 49,
+   "delayPs": 2294
+  },
+  "ADD16 LOA6": {
+   "module": "add16_loa6",
+   "luts": 16,
+   "carry4": 3,
+   "ff": 49,
+   "delayPs": 2514
+  },
+  "ADD16 LOA7": {
+   "module": "add16_loa7",
+   "luts": 16,
+   "carry4": 3,
+   "ff": 49,
+   "delayPs": 2409
+  },
+  "ADD16 LOA9": {
+   "module": "add16_loa9",
+   "luts": 16,
+   "carry4": 2,
+   "ff": 49,
+   "delayPs": 2177
+  },
+  "ADD16 LOA10": {
+   "module": "add16_loa10",
+   "luts": 16,
+   "carry4": 2,
+   "ff": 49,
+   "delayPs": 2397
+  },
+  "ADD16 LOA11": {
+   "module": "add16_loa11",
+   "luts": 19,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 2916
+  },
+  "ADD16 LOA12": {
+   "module": "add16_loa12",
+   "luts": 18,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 2340
+  },
+  "ADD16 LOA13": {
+   "module": "add16_loa13",
+   "luts": 18,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 2333
+  },
+  "ADD16 LOA14": {
+   "module": "add16_loa14",
+   "luts": 17,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 1756
+  },
+  "ADD16 LOA15": {
+   "module": "add16_loa15",
+   "luts": 17,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 1578
+  },
+  "ADD16 LOA16": {
+   "module": "add16_loa16",
+   "luts": 17,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 1280
+  },
+  "ADD16 SEG L2 P0": {
+   "module": "add16_seg_l2_p0",
+   "luts": 17,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 1571
+  },
+  "ADD16 SEG L2 P2": {
+   "module": "add16_seg_l2_p2",
+   "luts": 24,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 2346
+  },
+  "ADD16 SEG L2 P4": {
+   "module": "add16_seg_l2_p4",
+   "luts": 29,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 2916
+  },
+  "ADD16 SEG L2 P6": {
+   "module": "add16_seg_l2_p6",
+   "luts": 49,
+   "carry4": 10,
+   "ff": 49,
+   "delayPs": 2652
+  },
+  "ADD16 SEG L2 P8": {
+   "module": "add16_seg_l2_p8",
+   "luts": 57,
+   "carry4": 10,
+   "ff": 49,
+   "delayPs": 2824
+  },
+  "ADD16 SEG L2 P10": {
+   "module": "add16_seg_l2_p10",
+   "luts": 63,
+   "carry4": 13,
+   "ff": 49,
+   "delayPs": 2817
+  },
+  "ADD16 SEG L2 P12": {
+   "module": "add16_seg_l2_p12",
+   "luts": 67,
+   "carry4": 13,
+   "ff": 49,
+   "delayPs": 2950
+  },
+  "ADD16 SEG L2 P14": {
+   "module": "add16_seg_l2_p14",
+   "luts": 69,
+   "carry4": 14,
+   "ff": 49,
+   "delayPs": 2943
+  },
+  "ADD16 SEG L2 P16": {
+   "module": "add16_seg_l2_p16",
+   "luts": 69,
+   "carry4": 14,
+   "ff": 49,
+   "delayPs": 2943
+  },
+  "ADD16 SEG L4 P0": {
+   "module": "add16_seg_l4_p0",
+   "luts": 21,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 2333
+  },
+  "ADD16 SEG L4 P2": {
+   "module": "add16_seg_l4_p2",
+   "luts": 24,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 2929
+  },
+  "ADD16 SEG L4 P6": {
+   "module": "add16_seg_l4_p6",
+   "luts": 34,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 3503
+  },
+  "ADD16 SEG L4 P8": {
+   "module": "add16_seg_l4_p8",
+   "luts": 38,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 3503
+  },
+  "ADD16 SEG L4 P10": {
+   "module": "add16_seg_l4_p10",
+   "luts": 40,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 3509
+  },
+  "ADD16 SEG L4 P12": {
+   "module": "add16_seg_l4_p12",
+   "luts": 42,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 3518
+  },
+  "ADD16 SEG L4 P14": {
+   "module": "add16_seg_l4_p14",
+   "luts": 42,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 3518
+  },
+  "ADD16 SEG L4 P16": {
+   "module": "add16_seg_l4_p16",
+   "luts": 42,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 3518
+  },
+  "ADD16 SEG L6 P0": {
+   "module": "add16_seg_l6_p0",
+   "luts": 18,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 2333
+  },
+  "ADD16 SEG L6 P2": {
+   "module": "add16_seg_l6_p2",
+   "luts": 19,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 3229
+  },
+  "ADD16 SEG L6 P4": {
+   "module": "add16_seg_l6_p4",
+   "luts": 21,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 3492
+  },
+  "ADD16 SEG L6 P6": {
+   "module": "add16_seg_l6_p6",
+   "luts": 30,
+   "carry4": 8,
+   "ff": 49,
+   "delayPs": 3473
+  },
+  "ADD16 SEG L6 P8": {
+   "module": "add16_seg_l6_p8",
+   "luts": 32,
+   "carry4": 8,
+   "ff": 49,
+   "delayPs": 3473
+  },
+  "ADD16 SEG L6 P10": {
+   "module": "add16_seg_l6_p10",
+   "luts": 34,
+   "carry4": 9,
+   "ff": 49,
+   "delayPs": 3473
+  },
+  "ADD16 SEG L6 P12": {
+   "module": "add16_seg_l6_p12",
+   "luts": 36,
+   "carry4": 9,
+   "ff": 49,
+   "delayPs": 3515
+  },
+  "ADD16 SEG L6 P14": {
+   "module": "add16_seg_l6_p14",
+   "luts": 36,
+   "carry4": 9,
+   "ff": 49,
+   "delayPs": 3515
+  },
+  "ADD16 SEG L6 P16": {
+   "module": "add16_seg_l6_p16",
+   "luts": 36,
+   "carry4": 9,
+   "ff": 49,
+   "delayPs": 3515
+  },
+  "ADD16 SEG L8 P0": {
+   "module": "add16_seg_l8_p0",
+   "luts": 16,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 2185
+  },
+  "ADD16 SEG L8 P2": {
+   "module": "add16_seg_l8_p2",
+   "luts": 16,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 3290
+  },
+  "ADD16 SEG L8 P6": {
+   "module": "add16_seg_l8_p6",
+   "luts": 22,
+   "carry4": 7,
+   "ff": 49,
+   "delayPs": 3534
+  },
+  "ADD16 SEG L8 P8": {
+   "module": "add16_seg_l8_p8",
+   "luts": 24,
+   "carry4": 7,
+   "ff": 49,
+   "delayPs": 3700
+  },
+  "ADD16 SEG L8 P10": {
+   "module": "add16_seg_l8_p10",
+   "luts": 24,
+   "carry4": 7,
+   "ff": 49,
+   "delayPs": 3700
+  },
+  "ADD16 SEG L8 P12": {
+   "module": "add16_seg_l8_p12",
+   "luts": 24,
+   "carry4": 7,
+   "ff": 49,
+   "delayPs": 3700
+  },
+  "ADD16 SEG L8 P14": {
+   "module": "add16_seg_l8_p14",
+   "luts": 24,
+   "carry4": 7,
+   "ff": 49,
+   "delayPs": 3700
+  },
+  "ADD16 SEG L8 P16": {
+   "module": "add16_seg_l8_p16",
+   "luts": 24,
+   "carry4": 7,
+   "ff": 49,
+   "delayPs": 3700
+  },
+  "ADD16 SEG L10 P0": {
+   "module": "add16_seg_l10_p0",
+   "luts": 16,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 2241
+  },
+  "ADD16 SEG L10 P2": {
+   "module": "add16_seg_l10_p2",
+   "luts": 16,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 3229
+  },
+  "ADD16 SEG L10 P4": {
+   "module": "add16_seg_l10_p4",
+   "luts": 17,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 3172
+  },
+  "ADD16 SEG L10 P6": {
+   "module": "add16_seg_l10_p6",
+   "luts": 22,
+   "carry4": 7,
+   "ff": 49,
+   "delayPs": 3473
+  },
+  "ADD16 SEG L10 P8": {
+   "module": "add16_seg_l10_p8",
+   "luts": 24,
+   "carry4": 7,
+   "ff": 49,
+   "delayPs": 3639
+  },
+  "ADD16 SEG L10 P10": {
+   "module": "add16_seg_l10_p10",
+   "luts": 26,
+   "carry4": 8,
+   "ff": 49,
+   "delayPs": 3590
+  },
+  "ADD16 SEG L10 P12": {
+   "module": "add16_seg_l10_p12",
+   "luts": 26,
+   "carry4": 8,
+   "ff": 49,
+   "delayPs": 3590
+  },
+  "ADD16 SEG L10 P14": {
+   "module": "add16_seg_l10_p14",
+   "luts": 26,
+   "carry4": 8,
+   "ff": 49,
+   "delayPs": 3590
+  },
+  "ADD16 SEG L10 P16": {
+   "module": "add16_seg_l10_p16",
+   "luts": 26,
+   "carry4": 8,
+   "ff": 49,
+   "delayPs": 3590
+  },
+  "ADD16 SEG L12 P0": {
+   "module": "add16_seg_l12_p0",
+   "luts": 18,
+   "carry4": 3,
+   "ff": 49,
+   "delayPs": 2333
+  },
+  "ADD16 SEG L12 P2": {
+   "module": "add16_seg_l12_p2",
+   "luts": 19,
+   "carry4": 3,
+   "ff": 49,
+   "delayPs": 2923
+  },
+  "ADD16 SEG L12 P4": {
+   "module": "add16_seg_l12_p4",
+   "luts": 20,
+   "carry4": 3,
+   "ff": 49,
+   "delayPs": 3492
+  },
+  "ADD16 SEG L12 P6": {
+   "module": "add16_seg_l12_p6",
+   "luts": 24,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 3224
+  },
+  "ADD16 SEG L12 P8": {
+   "module": "add16_seg_l12_p8",
+   "luts": 26,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 3390
+  },
+  "ADD16 SEG L12 P10": {
+   "module": "add16_seg_l12_p10",
+   "luts": 28,
+   "carry4": 6,
+   "ff": 49,
+   "delayPs": 3341
+  },
+  "ADD16 SEG L12 P12": {
+   "module": "add16_seg_l12_p12",
+   "luts": 30,
+   "carry4": 6,
+   "ff": 49,
+   "delayPs": 3507
+  },
+  "ADD16 SEG L12 P14": {
+   "module": "add16_seg_l12_p14",
+   "luts": 30,
+   "carry4": 6,
+   "ff": 49,
+   "delayPs": 3507
+  },
+  "ADD16 SEG L12 P16": {
+   "module": "add16_seg_l12_p16",
+   "luts": 30,
+   "carry4": 6,
+   "ff": 49,
+   "delayPs": 3507
+  },
+  "ADD16 SEG L14 P0": {
+   "module": "add16_seg_l14_p0",
+   "luts": 17,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 2358
+  },
+  "ADD16 SEG L14 P2": {
+   "module": "add16_seg_l14_p2",
+   "luts": 18,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 2340
+  },
+  "ADD16 SEG L14 P4": {
+   "module": "add16_seg_l14_p4",
+   "luts": 19,
+   "carry4": 4,
+   "ff": 49,
+   "delayPs": 2909
+  },
+  "ADD16 SEG L14 P6": {
+   "module": "add16_seg_l14_p6",
+   "luts": 23,
+   "carry4": 6,
+   "ff": 49,
+   "delayPs": 2641
+  },
+  "ADD16 SEG L14 P8": {
+   "module": "add16_seg_l14_p8",
+   "luts": 25,
+   "carry4": 6,
+   "ff": 49,
+   "delayPs": 2807
+  },
+  "ADD16 SEG L14 P10": {
+   "module": "add16_seg_l14_p10",
+   "luts": 27,
+   "carry4": 7,
+   "ff": 49,
+   "delayPs": 2758
+  },
+  "ADD16 SEG L14 P12": {
+   "module": "add16_seg_l14_p12",
+   "luts": 29,
+   "carry4": 7,
+   "ff": 49,
+   "delayPs": 2924
+  },
+  "ADD16 SEG L14 P14": {
+   "module": "add16_seg_l14_p14",
+   "luts": 31,
+   "carry4": 8,
+   "ff": 49,
+   "delayPs": 2875
+  },
+  "ADD16 SEG L14 P16": {
+   "module": "add16_seg_l14_p16",
+   "luts": 31,
+   "carry4": 8,
+   "ff": 49,
+   "delayPs": 2875
+  },
+  "ADD8 nativo": {
+   "module": "nat_add8",
+   "luts": 8,
+   "carry4": 3,
+   "ff": 25,
+   "delayPs": 2185
+  },
+  "MUL8 nativo": {
+   "module": "nat_mul8",
+   "luts": 89,
+   "carry4": 10,
+   "ff": 32,
+   "delayPs": 5889
+  },
+  "ADD16 nativo": {
+   "module": "nat_add16",
+   "luts": 16,
+   "carry4": 5,
+   "ff": 49,
+   "delayPs": 2419
+  },
+  "MUL16 nativo": {
+   "module": "nat_mul16",
+   "luts": 342,
+   "carry4": 40,
+   "ff": 64,
+   "delayPs": 8378
+  },
+  "ADD32 nativo": {
+   "module": "nat_add32",
+   "luts": 32,
+   "carry4": 9,
+   "ff": 97,
+   "delayPs": 2887
+  },
+  "cmp8": {
+   "module": "nat_cmp8",
+   "luts": 8,
+   "carry4": 1,
+   "ff": 17,
+   "delayPs": 2147
+  },
+  "mux8": {
+   "module": "nat_mux8",
+   "luts": 8,
+   "carry4": 0,
+   "ff": 25,
+   "delayPs": 1560
+  },
+  "logic8": {
+   "module": "nat_xor8",
+   "luts": 8,
+   "carry4": 0,
+   "ff": 24,
+   "delayPs": 1243
+  },
+  "cmp16": {
+   "module": "nat_cmp16",
+   "luts": 16,
+   "carry4": 2,
+   "ff": 33,
+   "delayPs": 2264
+  },
+  "mux16": {
+   "module": "nat_mux16",
+   "luts": 16,
+   "carry4": 0,
+   "ff": 49,
+   "delayPs": 1560
+  },
+  "logic16": {
+   "module": "nat_xor16",
+   "luts": 16,
+   "carry4": 0,
+   "ff": 48,
+   "delayPs": 1243
+  },
+  "cmp32": {
+   "module": "nat_cmp32",
+   "luts": 32,
+   "carry4": 4,
+   "ff": 65,
+   "delayPs": 2498
+  },
+  "mux32": {
+   "module": "nat_mux32",
+   "luts": 32,
+   "carry4": 0,
+   "ff": 97,
+   "delayPs": 1560
+  },
+  "logic32": {
+   "module": "nat_xor32",
+   "luts": 32,
+   "carry4": 0,
+   "ff": 96,
+   "delayPs": 1243
+  },
+  "reg": {
+   "module": "nat_reg",
+   "luts": 0,
+   "carry4": 0,
+   "ff": 2,
+   "delayPs": 812
+  }
+ }
+}
