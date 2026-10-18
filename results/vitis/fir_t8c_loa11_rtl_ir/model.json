@@ -1,0 +1,91 @@
+{
+ "case": "fir_t8c_loa11_rtl_ir",
+ "kernel": "fir",
+ "kind": "ir",
+ "note": "mul8=MUL8 T8 +C;add16=ADD16 LOA11;add32=ADD32 (ADD16 LOA11 + ADD16 exato), unidades em RTL (caixa preta)",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "fir",
+ "assign": {
+  "S1.1": "MUL8 T8 +C",
+  "S1.3": "MUL8 T8 +C",
+  "S1.6": "MUL8 T8 +C",
+  "S1.9": "MUL8 T8 +C",
+  "S1.12": "MUL8 T8 +C",
+  "S1.15": "MUL8 T8 +C",
+  "S1.21": "MUL8 T8 +C",
+  "S1.24": "MUL8 T8 +C",
+  "S1.30": "MUL8 T8 +C",
+  "S1.33": "MUL8 T8 +C",
+  "S1.36": "MUL8 T8 +C",
+  "S1.39": "MUL8 T8 +C",
+  "S1.42": "MUL8 T8 +C",
+  "S1.45": "MUL8 T8 +C",
+  "S1.4": "ADD16 LOA11",
+  "S1.7": "ADD16 LOA11",
+  "S1.10": "ADD16 LOA11",
+  "S1.13": "ADD16 LOA11",
+  "S1.16": "ADD16 LOA11",
+  "S1.19": "ADD16 LOA11",
+  "S1.22": "ADD16 LOA11",
+  "S1.25": "ADD16 LOA11",
+  "S1.28": "ADD16 LOA11",
+  "S1.31": "ADD16 LOA11",
+  "S1.34": "ADD16 LOA11",
+  "S1.37": "ADD32 (ADD16 LOA11 + ADD16 exato)",
+  "S1.40": "ADD32 (ADD16 LOA11 + ADD16 exato)",
+  "S1.43": "ADD32 (ADD16 LOA11 + ADD16 exato)",
+  "S1.46": "ADD32 (ADD16 LOA11 + ADD16 exato)"
+ },
+ "prediction": {
+  "cycles": 1027,
+  "timeNs": 5135,
+  "intervalNs": 5,
+  "critPs": 4523,
+  "luts": 978,
+  "carry4": 12,
+  "ff": 733,
+  "areaUm2": 43879.27185105105,
+  "energyFj": 115026528.18886663,
+  "loops": [
+   {
+    "label": "samples",
+    "mode": "pipelined",
+    "trip": 1009,
+    "II": 1,
+    "iterLatency": 18,
+    "latency": 1027
+   }
+  ],
+  "addrLuts": 522,
+  "units": [
+   {
+    "unit": "MUL8 T8 +C",
+    "count": 14,
+    "luts": 78,
+    "carry4": 8
+   },
+   {
+    "unit": "ADD16 LOA11",
+    "count": 11,
+    "luts": 137,
+    "carry4": 0
+   },
+   {
+    "unit": "ADD32 (ADD16 LOA11 + ADD16 exato)",
+    "count": 4,
+    "luts": 44,
+    "carry4": 0
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}

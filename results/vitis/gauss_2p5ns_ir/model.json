@@ -8,15 +8,15 @@
  "top": "gauss",
  "assign": {},
  "prediction": {
-  "cycles": 72224,
-  "timeNs": 180560,
+  "cycles": 72225,
+  "timeNs": 180562.5,
   "intervalNs": 5,
-  "critPs": 2230,
-  "luts": 703,
+  "critPs": 2419,
+  "luts": 792,
   "carry4": 70,
-  "ff": 1127,
-  "areaUm2": 24547.917437662338,
-  "energyFj": 3367046893.0369153,
+  "ff": 784,
+  "areaUm2": 24708.07103766234,
+  "energyFj": 3399299225.983206,
   "loops": [
    {
     "label": "rows_cols",
@@ -24,8 +24,8 @@
     "flattened": true,
     "trip": 36100,
     "II": 2,
-    "iterLatency": 25,
-    "latency": 72224
+    "iterLatency": 26,
+    "latency": 72225
    }
   ],
   "addrLuts": 464,

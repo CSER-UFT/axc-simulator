@@ -8,15 +8,15 @@
  "top": "sobel",
  "assign": {},
  "prediction": {
-  "cycles": 72217,
-  "timeNs": 361085,
+  "cycles": 72218,
+  "timeNs": 361090,
   "intervalNs": 10,
-  "critPs": 4623,
-  "luts": 644,
+  "critPs": 4774,
+  "luts": 683,
   "carry4": 43,
-  "ff": 492,
-  "areaUm2": 11661.568467532468,
-  "energyFj": 1165326641.7230198,
+  "ff": 516,
+  "areaUm2": 12462.336467532468,
+  "energyFj": 1326381406.2080796,
   "loops": [
    {
     "label": "rows_cols",
@@ -24,8 +24,8 @@
     "flattened": true,
     "trip": 36100,
     "II": 2,
-    "iterLatency": 18,
-    "latency": 72217
+    "iterLatency": 19,
+    "latency": 72218
    }
   ],
   "addrLuts": 442,

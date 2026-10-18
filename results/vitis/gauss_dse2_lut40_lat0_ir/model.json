@@ -22,15 +22,15 @@
   "S1.25": "ADD16 TRUNC6"
  },
  "prediction": {
-  "cycles": 72217,
-  "timeNs": 361085,
+  "cycles": 72219,
+  "timeNs": 361095,
   "intervalNs": 10,
-  "critPs": 4673,
-  "luts": 618,
-  "carry4": 32,
-  "ff": 546,
-  "areaUm2": 11042.48400178079,
-  "energyFj": 1277495281.0637686,
+  "critPs": 4952,
+  "luts": 674,
+  "carry4": 30,
+  "ff": 616,
+  "areaUm2": 13800.937562274617,
+  "energyFj": 1849236030.1841936,
   "loops": [
    {
     "label": "rows_cols",
@@ -38,17 +38,17 @@
     "flattened": true,
     "trip": 36100,
     "II": 2,
-    "iterLatency": 18,
-    "latency": 72217
+    "iterLatency": 20,
+    "latency": 72219
    }
   ],
   "addrLuts": 464,
   "units": [
    {
     "unit": "MUL8 T8 +C",
-    "count": 3,
-    "luts": 26,
-    "carry4": 6
+    "count": 5,
+    "luts": 36,
+    "carry4": 4
    },
    {
     "unit": "ADD16 TRUNC2",

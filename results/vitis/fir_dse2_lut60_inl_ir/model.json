@@ -38,23 +38,23 @@
   "S1.46": "ADD32 (ADD16 TRUNC7 + ADD16 exato)"
  },
  "prediction": {
-  "cycles": 1016,
-  "timeNs": 5080,
+  "cycles": 1020,
+  "timeNs": 5100,
   "intervalNs": 5,
-  "critPs": 4661,
-  "luts": 709,
-  "carry4": 44,
-  "ff": 656,
-  "areaUm2": 19365.979818860724,
-  "energyFj": 43271051.031132296,
+  "critPs": 4999,
+  "luts": 845,
+  "carry4": 39,
+  "ff": 610,
+  "areaUm2": 27854.120618860725,
+  "energyFj": 67520534.81434317,
   "loops": [
    {
     "label": "samples",
     "mode": "pipelined",
     "trip": 1009,
     "II": 1,
-    "iterLatency": 7,
-    "latency": 1016
+    "iterLatency": 11,
+    "latency": 1020
    }
   ],
   "addrLuts": 522,
@@ -62,8 +62,8 @@
    {
     "unit": "MUL8 T8 +C",
     "count": 6,
-    "luts": 50,
-    "carry4": 9
+    "luts": 51,
+    "carry4": 4
    },
    {
     "unit": "MUL8 T6 A2c",
@@ -74,7 +74,7 @@
    {
     "unit": "MUL8 T6 A10c",
     "count": 6,
-    "luts": 11,
+    "luts": 10,
     "carry4": 0
    },
    {
@@ -90,16 +90,16 @@
     "carry4": 14
    },
    {
-    "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
-    "count": 4,
-    "luts": 24,
-    "carry4": 8
-   },
-   {
     "unit": "MUL8 T10 +C",
     "count": 1,
     "luts": 0,
     "carry4": 0
+   },
+   {
+    "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
+    "count": 4,
+    "luts": 24,
+    "carry4": 8
    }
   ],
   "model": {

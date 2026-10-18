@@ -11,12 +11,12 @@
   "cycles": 72216,
   "timeNs": 722160,
   "intervalNs": 20,
-  "critPs": 8895,
-  "luts": 703,
+  "critPs": 8847,
+  "luts": 713,
   "carry4": 70,
-  "ff": 492,
-  "areaUm2": 14398.183037662338,
-  "energyFj": 1325558270.6343393,
+  "ff": 518,
+  "areaUm2": 14918.682237662337,
+  "energyFj": 1430233642.7380831,
   "loops": [
    {
     "label": "rows_cols",

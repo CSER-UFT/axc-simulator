@@ -10,15 +10,15 @@
   "S1.1": "MUL8 KUL"
  },
  "prediction": {
-  "cycles": 72216,
-  "timeNs": 361080,
+  "cycles": 72218,
+  "timeNs": 361090,
   "intervalNs": 10,
-  "critPs": 4865,
-  "luts": 530,
+  "critPs": 4766,
+  "luts": 556,
   "carry4": 23,
-  "ff": 384,
-  "areaUm2": 6469.588188777635,
-  "energyFj": 633936485.0145844,
+  "ff": 455,
+  "areaUm2": 7570.6441887776355,
+  "energyFj": 855383648.2704881,
   "loops": [
    {
     "label": "rows_cols",
@@ -26,8 +26,8 @@
     "flattened": true,
     "trip": 36100,
     "II": 2,
-    "iterLatency": 17,
-    "latency": 72216
+    "iterLatency": 19,
+    "latency": 72218
    }
   ],
   "addrLuts": 404,

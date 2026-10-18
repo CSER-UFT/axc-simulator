@@ -1,0 +1,62 @@
+{
+ "case": "gauss_drum6_rtl_ir",
+ "kernel": "gauss",
+ "kind": "ir",
+ "note": "mul8=MUL8 DRUM6, unidades em RTL (caixa preta)",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "gauss",
+ "assign": {
+  "S1.1": "MUL8 DRUM6",
+  "S1.6": "MUL8 DRUM6",
+  "S1.12": "MUL8 DRUM6",
+  "S1.18": "MUL8 DRUM6",
+  "S1.24": "MUL8 DRUM6"
+ },
+ "prediction": {
+  "cycles": 72220,
+  "timeNs": 361100,
+  "intervalNs": 10,
+  "critPs": 4026,
+  "luts": 877,
+  "carry4": 51,
+  "ff": 635,
+  "areaUm2": 19398.232844924907,
+  "energyFj": 2283328680.9438143,
+  "loops": [
+   {
+    "label": "rows_cols",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 36100,
+    "II": 2,
+    "iterLatency": 21,
+    "latency": 72220
+   }
+  ],
+  "addrLuts": 464,
+  "units": [
+   {
+    "unit": "ADD16 exato",
+    "count": 8,
+    "luts": 111,
+    "carry4": 35
+   },
+   {
+    "unit": "MUL8 DRUM6",
+    "count": 5,
+    "luts": 189,
+    "carry4": 11
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}

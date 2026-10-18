@@ -2,7 +2,7 @@
 
 Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-1. Cada caso é o mesmo projeto no simulador e no Vitis HLS 2022.2 (o C++ exportado do projeto elaborado, `_ir`, ou o código original, `_src`), com multiplicadores na lógica (sem DSP). LUT e FF do modelo vêm da síntese das unidades (Yosys `synth_xilinx`, ou o Vivado quando há data/vivado-units.json), mais as peças do modelo (multiplexadores, comparadores, registradores, contadores e a seleção de banco). A referência de recursos e de período é o Vivado depois do roteamento; a estimativa do csynth fica na tabela só para comparação. "Exportação" é a previsão feita quando o caso foi gerado (o modelo antes da primeira rodada, nos 23 primeiros casos; o calibrado com a primeira rodada, nos da segunda); "modelo" é o atual, para as mesmas atribuições de unidades, com LUT, CARRY4 e atrasos das unidades caracterizadas no Vivado (data/vivado-units.json).
 
-45 de 45 casos com relatório do csynth; 45 com o Vivado (impl); 45 com csim.
+45 de 55 casos com relatório do csynth; 45 com o Vivado (impl); 55 com csim.
 
 #### Erro médio do modelo (desvio relativo médio entre o modelo e a medida)
 
@@ -64,6 +64,16 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_inl_ir | 0 | 1009 |
 | gauss_dse2_lut40_inl_ir | 0 | 36100 |
 | fir_dse2_lut60_inl_ir | 0 | 1009 |
+| gauss_drum6_rtl_ir | 0 | 36100 |
+| gauss_t8c_loa6_rtl_ir | 0 | 36100 |
+| sobel_loa4_rtl_ir | 0 | 36100 |
+| sharpen_kul_rtl_ir | 0 | 36100 |
+| fir_t8c_loa11_rtl_ir | 0 | 1009 |
+| dot_t4_rtl_ir | 0 | 1 |
+| gauss_dse_op40_rtl_ir | 0 | 36100 |
+| fir_dse_op60_rtl_ir | 0 | 1009 |
+| gauss_dse2_lut40_rtl_ir | 0 | 36100 |
+| fir_dse2_lut60_rtl_ir | 0 | 1009 |
 
 #### Latência (ciclos) e período
 
@@ -114,6 +124,16 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_inl_ir | 1015 | 1021 | 1036 | 0,986 | 4,98 | 3,73 | 4,42 |
 | gauss_dse2_lut40_inl_ir | 72217 | 72219 | 72220 | 1,000 | 4,95 | 7,05 | 5,71 |
 | fir_dse2_lut60_inl_ir | 1016 | 1020 | 1030 | 0,990 | 5,00 | 3,73 | 4,51 |
+| gauss_drum6_rtl_ir | 72220 | 72220 | - | - | 4,03 | - | - |
+| gauss_t8c_loa6_rtl_ir | 72220 | 72220 | - | - | 4,22 | - | - |
+| sobel_loa4_rtl_ir | 72218 | 72218 | - | - | 4,93 | - | - |
+| sharpen_kul_rtl_ir | 72218 | 72218 | - | - | 4,77 | - | - |
+| fir_t8c_loa11_rtl_ir | 1027 | 1027 | - | - | 4,52 | - | - |
+| dot_t4_rtl_ir | 260 | 260 | - | - | 4,98 | - | - |
+| gauss_dse_op40_rtl_ir | 72219 | 72219 | - | - | 4,87 | - | - |
+| fir_dse_op60_rtl_ir | 1021 | 1021 | - | - | 4,98 | - | - |
+| gauss_dse2_lut40_rtl_ir | 72219 | 72219 | - | - | 4,95 | - | - |
+| fir_dse2_lut60_rtl_ir | 1020 | 1020 | - | - | 5,00 | - | - |
 
 #### Recursos de FPGA
 
@@ -164,6 +184,16 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_inl_ir | 938 | 1046 | 10762 | 1063 | 30 | 35 | 556 | 626 | 10844 | 1062 |
 | gauss_dse2_lut40_inl_ir | 618 | 674 | 3772 | 815 | 30 | 160 | 546 | 616 | 1670 | 646 |
 | fir_dse2_lut60_inl_ir | 709 | 845 | 8958 | 1025 | 39 | 85 | 656 | 610 | 7508 | 935 |
+| gauss_drum6_rtl_ir | 877 | 877 | - | - | 51 | - | 635 | 635 | - | - |
+| gauss_t8c_loa6_rtl_ir | 795 | 795 | - | - | 19 | - | 635 | 635 | - | - |
+| sobel_loa4_rtl_ir | 728 | 728 | - | - | 35 | - | 516 | 516 | - | - |
+| sharpen_kul_rtl_ir | 556 | 556 | - | - | 23 | - | 455 | 455 | - | - |
+| fir_t8c_loa11_rtl_ir | 978 | 978 | - | - | 12 | - | 733 | 733 | - | - |
+| dot_t4_rtl_ir | 124 | 124 | - | - | 12 | - | 89 | 89 | - | - |
+| gauss_dse_op40_rtl_ir | 709 | 709 | - | - | 23 | - | 624 | 624 | - | - |
+| fir_dse_op60_rtl_ir | 1046 | 1046 | - | - | 30 | - | 626 | 626 | - | - |
+| gauss_dse2_lut40_rtl_ir | 674 | 674 | - | - | 30 | - | 616 | 616 | - | - |
+| fir_dse2_lut60_rtl_ir | 845 | 845 | - | - | 39 | - | 610 | 610 | - | - |
 
 #### Efeito da aproximação: LUTs contra o projeto exato do mesmo kernel
 
@@ -207,6 +237,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | INLINE off (o Vitis divide a netlist em estágios) | 10 | 25,5 p.p. | 5 de 10 | -5,0% |
 | combinacional (INLINE off, LATENCY 0) | 10 | 16,5 p.p. | 6 de 10 | 32,8% |
 | em linha (INLINE) | 10 | 18,9 p.p. | 6 de 10 | 27,0% |
+| RTL (caixa preta) | 0 | - | 0 de 0 | - |
 
 #### Unidades aproximadas no Vivado (funções com INLINE off): instâncias, LUT e FF por instância
 

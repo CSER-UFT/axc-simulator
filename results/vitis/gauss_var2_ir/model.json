@@ -8,47 +8,47 @@
  "top": "gauss",
  "assign": {},
  "prediction": {
-  "cycles": 3069070,
-  "timeNs": 15345350,
+  "cycles": 3718870,
+  "timeNs": 18594350,
   "intervalNs": null,
-  "critPs": 3737,
-  "luts": 241,
-  "carry4": 18,
+  "critPs": 2945,
+  "luts": 250,
+  "carry4": 23,
   "ff": 101,
   "areaUm2": 6341.011193912338,
-  "energyFj": 19761360474.544525,
+  "energyFj": 23734743955.57616,
   "loops": [
    {
     "label": "rows",
     "mode": "sequential",
     "trip": 190,
     "II": null,
-    "iterLatency": 16153,
-    "latency": 3069070
+    "iterLatency": 19573,
+    "latency": 3718870
    },
    {
     "label": "cols",
     "mode": "sequential",
     "trip": 190,
     "II": null,
-    "iterLatency": 85,
-    "latency": 16150
+    "iterLatency": 103,
+    "latency": 19570
    },
    {
     "label": "L3",
     "mode": "sequential",
     "trip": 3,
     "II": null,
-    "iterLatency": 27,
-    "latency": 81
+    "iterLatency": 33,
+    "latency": 99
    },
    {
     "label": "L4",
     "mode": "sequential",
     "trip": 3,
     "II": null,
-    "iterLatency": 4,
-    "latency": 12
+    "iterLatency": 6,
+    "latency": 18
    }
   ],
   "addrLuts": 88,
@@ -62,8 +62,8 @@
    {
     "unit": "MUL8 exato",
     "count": 1,
-    "luts": 76,
-    "carry4": 4
+    "luts": 67,
+    "carry4": 9
    }
   ],
   "model": {

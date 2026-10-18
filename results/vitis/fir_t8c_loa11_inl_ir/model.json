@@ -38,23 +38,23 @@
   "S1.46": "ADD32 (ADD16 LOA11 + ADD16 exato)"
  },
  "prediction": {
-  "cycles": 1015,
-  "timeNs": 5075,
+  "cycles": 1027,
+  "timeNs": 5135,
   "intervalNs": 5,
-  "critPs": 4534,
-  "luts": 782,
-  "carry4": 33,
-  "ff": 519,
-  "areaUm2": 15752.295851051053,
-  "energyFj": 34251831.53218532,
+  "critPs": 4523,
+  "luts": 978,
+  "carry4": 12,
+  "ff": 733,
+  "areaUm2": 43879.27185105105,
+  "energyFj": 115026528.18886663,
   "loops": [
    {
     "label": "samples",
     "mode": "pipelined",
     "trip": 1009,
     "II": 1,
-    "iterLatency": 6,
-    "latency": 1015
+    "iterLatency": 18,
+    "latency": 1027
    }
   ],
   "addrLuts": 522,
@@ -62,20 +62,20 @@
    {
     "unit": "MUL8 T8 +C",
     "count": 14,
-    "luts": 76,
-    "carry4": 15
+    "luts": 78,
+    "carry4": 8
    },
    {
     "unit": "ADD16 LOA11",
     "count": 11,
-    "luts": 123,
-    "carry4": 11
+    "luts": 137,
+    "carry4": 0
    },
    {
     "unit": "ADD32 (ADD16 LOA11 + ADD16 exato)",
     "count": 4,
-    "luts": 39,
-    "carry4": 3
+    "luts": 44,
+    "carry4": 0
    }
   ],
   "model": {

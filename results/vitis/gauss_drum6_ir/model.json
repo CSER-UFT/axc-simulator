@@ -14,15 +14,15 @@
   "S1.24": "MUL8 DRUM6"
  },
  "prediction": {
-  "cycles": 72217,
-  "timeNs": 361085,
+  "cycles": 72220,
+  "timeNs": 361100,
   "intervalNs": 10,
-  "critPs": 4046,
-  "luts": 749,
-  "carry4": 46,
-  "ff": 592,
-  "areaUm2": 14968.333980120438,
-  "energyFj": 1675321862.5655859,
+  "critPs": 4026,
+  "luts": 877,
+  "carry4": 51,
+  "ff": 635,
+  "areaUm2": 19398.232844924907,
+  "energyFj": 2283328680.9438143,
   "loops": [
    {
     "label": "rows_cols",
@@ -30,8 +30,8 @@
     "flattened": true,
     "trip": 36100,
     "II": 2,
-    "iterLatency": 18,
-    "latency": 72217
+    "iterLatency": 21,
+    "latency": 72220
    }
   ],
   "addrLuts": 464,
@@ -44,9 +44,9 @@
    },
    {
     "unit": "MUL8 DRUM6",
-    "count": 3,
-    "luts": 120,
-    "carry4": 6
+    "count": 5,
+    "luts": 189,
+    "carry4": 11
    }
   ],
   "model": {

@@ -38,23 +38,23 @@
   "S1.46": "ADD32 (ADD16 LOA15 + ADD16 exato)"
  },
  "prediction": {
-  "cycles": 1015,
-  "timeNs": 5075,
+  "cycles": 1021,
+  "timeNs": 5105,
   "intervalNs": 5,
-  "critPs": 4981,
-  "luts": 938,
-  "carry4": 38,
-  "ff": 556,
-  "areaUm2": 18852.125017724175,
-  "energyFj": 39018832.14205327,
+  "critPs": 4980,
+  "luts": 1046,
+  "carry4": 30,
+  "ff": 626,
+  "areaUm2": 30723.510617724176,
+  "energyFj": 72950859.54523367,
   "loops": [
    {
     "label": "samples",
     "mode": "pipelined",
     "trip": 1009,
     "II": 1,
-    "iterLatency": 6,
-    "latency": 1015
+    "iterLatency": 12,
+    "latency": 1021
    }
   ],
   "addrLuts": 522,
@@ -62,14 +62,26 @@
    {
     "unit": "MUL8 DRUM4",
     "count": 2,
-    "luts": 70,
+    "luts": 62,
     "carry4": 1
    },
    {
     "unit": "MUL8 DRUM2",
     "count": 1,
-    "luts": 29,
-    "carry4": 1
+    "luts": 23,
+    "carry4": 0
+   },
+   {
+    "unit": "MUL8 T8 +C",
+    "count": 3,
+    "luts": 32,
+    "carry4": 3
+   },
+   {
+    "unit": "MUL8 T6 A10c",
+    "count": 4,
+    "luts": 5,
+    "carry4": 0
    },
    {
     "unit": "MUL8 T16",
@@ -84,57 +96,45 @@
     "carry4": 0
    },
    {
-    "unit": "MUL8 T8 +C",
-    "count": 3,
-    "luts": 32,
-    "carry4": 6
+    "unit": "MUL8 DRUM3 +C",
+    "count": 1,
+    "luts": 36,
+    "carry4": 0
    },
    {
     "unit": "ADD16 LOA10",
     "count": 1,
-    "luts": 9,
+    "luts": 8,
     "carry4": 1
-   },
-   {
-    "unit": "MUL8 T6 A10c",
-    "count": 4,
-    "luts": 5,
-    "carry4": 0
-   },
-   {
-    "unit": "MUL8 DRUM3 +C",
-    "count": 1,
-    "luts": 38,
-    "carry4": 2
    },
    {
     "unit": "ADD16 LOA9",
     "count": 5,
-    "luts": 66,
+    "luts": 63,
     "carry4": 7
    },
    {
     "unit": "ADD16 LOA8",
     "count": 4,
-    "luts": 53,
+    "luts": 50,
     "carry4": 9
    },
    {
     "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
     "count": 2,
-    "luts": 27,
+    "luts": 25,
     "carry4": 4
    },
    {
     "unit": "MUL8 DRUM3",
     "count": 1,
-    "luts": 38,
-    "carry4": 2
+    "luts": 36,
+    "carry4": 0
    },
    {
     "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
     "count": 1,
-    "luts": 11,
+    "luts": 10,
     "carry4": 1
    },
    {

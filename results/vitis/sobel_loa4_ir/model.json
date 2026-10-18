@@ -14,15 +14,15 @@
   "S1.28": "ADD16 LOA4"
  },
  "prediction": {
-  "cycles": 72217,
-  "timeNs": 361085,
+  "cycles": 72218,
+  "timeNs": 361090,
   "intervalNs": 10,
-  "critPs": 4545,
-  "luts": 691,
+  "critPs": 4930,
+  "luts": 728,
   "carry4": 35,
-  "ff": 492,
-  "areaUm2": 12015.22603996004,
-  "energyFj": 1136407776.8900898,
+  "ff": 516,
+  "areaUm2": 12815.99403996004,
+  "energyFj": 1297462541.3727987,
   "loops": [
    {
     "label": "rows_cols",
@@ -30,8 +30,8 @@
     "flattened": true,
     "trip": 36100,
     "II": 2,
-    "iterLatency": 18,
-    "latency": 72217
+    "iterLatency": 19,
+    "latency": 72218
    }
   ],
   "addrLuts": 442,
@@ -45,7 +45,7 @@
    {
     "unit": "ADD16 LOA4",
     "count": 3,
-    "luts": 26,
+    "luts": 24,
     "carry4": 6
    }
   ],

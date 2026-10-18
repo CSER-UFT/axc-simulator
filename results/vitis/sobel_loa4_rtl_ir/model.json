@@ -1,0 +1,62 @@
+{
+ "case": "sobel_loa4_rtl_ir",
+ "kernel": "sobel",
+ "kind": "ir",
+ "note": "*=ADD16 LOA4, unidades em RTL (caixa preta)",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "sobel",
+ "assign": {
+  "S1.3": "ADD16 LOA4",
+  "S1.5": "ADD16 LOA4",
+  "S1.15": "ADD16 LOA4",
+  "S1.16": "ADD16 LOA4",
+  "S1.28": "ADD16 LOA4"
+ },
+ "prediction": {
+  "cycles": 72218,
+  "timeNs": 361090,
+  "intervalNs": 10,
+  "critPs": 4930,
+  "luts": 728,
+  "carry4": 35,
+  "ff": 516,
+  "areaUm2": 12815.99403996004,
+  "energyFj": 1297462541.3727987,
+  "loops": [
+   {
+    "label": "rows_cols",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 36100,
+    "II": 2,
+    "iterLatency": 19,
+    "latency": 72218
+   }
+  ],
+  "addrLuts": 442,
+  "units": [
+   {
+    "unit": "ADD16 exato",
+    "count": 8,
+    "luts": 62,
+    "carry4": 19
+   },
+   {
+    "unit": "ADD16 LOA4",
+    "count": 3,
+    "luts": 24,
+    "carry4": 6
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}

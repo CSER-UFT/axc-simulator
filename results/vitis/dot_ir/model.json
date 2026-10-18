@@ -8,23 +8,23 @@
  "top": "dot",
  "assign": {},
  "prediction": {
-  "cycles": 259,
-  "timeNs": 1295,
+  "cycles": 261,
+  "timeNs": 1305,
   "intervalNs": 5,
-  "critPs": 4949,
-  "luts": 139,
-  "carry4": 13,
-  "ff": 73,
-  "areaUm2": 6128.3716,
-  "energyFj": 2424312.361624,
+  "critPs": 4026,
+  "luts": 137,
+  "carry4": 19,
+  "ff": 89,
+  "areaUm2": 6448.678800000001,
+  "energyFj": 2668375.9004879994,
   "loops": [
    {
     "label": "acc",
     "mode": "pipelined",
     "trip": 256,
     "II": 1,
-    "iterLatency": 2,
-    "latency": 258
+    "iterLatency": 4,
+    "latency": 260
    }
   ],
   "addrLuts": 0,
@@ -38,8 +38,8 @@
    {
     "unit": "MUL8 exato",
     "count": 1,
-    "luts": 101,
-    "carry4": 4
+    "luts": 89,
+    "carry4": 10
    }
   ],
   "model": {

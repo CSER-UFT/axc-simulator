@@ -8,23 +8,23 @@
  "top": "fir",
  "assign": {},
  "prediction": {
-  "cycles": 1018,
-  "timeNs": 5090,
+  "cycles": 1020,
+  "timeNs": 5100,
   "intervalNs": 5,
-  "critPs": 4046,
-  "luts": 888,
+  "critPs": 4026,
+  "luts": 1024,
   "carry4": 114,
-  "ff": 816,
-  "areaUm2": 31383.877174025976,
-  "energyFj": 63370328.42326458,
+  "ff": 582,
+  "areaUm2": 36969.23397402598,
+  "energyFj": 79320569.61886753,
   "loops": [
    {
     "label": "samples",
     "mode": "pipelined",
     "trip": 1009,
     "II": 1,
-    "iterLatency": 9,
-    "latency": 1018
+    "iterLatency": 11,
+    "latency": 1020
    }
   ],
   "addrLuts": 522,

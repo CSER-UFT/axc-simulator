@@ -1,0 +1,70 @@
+{
+ "case": "gauss_t8c_loa6_rtl_ir",
+ "kernel": "gauss",
+ "kind": "ir",
+ "note": "mul8=MUL8 T8 +C;add16=ADD16 LOA6, unidades em RTL (caixa preta)",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "gauss",
+ "assign": {
+  "S1.1": "MUL8 T8 +C",
+  "S1.6": "MUL8 T8 +C",
+  "S1.12": "MUL8 T8 +C",
+  "S1.18": "MUL8 T8 +C",
+  "S1.24": "MUL8 T8 +C",
+  "S1.4": "ADD16 LOA6",
+  "S1.7": "ADD16 LOA6",
+  "S1.10": "ADD16 LOA6",
+  "S1.13": "ADD16 LOA6",
+  "S1.16": "ADD16 LOA6",
+  "S1.19": "ADD16 LOA6",
+  "S1.22": "ADD16 LOA6",
+  "S1.25": "ADD16 LOA6"
+ },
+ "prediction": {
+  "cycles": 72220,
+  "timeNs": 361100,
+  "intervalNs": 10,
+  "critPs": 4216,
+  "luts": 795,
+  "carry4": 19,
+  "ff": 635,
+  "areaUm2": 15562.686538531512,
+  "energyFj": 2047056003.7872453,
+  "loops": [
+   {
+    "label": "rows_cols",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 36100,
+    "II": 2,
+    "iterLatency": 21,
+    "latency": 72220
+   }
+  ],
+  "addrLuts": 464,
+  "units": [
+   {
+    "unit": "MUL8 T8 +C",
+    "count": 5,
+    "luts": 36,
+    "carry4": 4
+   },
+   {
+    "unit": "ADD16 LOA6",
+    "count": 4,
+    "luts": 54,
+    "carry4": 10
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}
