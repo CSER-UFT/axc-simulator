@@ -1,6 +1,6 @@
 # Resultados dos estudos de caso
 
-Gerado por `scripts/experiments.mjs` em 2026-10-18 (commit d3ab47d, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
+Gerado por `scripts/experiments.mjs` em 2026-10-18 (commit daecf30, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
 
 ### E1. Precisão do modelo estático de erro
 
@@ -83,14 +83,14 @@ Objetivo: área ASIC; restrição: PSNR mínimo (estimado na busca, conferido bi
 
 | Heurística | Grupos | Avaliações | Tempo (s) |
 | --- | --- | ---: | ---: |
-| Sequencial | classe | 31 | 0,2 |
-| Sequencial | operação | 189 | 0,9 |
-| Eficiência | classe | 145 | 1,1 |
-| Eficiência | operação | 2062 | 13,1 |
-| Exaustiva | classe | 378 | 2,5 |
-| Exaustiva | operação | 1180 | 6,9 |
-| Aleatória | classe | 74 | 0,4 |
-| Aleatória | operação | 153 | 0,8 |
+| Sequencial | classe | 31 | 0,5 |
+| Sequencial | operação | 189 | 1,5 |
+| Eficiência | classe | 145 | 1,4 |
+| Eficiência | operação | 2062 | 19,8 |
+| Exaustiva | classe | 378 | 2,8 |
+| Exaustiva | operação | 1180 | 14,7 |
+| Aleatória | classe | 74 | 0,7 |
+| Aleatória | operação | 153 | 1,6 |
 
 Verificação: o primeiro ponto (o mais barato estimado como viável) passou na execução bit a bit em 90 de 90 casos; nos outros, a busca verificou em média 0,0 pontos até achar um que passa (no máximo 1).
 
@@ -151,5 +151,31 @@ Kernels com `unroll factor=2` no laço com pipeline; objetivo área, PSNR de pel
 | sharpen | operação | 36 | 0,4% | ∞ | 2 | 1 de 5 |
 | sharpen | operação do código | 7 | 0,0% | ∞ | 0 | 0 de 5 |
 
-Tempo total: 507 s.
+### E7. SSIM: estimativa e exploração
+
+SSIM padrão (janela gaussiana 11 × 11, σ = 1,5) na saída de imagem, com a imagem de teste; 27 casos (kernel e família de unidades, como no E1). A estimativa usa as estatísticas locais da imagem exata e o erro do modelo estático: pela faixa de valor da saída (média e variância do erro em 32 faixas, do modelo por amostras), como ruído independente do sinal, ou pelo modelo analítico (sem as faixas, o ganho é zero e cai na fórmula do ruído independente). "Abaixo do medido" é a fração dos casos em que a estimativa é conservadora.
+
+#### E7: SSIM estimado contra o medido
+
+| Estimativa | Diferença mediana | Até 0,01 | Até 0,05 | Pior diferença | Abaixo do medido | Mediana com SSIM ≥ 0,95 (15 casos) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| por faixa de valor (amostras) | 0,0174 | 44% | 67% | 0,463 | 85% | 0,0008 |
+| ruído independente (amostras) | 0,0379 | 41% | 59% | 0,503 | 93% | 0,0016 |
+| analítico | 0,0316 | 41% | 59% | 0,524 | 78% | 0,0006 |
+
+#### E7: exploração por operação com restrição em SSIM (heurística de eficiência, área)
+
+| Kernel | SSIM mín. | Avaliações | Economia de área | SSIM estimado | SSIM medido | PSNR medido | Verificações |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| gauss | 0,95 | 3236 | 45,1% | 0,9518 | 0,9680 | 29,3 | 1 |
+| gauss | 0,98 | 2979 | 41,7% | 0,9815 | 0,9867 | 38,0 | 1 |
+| gauss | 0,99 | 2665 | 38,2% | 0,9910 | 0,9934 | 38,1 | 1 |
+| sobel | 0,95 | 205 | 8,2% | 0,9593 | 0,9507 | 28,3 | 1 |
+| sobel | 0,98 | 160 | 2,8% | 0,9882 | 0,9839 | 47,4 | 3 |
+| sobel | 0,99 | 138 | 2,5% | 0,9959 | 0,9938 | 51,9 | 1 |
+| sharpen | 0,95 | 9 | 0,4% | 1,0000 | 1,0000 | ∞ | 1 |
+| sharpen | 0,98 | 9 | 0,4% | 1,0000 | 1,0000 | ∞ | 1 |
+| sharpen | 0,99 | 9 | 0,4% | 1,0000 | 1,0000 | ∞ | 1 |
+
+Tempo total: 991 s.
 

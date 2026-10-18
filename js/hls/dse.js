@@ -8,7 +8,7 @@
  *   objetivo     área ASIC (µm²), LUT + CARRY4, energia por execução (sky130), latência (ns) ou intervalo entre
  *                resultados (II × período), ou a soma ponderada de área, energia e latência, cada uma dividida pela
  *                do projeto exato;
- *   restrição    PSNR mínimo ou MSE máximo em todas as saídas;
+ *   restrição    PSNR mínimo, MSE máximo ou SSIM mínimo (saídas de imagem) em todas as saídas;
  *   grupos       a unidade é escolhida por operação, por linha do código (operação e largura) ou por classe (todas
  *                as multiplicações de 8 bits juntas, por exemplo);
  *   candidatas   para cada grupo, só as unidades da fronteira de Pareto entre o custo da unidade (no objetivo) e o erro
@@ -30,6 +30,7 @@ import { synthesize } from './index.js';
 import { estimateError, unitErrors, analyzeError } from './error.js';
 import { execute, makeInputs } from './exec.js';
 import { rng } from '../axc/metrics.js';
+import { outputSsimStats } from './exec.js';
 
 export const OBJECTIVES = ['area', 'luts', 'energy', 'latency', 'interval', 'weighted'];
 export const HEURISTICS = ['sequential', 'efficiency', 'exhaustive', 'random'];
@@ -74,11 +75,23 @@ export function scoreFn(objective, weights = { area: 1, energy: 1, latency: 1 },
 }
 
 /** Restrição de erro em todas as saídas. */
+export const METRICS = ['psnr', 'mse', 'ssim'];
+/**
+ * Restrição em todas as saídas: PSNR mínimo, MSE máximo ou SSIM mínimo. O SSIM só existe nas saídas de imagem (8 bits
+ * sem sinal, 2 dimensões): com a restrição em SSIM, ela vale nessas saídas (a exploração recusa um kernel sem nenhuma).
+ */
 export function constraintFn({ metric = 'psnr', value = 30 } = {}) {
+    if (metric === 'ssim') return (outs) => outs.every((o) => o.SSIM === null || o.SSIM === undefined || o.SSIM >= value);
     return (outs) => outs.every((o) => (metric === 'psnr' ? o.PSNR >= value : o.MSE <= value));
 }
-/** Erro escalar para a eficiência: soma de MSE / pico² das saídas (coerente com o PSNR). */
-const errScalar = (outs) => outs.reduce((s, o) => s + o.MSE / (o.peak * o.peak), 0);
+/**
+ * Erro escalar para a eficiência e a fronteira: soma de MSE / pico² das saídas (coerente com o PSNR e o MSE), ou
+ * soma de 1 - SSIM com a restrição em SSIM.
+ */
+const errScalarOf = (metric) => (metric === 'ssim'
+    ? (outs) => outs.reduce((s, o) => s + (o.SSIM === null || o.SSIM === undefined ? o.MSE / (o.peak * o.peak) : 1 - o.SSIM), 0)
+    : (outs) => outs.reduce((s, o) => s + o.MSE / (o.peak * o.peak), 0));
+const errScalar = errScalarOf('psnr');
 
 const keyOf = (assign) => [...assign].filter(([, u]) => !/ exato$|2 × ADD16 exato/.test(u)).sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, u]) => `${k}=${u}`).join(';');
 
@@ -102,7 +115,7 @@ function evaluate(v, assign, ctx) {
     const est = estimateError(r, v.prof, { method: v.method, budget: false, cache: v.ownCache, maxRows: ctx.maxRows ?? Infinity });
     const outs = [...est.outputs].map(([array, o]) => ({ array, ...o }));
     const cost = costOf(r);
-    const p = { variant: v.label, clockNs: v.clockNs, key, assign: new Map(r.assign), units: r.cost.units.map((u) => `${u.count} × ${u.unit.name}`), cost, score: ctx.score(cost), outs, err: errScalar(outs), feasible: ctx.ok(outs), v };
+    const p = { variant: v.label, clockNs: v.clockNs, key, assign: new Map(r.assign), units: r.cost.units.map((u) => `${u.count} × ${u.unit.name}`), cost, score: ctx.score(cost), outs, err: (ctx.errOf ?? errScalar)(outs), feasible: ctx.ok(outs), v };
     v.cache.set(key, p);
     v.evals++;
     ctx.points.push(p);
@@ -395,6 +408,7 @@ export function explore(src, o = {}) {
     const good = prepared.filter((v) => !v.error);
     const prepMs = Date.now() - t0;
     if (!good.length) throw new Error(prepared[0]?.error ?? 'nenhuma variante');
+    if (o.constraint?.metric === 'ssim' && !outputSsimStats(good[0].design, good[0].prof).size) throw new Error('restrição em SSIM: o kernel não tem saída de imagem (vetor de 2 dimensões com 8 bits sem sinal, pelo menos 11 × 11 escritos)');
     const ref = costOf(good[0].base);
     const score = scoreFn(o.objective ?? 'area', o.weights, ref);
     const runs = [];
@@ -404,7 +418,7 @@ export function explore(src, o = {}) {
     const candMs = Date.now() - t2;
     for (const h of heuristics) {
         const t1 = Date.now();
-        const ctx = { score, ok, points: [], progress: o.progress, maxRows: o.maxRows, steps: [] };
+        const ctx = { score, ok, errOf: errScalarOf(o.constraint?.metric), points: [], progress: o.progress, maxRows: o.maxRows, steps: [] };
         let best = null;
         const traces = [], last = [];
         for (const v of good) {
@@ -443,7 +457,7 @@ export function pointSummary(p, ref = null) {
     if (!p) return null;
     return {
         variant: p.variant, clockNs: p.clockNs, score: p.score, cost: p.cost, units: p.units, assign: Object.fromEntries(p.assign),
-        estimated: p.outs.map((x) => ({ array: x.array, ME: x.ME, MSE: x.MSE, PSNR: x.PSNR })), feasible: p.feasible,
+        estimated: p.outs.map((x) => ({ array: x.array, ME: x.ME, MSE: x.MSE, PSNR: x.PSNR, SSIM: x.SSIM ?? null })), feasible: p.feasible,
         measured: p.measured ?? null, measuredOk: p.measuredOk ?? null,
         savings: ref ? { area: 1 - p.cost.area / ref.area, energy: 1 - p.cost.energy / ref.energy, latency: 1 - p.cost.latency / ref.latency } : null,
     };

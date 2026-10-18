@@ -23,7 +23,8 @@
  * Lógica bit a bit fora as máscaras passa o erro adiante sem modelo (marcado), e truncamentos de tipo são tratados
  * como sem estouro.
  */
-import { outputArrays, compile, wrapTo, bit, CMP, execute, compareOutputs } from './exec.js';
+import { ssimEstimate, ssimEstimateBins, SSIM_BINS } from '../axc/ssim.js';
+import { outputArrays, compile, wrapTo, bit, CMP, execute, compareOutputs, outputSsimStats } from './exec.js';
 import { rng } from '../axc/metrics.js';
 import { opFunction } from './approx.js';
 import { typeRange } from './elab.js';
@@ -254,6 +255,11 @@ export function propagate(result, prof, { intrinsic = new Map(), fns = new Map()
         const reps = Math.max(1, Math.ceil(512 / rows.length));
         const L = prog.length, R = rows.length * reps;
         const s1 = new Float64Array(L), s2 = new Float64Array(L);
+        // Nas escritas, também a relação entre o erro e o valor exato (para o SSIM: um erro proporcional ao valor
+        // preserva a estrutura da imagem).
+        const sx = new Float64Array(L), sxx = new Float64Array(L), sxe = new Float64Array(L);
+        // e o erro condicionado ao valor exato da saída, em SSIM_BINS faixas (contagem, soma e soma dos quadrados).
+        const binsOf = new Map();
         const ap = new Float64Array(L);
         const argIdx = prog.map((ins) => ins.a.map((x) => (x.ix !== undefined ? loc.get(x.ix) : -1)));
         const consts = prog.map((ins) => ins.a.map((x) => x.c));
@@ -277,8 +283,15 @@ export function propagate(result, prof, { intrinsic = new Map(), fns = new Map()
                     case 'iv': v = row[k]; break;
                     case 'store': case 'out': {
                         const t = ins.arr.type;
-                        const e = wrapTo(X(k, 0), t.bits, t.signed) - wrapTo(Xe(k, 0), t.bits, t.signed);
+                        const xe = wrapTo(Xe(k, 0), t.bits, t.signed);
+                        const e = wrapTo(X(k, 0), t.bits, t.signed) - xe;
                         s1[k] += e; s2[k] += e * e;
+                        sx[k] += xe; sxx[k] += xe * xe; sxe[k] += xe * e;
+                        if (t.bits === 8 && !t.signed) {
+                            if (!binsOf.has(k)) binsOf.set(k, new Float64Array(3 * SSIM_BINS));
+                            const B = binsOf.get(k), j = 3 * Math.min(SSIM_BINS - 1, Math.floor((xe * SSIM_BINS) / 256));
+                            B[j]++; B[j + 1] += e; B[j + 2] += e * e;
+                        }
                         continue;
                     }
                     case 'carryout': continue;
@@ -309,6 +322,12 @@ export function propagate(result, prof, { intrinsic = new Map(), fns = new Map()
                 if (!arrErr.has(name)) arrErr.set(name, { w: 0, mu: 0, m2: 0 });
                 const a = arrErr.get(name);
                 a.w += w; a.mu += w * st.mu; a.m2 += w * st.m2;
+                a.wx = (a.wx ?? 0) + w; a.sx = (a.sx ?? 0) + (w * sx[k]) / R; a.sxx = (a.sxx ?? 0) + (w * sxx[k]) / R; a.sxe = (a.sxe ?? 0) + (w * sxe[k]) / R;
+                if (binsOf.has(k)) {
+                    a.bins ??= new Float64Array(3 * SSIM_BINS);
+                    const B = binsOf.get(k);
+                    for (let j = 0; j < B.length; j++) a.bins[j] += (w * B[j]) / R;
+                }
             } else if (n.op !== 'carryout') err.set(n.id, st);
         }
     }
@@ -376,11 +395,33 @@ export function propagate(result, prof, { intrinsic = new Map(), fns = new Map()
     }
     region(design.top, true);
     const outputs = new Map();
+    // SSIM estimado nas saídas de imagem: as estatísticas locais da imagem exata e o erro como ruído independente.
+    const ssimOf = outputSsimStats(design, prof);
     for (const arr of outputArrays(design)) {
         const s = arrErr.get(arr.name);
         const mu = s?.w ? s.mu / s.w : 0, m2 = s?.w ? s.m2 / s.w : 0;
         const peak = typeRange(arr.type)[1];
-        outputs.set(arr.name, { ME: mu, MSE: m2, PSNR: m2 ? 10 * Math.log10((peak * peak) / m2) : Infinity, peak });
+        const st = ssimOf.get(arr.name);
+        // Erro decomposto em uma parte proporcional ao valor exato e um ruído independente: e = a + b·x + n.
+        let gain = 0;
+        if (s?.wx) {
+            const ex = s.sx / s.wx, vx = s.sxx / s.wx - ex * ex, cxe = s.sxe / s.wx - ex * (s.mu / s.w);
+            if (vx > 1e-9) gain = cxe / vx;
+        }
+        // Com o erro por faixa de valor (modelo por amostras), a estimativa usa a média e a variância do erro de cada
+        // faixa, pixel a pixel; sem ele, o ganho e o ruído independente.
+        let byValue = null;
+        if (s?.bins) {
+            byValue = [];
+            for (let j = 0; j < SSIM_BINS; j++) {
+                const c = s.bins[3 * j];
+                byValue.push(c > 1e-9 ? { mu: s.bins[3 * j + 1] / c, v: Math.max(0, s.bins[3 * j + 2] / c - (s.bins[3 * j + 1] / c) ** 2) } : { mu, v: Math.max(0, m2 - mu * mu) });
+            }
+        }
+        const SSIM = !st ? null : byValue ? ssimEstimateBins(st.stats, byValue) : ssimEstimate(st.stats, mu, m2 - mu * mu, gain);
+        // A fórmula do erro independente do sinal, para comparação (estudo E7).
+        const SSIMindep = st ? ssimEstimate(st.stats, mu, m2 - mu * mu) : null;
+        outputs.set(arr.name, { ME: mu, MSE: m2, PSNR: m2 ? 10 * Math.log10((peak * peak) / m2) : Infinity, SSIM, SSIMindep, peak });
     }
     return { err, outputs, flags: [...flags] };
 }

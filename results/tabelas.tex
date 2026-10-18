@@ -96,14 +96,14 @@ fir & operação & 70 & 32,3\% (70,0) & 33,6\% (70,1) & - & 0,0\% ($\infty$) \\ 
 \hline
 \rowcolor{tabAzul}\color{white}Heurística & \color{white}Grupos & \color{white}Avaliações & \color{white}Tempo (s) \\
 \hline
-Sequencial & classe & 31 & 0,2 \\ \hline
-Sequencial & operação & 189 & 0,9 \\ \hline
-Eficiência & classe & 145 & 1,1 \\ \hline
-Eficiência & operação & 2062 & 13,1 \\ \hline
-Exaustiva & classe & 378 & 2,5 \\ \hline
-Exaustiva & operação & 1180 & 6,9 \\ \hline
-Aleatória & classe & 74 & 0,4 \\ \hline
-Aleatória & operação & 153 & 0,8 \\ \hline
+Sequencial & classe & 31 & 0,5 \\ \hline
+Sequencial & operação & 189 & 1,5 \\ \hline
+Eficiência & classe & 145 & 1,4 \\ \hline
+Eficiência & operação & 2062 & 19,8 \\ \hline
+Exaustiva & classe & 378 & 2,8 \\ \hline
+Exaustiva & operação & 1180 & 14,7 \\ \hline
+Aleatória & classe & 74 & 0,7 \\ \hline
+Aleatória & operação & 153 & 1,6 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -163,5 +163,37 @@ sobel & operação & 603 & 6,8\% & 41,0 & 6 & 5 de 13 \\ \hline
 sobel & operação do código & 14 & 0,0\% & $\infty$ & 0 & 0 de 13 \\ \hline
 sharpen & operação & 36 & 0,4\% & $\infty$ & 2 & 1 de 5 \\ \hline
 sharpen & operação do código & 7 & 0,0\% & $\infty$ & 0 & 0 de 5 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{E7: SSIM estimado contra o medido}
+\begin{tabular}{|l|r|r|r|r|r|r|}
+\hline
+\rowcolor{tabAzul}\color{white}Estimativa & \color{white}Diferença mediana & \color{white}Até 0,01 & \color{white}Até 0,05 & \color{white}Pior diferença & \color{white}Abaixo do medido & \color{white}Mediana com SSIM $\geq$ 0,95 (15 casos) \\
+\hline
+por faixa de valor (amostras) & 0,0174 & 44\% & 67\% & 0,463 & 85\% & 0,0008 \\ \hline
+ruído independente (amostras) & 0,0379 & 41\% & 59\% & 0,503 & 93\% & 0,0016 \\ \hline
+analítico & 0,0316 & 41\% & 59\% & 0,524 & 78\% & 0,0006 \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{E7: exploração por operação com restrição em SSIM (heurística de eficiência, área)}
+\begin{tabular}{|l|r|r|r|r|r|r|r|}
+\hline
+\rowcolor{tabAzul}\color{white}Kernel & \color{white}SSIM mín. & \color{white}Avaliações & \color{white}Economia de área & \color{white}SSIM estimado & \color{white}SSIM medido & \color{white}PSNR medido & \color{white}Verificações \\
+\hline
+gauss & 0,95 & 3236 & 45,1\% & 0,9518 & 0,9680 & 29,3 & 1 \\ \hline
+gauss & 0,98 & 2979 & 41,7\% & 0,9815 & 0,9867 & 38,0 & 1 \\ \hline
+gauss & 0,99 & 2665 & 38,2\% & 0,9910 & 0,9934 & 38,1 & 1 \\ \hline
+sobel & 0,95 & 205 & 8,2\% & 0,9593 & 0,9507 & 28,3 & 1 \\ \hline
+sobel & 0,98 & 160 & 2,8\% & 0,9882 & 0,9839 & 47,4 & 3 \\ \hline
+sobel & 0,99 & 138 & 2,5\% & 0,9959 & 0,9938 & 51,9 & 1 \\ \hline
+sharpen & 0,95 & 9 & 0,4\% & 1,0000 & 1,0000 & $\infty$ & 1 \\ \hline
+sharpen & 0,98 & 9 & 0,4\% & 1,0000 & 1,0000 & $\infty$ & 1 \\ \hline
+sharpen & 0,99 & 9 & 0,4\% & 1,0000 & 1,0000 & $\infty$ & 1 \\ \hline
 \end{tabular}
 \end{table}

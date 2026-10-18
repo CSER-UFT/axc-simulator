@@ -5,6 +5,7 @@
  * cada nó e uma amostra dos operandos de cada soma, multiplicação, comparação e seleção, que o modelo estático de
  * erro (error.js) usa.
  */
+import { ssim, ssimStats } from '../axc/ssim.js';
 import { rng } from '../axc/metrics.js';
 import { testImage } from '../axc/image.js';
 import { typeRange } from './elab.js';
@@ -247,8 +248,8 @@ export function execute(design, inputs, { ops = null, profile = false, seed = 7 
 
 /**
  * Compara as saídas aproximadas com as exatas, só nas posições escritas pelo kernel.
- * Para vetores de 2 dimensões com tipo de 8 bits sem sinal, também o SSIM (janelas 8 x 8, como na página de
- * unidades), no retângulo das posições escritas.
+ * Para vetores de 2 dimensões com tipo de 8 bits sem sinal, também o SSIM (janela gaussiana 11 × 11, como em Wang
+ * e colegas, 2004; js/axc/ssim.js), no retângulo das posições escritas.
  */
 export function compareOutputs(design, exact, approx) {
     const res = [];
@@ -268,8 +269,8 @@ export function compareOutputs(design, exact, approx) {
         const r = { array: arr.name, type: arr.type.name, n, peak, ME: n ? sum / n : 0, MED: n ? sumAbs / n : 0, MSE, WCE: wce, EP: n ? errs / n : 0, MRED: redN ? red / redN : 0, PSNR: MSE ? 10 * Math.log10((peak * peak) / MSE) : Infinity, SSIM: null };
         if (arr.dims.length === 2 && arr.type.bits === 8 && !arr.type.signed) {
             const box = bbox(arr, w);
-            if (box && box.w >= 8 && box.h >= 8) {
-                r.SSIM = ssim2(crop(X, arr, box), crop(Y, arr, box), box.w, box.h);
+            if (box && box.w >= 11 && box.h >= 11) {
+                r.SSIM = ssim(crop(X, arr, box), crop(Y, arr, box), box.w, box.h, peak);
                 r.box = box;
             }
         }
@@ -278,7 +279,24 @@ export function compareOutputs(design, exact, approx) {
     return res;
 }
 
-function bbox(arr, w) {
+/**
+ * Estatísticas locais (para a estimativa do SSIM) das saídas de imagem da execução exata, guardadas na própria
+ * execução: vetor -> {stats, box}.
+ */
+export function outputSsimStats(design, exact) {
+    if (exact.ssimStats) return exact.ssimStats;
+    const out = new Map();
+    for (const arr of outputArrays(design)) {
+        if (arr.dims.length !== 2 || arr.type.bits !== 8 || arr.type.signed) continue;
+        const box = bbox(arr, exact.written.get(arr.name));
+        if (!box || box.w < 11 || box.h < 11) continue;
+        out.set(arr.name, { box, stats: ssimStats(crop(exact.mem.get(arr.name), arr, box), box.w, box.h, typeRange(arr.type)[1]) });
+    }
+    exact.ssimStats = out;
+    return out;
+}
+
+export function bbox(arr, w) {
     const [H, W] = arr.dims;
     let x0 = W, y0 = H, x1 = -1, y1 = -1;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (w[y * W + x]) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
@@ -289,25 +307,4 @@ export function crop(M, arr, box) {
     for (let y = 0; y < box.h; y++) for (let x = 0; x < box.w; x++) out[y * box.w + x] = M[(box.y + y) * W + box.x + x];
     return out;
 }
-/** SSIM médio em janelas 8 x 8 com passo 4 (o mesmo de js/axc/image.js). */
-function ssim2(X, Y, w, h) {
-    const C1 = (0.01 * 255) ** 2, C2 = (0.03 * 255) ** 2;
-    let total = 0, count = 0;
-    for (let y0 = 0; y0 + 8 <= h; y0 += 4) {
-        for (let x0 = 0; x0 + 8 <= w; x0 += 4) {
-            let mx = 0, my = 0;
-            for (let j = 0; j < 8; j++) for (let i = 0; i < 8; i++) { const k = (y0 + j) * w + x0 + i; mx += X[k]; my += Y[k]; }
-            mx /= 64; my /= 64;
-            let vx = 0, vy = 0, cxy = 0;
-            for (let j = 0; j < 8; j++) for (let i = 0; i < 8; i++) {
-                const k = (y0 + j) * w + x0 + i;
-                const dx = X[k] - mx, dy = Y[k] - my;
-                vx += dx * dx; vy += dy * dy; cxy += dx * dy;
-            }
-            vx /= 63; vy /= 63; cxy /= 63;
-            total += ((2 * mx * my + C1) * (2 * cxy + C2)) / ((mx * mx + my * my + C1) * (vx + vy + C2));
-            count++;
-        }
-    }
-    return count ? total / count : 1;
-}
+

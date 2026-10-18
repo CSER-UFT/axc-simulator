@@ -4,6 +4,7 @@
  * As imagens são em tons de cinza, 8 bits por pixel ({w, h, data: Uint8ClampedArray}). Todos os produtos ou
  * todas as somas de uma etapa do filtro são avaliados de uma vez pelo circuito (avaliação em paralelo).
  */
+import { ssim as ssimCore } from './ssim.js';
 import { rng } from './metrics.js';
 
 /** Imagem de teste sintética: gradiente, círculos, listras de frequência crescente, xadrez e textura. */
@@ -258,28 +259,9 @@ export function psnr(x, y) {
     return mse === 0 ? Infinity : 10 * Math.log10((255 * 255) / mse);
 }
 
-/** SSIM médio em janelas 8 x 8 com passo 4 (constantes de Wang e colegas, 2004). */
+/** SSIM médio (janela gaussiana 11 × 11, Wang e colegas, 2004; js/axc/ssim.js). */
 export function ssim(x, y) {
-    const C1 = (0.01 * 255) ** 2, C2 = (0.03 * 255) ** 2;
-    const { w, h } = x;
-    let total = 0, count = 0;
-    for (let y0 = 0; y0 + 8 <= h; y0 += 4) {
-        for (let x0 = 0; x0 + 8 <= w; x0 += 4) {
-            let mx = 0, my = 0;
-            for (let j = 0; j < 8; j++) for (let i = 0; i < 8; i++) { const k = (y0 + j) * w + x0 + i; mx += x.data[k]; my += y.data[k]; }
-            mx /= 64; my /= 64;
-            let vx = 0, vy = 0, cxy = 0;
-            for (let j = 0; j < 8; j++) for (let i = 0; i < 8; i++) {
-                const k = (y0 + j) * w + x0 + i;
-                const dx = x.data[k] - mx, dy = y.data[k] - my;
-                vx += dx * dx; vy += dy * dy; cxy += dx * dy;
-            }
-            vx /= 63; vy /= 63; cxy /= 63;
-            total += ((2 * mx * my + C1) * (2 * cxy + C2)) / ((mx * mx + my * my + C1) * (vx + vy + C2));
-            count++;
-        }
-    }
-    return count ? total / count : 1;
+    return ssimCore(x.data, y.data, x.w, x.h) ?? 1;
 }
 
 /** Diferença absoluta ampliada (para ver onde a aproximação erra). */

@@ -108,3 +108,21 @@ test('erro: recorrência do produto escalar acumula o viés das multiplicações
     const ex = execute(r.design, makeInputs(r.design, 'uniform'), { profile: true });
     assert.equal(compareOutputs(r.design, ex, ex)[0].MSE, 0);
 });
+
+test('SSIM: definição padrão, estimativa pelo modelo e restrição na exploração', async () => {
+    const { ssim, ssimStats, ssimEstimate } = await import('../js/axc/ssim.js');
+    const { explore } = await import('../js/hls/dse.js');
+    const { analyzeError } = await import('../js/hls/error.js');
+    const { makeInputs } = await import('../js/hls/exec.js');
+    const w = 40, h = 30, X = new Float64Array(w * h).map((_, k) => (k * 37) % 256);
+    assert.equal(ssim(X, X, w, h), 1);
+    assert.ok(Math.abs(ssimEstimate(ssimStats(X, w, h), 0, 0) - 1) < 1e-12);
+    // Gaussiano com DRUM6: a estimativa por faixa de valor fica a menos de 0,005 do medido.
+    const b = run(kernel('gauss'));
+    const r = run(kernel('gauss'), { assign: parseAssign(b.ops, 'mul8=MUL8 DRUM6'), design: b.design });
+    const a = analyzeError(r, { inputs: makeInputs(r.design, 'image'), budget: false });
+    const est = [...a.est.outputs.values()][0].SSIM, meas = a.measured[0].SSIM;
+    assert.ok(Math.abs(est - meas) < 0.005, `${est} contra ${meas}`);
+    // O produto escalar não tem saída de imagem.
+    assert.throws(() => explore(kernel('dot'), { synth, cells, constraint: { metric: 'ssim', value: 0.98 } }), /saída de imagem/);
+});

@@ -12,7 +12,7 @@
  *   node bin/axc.mjs hls <kernel.c | --example gauss|sobel|sharpen|fir|dot> [--clock ns] [--flow delay|area|iso] [--ports n]
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
- *        [--weights 1,1,1] [--psnr dB | --mse v] [--granularity class|line|source|op] [--heuristic sequential|efficiency|
+ *        [--weights 1,1,1] [--psnr dB | --mse v | --ssim s] [--granularity class|line|source|op] [--heuristic sequential|efficiency|
  *        exhaustive|random|all] [--directives] [--clocks 5,2.5] [--input image|uniform] [--model sampled|analytic]
  *        [--all-units] [--samples n] [--verify-front n] [--csv]
  *
@@ -186,7 +186,7 @@ switch (cmd) {
             };
             errText = [
                 `  erro (entrada ${input}, modelo ${model}):`,
-                ...res.error.outputs.map(({ array, estimated: e, measured: m }) => `    ${array}: ME ${fmt(e.ME)} estimado, ${fmt(m.ME)} medido; MSE ${fmt(e.MSE, 4)} / ${fmt(m.MSE, 4)}; PSNR ${fmt(e.PSNR, 2)} / ${fmt(m.PSNR, 2)} dB${m.SSIM !== null ? `; SSIM ${fmt(m.SSIM, 4)} medido` : ''}; WCE ${m.WCE}, EP ${fmt(m.EP)}`),
+                ...res.error.outputs.map(({ array, estimated: e, measured: m }) => `    ${array}: ME ${fmt(e.ME)} estimado, ${fmt(m.ME)} medido; MSE ${fmt(e.MSE, 4)} / ${fmt(m.MSE, 4)}; PSNR ${fmt(e.PSNR, 2)} / ${fmt(m.PSNR, 2)} dB${m.SSIM !== null ? `; SSIM ${fmt(e.SSIM, 4)} / ${fmt(m.SSIM, 4)}` : ''}; WCE ${m.WCE}, EP ${fmt(m.EP)}`),
                 ...res.error.budget.map((b) => `    ${b.id.padEnd(7)} ${b.unit.padEnd(32)} erro próprio ${fmt(b.ownMean)} (MSE ${fmt(b.ownMSE, 2)}), sozinho na saída: MSE ${Object.entries(b.outputs).map(([k, v]) => `${k} ${fmt(v.MSE, 4)}`).join(', ')}`),
                 ...a.est.flags.map((f) => `    nota: ${f}`),
             ];
@@ -207,7 +207,7 @@ switch (cmd) {
         const ex = opt('--example');
         const src = ex ? (KERNELS.find((k) => k.id === ex) ?? die(`exemplo desconhecido: ${ex}`)).code
             : pos[0] ? readFileSync(pos[0], 'utf8') : die('falta o arquivo do kernel ou --example');
-        const constraint = opt('--mse') !== undefined ? { metric: 'mse', value: +opt('--mse') } : { metric: 'psnr', value: +opt('--psnr', 40) };
+        const constraint = opt('--ssim') !== undefined ? { metric: 'ssim', value: +opt('--ssim') } : opt('--mse') !== undefined ? { metric: 'mse', value: +opt('--mse') } : { metric: 'psnr', value: +opt('--psnr', 40) };
         const w = (opt('--weights', '1,1,1')).split(',').map(Number);
         let res;
         try {
@@ -225,8 +225,8 @@ switch (cmd) {
             front: r.front.map((p) => pointSummary(p, res.ref)),
         }));
         if (flag('--csv')) {
-            const rows = [['heuristic', 'variant', 'clock_ns', 'score', 'area_um2', 'luts_carry4', 'energy_fJ', 'latency_ns', 'interval_ns', 'psnr_est', 'mse_est', 'psnr_measured', 'feasible', 'units']];
-            for (const r of runs) for (const p of r.front) rows.push([r.heuristic, p.variant, p.clockNs, p.score, p.cost.area, p.cost.luts, p.cost.energy, p.cost.latency, p.cost.interval, p.estimated[0]?.PSNR, p.estimated[0]?.MSE, p.measured?.[0]?.PSNR ?? '', p.feasible, p.units.join(' + ')]);
+            const rows = [['heuristic', 'variant', 'clock_ns', 'score', 'area_um2', 'luts_carry4', 'energy_fJ', 'latency_ns', 'interval_ns', 'psnr_est', 'mse_est', 'ssim_est', 'psnr_measured', 'ssim_measured', 'feasible', 'units']];
+            for (const r of runs) for (const p of r.front) rows.push([r.heuristic, p.variant, p.clockNs, p.score, p.cost.area, p.cost.luts, p.cost.energy, p.cost.latency, p.cost.interval, p.estimated[0]?.PSNR, p.estimated[0]?.MSE, p.estimated[0]?.SSIM ?? '', p.measured?.[0]?.PSNR ?? '', p.measured?.[0]?.SSIM ?? '', p.feasible, p.units.join(' + ')]);
             console.log(rows.map((r) => r.map((x) => (typeof x === 'string' && /[",]/.test(x) ? `"${x.replace(/"/g, '""')}"` : x)).join(',')).join('\n'));
             break;
         }
@@ -234,14 +234,14 @@ switch (cmd) {
         const pctS = (v) => `${(100 * v).toFixed(1)}%`;
         out({ variants: res.variants, reference: res.ref, referenceScore: res.refScore, ms: res.ms, runs }, () => [
             `${res.variants.length} variante(s); referência exata: área ${f(res.ref.area, 0)} µm², energia ${f(res.ref.energy / 1e6, 2)} nJ, latência ${f(res.ref.latency, 0)} ns; preparo ${res.prepMs} ms, candidatas ${res.candMs} ms`,
-            `restrição: ${constraint.metric === 'psnr' ? `PSNR >= ${constraint.value} dB` : `MSE <= ${constraint.value}`}; objetivo ${opt('--objective', 'area')}; grupos por ${opt('--granularity', 'class')}`,
+            `restrição: ${constraint.metric === 'psnr' ? `PSNR >= ${constraint.value} dB` : constraint.metric === 'ssim' ? `SSIM >= ${constraint.value}` : `MSE <= ${constraint.value}`}; objetivo ${opt('--objective', 'area')}; grupos por ${opt('--granularity', 'class')}`,
             ...runs.flatMap((r) => {
                 const b = r.verified ?? r.best;
                 if (!b) return [`  ${r.heuristic}: ${r.error ?? 'nada'}`];
                 return [
                     `  ${r.heuristic.padEnd(11)} ${String(r.evaluations).padStart(5)} avaliações, ${r.ms} ms${r.error ? ` (${r.error})` : ''}`,
                     `    custo ${f(b.score, 3)} (área ${pctS(b.savings.area)} menor, energia ${pctS(b.savings.energy)}, latência ${pctS(b.savings.latency)}); ${b.variant}`,
-                    `    PSNR estimado ${f(b.estimated[0]?.PSNR)} dB, medido ${b.measured ? f(b.measured[0].PSNR) : '-'} dB${r.verified ? '' : ' (nenhum ponto passou na verificação)'}`,
+                    `    PSNR estimado ${f(b.estimated[0]?.PSNR)} dB, medido ${b.measured ? f(b.measured[0].PSNR) : '-'} dB${b.estimated[0]?.SSIM != null ? `; SSIM estimado ${f(b.estimated[0].SSIM, 4)}, medido ${b.measured ? f(b.measured[0].SSIM, 4) : '-'}` : ''}${r.verified ? '' : ' (nenhum ponto passou na verificação)'}`,
                     `    ${b.units.join(', ')}`,
                 ];
             }),

@@ -47,7 +47,7 @@ Na aba Aproximação, cada soma e multiplicação do DFG (depois do desenrolamen
 
 * Perfil: uma execução exata do projeto elaborado com os dados de entrada (a imagem de teste ou valores uniformes na faixa do tipo) dá a média e o segundo momento de cada valor, amostras dos operandos de cada operação e execuções amostradas de cada trecho.
 * Estimativa estática: o viés (média) e o segundo momento do erro de cada nó, propagados das unidades até as saídas. O erro próprio de cada operação é o da unidade sobre os operandos reais dela. Há dois modelos: o analítico (fórmulas por operação, com o arredondamento dos deslocamentos e a troca de decisão das comparações) e o por amostras (cada trecho refeito nas execuções amostradas, com o erro que chega de fora como ruído normal), que mantém as correlações dentro do trecho. Recorrências seguem e(t + 1) = g·e(t) + d; memórias guardam a média dos erros escritos. O orçamento mostra o erro que cada operação causaria sozinha na saída.
-* Verificação bit a bit: o projeto elaborado (os mesmos laços, truncamentos e larguras de memória do hardware) executado com os modelos funcionais das unidades, comparado com o exato nas posições escritas: ME, MSE, PSNR, SSIM, MED, WCE, EP e MRED, com as imagens exata, aproximada e a diferença.
+* Verificação bit a bit: o projeto elaborado (os mesmos laços, truncamentos e larguras de memória do hardware) executado com os modelos funcionais das unidades, comparado com o exato nas posições escritas: ME, MSE, PSNR, SSIM (o padrão, com janela gaussiana 11 × 11), MED, WCE, EP e MRED, com as imagens exata, aproximada e a diferença. O SSIM também é estimado pelo modelo estático, com o erro de cada faixa de valor da saída sobre as estatísticas locais da imagem exata.
 
 Nos exemplos, o modelo por amostras fica a menos de 10% do MSE medido nos kernels com pipeline (gaussiano, Sobel, realce, FIR), com unidades de todas as técnicas. A limitação conhecida é o somador truncado ou segmentado dentro de um acumulador (o produto escalar, o gaussiano sem diretivas): o modelo supõe bits baixos quaisquer no acumulador e superestima o erro do truncado (até 13 vezes no produto escalar). A execução bit a bit é a referência para decidir.
 
@@ -86,14 +86,14 @@ Os detalhes, as tabelas e as causas de cada diferença estão em [`results/vitis
 
 ### Metodologia e estudos de caso
 
-As hipóteses dos modelos de custo e de erro, as ameaças à validade e o passo a passo de reprodução estão em [`docs/METODOLOGIA.md`](docs/METODOLOGIA.md). Os estudos de caso (precisão do modelo de erro, comparação das heurísticas, fronteiras verificadas bit a bit, diretivas e período, sensibilidade aos dados, unroll e grupos) rodam com `npm run experiments` e ficam em [`results/`](results/RESULTADOS.md), em CSV, Markdown e LaTeX.
+As hipóteses dos modelos de custo e de erro, as ameaças à validade e o passo a passo de reprodução estão em [`docs/METODOLOGIA.md`](docs/METODOLOGIA.md). Os estudos de caso (precisão do modelo de erro, comparação das heurísticas, fronteiras verificadas bit a bit, diretivas e período, sensibilidade aos dados, unroll e grupos, SSIM) rodam com `npm run experiments` e ficam em [`results/`](results/RESULTADOS.md), em CSV, Markdown e LaTeX.
 
 ### Exploração do espaço de projeto
 
 A aba Exploração (e o comando `dse`) procura as unidades, e opcionalmente as diretivas e o período, que minimizam o objetivo com o erro dentro de um limite:
 
 * **avaliação**: cada ponto é sintetizado de novo (o compartilhamento das unidades, os multiplexadores e o II entram no custo, por isso o custo de uma troca não é a soma dos custos das unidades) e o erro das saídas vem do modelo estático; a elaboração e o perfil exato são feitos uma vez por variante de diretivas;
-* **objetivo**: área ASIC, LUT + CARRY4, energia por execução, latência, intervalo entre resultados, ou a soma ponderada de área, energia e latência divididas pelas do projeto exato; **restrição**: PSNR mínimo ou MSE máximo em todas as saídas;
+* **objetivo**: área ASIC, LUT + CARRY4, energia por execução, latência, intervalo entre resultados, ou a soma ponderada de área, energia e latência divididas pelas do projeto exato; **restrição**: PSNR mínimo ou MSE máximo em todas as saídas, ou SSIM mínimo nas saídas de imagem (estimado na busca, medido na verificação);
 * **grupos**: a unidade é escolhida por classe (todas as multiplicações de 8 bits juntas), por linha do código, por operação do código (as cópias criadas pela diretiva `unroll` recebem a mesma unidade) ou por operação; **candidatas**: em cada grupo, as unidades da fronteira de Pareto entre o custo da unidade e o erro próprio sobre os operandos reais do grupo;
 * **heurísticas**: sequencial (os grupos na ordem do código, multiplicações antes das somas, em cada um a candidata de menor custo que mantém a restrição), eficiência (a partir do exato, a troca com a maior economia por aumento de erro, até nenhuma economizar; com grupos menores que a classe, também a troca da classe inteira), exaustiva com poda (em ordem de custo: o primeiro viável é o ótimo do modelo) e aleatória;
 * **verificação**: o ponto viável mais barato de cada heurística é executado bit a bit; se o erro medido passar do limite, o próximo viável em ordem de custo é verificado.
@@ -161,7 +161,7 @@ O arquivo `CITATION.cff` traz os mesmos metadados (o GitHub mostra "Cite this re
 | `js/axc/netlist.js` | circuito no nível de portas, avaliação de 32 pares por vez (bit slicing), área e atraso |
 | `js/axc/units.js` | geradores de multiplicadores e somadores exatos e aproximados |
 | `js/axc/metrics.js` | entradas de teste, métricas de erro, histograma, mapa de erro, fronteira de Pareto |
-| `js/axc/image.js` | imagem de teste, leitura de PPM, PGM e PBM, filtros, PSNR e SSIM |
+| `js/axc/image.js`, `js/axc/ssim.js` | imagem de teste, leitura de PPM, PGM e PBM, filtros, PSNR; SSIM padrão e a sua estimativa a partir dos momentos do erro |
 | `js/axc/vos.js` | escalonamento de tensão (atraso, tempo de chegada, captura) e memória aproximada |
 | `js/axc/lenet.js`, `js/lenet-app.js` | inferência inteira da LeNet-5 com a tabela de produtos da unidade; a página `lenet.html` |
 | `scripts/lenet5/train.py` | treino da LeNet-5 com NumPy e quantização em 8 bits (gera `data/lenet5.json` e `data/mnist1000.bin`) |

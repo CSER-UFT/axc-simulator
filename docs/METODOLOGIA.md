@@ -45,14 +45,16 @@ O erro de um valor é o aproximado menos o exato. Para cada nó do DFG, o modelo
 
 **Recorrências.** O erro do acumulador evolui como e(t + 1) = g·e(t) + d, com o incremento d medido no corpo do laço e o ganho g pelo modelo analítico (linear). Dentro do laço vale a média sobre as iterações; depois dele, o valor final.
 
+**SSIM estimado.** Nas saídas de imagem (2 dimensões, 8 bits sem sinal), o modelo estima o SSIM sem executar o kernel aproximado. A imagem exata dá, uma vez, a média e a variância locais de cada janela e, para cada uma de 32 faixas de valor, o filtro da indicadora da faixa (P_b) e do valor dentro dela (Q_b). O modelo por amostras guarda, nas escritas, a média m_b e a variância v_b do erro em cada faixa do valor exato. Com o erro y = x + e, independente entre pixels e dependente só do valor, cada janela tem μy = μx + Σ m_b P_b, E[y²] = E[x²] + 2 Σ m_b Q_b + Σ (m_b² + v_b) P_b e E[xy] = E[x²] + Σ m_b Q_b, e o SSIM local sai dessas médias. Assim um erro que só aparece nos valores altos (a saturação, os produtos grandes) entra onde acontece, em vez de espalhado pela imagem. Sem as faixas (modelo analítico), vale a fórmula do erro independente do sinal: μy = μx + μe, σy² = σx² + σe², σxy = σx².
+
 **Memória.** Cada vetor guarda a média dos erros escritos nele, pesada pelas execuções; as leituras veem essa média.
 
-**Verificação bit a bit.** O projeto elaborado (os mesmos laços, trechos, truncamentos e larguras de memória do hardware) é executado com os modelos funcionais das unidades (tabela exaustiva nos multiplicadores de 8 bits, netlist com memória nos de 16 bits, modelo aritmético conferido nos testes nos somadores) e comparado com o exato nas posições escritas: ME, MSE, PSNR, SSIM (janelas 8 × 8), MED, WCE, EP e MRED. A execução exata é conferida nos testes contra implementações de referência em JavaScript.
+**Verificação bit a bit.** O projeto elaborado (os mesmos laços, trechos, truncamentos e larguras de memória do hardware) é executado com os modelos funcionais das unidades (tabela exaustiva nos multiplicadores de 8 bits, netlist com memória nos de 16 bits, modelo aritmético conferido nos testes nos somadores) e comparado com o exato nas posições escritas: ME, MSE, PSNR, SSIM, MED, WCE, EP e MRED. O SSIM é o padrão de Wang e colegas (2004): janela gaussiana 11 × 11 com σ = 1,5, K1 = 0,01, K2 = 0,03, faixa dinâmica do tipo (255 em 8 bits), nas janelas inteiras dentro do retângulo das posições escritas (`js/axc/ssim.js`; a página de unidades usa o mesmo). A execução exata é conferida nos testes contra implementações de referência em JavaScript.
 
 ## 4. Exploração
 
 * **Avaliação**: cada ponto é sintetizado de novo (de 1 a 4 ms, porque a elaboração é feita uma vez por variante) e o erro vem do modelo estático (por amostras com todas as execuções guardadas no perfil, até 2048 por trecho, ou analítico). Com menos amostras a busca fica mais rápida, mas o ruído da estimativa favorece, entre milhares de pontos, os estimados com folga a mais: no FIR com grupos por operação e 512 amostras, os pontos escolhidos perto de 60 dB mediram cerca de 0,6 dB a menos.
-* **Objetivo**: área ASIC, LUT + CARRY4, energia por execução, latência, intervalo entre resultados, ou a soma ponderada de área, energia e latência, cada uma dividida pela do projeto exato. **Restrição**: PSNR mínimo ou MSE máximo, em todas as saídas.
+* **Objetivo**: área ASIC, LUT + CARRY4, energia por execução, latência, intervalo entre resultados, ou a soma ponderada de área, energia e latência, cada uma dividida pela do projeto exato. **Restrição**: PSNR mínimo ou MSE máximo em todas as saídas, ou SSIM mínimo nas saídas de imagem (estimado na busca, medido na verificação; com o SSIM, o erro da fronteira e da eficiência é a soma de 1 − SSIM).
 * **Grupos**: a unidade é escolhida por classe (todas as operações da mesma classe e largura), por linha do código, por operação do código ou por operação. Na granularidade por operação do código, as cópias de uma operação criadas pela diretiva `unroll` (com ou sem fator) formam um grupo e recebem a mesma unidade; as cópias criadas pelo desenrolamento implícito dos laços internos de um laço com pipeline (os pesos de uma janela, por exemplo) continuam separadas, porque fazem contas diferentes. A elaboração marca cada operação com a expressão do código de onde veio e as iterações desses laços implícitos.
 * **Candidatas**: em cada grupo, as unidades da fronteira de Pareto entre o custo da unidade no objetivo e o erro próprio nas operações do grupo.
 * **Heurísticas**:
@@ -73,7 +75,8 @@ O erro de um valor é o aproximado menos o exato. Para cada nó do DFG, o modelo
 * A poda da exaustiva é heurística; a gulosa de eficiência pode parar num mínimo local.
 
 **De construto (o que se mede).**
-* A qualidade é medida por PSNR e MSE na saída do kernel, não por uma métrica da aplicação inteira (classificação, detecção). O SSIM é só medido.
+* A qualidade é medida por PSNR, MSE ou SSIM na saída do kernel, não por uma métrica da aplicação inteira (classificação, detecção).
+* A estimativa do SSIM supõe o erro independente entre pixels: erros correlacionados no espaço (um somador que erra igual numa região lisa) contam como ruído, e a estimativa tende a ser conservadora (85% dos casos do E7 abaixo do medido); com SSIM alto (0,95 ou mais), a diferença mediana é de 0,0008, mas nos SSIM baixos chega a 0,46. No Sobel, a estimativa passou do medido em alguns pontos, e a verificação precisou de até 3 tentativas.
 * A imagem de teste é sintética (gradientes, círculos, listras, xadrez e textura); o experimento E5 mostra que o projeto escolhido com um conjunto de dados pode não manter o limite em outro.
 
 **Externa (generalização).**
@@ -110,7 +113,7 @@ Configuração: parte `xc7a100tcsg324-1`; multiplicadores em LUT (`config_op mul
 
 ```
 npm test                               # 59 testes, inclusive execução exata contra referência e precisão do modelo
-npm run experiments                    # estudos de caso E1 a E6, saída em results/ (cerca de 15 a 30 min)
+npm run experiments                    # estudos de caso E1 a E7, saída em results/ (cerca de 15 a 30 min)
 node scripts/experiments.mjs --only E2 # só um experimento
 node scripts/experiments.mjs --quick   # versão reduzida, para conferir o ambiente (menos de 1 min)
 ```
@@ -146,4 +149,5 @@ Os números dos estudos de caso estão em [`results/RESULTADOS.md`](../results/R
 * **Fronteiras verificadas (E3)**: ao longo das fronteiras, a diferença média entre o PSNR estimado e o medido é de 0,2 dB (no máximo 4,7 dB); no limite de 40 dB, nenhum ponto foi aceito pelo modelo e rejeitado pela medida, nem o contrário.
 * **Diretivas e período (E4)**: no gaussiano, o objetivo ponderado e o de latência escolhem o período de 2,5 ns com pipeline; o de área escolhe tirar o pipeline e a partição (4986 µm², mas 24 vezes a latência).
 * **Unroll (E6)**: com `unroll factor=2` no laço com pipeline, a busca por operação deixa as cópias de uma mesma operação com unidades diferentes em 10 de 13 operações do gaussiano e 5 de 13 do Sobel. Por operação do código, as cópias ficam iguais por construção: no gaussiano, a economia é a mesma (34,9% contra 34,4%, com o erro distribuído pela imagem inteira); no Sobel e no realce, não sobra economia. Com o unroll, o II passa a 2 (portas da memória), as duas cópias ficam em ciclos diferentes e passam a dividir uma unidade aproximada por um multiplexador, como o Vitis faz com as funções das unidades; o multiplexador custa quase o que o somador aproximado economiza. A economia que a busca por operação achava vinha de aproximar só uma das cópias, o que evita o multiplexador e concentra o erro em colunas alternadas da saída.
+* **SSIM (E7)**: em 27 casos com a imagem de teste, a estimativa por faixa de valor tem diferença mediana de 0,017 para o SSIM medido (0,038 com o ruído independente) e de 0,0008 nos casos com SSIM de 0,95 ou mais. Na exploração do gaussiano por operação, a restrição de SSIM 0,98 aceita 41,7% de economia de área com 38,0 dB de PSNR, e a de 0,95, 45,1% com 29,3 dB: o SSIM tolera erros que o PSNR de 40 dB recusaria. No Sobel, a economia continua pequena (2,5% a 8,2%).
 * **Dados (E5)**: o projeto escolhido com entradas uniformes não mantém os 40 dB na imagem (39,7 dB no gaussiano); o escolhido com a imagem mantém nas uniformes. O perfil deve vir de dados representativos da aplicação.

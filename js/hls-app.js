@@ -441,7 +441,7 @@ function renderApprox() {
     $('apOutputs').innerHTML = `<tr><th>${t('hls.ap.th.out')}</th><th>${t('hls.ap.th.n')}</th><th>ME</th><th>MSE</th><th>PSNR (dB)</th><th>SSIM</th><th>MED</th><th>WCE</th><th>EP</th><th>MRED</th></tr>`
         + a.measured.map((m) => {
             const e = a.est.outputs.get(m.array);
-            return `<tr><td class="mono">${esc(m.array)} (${esc(m.type)})</td><td>${nf(m.n)}</td><td>${pair(e.ME, m.ME, 3)}</td><td>${pair(e.MSE, m.MSE, 4)}</td><td>${pair(e.PSNR, m.PSNR, 2)}</td><td>${m.SSIM === null ? '-' : fx(m.SSIM, 4)}</td><td>${fx(m.MED, 3)}</td><td>${fx(m.WCE, 0)}</td><td>${fx(100 * m.EP, 1)}%</td><td>${fx(100 * m.MRED, 3)}%</td></tr>`;
+            return `<tr><td class="mono">${esc(m.array)} (${esc(m.type)})</td><td>${nf(m.n)}</td><td>${pair(e.ME, m.ME, 3)}</td><td>${pair(e.MSE, m.MSE, 4)}</td><td>${pair(e.PSNR, m.PSNR, 2)}</td><td>${m.SSIM === null ? '-' : e.SSIM !== null && e.SSIM !== undefined ? pair(e.SSIM, m.SSIM, 4) : fx(m.SSIM, 4)}</td><td>${fx(m.MED, 3)}</td><td>${fx(m.WCE, 0)}</td><td>${fx(100 * m.EP, 1)}%</td><td>${fx(100 * m.MRED, 3)}%</td></tr>`;
         }).join('');
     $('apOutNote').textContent = t('hls.ap.outNote') + (a.measured.some((m) => m.n === 1) ? ` ${t('hls.ap.single')}` : '');
     // Imagens: entrada, exata, aproximada e diferença (saídas de 2 dimensões e 8 bits).

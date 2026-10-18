@@ -12,7 +12,9 @@
  *       fronteira contra o medido;
  *   E4  diretivas e período junto com as unidades (objetivo ponderado e latência);
  *   E5  sensibilidade aos dados: o projeto escolhido com entradas uniformes, verificado na imagem, e o contrário;
- *   E6  unroll: grupos por operação contra por operação do código (as cópias do unroll com a mesma unidade).
+ *   E6  unroll: grupos por operação contra por operação do código (as cópias do unroll com a mesma unidade);
+ *   E7  SSIM: a estimativa (erro por faixa de valor, ruído independente, analítico) contra o medido, e a exploração
+ *       com restrição em SSIM, verificada bit a bit.
  *
  *   node scripts/experiments.mjs [--only E1,E3] [--quick] [--out results]
  */
@@ -22,7 +24,7 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { synthesize } from '../js/hls/index.js';
 import { KERNELS } from '../js/hls/kernels.js';
-import { execute, makeInputs } from '../js/hls/exec.js';
+import { execute, makeInputs, compareOutputs } from '../js/hls/exec.js';
 import { opFunction } from '../js/hls/approx.js';
 import { estimateError, analyzeError } from '../js/hls/error.js';
 import { explore, pointSummary } from '../js/hls/dse.js';
@@ -31,7 +33,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2);
 const opt = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; };
 const QUICK = argv.includes('--quick');
-const ONLY = new Set((opt('--only', 'E1,E2,E3,E4,E5,E6')).split(','));
+const ONLY = new Set((opt('--only', 'E1,E2,E3,E4,E5,E6,E7')).split(','));
 const OUT = resolve(ROOT, opt('--out', 'results'));
 mkdirSync(OUT, { recursive: true });
 
@@ -248,6 +250,64 @@ function e6() {
     table('E6: grupos por operação contra por operação do código, com unroll de 2', ['Kernel', 'Grupos', 'Avaliações', 'Economia de área', 'PSNR medido', 'Operações aproximadas', 'Cópias diferentes'], tab, ['l', 'l', 'r', 'r', 'r', 'r', 'r']);
 }
 
+// E7: SSIM ---------------------------------------------------------------------------------------------------------
+function e7() {
+    const rows = [['kernel', 'family', 'ops', 'ssim_measured', 'ssim_bins', 'ssim_indep', 'ssim_analytic', 'psnr_measured']];
+    const kernels = QUICK ? ['gauss'] : ['gauss', 'gauss-seq', 'sobel', 'sharpen'];
+    for (const k of kernels) {
+        const base = synthesize(KCODE[k], { synth, cells });
+        const inputs = makeInputs(base.design, 'image');
+        const prof = execute(base.design, inputs, { profile: true });
+        for (const [fam, mre, are] of FAMILIES) {
+            const asg = new Map();
+            for (const op of base.ops.list) {
+                const re = op.cls === 'mul' ? mre : are;
+                const n = re && op.candidates.find((c) => re.test(c));
+                if (n) asg.set(op.id, n);
+            }
+            if (!asg.size) continue;
+            const r = synthesize(KCODE[k], { synth, cells, assign: asg, design: base.design });
+            const ops = new Map([...asg].map(([id, n]) => [id, opFunction(r.lib, r.ops.byId.get(id), n)]));
+            const m = compareOutputs(r.design, prof, execute(r.design, inputs, { ops }))[0];
+            if (m.SSIM === null) continue;
+            const es = [...estimateError(r, prof, { method: 'sampled', budget: false }).outputs.values()][0];
+            const ea = [...estimateError(r, prof, { method: 'analytic', budget: false }).outputs.values()][0];
+            rows.push([k, fam, asg.size, m.SSIM, es.SSIM, es.SSIMindep, ea.SSIM, m.PSNR]);
+        }
+        log('E7', k);
+    }
+    save('e7_ssim_estimativa.csv', csv(rows));
+    const data = rows.slice(1).filter((r) => r[3] < 1);
+    const stat = (col) => {
+        const d = data.map((r) => r[col] - r[3]);
+        const a = d.map(Math.abs).sort((x, y) => x - y);
+        const within = (t) => d.filter((x) => Math.abs(x) <= t).length / d.length;
+        const hi = data.filter((r) => r[3] >= 0.95);
+        const dh = hi.map((r) => Math.abs(r[col] - r[3])).sort((x, y) => x - y);
+        return { med: a[Math.floor(a.length / 2)], w1: within(0.01), w5: within(0.05), worst: a[a.length - 1], below: d.filter((x) => x <= 1e-9).length / d.length, hiMed: dh.length ? dh[Math.floor(dh.length / 2)] : null, hiN: hi.length };
+    };
+    const B = stat(4), I = stat(5), A = stat(6);
+    md.push('### E7. SSIM: estimativa e exploração\n', `SSIM padrão (janela gaussiana 11 × 11, σ = 1,5) na saída de imagem, com a imagem de teste; ${data.length} casos (kernel e família de unidades, como no E1). A estimativa usa as estatísticas locais da imagem exata e o erro do modelo estático: pela faixa de valor da saída (média e variância do erro em 32 faixas, do modelo por amostras), como ruído independente do sinal, ou pelo modelo analítico (sem as faixas, o ganho é zero e cai na fórmula do ruído independente). "Abaixo do medido" é a fração dos casos em que a estimativa é conservadora.\n`);
+    table('E7: SSIM estimado contra o medido', ['Estimativa', 'Diferença mediana', 'Até 0,01', 'Até 0,05', 'Pior diferença', 'Abaixo do medido', `Mediana com SSIM ≥ 0,95 (${B.hiN} casos)`], [
+        ['por faixa de valor (amostras)', br(B.med, 4), pctBr(B.w1, 0), pctBr(B.w5, 0), br(B.worst, 3), pctBr(B.below, 0), br(B.hiMed, 4)],
+        ['ruído independente (amostras)', br(I.med, 4), pctBr(I.w1, 0), pctBr(I.w5, 0), br(I.worst, 3), pctBr(I.below, 0), br(I.hiMed, 4)],
+        ['analítico', br(A.med, 4), pctBr(A.w1, 0), pctBr(A.w5, 0), br(A.worst, 3), pctBr(A.below, 0), br(A.hiMed, 4)],
+    ], ['l', 'r', 'r', 'r', 'r', 'r', 'r']);
+    // Exploração com a restrição em SSIM.
+    const drows = [['kernel', 'ssim_min', 'evaluations', 'area_saving', 'ssim_est', 'ssim_measured', 'psnr_measured', 'verify_tries', 'verified', 'units']];
+    const tab = [];
+    for (const k of QUICK ? ['gauss'] : ['gauss', 'sobel', 'sharpen']) for (const lim of QUICK ? [0.98] : [0.95, 0.98, 0.99]) {
+        const r = explore(KCODE[k], { synth, cells, objective: 'area', constraint: { metric: 'ssim', value: lim }, granularity: 'op', heuristic: 'efficiency' });
+        const run = r.runs[0], p = run.chosen;
+        log('E7', k, lim);
+        const est = p?.outs[0].SSIM ?? null, meas = p?.measured?.[0].SSIM ?? null;
+        drows.push([k, lim, run.evals, p ? 1 - p.score / r.refScore : null, est, meas, p?.measured?.[0].PSNR ?? null, run.verifyTries, !!p, p?.units.join(' + ') ?? '']);
+        tab.push([k, br(lim, 2), String(run.evals), p ? pctBr(1 - p.score / r.refScore) : '-', br(est, 4), br(meas, 4), br(p?.measured?.[0].PSNR ?? null, 1), String(run.verifyTries)]);
+    }
+    save('e7_ssim_exploracao.csv', csv(drows));
+    table('E7: exploração por operação com restrição em SSIM (heurística de eficiência, área)', ['Kernel', 'SSIM mín.', 'Avaliações', 'Economia de área', 'SSIM estimado', 'SSIM medido', 'PSNR medido', 'Verificações'], tab, ['l', 'r', 'r', 'r', 'r', 'r', 'r', 'r']);
+}
+
 // E5: sensibilidade aos dados ------------------------------------------------------------------------------------------
 function e5() {
     const tab = [];
@@ -278,6 +338,7 @@ if (ONLY.has('E3')) e3();
 if (ONLY.has('E4')) e4();
 if (ONLY.has('E5')) e5();
 if (ONLY.has('E6')) e6();
+if (ONLY.has('E7')) e7();
 meta.seconds = Math.round((Date.now() - t0) / 1000);
 md.push(`Tempo total: ${meta.seconds} s.`, '');
 save('RESULTADOS.md', `${md.join('\n')}\n`);
