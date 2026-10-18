@@ -59,6 +59,20 @@ node bin/axc.mjs hls kernel.c --approx "16:mul8=MUL8 T4" --error --input uniform
 
 O alvo de `--approx` é um nó (`S1.3`), um grupo linha:operação (`16:mul8`), uma classe (`mul8`, `add16`, `add32`) ou `*`.
 
+### Validação com o Vitis HLS e o Vivado
+
+O modelo de custo é conferido contra o Vitis HLS e o Vivado 2022.2 em 23 casos: os cinco exemplos exatos (o código original e o projeto elaborado pelo simulador), as variantes de diretivas e os períodos de 2,5 e 10 ns do gaussiano, e projetos aproximados (atribuições fixas e os pontos escolhidos pela exploração). Para cada caso, `scripts/vitis.mjs` gera o C++ (com `ap_int`; no projeto elaborado, cada valor com a largura da nossa análise de faixas e cada operação aproximada chamando a função C++ da sua unidade, escrita a partir da mesma netlist do Verilog exportado), um testbench que compara a saída com a execução bit a bit do simulador, o Tcl do Vitis (parte `xc7a100tcsg324-1`, multiplicadores em LUT, sem pipeline automático de laços) e as previsões do modelo. Tudo roda da pasta do repositório:
+
+```
+npm run vitis:export                    # gera build/vitis/<caso>/ (cerca de 2 min)
+npm run vitis:check                     # opcional: compila e roda cada caso com g++ e o ap_int do Vitis
+bash build/vitis/run_all.sh -j 4        # Vitis HLS: csim e csynth de todos os casos
+bash build/vitis/run_all.sh -j 2 --impl # também o Vivado (export_design -flow impl), bem mais demorado
+npm run vitis:collect                   # lê os relatórios e grava results/vitis/
+```
+
+O `run_all.sh` aceita `--only caso1,caso2` e `--cosim`. O coletor grava em `results/vitis/` a comparação (latência, II por laço, período, LUT, CARRY4, FF; a csim contra o simulador), as tabelas em Markdown e LaTeX, a calibração sugerida das constantes do modelo (`calibracao.json`) e uma cópia dos relatórios usados. O C++ dos 23 casos foi conferido aqui com g++ e os cabeçalhos abertos do `ap_int`: a saída é idêntica à execução bit a bit do simulador em todas as posições.
+
 ### Metodologia e estudos de caso
 
 As hipóteses dos modelos de custo e de erro, as ameaças à validade e o passo a passo de reprodução estão em [`docs/METODOLOGIA.md`](docs/METODOLOGIA.md). Os estudos de caso (precisão do modelo de erro, comparação das heurísticas, fronteiras verificadas bit a bit, diretivas e período, sensibilidade aos dados) rodam com `npm run experiments` e ficam em [`results/`](results/RESULTADOS.md), em CSV, Markdown e LaTeX.
@@ -154,6 +168,7 @@ O arquivo `CITATION.cff` traz os mesmos metadados (o GitHub mostra "Cite this re
 | `js/hls/exec.js` | execução bit a bit do projeto elaborado, perfil dos sinais, comparação das saídas (PSNR, SSIM) |
 | `js/hls/error.js` | modelo estático de erro (analítico e por amostras), recorrências, orçamento por operação |
 | `js/hls/dse.js`, `dse-worker.js` | exploração: avaliação, candidatas, heurísticas, fronteira, verificação (o worker roda na página sem travar) |
+| `js/hls/vitis.js`, `scripts/vitis.mjs` | exportação para o Vitis HLS (C++, testbench, Tcl), execução em lote e coleta dos relatórios com a calibração |
 | `scripts/experiments.mjs`, `docs/METODOLOGIA.md`, `results/` | estudos de caso reprodutíveis, metodologia e limitações, resultados (CSV, Markdown, LaTeX) |
 | `js/hls/highlight.js`, `js/ui/library.js` | destaque de sintaxe do kernel e da IR; aba Biblioteca (unidades sintetizadas, espaço de projeto, Verilog) |
 | `js/hls/index.js`, `kernels.js`, `ui.js`, `js/hls-app.js` | fluxo de síntese, exemplos, figuras (Gantt e DFG) e a página `hls.html` |
@@ -168,7 +183,6 @@ Os testes conferem as unidades exatas contra a aritmética (8 bits exaustivo), o
 ## Próximas etapas possíveis
 
 * Exploração: busca local depois da gulosa (trocas de duas unidades), diretivas com valores numéricos (II, fatores de unroll e de partição) e exploração em lote de vários kernels.
-* Validação e calibração contra o Vitis HLS e o Vivado.
 * Recorrências com somadores aproximados no modelo de erro (execuções consecutivas no perfil).
 * Mais técnicas (codificador de Booth aproximado, outros somadores) e somas com sinal aproximadas.
 

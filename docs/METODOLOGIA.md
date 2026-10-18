@@ -63,7 +63,7 @@ O erro de um valor é o aproximado menos o exato. Para cada nó do DFG, o modelo
 ## 5. Ameaças à validade
 
 **Interna (os modelos).**
-* O custo é de pré síntese: sem posicionamento, roteamento, fios e árvore de relógio; as constantes de latência da memória e de controle não foram calibradas. A comparação com o Vitis HLS e o Vivado é a próxima etapa (entrega 5).
+* O custo é de pré síntese: sem posicionamento, roteamento, fios e árvore de relógio; as constantes de latência da memória e de controle ainda não foram calibradas. A comparação com o Vitis HLS e o Vivado está preparada (seção 6) e a calibração depende dos relatórios dessa execução.
 * A energia das unidades é a de entradas uniformes; com os dados de uma aplicação ela pode mudar bastante (na biblioteca, a vantagem de energia do MUL8 DRUM3 cai de 63% para 7% com os operandos da LeNet-5). A biblioteca já tem a energia com os operandos da LeNet-5 e do filtro, mas o modelo de HLS ainda não a usa.
 * O modelo de erro supõe, entre trechos, erros independentes e normais. Somadores truncados ou segmentados dentro de um acumulador são estimados como se o acumulador tivesse bits baixos quaisquer, o que superestima o erro do truncado (até cerca de 13 vezes no produto escalar). A verificação bit a bit corrige a decisão final, mas a busca pode descartar pontos bons nesses casos.
 * A poda da exaustiva é heurística; a gulosa de eficiência pode parar num mínimo local.
@@ -81,7 +81,17 @@ O erro de um valor é o aproximado menos o exato. Para cada nó do DFG, o modelo
 * O perfil e o modelo por amostras usam amostras com semente fixa: os números são reprodutíveis, mas são estimativas; a verificação bit a bit usa todas as posições da saída.
 * Os estudos usam uma imagem e um período por padrão; diferenças pequenas entre heurísticas (menos de 1% de área) não devem ser tomadas como significativas.
 
-## 6. Como reproduzir
+## 6. Validação com o Vitis HLS e o Vivado
+
+O mesmo projeto é descrito em C++ para o Vitis HLS 2022.2 (`scripts/vitis.mjs`). No caso `_ir`, o C++ é o projeto elaborado pelo simulador: os laços mantidos com as mesmas diretivas, o corpo de cada trecho em linha reta, cada valor com a largura da análise de faixas e cada operação aproximada chamando a função C++ da sua unidade (a netlist, com as cadeias de vai um escritas como `+`, como no Verilog). Assim a comparação mede o modelo de custo, não diferenças de entrada. No caso `_src`, o código original vai para o Vitis como está: a diferença entre `_src` e `_ir` mostra o efeito da nossa elaboração e da análise de faixas.
+
+Configuração: parte `xc7a100tcsg324-1`; multiplicadores em LUT (`config_op mul -impl fabric`, como a biblioteca, sintetizada sem DSP); sem pipeline automático de laços (`config_compile -pipeline_loops 0`), já que o modelo só faz pipeline onde a diretiva pede; memórias `ap_memory` com 2 portas (`ram_t2p`), latência de 1 ciclo; incerteza de relógio padrão do Vitis.
+
+O que se compara: a latência total e por laço, o II, o período (o mínimo do modelo, o estimado pelo Vitis e o obtido no Vivado), LUT, CARRY4 e FF, e a saída da csim contra a execução bit a bit. Diferenças esperadas: o encadeamento do modelo usa os atrasos da sky130 e o do Vitis, os do Artix 7, então em períodos apertados o escalonamento pode divergir; as LUTs do modelo vêm do Yosys, e as do Vitis e do Vivado, das ferramentas da Xilinx.
+
+O C++ dos 23 casos foi compilado com g++ e os cabeçalhos abertos do `ap_int`, e a saída é idêntica à execução bit a bit do simulador em todas as posições (o mesmo teste está em `test/hls-vitis.test.js` quando os cabeçalhos estão disponíveis).
+
+## 7. Como reproduzir
 
 ```
 npm test                               # 54 testes, inclusive execução exata contra referência e precisão do modelo
@@ -99,7 +109,7 @@ node bin/axc.mjs hls --example gauss --approx "mul8=MUL8 DRUM6" --error --json
 node bin/axc.mjs dse kernel.c --psnr 40 --heuristic all --granularity op --csv
 ```
 
-## 7. Resultados
+## 8. Resultados
 
 Os números dos estudos de caso estão em [`results/RESULTADOS.md`](../results/RESULTADOS.md). Resumo:
 
