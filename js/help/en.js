@@ -22,7 +22,7 @@ export default {
 <ol>
     <li>Choose the type of unit (multiplier or adder), the width and the approximation technique on the left panel. Everything is recomputed on each change.</li>
     <li>The <strong>Summary</strong> shows the estimated area and delay, compared with the exact unit, and the error metrics.</li>
-    <li><strong>Structure</strong> shows where the approximation happens; <strong>Error</strong> shows for which operands it fails and by how much; <strong>Comparison</strong> puts several configurations on a cost against error chart; <strong>Application</strong> shows the effect on an image; <strong>Voltage and memory</strong> and <strong>Stochastic</strong> deal with other sources of approximation. The FPGA and ASIC numbers of the synthesized units are in the <strong>Library</strong> tab of the high level synthesis page.</li>
+    <li><strong>Structure</strong> shows where the approximation happens; <strong>Error</strong> shows for which operands it fails and by how much; <strong>Comparison</strong> puts several configurations on a cost against error chart; <strong>Neural network</strong> shows the effect on LeNet-5; <strong>Voltage and memory</strong> and <strong>Stochastic</strong> deal with other sources of approximation. The FPGA and ASIC numbers of the synthesized units are in the <strong>Library</strong> tab of the high level synthesis page.</li>
     <li><strong>Copy link</strong> stores the unit configuration, the tab and the controls of the tabs in the page address: whoever opens the link sees the same screen. The language is in the selector of the header.</li>
 </ol>
 <p class="tip">To start: 8 bit multiplier, 4 truncated columns and no approximate ones. MED is 12.25 and WCE is 49. Then switch to 6 approximate columns and compare the two error maps.</p>`,
@@ -168,23 +168,7 @@ export default {
 <p>A configuration <strong>dominates</strong> another when it is not worse on either axis and is better on at least one. The non dominated ones form the <strong>Pareto front</strong>, drawn as steps: they are the only reasonable choices, and the decision among them depends on how much error the application tolerates. Change the error metric and see the front change: WCE and MRED may choose different configurations.</p>
 <p>The <strong>dominated by</strong> column counts how many configurations of the comparison dominate each one, with the chosen cost and error: zero is the front. The <strong>knee point</strong>, marked on the chart, is the point of the front farthest from the line joining its ends, with both axes normalized between 0 and 1 (the error in log, when the chart is in log, and then without the zero error points). Up to it, reducing cost is cheap in error; beyond it, each reduction costs much more error. It is a reasonable choice when there is no defined error constraint. The criterion is similar to that of the Kneedle algorithm (${c('satopaa2011')}).</p>
 <p>As cost, besides area and delay, you can use the activity and the product of area and activity, an analog of the power area product.</p>
-<p>The <strong>Use in the compiler simulator</strong> button, below the configuration, opens the RISC-V Compiler Simulator with this unit: in its data flow graph and scheduling, the latency and area of multiplication (with a multiplier) or of addition and subtraction (with an adder) come from it, from the ASIC sky130 synthesis, when the configuration was synthesized, or from the gate model. The compiler simulator also lists the configurations synthesized here, to choose a multiplier and an adder right there.</p>
-<p>The metric "MSE of the filtered image" measures the error in the application, with the filter chosen in the Application tab. The comparison is stored in the browser; the CSV button exports the table.</p>`,
-        },
-        {
-            id: 'app',
-            title: 'Image application',
-            html: `
-<p>The filter is computed twice, with the exact unit and with the approximate one, on a synthetic test image (or an image of yours, in PNG, JPEG or another format the browser opens, or also PPM, PGM or PBM, reduced to at most 256 pixels per side and converted to grayscale).</p>
-<ul>
-    <li><strong>Gaussian σ = 1</strong>: nine pixel × weight products per pixel (weights 19, 32, 52), divided by 256. With a multiplier, only the products are approximate; with a 16 bit adder, only the accumulation.</li>
-    <li><strong>Gaussian 1 2 1</strong>: weights that are powers of 2. Each product has a single partial product per row, and truncating low columns may cause no error at all: the error depends on the data the unit receives.</li>
-    <li><strong>brightness gain</strong>: one product per pixel.</li>
-    <li><strong>average with the neighbor</strong>: one 8 bit sum per pixel.</li>
-    <li><strong>Sobel edges</strong>: the gradients Gx and Gy, with weights ±1 and ±2 (the same operations as the unrolled MiniC code of the compiler simulator), and the output (|Gx| + |Gy|) / 4. The units are unsigned, so the positive and negative parts of each gradient are accumulated with the unit and subtracted exactly. With a 16 bit adder, the sums are approximate: the LOA with k = 4 gives about 40 dB, and the segmented adder with L = 4 and P = 2, about 20 dB. With a multiplier, the products by 1 and by 2 have a single partial product per row, and the approximate compressors and Mitchell make no error; truncation and DRUM do.</li>
-    <li><strong>edge enhancement</strong>: 5 times the pixel minus the 4 neighbors, clamped to 0 and 255. The result is a difference between large values, so a small error in one of the parts becomes a large error in the result: the same units lose much more PSNR here than in the Gaussian.</li>
-</ul>
-<p><strong>PSNR</strong> = 10 log<sub>10</sub>(255² / MSE), in dB. <strong>SSIM</strong> (${c('wang2004')}) compares brightness, contrast and structure in 8 × 8 windows; 1 is identical. The difference, colored with the same ramp as the error map (black is zero), shows in which regions of the image the approximation appears.</p>`,
+<p>The metric "MSE of the filtered image" measures the error in the application: the 3 × 3 Gaussian filter over the test image (for 8 bit adders, the average with the neighbor). Whole kernels, with your own images, are in the high level synthesis page. The comparison is stored in the browser; the CSV button exports the table.</p>`,
         },
         {
             id: 'nn',
@@ -210,7 +194,7 @@ export default {
             html: `
 <ul>
     <li>more techniques: approximate Booth encoder, adders with other carry predictions;</li>
-    <li>using the approximate product also in program execution in the compiler simulator.</li>
+    <li>more kernels and applications in the high level synthesis page.</li>
 </ul>`,
         },
         {

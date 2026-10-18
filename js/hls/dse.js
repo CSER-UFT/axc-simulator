@@ -53,10 +53,10 @@ export function pragmaVariants(src, maxPragmas = 4) {
  * @param {string} src código
  * @param {object} o synth, cells, clockNs, flow, ports, input ('image'|'uniform'), method ('sampled'|'analytic'), label
  */
-export function prepare(src, { synth, cells, clockNs = 5, flow = 'delay', ports = 2, input = 'image', method = 'sampled', label = '' } = {}) {
+export function prepare(src, { synth, cells, clockNs = 5, flow = 'delay', ports = 2, input = 'image', image = null, method = 'sampled', label = '' } = {}) {
     const syn = { synth, cells, clockNs, flow, ports };
     const base = synthesize(src, syn);
-    const inputs = makeInputs(base.design, input);
+    const inputs = makeInputs(base.design, input, 2027, image);
     const prof = execute(base.design, inputs, { profile: true });
     return { src, syn, label, clockNs, design: base.design, base, inputs, prof, method, ownCache: new Map(), cache: new Map(), costCache: new Map(), evals: 0 };
 }
@@ -143,7 +143,8 @@ export function groupsOf(v, { granularity = 'class', objective = 'area', weights
         const front = allUnits ? rows : rows.filter((a, i) => i === 0 || !rows.some((b) => b !== a && b.cost <= a.cost && b.own <= a.own && (b.cost < a.cost || b.own < a.own)));
         // A exata primeiro (ela fica mesmo dominada, como referência); as outras em ordem de erro próprio.
         front.sort((a, b) => (b.name === names[0]) - (a.name === names[0]) || a.own - b.own || a.cost - b.cost);
-        groups.push({ key, cls: list[0].cls, W: list[0].W, line: list[0].node.line, ops: list, exact: names[0], cands: front.map((x) => x.name), all: names.length, ownOf: new Map(front.map((x) => [x.name, x.own])) });
+        const label = granularity === 'op' ? `${list[0].id} (${list[0].text})` : granularity === 'line' ? `linha ${list[0].node.line}, ${list[0].cls}${list[0].W}` : key;
+        groups.push({ key, label, cls: list[0].cls, W: list[0].W, line: list[0].node.line, ops: list, exact: names[0], cands: front.map((x) => x.name), all: names.length, ownOf: new Map(front.map((x) => [x.name, x.own])) });
     }
     return groups;
 }
@@ -156,6 +157,13 @@ const expand = (groups, choice) => {
 };
 
 // Heurísticas ---------------------------------------------------------------------------------------------------
+// Cada heurística registra as suas iterações em ctx.steps (o passo a passo que a página anima): o que foi avaliado,
+// o que foi escolhido e por quê, e o estado da busca depois da iteração.
+
+const psnrOf = (p) => Math.min(...p.outs.map((o) => o.PSNR));
+const stateOf = (p) => ({ score: p.score, psnr: psnrOf(p), units: p.units });
+const tryOf = (p, label, extra = {}) => ({ label, score: p.score, psnr: psnrOf(p), feasible: p.feasible, ...extra });
+const step = (ctx, s) => ctx.steps?.push(s);
 
 /** Sequencial: grupos na ordem do código, multiplicações primeiro; em cada um, a candidata de menor custo viável. */
 function sequential(v, groups, ctx) {
@@ -163,16 +171,21 @@ function sequential(v, groups, ctx) {
     const choice = groups.map((g) => g.exact);
     let cur = evaluate(v, expand(groups, choice), ctx);
     const trace = [cur];
+    step(ctx, { kind: 'start', state: stateOf(cur), order: order.map((i) => groups[i].label) });
     for (const i of order) {
         let best = cur, bestU = choice[i];
+        const tries = [];
         for (const u of groups[i].cands) {
             if (u === choice[i]) continue;
             const c = [...choice];
             c[i] = u;
             const p = evaluate(v, expand(groups, c), ctx);
+            tries.push(tryOf(p, u));
             if (p.feasible && p.score < best.score) { best = p; bestU = u; }
         }
-        if (bestU !== choice[i]) { choice[i] = bestU; cur = best; trace.push(cur); }
+        const changed = bestU !== choice[i];
+        if (changed) { choice[i] = bestU; cur = best; trace.push(cur); }
+        step(ctx, { kind: 'seq', group: groups[i].label, ops: groups[i].ops.length, tries, chosen: changed ? bestU : null, keep: groups[i].exact, state: stateOf(cur) });
     }
     return { best: cur, trace };
 }
@@ -182,9 +195,9 @@ function sequential(v, groups, ctx) {
  *
  * Avaliação preguiçosa (lazy greedy): cada troca guarda a eficiência da última vez em que foi avaliada; a cada passo,
  * as refresh trocas de maior valor guardado (no mínimo) são reavaliadas no estado atual, e a melhor delas é aplicada
- * quando nenhuma guardada passa dela. As trocas do grupo que mudou voltam a ser avaliadas com certeza. Supõe que a eficiência de uma troca não cresce quando
- * outras são aplicadas (retorno decrescente), o que vale aproximadamente; com poucas trocas por passo (até
- * fullBelow), a busca reavalia todas a cada passo, sem essa hipótese.
+ * quando nenhuma guardada passa dela. As trocas do grupo que mudou voltam a ser avaliadas com certeza. Supõe que a
+ * eficiência de uma troca não cresce quando outras são aplicadas (retorno decrescente), o que vale aproximadamente;
+ * com poucas trocas por passo (até fullBelow), a busca reavalia todas a cada passo, sem essa hipótese.
  */
 function efficiency(v, groups, ctx, { granularity, fullBelow = 400, refresh = 40 }) {
     let choice = groups.map((g) => g.exact);
@@ -194,27 +207,32 @@ function efficiency(v, groups, ctx, { granularity, fullBelow = 400, refresh = 40
     const classes = granularity === 'class' ? [] : [...new Set(groups.map((g) => `${g.cls}${g.W}`))].map((k) => {
         const idx = groups.map((g, i) => i).filter((i) => `${groups[i].cls}${groups[i].W}` === k);
         const cands = groups[idx[0]].cands.filter((u) => idx.every((i) => groups[i].cands.includes(u)));
-        return { idx, cands };
+        return { idx, cands, label: k };
     });
     const moves = [];
-    groups.forEach((g, i) => { for (const u of g.cands) moves.push({ idx: [i], u }); });
-    for (const cl of classes) for (const u of cl.cands) moves.push({ idx: cl.idx, u });
+    groups.forEach((g, i) => { for (const u of g.cands) moves.push({ idx: [i], u, label: `${g.label} → ${u}` }); });
+    for (const cl of classes) for (const u of cl.cands) moves.push({ idx: cl.idx, u, label: `${cl.label} (classe inteira) → ${u}` });
     const target = (m) => { const c = [...choice]; for (const i of m.idx) c[i] = m.u; return c; };
     const noop = (m) => m.idx.every((i) => choice[i] === m.u);
+    let tries = [], skipped = 0;
     /** Eficiência da troca no estado atual (null se não economiza ou viola a restrição). */
     const rate = (m) => {
         const c = target(m), a = expand(groups, c);
-        if (cur.score - costOnly(v, a, ctx) <= 1e-12) return null;
+        if (cur.score - costOnly(v, a, ctx) <= 1e-12) { skipped++; return null; }
         const p = evaluate(v, a, ctx);
         const ds = cur.score - p.score;
-        if (!p.feasible || ds <= 1e-12) return null;
         const de = p.err - cur.err;
-        return { eff: de <= 1e-15 ? 1e15 + ds : ds / de, p, c };
+        const eff = de <= 1e-15 ? 1e15 + ds : ds / de;
+        tries.push(tryOf(p, m.label, { eff: p.feasible && ds > 1e-12 ? eff : null }));
+        if (!p.feasible || ds <= 1e-12) return null;
+        return { eff, p, c, ds, de };
     };
     const lazy = moves.length > fullBelow;
+    step(ctx, { kind: 'start', state: stateOf(cur), moves: moves.length, lazy, refresh });
     let entries = moves.map((m) => ({ m, eff: Infinity }));
-    for (let step = 0; step < 2000; step++) {
+    for (let it = 0; it < 2000; it++) {
         let taken = null;
+        tries = []; skipped = 0;
         if (!lazy) {
             for (const e of entries) {
                 if (noop(e.m)) continue;
@@ -229,7 +247,7 @@ function efficiency(v, groups, ctx, { granularity, fullBelow = 400, refresh = 40
             let k = 0;
             while (k < entries.length) {
                 const e = entries[k];
-                const best = fresh.reduce((m, x) => (x.eff > m ? x.eff : m), -Infinity);
+                const best = fresh.reduce((mx, x) => (x.eff > mx ? x.eff : mx), -Infinity);
                 if (fresh.length >= refresh && best >= e.eff) break;
                 const r = rate(e.m);
                 if (!r) { entries.splice(k, 1); continue; }
@@ -239,10 +257,11 @@ function efficiency(v, groups, ctx, { granularity, fullBelow = 400, refresh = 40
             }
             for (const f of fresh) if (!taken || f.eff > taken.eff) taken = f;
         }
-        if (!taken) break;
+        if (!taken) { step(ctx, { kind: 'effEnd', tries, skipped, state: stateOf(cur) }); break; }
         choice = taken.c;
         cur = taken.p;
         trace.push(cur);
+        step(ctx, { kind: 'eff', n: it + 1, tries, skipped, chosen: taken.m.label, ds: taken.ds, de: taken.de, eff: taken.eff, zeroErr: taken.de <= 1e-15, state: stateOf(cur) });
         if (lazy) {
             // As trocas dos grupos que mudaram (inclusive as descartadas) são reavaliadas no próximo passo.
             const changed = new Set(taken.m.idx);
@@ -259,20 +278,30 @@ function efficiency(v, groups, ctx, { granularity, fullBelow = 400, refresh = 40
 
 /** Exaustiva com poda, em ordem de custo. */
 function exhaustive(v, groups, ctx, { maxCombos = 20000, frontEvals = 3000 }) {
+    const exact = evaluate(v, expand(groups, groups.map((g) => g.exact)), ctx);
+    step(ctx, { kind: 'start', state: stateOf(exact) });
     // Poda: em cada grupo, as unidades (em ordem de erro próprio) até a primeira que sozinha já viola a restrição.
     const lists = groups.map((g, i) => {
         const keep = [g.exact];
+        const tries = [];
+        let cut = null;
         for (const u of g.cands) {
             if (u === g.exact) continue;
             const c = groups.map((h) => h.exact);
             c[i] = u;
-            if (!evaluate(v, expand(groups, c), ctx).feasible) break;
+            const p = evaluate(v, expand(groups, c), ctx);
+            tries.push(tryOf(p, u));
+            if (!p.feasible) { cut = u; break; }
             keep.push(u);
         }
+        step(ctx, { kind: 'prune', group: g.label, tries, kept: keep.length, of: g.cands.length, cut, state: stateOf(exact) });
         return keep;
     });
     const total = lists.reduce((s, l) => s * l.length, 1);
-    if (total > maxCombos) throw new Error(`exaustiva: ${total} combinações depois da poda (limite ${maxCombos}); use outra heurística ou grupos por classe`);
+    if (total > maxCombos) {
+        step(ctx, { kind: 'exhStop', total, max: maxCombos, state: stateOf(exact) });
+        throw new Error(`exaustiva: ${total} combinações depois da poda (limite ${maxCombos}); use outra heurística ou grupos por classe`);
+    }
     // Custo de todas (síntese, rápida); erro em ordem de custo.
     const combos = [];
     const rec = (i, c) => {
@@ -285,24 +314,37 @@ function exhaustive(v, groups, ctx, { maxCombos = 20000, frontEvals = 3000 }) {
         const r = synthesize(v.src, { ...v.syn, design: v.design, assign: a });
         return { c, score: ctx.score(costOf(r)) };
     }).sort((a, b) => a.score - b.score);
+    step(ctx, { kind: 'order', total, state: stateOf(exact) });
     let best = null;
     const limit = Math.min(costed.length, frontEvals);
+    const label = (c) => c.map((u, i) => (u === groups[i].exact ? null : `${groups[i].label}: ${u}`)).filter(Boolean).join(', ') || 'exato';
+    let batch = [];
     for (let k = 0; k < costed.length; k++) {
         if (best && k >= limit) break;
         const p = evaluate(v, expand(groups, costed[k].c), ctx);
-        if (!best && p.feasible) best = p;
+        batch.push(tryOf(p, label(costed[k].c)));
+        const first = !best && p.feasible;
+        if (first) best = p;
+        if (first || batch.length === 10 || k === costed.length - 1) {
+            step(ctx, { kind: 'exh', from: k + 2 - batch.length, to: k + 1, total, tries: batch, found: first ? label(costed[k].c) : null, state: stateOf(best ?? exact) });
+            batch = [];
+        }
     }
-    return { best: best ?? evaluate(v, expand(groups, groups.map((g) => g.exact)), ctx), trace: [], combos: total };
+    return { best: best ?? exact, trace: [], combos: total };
 }
 
 /** Aleatória: amostras com semente fixa (cada grupo exato com probabilidade 1/3, senão uma candidata qualquer). */
 function random(v, groups, ctx, { samples = 200, seed = 11 }) {
     const rand = rng(seed);
     let best = evaluate(v, expand(groups, groups.map((g) => g.exact)), ctx);
+    step(ctx, { kind: 'start', state: stateOf(best) });
+    let batch = [];
     for (let s = 0; s < samples; s++) {
         const c = groups.map((g) => (rand() < 1 / 3 ? g.exact : g.cands[Math.floor(rand() * g.cands.length)]));
         const p = evaluate(v, expand(groups, c), ctx);
+        batch.push(tryOf(p, p.units.join(', ')));
         if (p.feasible && p.score < best.score) best = p;
+        if (batch.length === 20 || s === samples - 1) { step(ctx, { kind: 'rnd', from: s + 2 - batch.length, to: s + 1, total: samples, tries: batch, state: stateOf(best) }); batch = []; }
     }
     return { best, trace: [] };
 }
@@ -362,13 +404,14 @@ export function explore(src, o = {}) {
     const candMs = Date.now() - t2;
     for (const h of heuristics) {
         const t1 = Date.now();
-        const ctx = { score, ok, points: [], progress: o.progress, maxRows: o.maxRows };
+        const ctx = { score, ok, points: [], progress: o.progress, maxRows: o.maxRows, steps: [] };
         let best = null;
         const traces = [], last = [];
         for (const v of good) {
             v.cache = new Map(); // cada heurística conta as suas avaliações
             v.costCache ??= new Map();
             const groups = v.groups;
+            if (good.length > 1) step(ctx, { kind: 'variant', label: v.label, groups: groups.length });
             if (!groups.length) { evaluate(v, new Map(), ctx); continue; }
             let res;
             try { res = RUN[h](v, groups, ctx, { granularity: o.granularity ?? 'class', ...o }); } catch (e) { traces.push({ variant: v.label, error: e.message }); continue; }
@@ -384,12 +427,13 @@ export function explore(src, o = {}) {
         for (const p of feasible.slice(0, o.maxVerify ?? 25)) {
             tries++;
             verifyPoint(p, ok);
+            step(ctx, { kind: 'verify', n: tries, label: p.units.join(', '), variant: p.variant, score: p.score, psnr: psnrOf(p), measured: Math.min(...p.measured.map((m) => m.PSNR)), ok: p.measuredOk, state: stateOf(p) });
             if (p.measuredOk) { chosen = p; break; }
         }
         const front = paretoPoints(ctx.points);
         // Os pontos viáveis da fronteira mais baratos (os que interessam para a decisão).
         for (const p of front.filter((x) => x.feasible).slice(0, o.verifyFront ?? 0)) verifyPoint(p, ok);
-        runs.push({ heuristic: h, best, last, chosen, verifyTries: tries, evals: ctx.points.length, ms: Date.now() - t1, points: ctx.points, front, traces, error: traces.find((x) => x.error)?.error ?? null });
+        runs.push({ heuristic: h, best, last, chosen, steps: ctx.steps, verifyTries: tries, evals: ctx.points.length, ms: Date.now() - t1, points: ctx.points, front, traces, error: traces.find((x) => x.error)?.error ?? null });
     }
     return { variants: prepared.map((v) => ({ label: v.label, error: v.error ?? null, ops: v.base?.ops.list.length ?? 0 })), ref, refScore: score(ref), runs, ms: Date.now() - t0, prepMs, candMs, options: { ...o, synth: undefined, cells: undefined, progress: undefined } };
 }

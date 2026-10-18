@@ -184,3 +184,52 @@ export function dseSvg(runs, { xLabel, psnrMin = null, refScore, names, chosenLa
     });
     return `${s}</svg>`;
 }
+
+/**
+ * Uma iteração da busca: custo (x) contra o PSNR estimado (y). Em cinza, o que já foi avaliado antes; em cor, o que
+ * esta iteração avaliou (cheio: viável; vazado: viola a restrição); a linha liga os estados da busca até aqui e o anel
+ * marca o estado atual.
+ * @param {object[]} steps passo a passo da heurística
+ * @param {number} k iteração mostrada
+ */
+export function dseStepSvg(steps, k, { xLabel, yLabel, psnrMin = null, refScore, chosenLabel = null }) {
+    const W = 760, H = 380, L = 60, R = 14, T = 16, B = 44;
+    const all = steps.flatMap((s) => s.tries ?? []).concat(steps.map((s) => s.state).filter(Boolean));
+    const fin = all.map((p) => p.psnr).filter(Number.isFinite);
+    const yTop = Math.ceil(Math.max(psnrMin ?? 0, ...fin, 20) / 10) * 10 + 10;
+    const yBot = Math.max(0, Math.floor(Math.min(...fin, yTop - 10) / 10) * 10, psnrMin !== null ? Math.floor((psnrMin - 20) / 10) * 10 : 0);
+    const xs = all.map((p) => p.score).concat(refScore);
+    let x0 = Math.min(...xs), x1 = Math.max(...xs);
+    const pad = (x1 - x0) * 0.04 || Math.abs(x1) * 0.05 || 1;
+    x0 -= pad; x1 += pad;
+    const X = (v) => L + ((v - x0) / (x1 - x0)) * (W - L - R);
+    const Y = (v) => T + (1 - (Math.max(yBot, Math.min(v, yTop)) - yBot) / (yTop - yBot)) * (H - T - B);
+    const fmt = (v) => (Math.abs(v) >= 1e6 ? `${(v / 1e6).toFixed(1)}M` : Math.abs(v) >= 1e4 ? `${(v / 1e3).toFixed(0)}k` : Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(2));
+    let s = `<svg class="fig-svg hls-dse hls-step" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img">`;
+    for (let q = 0; q <= 5; q++) {
+        const v = yBot + ((yTop - yBot) * q) / 5;
+        s += `<line class="grid" x1="${L}" y1="${Y(v)}" x2="${W - R}" y2="${Y(v)}"/><text class="small muted" x="${L - 6}" y="${Y(v) + 4}" text-anchor="end">${q === 5 ? '∞' : v.toFixed(0)}</text>`;
+        const xv = x0 + ((x1 - x0) * q) / 5;
+        s += `<text class="small muted" x="${X(xv)}" y="${H - B + 16}" text-anchor="middle">${fmt(xv)}</text>`;
+    }
+    s += `<line class="axis" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H - B}"/>`;
+    s += `<text class="small" x="${(L + W - R) / 2}" y="${H - 8}" text-anchor="middle">${esc(xLabel)}</text>`;
+    s += `<text class="small" transform="translate(14 ${(T + H - B) / 2}) rotate(-90)" text-anchor="middle">${esc(yLabel)}</text>`;
+    if (psnrMin !== null) s += `<line class="limit" x1="${L}" y1="${Y(psnrMin)}" x2="${W - R}" y2="${Y(psnrMin)}"/>`;
+    s += `<line class="ref" x1="${X(refScore)}" y1="${T}" x2="${X(refScore)}" y2="${H - B}"/>`;
+    // Antes desta iteração.
+    for (let j = 0; j < k; j++) for (const p of steps[j].tries ?? []) s += `<circle class="old" cx="${X(p.score)}" cy="${Y(p.psnr)}" r="2.2"/>`;
+    // Caminho dos estados.
+    const states = steps.slice(0, k + 1).map((x) => x.state).filter(Boolean);
+    if (states.length > 1) s += `<path class="path" d="${states.map((p, j) => `${j ? 'L' : 'M'}${X(p.score)},${Y(p.psnr)}`).join(' ')}"/>`;
+    for (const p of states.slice(0, -1)) s += `<circle class="st" cx="${X(p.score)}" cy="${Y(p.psnr)}" r="3"/>`;
+    // Esta iteração.
+    const cur = steps[k];
+    for (const p of cur.tries ?? []) {
+        const pick = chosenLabel && p.label === chosenLabel;
+        s += `<g><circle class="try${p.feasible ? '' : ' bad'}${pick ? ' pick' : ''}" cx="${X(p.score)}" cy="${Y(p.psnr)}" r="${pick ? 5.5 : 3.6}"/><title>${esc(`${p.label}: ${fmt(p.score)}, ${Number.isFinite(p.psnr) ? p.psnr.toFixed(2) : '∞'} dB`)}</title></g>`;
+    }
+    if (cur.kind === 'verify') s += `<circle class="verify${cur.ok ? '' : ' bad'}" cx="${X(cur.score)}" cy="${Y(cur.measured)}" r="5"/><line class="vline" x1="${X(cur.score)}" y1="${Y(cur.psnr)}" x2="${X(cur.score)}" y2="${Y(cur.measured)}"/>`;
+    if (cur.state) s += `<circle class="now" cx="${X(cur.state.score)}" cy="${Y(cur.state.psnr)}" r="8"/>`;
+    return `${s}</svg>`;
+}

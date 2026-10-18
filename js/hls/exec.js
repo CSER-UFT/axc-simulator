@@ -48,23 +48,24 @@ export function outputArrays(design) {
     return design.arrays.filter((a) => a.kind === 'param' && wr.has(a.name));
 }
 
-export const INPUT_SOURCES = ['image', 'uniform'];
+export const INPUT_SOURCES = ['image', 'uniform', 'own'];
 
 /**
- * Dados de entrada: a imagem de teste da página de unidades (vetores de 2 dimensões têm a imagem no tamanho deles; os
- * de 1 dimensão, as linhas da imagem em sequência), na faixa do tipo; ou valores uniformes na faixa do tipo.
+ * Dados de entrada: a imagem de teste da página de unidades, ou uma imagem do usuário (own: {w, h, data}, levada ao
+ * tamanho do vetor pelo vizinho mais próximo); vetores de 2 dimensões têm a imagem no tamanho deles e os de 1 dimensão,
+ * as linhas da imagem em sequência, na faixa do tipo; ou valores uniformes na faixa do tipo.
  * @returns {Map<string, Float64Array>}
  */
-export function makeInputs(design, source = 'image', seed = 2027) {
+export function makeInputs(design, source = 'image', seed = 2027, own = null) {
     const out = new Map();
     const rand = rng(seed);
     for (const arr of inputArrays(design)) {
         const [lo, hi] = typeRange(arr.type);
         const v = new Float64Array(arr.size);
-        if (source === 'image') {
+        if (source === 'image' || (source === 'own' && own)) {
             const w = arr.dims.length === 2 ? arr.dims[1] : Math.min(arr.size, 192);
             const h = arr.dims.length === 2 ? arr.dims[0] : Math.ceil(arr.size / w);
-            const img = testImage(w, h);
+            const img = source === 'own' ? resample(own, w, h) : testImage(w, h);
             // 0..255 vai para a faixa do tipo: com sinal, centrado no zero; mais largo que 8 bits, sem escala.
             for (let k = 0; k < arr.size; k++) {
                 const p = img.data[k];
@@ -74,6 +75,13 @@ export function makeInputs(design, source = 'image', seed = 2027) {
         out.set(arr.name, v);
     }
     return out;
+}
+
+/** Imagem em tons de cinza levada a w x h pelo vizinho mais próximo. */
+function resample(img, w, h) {
+    const data = new Uint8ClampedArray(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) data[y * w + x] = img.data[Math.min(img.h - 1, Math.floor((y * img.h) / h)) * img.w + Math.min(img.w - 1, Math.floor((x * img.w) / w))];
+    return { w, h, data };
 }
 
 /** Programa da execução: índice global de cada nó e as instruções de cada trecho. */

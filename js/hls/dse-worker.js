@@ -25,6 +25,8 @@ self.onmessage = (e) => {
                     best: sum(r.best), chosen: sum(r.chosen), front: r.front.map(sum),
                     points: r.points.map((p) => ({ score: p.score, psnr: Math.min(...p.outs.map((o) => o.PSNR)), err: p.err, feasible: p.feasible, variant: p.variant })),
                     groups: r.traces[0]?.groups ?? [],
+                    // Passo a passo, para a animação (os estados sem a lista de unidades, menos o último de cada passo).
+                    steps: r.steps,
                 })),
             },
         });

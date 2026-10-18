@@ -22,7 +22,7 @@ export default {
 <ol>
     <li>Escolha o tipo de unidade (multiplicador ou somador), a largura e a técnica de aproximação no painel da esquerda. Tudo é recalculado a cada mudança.</li>
     <li>O <strong>Resumo</strong> traz a área e o atraso estimados, comparados com a unidade exata, e as métricas de erro.</li>
-    <li><strong>Estrutura</strong> mostra onde a aproximação acontece; <strong>Erro</strong> mostra para quais operandos ela erra e quanto; <strong>Comparação</strong> junta várias configurações num gráfico de custo contra erro; <strong>Aplicação</strong> mostra o efeito numa imagem; <strong>Tensão e memória</strong> e <strong>Estocástica</strong> tratam de outras fontes de aproximação. Os números de FPGA e de ASIC das unidades sintetizadas ficam na aba <strong>Biblioteca</strong> da página de síntese de alto nível.</li>
+    <li><strong>Estrutura</strong> mostra onde a aproximação acontece; <strong>Erro</strong> mostra para quais operandos ela erra e quanto; <strong>Comparação</strong> junta várias configurações num gráfico de custo contra erro; <strong>Rede neural</strong> mostra o efeito na LeNet-5; <strong>Tensão e memória</strong> e <strong>Estocástica</strong> tratam de outras fontes de aproximação. Os números de FPGA e de ASIC das unidades sintetizadas ficam na aba <strong>Biblioteca</strong> da página de síntese de alto nível.</li>
     <li><strong>Copiar link</strong> guarda a configuração da unidade, a aba e os controles das abas no endereço da página: quem abrir o link vê a mesma tela. O idioma fica no seletor do cabeçalho.</li>
 </ol>
 <p class="tip">Para começar: multiplicador de 8 bits, 4 colunas truncadas e nenhuma aproximada. O MED dá 12,25 e o WCE dá 49. Depois troque por 6 colunas aproximadas e compare os dois mapas de erro.</p>`,
@@ -168,23 +168,7 @@ export default {
 <p>Uma configuração <strong>domina</strong> outra quando não é pior em nenhum dos dois eixos e é melhor em pelo menos um. As não dominadas formam a <strong>fronteira de Pareto</strong>, ligada em degraus: são as únicas escolhas razoáveis, e a decisão entre elas depende de quanto erro a aplicação tolera. Troque a métrica de erro e veja a fronteira mudar: WCE e MRED podem escolher configurações diferentes.</p>
 <p>A coluna <strong>dominada por</strong> conta quantas configurações da comparação dominam cada uma, com o custo e o erro escolhidos: zero é a fronteira. O <strong>ponto de joelho</strong>, marcado no gráfico, é o ponto da fronteira mais distante da reta que liga os seus extremos, com os dois eixos normalizados entre 0 e 1 (o erro em log, quando o gráfico está em log, e então sem os pontos de erro zero). Até ele, reduzir o custo sai barato em erro; depois dele, cada redução custa bem mais erro. É uma escolha razoável quando não há uma restrição de erro definida. O critério é semelhante ao do algoritmo Kneedle (${c('satopaa2011')}).</p>
 <p>Como custo, além da área e do atraso, dá para usar a atividade e o produto da área pela atividade, um análogo do produto de potência e área.</p>
-<p>O botão <strong>Usar no simulador de compilador</strong>, abaixo da configuração, abre o Simulador de Compilador RISC-V com esta unidade: no grafo de fluxo de dados e no escalonamento de lá, a latência e a área da multiplicação (com um multiplicador) ou da soma e da subtração (com um somador) passam a vir dela, da síntese ASIC sky130, quando a configuração foi sintetizada, ou do modelo de portas. O simulador de compilador também lista as configurações sintetizadas daqui, para escolher um multiplicador e um somador lá mesmo.</p>
-<p>A métrica "MSE da imagem filtrada" mede o erro na aplicação, com o filtro escolhido na aba Aplicação. A comparação fica guardada no navegador; o botão CSV exporta a tabela.</p>`,
-        },
-        {
-            id: 'app',
-            title: 'Aplicação em imagem',
-            html: `
-<p>O filtro é calculado duas vezes, com a unidade exata e com a aproximada, sobre uma imagem de teste sintética (ou uma imagem sua, em PNG, JPEG ou outro formato que o navegador abra, ou ainda PPM, PGM ou PBM, reduzida para no máximo 256 pixels de lado e convertida para tons de cinza).</p>
-<ul>
-    <li><strong>gaussiano σ = 1</strong>: nove produtos pixel × peso por pixel (pesos 19, 32, 52), divididos por 256. Com um multiplicador, só os produtos são aproximados; com um somador de 16 bits, só a acumulação.</li>
-    <li><strong>gaussiano 1 2 1</strong>: pesos que são potências de 2. Cada produto tem um único produto parcial por linha, e truncar colunas baixas pode não errar nada: o erro depende dos dados que a unidade recebe.</li>
-    <li><strong>ganho de brilho</strong>: um produto por pixel.</li>
-    <li><strong>média com o vizinho</strong>: uma soma de 8 bits por pixel.</li>
-    <li><strong>bordas de Sobel</strong>: os gradientes Gx e Gy, com pesos ±1 e ±2 (as mesmas contas do código MiniC desenrolado do simulador de compilador), e a saída (|Gx| + |Gy|) / 4. As unidades são sem sinal, então a parte positiva e a negativa de cada gradiente são acumuladas com a unidade e subtraídas de forma exata. Com um somador de 16 bits, as somas são aproximadas: o LOA com k = 4 dá uns 40 dB, e o segmentado com L = 4 e P = 2, uns 20 dB. Com um multiplicador, os produtos por 1 e por 2 têm um só produto parcial por linha, e os compressores aproximados e o Mitchell não erram nada; o truncamento e o DRUM erram.</li>
-    <li><strong>realce de bordas</strong>: 5 vezes o pixel menos os 4 vizinhos, limitado a 0 e 255. O resultado é uma diferença entre valores grandes, então um erro pequeno numa das partes vira um erro grande no resultado: as mesmas unidades perdem bem mais PSNR aqui que no gaussiano.</li>
-</ul>
-<p><strong>PSNR</strong> = 10 log<sub>10</sub>(255² / MSE), em dB. <strong>SSIM</strong> (${c('wang2004')}) compara brilho, contraste e estrutura em janelas 8 × 8; 1 é igual. A diferença, colorida com a mesma rampa do mapa de erro (preto é zero), mostra em que regiões da imagem a aproximação aparece.</p>`,
+<p>A métrica "MSE da imagem filtrada" mede o erro na aplicação: o filtro gaussiano 3 × 3 sobre a imagem de teste (para os somadores de 8 bits, a média com o vizinho). Kernels inteiros, com imagens suas, ficam na página de síntese de alto nível. A comparação fica guardada no navegador; o botão CSV exporta a tabela.</p>`,
         },
         {
             id: 'nn',
@@ -210,7 +194,7 @@ export default {
             html: `
 <ul>
     <li>mais técnicas: codificador de Booth aproximado, somadores com outras previsões de vai um;</li>
-    <li>usar o produto aproximado também na execução do programa no simulador de compilador.</li>
+    <li>mais kernels e aplicações na página de síntese de alto nível.</li>
 </ul>`,
         },
         {

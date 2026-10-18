@@ -3,10 +3,11 @@
  */
 import { synthesize, MODEL } from './hls/index.js';
 import { KERNELS } from './hls/kernels.js';
-import { ganttSvg, dfgSvg, dseSvg } from './hls/ui.js';
+import { ganttSvg, dfgSvg, dseSvg, dseStepSvg } from './hls/ui.js';
 import { technique } from './hls/approx.js';
 import { analyzeError } from './hls/error.js';
 import { makeInputs, crop, inputArrays } from './hls/exec.js';
+import { fromRgba, parseNetpbm, fitImage } from './axc/image.js';
 import { initLibrary, renderLibrary } from './ui/library.js';
 import { highlightC, highlightIR } from './hls/highlight.js';
 import { affSource } from './hls/elab.js';
@@ -182,7 +183,7 @@ for (const id of ['dseObj', 'dseMetric', 'dseValue', 'dseGran', 'dseHeur', 'dseC
 function syncDse() { $('dseWeights').style.display = $('dseObj').value === 'weighted' ? '' : 'none'; }
 syncDse();
 const dseOptions = () => ({
-    flow: $('flow').value, ports: +$('ports').value, input: $('apInput').value, method: $('apModel').value,
+    flow: $('flow').value, ports: +$('ports').value, input: $('apInput').value, image: $('apInput').value === 'own' ? ownImage : null, method: $('apModel').value,
     objective: $('dseObj').value, weights: { area: +$('dseWa').value, energy: +$('dseWe').value, latency: +$('dseWl').value },
     constraint: { metric: $('dseMetric').value, value: +$('dseValue').value }, granularity: $('dseGran').value, heuristic: $('dseHeur').value,
     clocks: $('dseClocks').value.split(/[,; ]+/).map(Number).filter((x) => x > 0), directives: $('dseDir').checked, allUnits: $('dseAll').checked,
@@ -204,6 +205,8 @@ $('dseRun').addEventListener('click', () => {
             dseWorker.terminate(); dseWorker = null;
             if (m.type === 'error') { $('dseStatus').textContent = m.message; return; }
             dseResult = { ...m.result, opts };
+            stopPlay();
+            fillStepSel();
             $('dseStatus').textContent = t('dse.done', { s: nf(m.result.ms / 1000, 1), prep: nf(m.result.prepMs / 1000, 1), cand: nf(m.result.candMs / 1000, 1), v: m.result.variants.length });
             renderDse();
         }
@@ -225,6 +228,8 @@ function fmtScore(v, obj) {
 }
 const hName = (h) => t(`dse.h.${h}`);
 function renderDse() {
+    if (dseResult && !$('dseStepSel').options.length) fillStepSel();
+    if (dseResult) renderStep();
     $('dseKernel').textContent = result ? t('dse.kernel', { k: result.design.name, n: result.ops.list.length }) : '';
     const R = dseResult;
     if (!R) { $('dseRuns').innerHTML = ''; $('dseFig').innerHTML = ''; $('dseFront').innerHTML = ''; return; }
@@ -253,6 +258,72 @@ function renderDse() {
             + `<td>${ps(minP(p.estimated))} / ${ps(minP(p.measured))}</td><td>${p.feasible ? '✓' : ''}</td><td class="units">${esc(p.variant)}<br>${esc(p.units.join(', '))}</td><td><button type="button" class="btn outline" data-apply="${+sel.value || 0}:${i}">${t('dse.apply')}</button></td></tr>`).join('');
 }
 $('dseFrontSel').addEventListener('change', () => renderDse());
+
+// Passo a passo da busca: cada iteração registrada pela heurística, com o gráfico, a explicação e o que foi avaliado.
+let stTimer = null;
+const stRun = () => dseResult?.runs[+$('dseStepSel').value || 0];
+function stopPlay() { if (stTimer) { clearInterval(stTimer); stTimer = null; } $('stPlay').textContent = '▶'; }
+function fillStepSel() {
+    const sel = $('dseStepSel'), prev = sel.value;
+    sel.innerHTML = dseResult.runs.map((r, k) => `<option value="${k}">${esc(hName(r.heuristic))}</option>`).join('');
+    if (prev && +prev < dseResult.runs.length) sel.value = prev;
+    const r = stRun();
+    $('stSlider').max = String(Math.max(0, (r?.steps?.length ?? 1) - 1));
+    $('stSlider').value = '0';
+}
+function stepText(st, obj) {
+    const sc = (v) => fmtScore(v, obj), ps = (v) => (v === Infinity ? '∞' : nf(v, 2));
+    const feas = (st.tries ?? []).filter((x) => x.feasible).length;
+    switch (st.kind) {
+        case 'start': return st.order ? t('dse.st.startSeq', { order: st.order.join(', ') }) : st.moves ? t(st.lazy ? 'dse.st.startEffLazy' : 'dse.st.startEff', { moves: st.moves, refresh: st.refresh }) : t('dse.st.start');
+        case 'variant': return t('dse.st.variant', { v: st.label, g: st.groups });
+        case 'seq': return t(st.chosen ? 'dse.st.seq' : 'dse.st.seqKeep', { g: st.group, ops: t(st.ops === 1 ? 'dse.st.op1' : 'dse.st.opsN', { n: st.ops }), n: st.tries.length, f: feas, u: st.chosen, c: sc(st.state.score), p: ps(st.state.psnr) });
+        case 'eff': return t(st.zeroErr ? 'dse.st.effZero' : 'dse.st.eff', { k: st.n, n: st.tries.length, sk: st.skipped, f: feas, m: st.chosen, ds: sc(st.ds), de: st.de.toExponential(2), e: st.eff.toExponential(2), c: sc(st.state.score), p: ps(st.state.psnr) });
+        case 'effEnd': return t('dse.st.effEnd', { n: st.tries.length, sk: st.skipped });
+        case 'prune': return t(st.cut ? 'dse.st.pruneCut' : 'dse.st.prune', { g: st.group, k: st.kept - 1, of: st.of - 1, cut: st.cut });
+        case 'exhStop': return t('dse.st.exhStop', { n: nf(st.total), max: nf(st.max) });
+        case 'order': return t('dse.st.order', { n: nf(st.total) });
+        case 'exh': return t(st.found ? 'dse.st.exhFound' : 'dse.st.exh', { a: st.from, b: st.to, n: nf(st.total), f: feas, found: st.found });
+        case 'rnd': return t('dse.st.rnd', { a: st.from, b: st.to, n: st.total, f: feas, c: sc(st.state.score), p: ps(st.state.psnr) });
+        case 'verify': return t(st.ok ? 'dse.st.verifyOk' : 'dse.st.verifyBad', { k: st.n, l: st.label, e: ps(st.psnr), m: ps(st.measured) });
+        default: return '';
+    }
+}
+function renderStep() {
+    const r = stRun();
+    if (!r?.steps?.length) { $('stFig').innerHTML = ''; $('stText').innerHTML = ''; $('stTries').innerHTML = ''; return; }
+    const k = Math.min(+$('stSlider').value, r.steps.length - 1), st = r.steps[k], obj = dseResult.opts.objective;
+    const chosenLabel = st.kind === 'seq' ? st.chosen : st.kind === 'eff' ? st.chosen : st.kind === 'exh' ? st.found : null;
+    $('stFig').innerHTML = dseStepSvg(r.steps, k, { xLabel: t(`dse.obj.${obj}`), yLabel: t('dse.yLabel'), psnrMin: dseResult.opts.constraint.metric === 'psnr' ? dseResult.opts.constraint.value : null, refScore: dseResult.refScore, chosenLabel });
+    const state = st.state ? `${t('dse.st.state')}: ${fmtScore(st.state.score, obj)} · PSNR ${st.state.psnr === Infinity ? '∞' : nf(st.state.psnr, 2)} dB${st.state.units ? ` · ${st.state.units.join(', ')}` : ''}` : '';
+    $('stText').innerHTML = `<div class="k">${esc(t('dse.st.iter', { k: k + 1, n: r.steps.length }))}</div><div>${esc(stepText(st, obj))}</div><div class="state">${esc(state)}</div>`;
+    // O escolhido primeiro; depois, pela eficiência (quando há) ou pelo custo.
+    const tries = [...(st.tries ?? [])].sort((a, b) => (b.label === chosenLabel) - (a.label === chosenLabel) || (b.eff ?? -1) - (a.eff ?? -1) || a.score - b.score).slice(0, 300);
+    $('stTries').innerHTML = tries.length ? `<tr><th class="left">${t('dse.st.th.try')}</th><th>${t('dse.th.cost')}</th><th>PSNR</th><th>${t('dse.st.th.ok')}</th>${tries.some((x) => x.eff !== undefined) ? `<th>${t('dse.st.th.eff')}</th>` : ''}</tr>`
+        + tries.map((x) => `<tr class="${x.label === chosenLabel ? 'pick' : ''}"><td class="units">${esc(x.label)}</td><td>${fmtScore(x.score, obj)}</td><td>${x.psnr === Infinity ? '∞' : nf(x.psnr, 2)}</td><td>${x.feasible ? '✓' : '✗'}</td>${x.eff !== undefined ? `<td>${x.eff === null ? '-' : x.eff > 1e14 ? t('dse.st.free') : x.eff.toExponential(2)}</td>` : ''}</tr>`).join('') : '';
+}
+$('dseStepSel').addEventListener('change', () => { stopPlay(); fillStepSel(); renderStep(); });
+$('stSlider').addEventListener('input', () => { stopPlay(); renderStep(); });
+const stGo = (d) => { const r = stRun(); if (!r?.steps) return; $('stSlider').value = String(Math.max(0, Math.min(r.steps.length - 1, d(+$('stSlider').value, r.steps.length)))); renderStep(); };
+$('stFirst').addEventListener('click', () => { stopPlay(); stGo(() => 0); });
+$('stPrev').addEventListener('click', () => { stopPlay(); stGo((v) => v - 1); });
+$('stNext').addEventListener('click', () => { stopPlay(); stGo((v) => v + 1); });
+$('stLast').addEventListener('click', () => { stopPlay(); stGo((v, n) => n - 1); });
+$('stPlay').addEventListener('click', () => {
+    if (stTimer) { stopPlay(); return; }
+    const r = stRun();
+    if (!r?.steps?.length) return;
+    if (+$('stSlider').value >= r.steps.length - 1) $('stSlider').value = '0';
+    $('stPlay').textContent = '⏸';
+    renderStep();
+    stTimer = setInterval(() => {
+        const v = +$('stSlider').value;
+        if (v >= r.steps.length - 1) { stopPlay(); return; }
+        $('stSlider').value = String(v + 1);
+        renderStep();
+    }, +$('stSpeed').value);
+});
+$('stSpeed').addEventListener('change', () => { if (stTimer) { stopPlay(); $('stPlay').click(); } });
 function applyPoint(p) {
     if (p.code !== $('code').value) { $('code').value = p.code; $('example').value = 'custom'; store.set('hls.example', 'custom'); store.set('hls.code', p.code); }
     $('clock').value = String(p.clockNs);
@@ -294,10 +365,43 @@ $('dseJson').addEventListener('click', () => {
 // Aproximação ---------------------------------------------------------------------------------------------------
 for (const id of ['apInput', 'apModel']) {
     const v = store.get(`hls.${id}`);
-    if (v) $(id).value = v;
+    if (v && v !== 'own') $(id).value = v;
     $(id).addEventListener('change', () => { store.set(`hls.${id}`, $(id).value); renderApprox(); });
 }
 $('apReset').addEventListener('click', () => { assign.clear(); saveAssign(); run(); });
+// Imagem do usuário (formatos do navegador e PPM, PGM, PBM), reduzida para no máximo 256 pixels de lado.
+let ownImage = null;
+$('apImgFile').addEventListener('change', (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const use = (im) => {
+        ownImage = fitImage(im, 256);
+        $('apOwnOpt').disabled = false;
+        $('apOwnOpt').textContent = t('hls.ap.input.ownName', { name: f.name, w: ownImage.w, h: ownImage.h });
+        $('apInput').value = 'own';
+        profCache = null; apCache = null;
+        renderApprox();
+    };
+    const fail = (msg) => { $('apStatus').textContent = msg; };
+    if (/\.(ppm|pgm|pbm|pnm)$/i.test(f.name)) {
+        f.arrayBuffer().then((buf) => { try { use(parseNetpbm(new Uint8Array(buf))); } catch (err) { fail(t('app.readError', { name: f.name, msg: t(err.message) })); } });
+    } else {
+        const img = new Image();
+        img.onload = () => {
+            const k = Math.min(1, 256 / Math.max(img.width, img.height));
+            const w = Math.max(8, Math.round(img.width * k)), h = Math.max(8, Math.round(img.height * k));
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            URL.revokeObjectURL(img.src);
+            use(fromRgba(ctx.getImageData(0, 0, w, h).data, w, h));
+        };
+        img.onerror = () => { URL.revokeObjectURL(img.src); fail(t('app.notImage', { name: f.name })); };
+        img.src = URL.createObjectURL(f);
+    }
+    e.target.value = '';
+});
 const TECH = ['exact', 'array', 'booth', 'kulkarni', 'drum', 'mitchell', 'trunc', 'loa', 'seg'];
 function unitOptions(op, sel) {
     const by = new Map();
@@ -316,7 +420,7 @@ function analysis() {
     const key = `${$('code').value}|${$('ports').value}|${input}`;
     if (apCache && apCache.result === result && apCache.input === input && apCache.model === model) return apCache.a;
     const t0 = performance.now();
-    const inputs = profCache?.key === key ? profCache.inputs : makeInputs(result.design, input);
+    const inputs = profCache?.key === key ? profCache.inputs : makeInputs(result.design, input, 2027, ownImage);
     const prof = profCache?.key === key ? profCache.prof : null;
     const a = analyzeError(result, { inputs, prof, method: model });
     profCache = { key, inputs, prof: a.prof };

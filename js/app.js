@@ -5,7 +5,7 @@
  */
 import { buildUnit, unitName, compressorTable } from './axc/units.js';
 import { testInputs, errorMetrics, histogram, errorGrid, paretoFront, rng, loadOperands, operandsLoaded, APP_DISTRIBUTIONS } from './axc/metrics.js';
-import { testImage, fromRgba, parseNetpbm, fitImage, applyFilter, psnr, ssim } from './axc/image.js';
+import { testImage, applyFilter, psnr, ssim } from './axc/image.js';
 import { lineChartSvg, stagesSvg, dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, drawGray, drawDiff, esc } from './ui/plots.js';
 import { Help } from './ui/help.js';
 import { SC_GENERATORS, scCurve, binaryError, streamDemo, scCost, faultError, scFilter, flipPixelBits } from './axc/stochastic.js';
@@ -30,7 +30,7 @@ const dn = (name) => (getLanguage() === 'en' ? name.replace(/ exato$/, ' exact')
 let tab = store.get('axc.tab') || 'struct';
 let cur = null;            // {cfg, unit, m, inp}
 let lastParam = 'kApprox'; // parâmetro varrido pelo botão Varrer
-let image = testImage();
+const image = testImage();
 // Resultados da síntese das configurações pré-definidas (data/synth.json, gerado na publicação do site).
 let synth = null;
 const synthOf = (name) => synth?.designs.find((d) => d.name === name) ?? null;
@@ -107,7 +107,7 @@ function evaluateCurrent() {
     const inp = testInputs(cfg.width, dist, undefined, undefined, cfg.kind);
     const m = errorMetrics(unit, inp);
     const exact = exactUnit(cfg);
-    cur = { cfg, unit, m, inp, exact, dist, appCache: null, activity: activityOf(unit), exactActivity: activityOf(exact) };
+    cur = { cfg, unit, m, inp, exact, dist, activity: activityOf(unit), exactActivity: activityOf(exact) };
     renderEvalNote();
     renderSummary();
     // Só a aba visível é desenhada agora; as outras, quando forem abertas.
@@ -134,8 +134,8 @@ function randomPairs(N, n, seed) {
 }
 
 /** Abas que precisam ser redesenhadas depois de uma mudança na unidade (ou no idioma). */
-const dirty = { struct: true, error: true, cmp: true, app: true, vos: true, sc: true, nn: true };
-const RENDER = { struct: () => renderStruct(), error: () => renderError(), cmp: () => renderCmp(), app: () => renderApp(), vos: () => renderVos(), nn: () => renderNN() };
+const dirty = { struct: true, error: true, cmp: true, vos: true, sc: true, nn: true };
+const RENDER = { struct: () => renderStruct(), error: () => renderError(), cmp: () => renderCmp(), vos: () => renderVos(), nn: () => renderNN() };
 function renderTab(name) {
     if (name === 'vos') { renderMem(); renderCal(); }
     if (name === 'sc') { if (dirty.sc) { dirty.sc = false; renderSc(); } return; }
@@ -368,27 +368,6 @@ function addToCmp(cfg, dist) {
     const entry = cmpEntry(cfg, dist);
     if (k >= 0) cmp[k] = entry; else cmp.push(entry);
 }
-// Ligação com o Simulador de Compilador: abre o fluxo de dados de lá com este multiplicador (#axc=perfil).
-const CC_URL = 'https://cser-uft.github.io/riscv-cc-simulator/';
-function encodeProfile(obj) {
-    const bytes = new TextEncoder().encode(JSON.stringify(obj));
-    let bin = '';
-    for (const b of bytes) bin += String.fromCharCode(b);
-    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-/** Perfil da unidade atual (multiplicador ou somador) para o simulador de compilador: custo dela e da exata de mesma largura, e o erro. */
-function ccProfile() {
-    const { unit, exact, cfg, m } = cur;
-    const sy = synthOf(unitName(cfg)), sx = synthOf(unitName(exact.cfg));
-    const p = { kind: cfg.kind, name: unitName(cfg), cfg, width: cfg.width, gates: unit.net.gates, gatesExact: exact.net.gates, depth: unit.net.delay(), depthExact: exact.net.delay(), MRED: m.MRED, NMED: m.NMED, EP: m.EP };
-    if (sy?.asic && sx?.asic) p.asic = { area: sy.asic.area, areaExact: sx.asic.area, delay: sy.asic.delay, delayExact: sx.asic.delay };
-    return p;
-}
-$('toCC').onclick = () => {
-    if (!cur) return;
-    window.open(`${CC_URL}#axc=${encodeProfile(ccProfile())}`, '_blank', 'noopener');
-};
-
 $('addCmp').onclick = () => {
     if (!cur) return;
     addToCmp(cur.cfg, cur.dist);
@@ -621,46 +600,16 @@ function loadCfg(cfg) {
     evaluateCurrent();
 }
 
-// Aplicação -------------------------------------------------------------------------------------------------
+// Métrica de imagem da comparação ----------------------------------------------------------------------------
 
-/** Filtro escolhido, se fizer sentido para a unidade (null quando não faz). */
+/** Filtro da métrica de imagem da comparação, se fizer sentido para a unidade (null quando não faz). */
 function filterFor(cfg) {
-    const f = $('filter').value;
+    const f = 'gauss';
     // Com sinal e 8 bits, os pixels (até 255) não cabem no operando.
     if (cfg.kind === 'mul' && cfg.method === 'booth' && cfg.width === 8) return null;
     if (cfg.kind === 'mul') return f === 'pairs' ? 'gauss' : f;
     if (cfg.width === 8) return 'pairs';
     return f === 'pairs' || f === 'gain' ? 'gauss' : f;
-}
-
-let imgMessage = null;   // aviso sobre o último arquivo de imagem (erro de leitura)
-function renderApp() {
-    if (!cur) return;
-    const filter = filterFor(cur.cfg);
-    if (!filter) {
-        $('appNote').textContent = t('app.booth8');
-        for (const id of ['imgExact', 'imgApprox', 'imgDiff']) { const c = $(id); c.getContext('2d').clearRect(0, 0, c.width, c.height); }
-        $('appMetrics').innerHTML = '';
-        $('diffCap').textContent = '';
-        return;
-    }
-    const key = `${unitName(cur.cfg)}|${filter}|${image.w}x${image.h}|${image.data[0]}`;
-    if (cur.appCache?.key !== key) {
-        const ex = applyFilter(image, filter, null);
-        const ap = applyFilter(image, filter, cur.unit);
-        cur.appCache = { key, ex, ap, psnr: psnr(ex, ap), ssim: ssim(ex, ap) };
-    }
-    const { ex, ap } = cur.appCache;
-    drawGray($('imgExact'), ex);
-    drawGray($('imgApprox'), ap);
-    const dmax = drawDiff($('imgDiff'), ex, ap);
-    $('diffCap').textContent = dmax ? t('app.diff', { n: dmax }) : t('app.noDiff');
-    const chosen = $('filter').value;
-    $('appNote').textContent = (imgMessage ? `${imgMessage} ` : '') + (filter !== chosen ? t('app.otherFilter') : '') + t(`app.note.${filter}`);
-    const p = cur.appCache.psnr;
-    $('appMetrics').innerHTML = `<table class="kv"><tr><th>PSNR</th><td class="mono">${p === Infinity ? t('app.same') : `${nf(p)} dB`}</td><td class="note">${t('app.psnrNote')}</td></tr>`
-        + `<tr><th>SSIM</th><td class="mono">${nf(cur.appCache.ssim, 4)}</td><td class="note">${t('app.ssimNote')}</td></tr>`
-        + `<tr><th>${t('app.mredUnit')}</th><td class="mono">${pct(cur.m.MRED)}</td><td class="note">${t('app.mredNote')}</td></tr></table>`;
 }
 
 // Rede neural (LeNet-5 no MNIST) -----------------------------------------------------------------------------
@@ -956,47 +905,10 @@ $('scGen').addEventListener('change', () => { renderScDemo(); renderScCurve(); r
 $('scN').addEventListener('input', () => renderSc());
 for (const id of ['scX', 'scY']) $(id).addEventListener('input', () => renderScDemo());
 $('scBer').addEventListener('input', () => renderScFault());
-$('filter').onchange = () => { renderApp(); };
 $('vosV').addEventListener('input', () => renderVos());
 $('vosClock').addEventListener('change', () => renderVos());
 $('vosModel').addEventListener('change', () => renderVos());
 for (const id of ['memBer', 'memProt']) $(id).addEventListener('input', () => renderMem());
-$('imgSynth').onclick = () => { image = testImage(); imgMessage = null; dirty.vos = true; dirty.sc = true; if (cur) cur.appCache = null; renderApp(); };
-$('imgFile').onchange = (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const useImage = (im) => {
-        image = fitImage(im, 256);
-        imgMessage = null;
-        dirty.vos = true;
-        dirty.sc = true;
-        renderApp();
-    };
-    const fail = (msg) => { imgMessage = msg; renderApp(); };
-    if (/\.(ppm|pgm|pbm|pnm)$/i.test(f.name)) {
-        // Netpbm: os navegadores não abrem, então o arquivo é lido aqui.
-        f.arrayBuffer().then((buf) => {
-            try { useImage(parseNetpbm(new Uint8Array(buf))); } catch (err) { fail(t('app.readError', { name: f.name, msg: t(err.message) })); }
-        });
-        e.target.value = '';
-        return;
-    }
-    const img = new Image();
-    img.onload = () => {
-        const s = Math.min(1, 256 / Math.max(img.width, img.height));
-        const w = Math.max(8, Math.round(img.width * s)), h = Math.max(8, Math.round(img.height * s));
-        const c = document.createElement('canvas');
-        c.width = w; c.height = h;
-        const ctx = c.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        URL.revokeObjectURL(img.src);
-        useImage(fromRgba(ctx.getImageData(0, 0, w, h).data, w, h));
-    };
-    img.onerror = () => { URL.revokeObjectURL(img.src); fail(t('app.notImage', { name: f.name })); };
-    img.src = URL.createObjectURL(f);
-    e.target.value = '';
-};
-
 // Abas e controles ------------------------------------------------------------------------------------------
 
 function showTab(name) {
@@ -1023,7 +935,7 @@ for (const id of ['kind', 'width', 'adder', 'dist', 'approxCarry', 'mulMethod', 
  * deles). O estado vai no fragmento do endereço (#kind=mul&width=8&...), legível e sem ir ao servidor.
  */
 const SHARE_IDS = [...LAYERS.map((l) => `nnL-${l}`), 'kind', 'width', 'mulMethod', 'kTrunc', 'kApprox', 'approxCarry', 'kBlock', 'drumK', 'comp', 'adder', 'kAdd', 'segL', 'segP', 'dist',
-    'histLog', 'cmpX', 'cmpY', 'cmpLog', 'filter', 'vosV', 'vosClock', 'vosModel', 'memBer', 'memProt', 'scOp', 'scGen', 'scN', 'scX', 'scY', 'scBer', 'nnAdder'];
+    'histLog', 'cmpX', 'cmpY', 'cmpLog', 'vosV', 'vosClock', 'vosModel', 'memBer', 'memProt', 'scOp', 'scGen', 'scN', 'scX', 'scY', 'scBer', 'nnAdder'];
 const DEFAULTS = new Map(SHARE_IDS.map((id) => [id, $(id).type === 'checkbox' ? $(id).checked : $(id).value]));
 const ctrlValue = (id) => ($(id).type === 'checkbox' ? $(id).checked : $(id).value);
 

@@ -89,7 +89,8 @@
                     </div>
                     <div class="pane hidden" id="pane-approx">
                         <div class="row">
-                            <label style="margin:0"><span data-i18n="hls.ap.input">Dados de entrada</span> <select id="apInput"><option value="image" data-i18n="hls.ap.input.image">imagem de teste</option><option value="uniform" data-i18n="hls.ap.input.uniform">uniformes na faixa do tipo</option></select></label>
+                            <label style="margin:0"><span data-i18n="hls.ap.input">Dados de entrada</span> <select id="apInput"><option value="image" data-i18n="hls.ap.input.image">imagem de teste</option><option value="uniform" data-i18n="hls.ap.input.uniform">uniformes na faixa do tipo</option><option value="own" id="apOwnOpt" data-i18n="hls.ap.input.own" disabled>imagem sua</option></select></label>
+                            <label class="btn outline file-btn"><span data-i18n="hls.ap.ownBtn">Usar uma imagem sua</span> <input type="file" id="apImgFile" accept="image/*,.ppm,.pgm,.pbm,.pnm" /></label>
                             <label style="margin:0"><span data-i18n="hls.ap.model">Modelo de erro</span> <select id="apModel"><option value="sampled" data-i18n="hls.ap.model.sampled">por amostras</option><option value="analytic" data-i18n="hls.ap.model.analytic">analítico</option></select></label>
                             <button type="button" class="btn" id="apReset" data-i18n="hls.ap.reset">Todas exatas</button>
                             <span class="note" id="apStatus"></span>
@@ -167,6 +168,21 @@
                         <div class="scroll-box"><table id="dseRuns" class="hls-table"></table></div>
                         <div class="fig-box" id="dseFig"></div>
                         <p class="note" id="dseFigNote"></p>
+                        <h3 data-i18n="dse.stepTitle">Passo a passo da busca</h3>
+                        <div class="dse-player">
+                            <label style="margin:0"><span data-i18n="dse.frontOf">Heurística</span> <select id="dseStepSel"></select></label>
+                            <button type="button" class="btn outline" id="stFirst" title="início">⏮</button>
+                            <button type="button" class="btn outline" id="stPrev" title="anterior">◀</button>
+                            <button type="button" class="btn primary" id="stPlay">▶</button>
+                            <button type="button" class="btn outline" id="stNext" title="próximo">▶|</button>
+                            <button type="button" class="btn outline" id="stLast" title="fim">⏭</button>
+                            <input type="range" id="stSlider" min="0" max="0" value="0" />
+                            <select id="stSpeed"><option value="1500" data-i18n="dse.speed.slow">devagar</option><option value="700" selected data-i18n="dse.speed.normal">normal</option><option value="250" data-i18n="dse.speed.fast">rápido</option></select>
+                        </div>
+                        <div class="dse-step">
+                            <div><div class="fig-box" id="stFig"></div><p class="note" data-i18n="dse.stepLegend">Cinza: avaliado antes; azul: avaliado nesta iteração e viável; vazado: viola a restrição; laranja: o escolhido; a linha liga os estados da busca e o anel é o estado atual. Na verificação, o ponto verde (ou vazado, se não passar) é o PSNR medido bit a bit.</p></div>
+                            <div><div class="dse-expl" id="stText"></div><div class="scroll-box" style="max-height:340px"><table id="stTries" class="hls-table"></table></div></div>
+                        </div>
                         <h3 data-i18n="dse.front">Fronteira de Pareto</h3>
                         <div class="row"><label style="margin:0"><span data-i18n="dse.frontOf">Heurística</span> <select id="dseFrontSel"></select></label><button type="button" class="btn outline" id="dseCsv" data-i18n="ds.csv">Exportar CSV</button><button type="button" class="btn outline" id="dseJson" data-i18n="ds.json">Exportar JSON</button></div>
                         <div class="scroll-box"><table id="dseFront" class="hls-table"></table></div>

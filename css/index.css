@@ -1,5 +1,5 @@
 /*
- * Simulador de Computação Aproximada (família de simuladores RISC-V do CSER-UFT)
+ * Simulador de Computação Aproximada
  * Tema claro e tema escuro definidos por variáveis; o tema é escolhido em <html data-theme="light|dark">.
  * Cores de etiquetas (estações, ROB, instruções) chegam pela variável --tag e são misturadas com o fundo.
  */
