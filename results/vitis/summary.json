@@ -1,6 +1,6 @@
 {
  "part": "xc7a100tcsg324-1",
- "collected": "2026-10-18T22:14:00.544Z",
+ "collected": "2026-10-18T22:59:50.970Z",
  "rows": [
   {
    "case": "gauss_src",
@@ -8417,8 +8417,56 @@
     "mismatches": 0,
     "total": 36100
    },
-   "hls": null,
-   "impl": null
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72218,
+    "latencyWorst": 72218,
+    "intervalMin": 72219,
+    "lut": 1921,
+    "ff": 1152,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72216,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 19
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 43,
+      "ff": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 200,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 806,
+    "ff": 583,
+    "dsp": 0,
+    "slice": 295,
+    "bram": 0,
+    "achievedNs": 7.028,
+    "timingMet": "FALSE",
+    "carry4": 120
+   }
   },
   {
    "case": "gauss_t8c_loa6_rtl_ir",
@@ -8476,8 +8524,80 @@
     "mismatches": 0,
     "total": 36100
    },
-   "hls": null,
-   "impl": null
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72224,
+    "latencyWorst": 72224,
+    "intervalMin": 72225,
+    "lut": 2043,
+    "ff": 1682,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72222,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 25
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 89,
+      "ff": 1
+     },
+     {
+      "module": "u_ADD16_LOA6_bb",
+      "count": 4,
+      "lut": 28,
+      "ff": 0
+     },
+     {
+      "module": "add16_loa6",
+      "count": 4,
+      "lut": 28,
+      "ff": 0
+     },
+     {
+      "module": "u_MUL8_T8_C_bb",
+      "count": 1,
+      "lut": 23,
+      "ff": 0
+     },
+     {
+      "module": "mul8_t8_c",
+      "count": 1,
+      "lut": 23,
+      "ff": 0
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 165,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 32,
+      "ff": 39
+     }
+    ],
+    "lut": 638,
+    "ff": 630,
+    "dsp": 0,
+    "slice": 269,
+    "bram": 0,
+    "achievedNs": 5.598,
+    "timingMet": "FALSE",
+    "carry4": 111
+   }
   },
   {
    "case": "sobel_loa4_rtl_ir",
@@ -8535,8 +8655,68 @@
     "mismatches": 0,
     "total": 36100
    },
-   "hls": null,
-   "impl": null
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72220,
+    "latencyWorst": 72220,
+    "intervalMin": 72221,
+    "lut": 1986,
+    "ff": 1396,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72218,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 89,
+      "ff": 2
+     },
+     {
+      "module": "u_ADD16_LOA4_bb",
+      "count": 3,
+      "lut": 34,
+      "ff": 0
+     },
+     {
+      "module": "add16_loa4",
+      "count": 3,
+      "lut": 34,
+      "ff": 0
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 167,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 667,
+    "ff": 609,
+    "dsp": 0,
+    "slice": 262,
+    "bram": 0,
+    "achievedNs": 5.702,
+    "timingMet": "FALSE",
+    "carry4": 112
+   }
   },
   {
    "case": "sharpen_kul_rtl_ir",
@@ -8594,8 +8774,68 @@
     "mismatches": 0,
     "total": 36100
    },
-   "hls": null,
-   "impl": null
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72218,
+    "latencyWorst": 72218,
+    "intervalMin": 72219,
+    "lut": 1640,
+    "ff": 1015,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72216,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 19
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 43,
+      "ff": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 194,
+      "ff": 0
+     },
+     {
+      "module": "u_MUL8_KUL_bb",
+      "count": 1,
+      "lut": 13,
+      "ff": 0
+     },
+     {
+      "module": "mul8_kul",
+      "count": 1,
+      "lut": 13,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 32,
+      "ff": 39
+     }
+    ],
+    "lut": 497,
+    "ff": 459,
+    "dsp": 0,
+    "slice": 212,
+    "bram": 0,
+    "achievedNs": 5.335,
+    "timingMet": "FALSE",
+    "carry4": 94
+   }
   },
   {
    "case": "fir_t8c_loa11_rtl_ir",
@@ -8658,8 +8898,44 @@
     "mismatches": 0,
     "total": 1009
    },
-   "hls": null,
-   "impl": null
+   "hls": {
+    "estClockNs": 3.733,
+    "latencyBest": 1031,
+    "latencyWorst": 1031,
+    "intervalMin": 1032,
+    "lut": 3256,
+    "ff": 2089,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1029,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 22
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 107,
+      "ff": 1
+     }
+    ],
+    "lut": 665,
+    "ff": 487,
+    "dsp": 0,
+    "slice": 222,
+    "bram": 0,
+    "achievedNs": 4.033,
+    "timingMet": "TRUE",
+    "carry4": 12
+   }
   },
   {
    "case": "dot_t4_rtl_ir",
@@ -8716,8 +8992,56 @@
     "mismatches": 0,
     "total": 1
    },
-   "hls": null,
-   "impl": null
+   "hls": {
+    "estClockNs": 4.034,
+    "latencyBest": 260,
+    "latencyWorst": 260,
+    "intervalMin": 261,
+    "lut": 118,
+    "ff": 74,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "acc",
+      "trip": 256,
+      "latency": 258,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 4
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 17,
+      "ff": 1
+     },
+     {
+      "module": "u_MUL8_T4_bb",
+      "count": 1,
+      "lut": 70,
+      "ff": 0
+     },
+     {
+      "module": "mul8_t4",
+      "count": 1,
+      "lut": 70,
+      "ff": 0
+     }
+    ],
+    "lut": 116,
+    "ff": 64,
+    "dsp": 0,
+    "slice": 42,
+    "bram": 0,
+    "achievedNs": 5.223,
+    "timingMet": "FALSE",
+    "carry4": 13
+   }
   },
   {
    "case": "gauss_dse_op40_rtl_ir",
@@ -8811,8 +9135,140 @@
     "mismatches": 0,
     "total": 36100
    },
-   "hls": null,
-   "impl": null
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72224,
+    "latencyWorst": 72224,
+    "intervalMin": 72225,
+    "lut": 1965,
+    "ff": 1690,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72222,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 25
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 89,
+      "ff": 1
+     },
+     {
+      "module": "u_ADD16_LOA8_bb",
+      "count": 2,
+      "lut": 11,
+      "ff": 0
+     },
+     {
+      "module": "add16_loa8",
+      "count": 2,
+      "lut": 11,
+      "ff": 0
+     },
+     {
+      "module": "u_MUL8_T8_C_bb",
+      "count": 1,
+      "lut": 24,
+      "ff": 0
+     },
+     {
+      "module": "mul8_t8_c",
+      "count": 1,
+      "lut": 24,
+      "ff": 0
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 165,
+      "ff": 0
+     },
+     {
+      "module": "u_MUL8_T6_A4c_bb",
+      "count": 1,
+      "lut": 2,
+      "ff": 0
+     },
+     {
+      "module": "mul8_t6_a4c",
+      "count": 1,
+      "lut": 2,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_LOA9_bb",
+      "count": 1,
+      "lut": 5,
+      "ff": 0
+     },
+     {
+      "module": "add16_loa9",
+      "count": 1,
+      "lut": 5,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_LOA7_bb",
+      "count": 1,
+      "lut": 5,
+      "ff": 0
+     },
+     {
+      "module": "add16_loa7",
+      "count": 1,
+      "lut": 5,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC7_bb",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc7",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC8_bb",
+      "count": 1,
+      "lut": 5,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc8",
+      "count": 1,
+      "lut": 5,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 631,
+    "ff": 603,
+    "dsp": 0,
+    "slice": 276,
+    "bram": 0,
+    "achievedNs": 5.632,
+    "timingMet": "FALSE",
+    "carry4": 109
+   }
   },
   {
    "case": "fir_dse_op60_rtl_ir",
@@ -8941,8 +9397,80 @@
     "mismatches": 0,
     "total": 1009
    },
-   "hls": null,
-   "impl": null
+   "hls": {
+    "estClockNs": 3.733,
+    "latencyBest": 1031,
+    "latencyWorst": 1031,
+    "intervalMin": 1032,
+    "lut": 3256,
+    "ff": 2089,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1029,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 22
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 107,
+      "ff": 1
+     },
+     {
+      "module": "u_ADD16_LOA8_bb",
+      "count": 6,
+      "lut": 32,
+      "ff": 0
+     },
+     {
+      "module": "add16_loa8",
+      "count": 6,
+      "lut": 32,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_LOA9_bb",
+      "count": 3,
+      "lut": 14,
+      "ff": 0
+     },
+     {
+      "module": "add16_loa9",
+      "count": 3,
+      "lut": 14,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_LOA10_bb",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     },
+     {
+      "module": "add16_loa10",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     }
+    ],
+    "lut": 729,
+    "ff": 560,
+    "dsp": 0,
+    "slice": 247,
+    "bram": 0,
+    "achievedNs": 4.746,
+    "timingMet": "TRUE",
+    "carry4": 28
+   }
   },
   {
    "case": "gauss_dse2_lut40_rtl_ir",
@@ -9042,8 +9570,164 @@
     "mismatches": 0,
     "total": 36100
    },
-   "hls": null,
-   "impl": null
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72224,
+    "latencyWorst": 72224,
+    "intervalMin": 72225,
+    "lut": 1939,
+    "ff": 1682,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72222,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 25
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 89,
+      "ff": 1
+     },
+     {
+      "module": "u_MUL8_T8_C_bb",
+      "count": 1,
+      "lut": 23,
+      "ff": 0
+     },
+     {
+      "module": "mul8_t8_c",
+      "count": 1,
+      "lut": 23,
+      "ff": 0
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 166,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC7_bb",
+      "count": 1,
+      "lut": 5,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc7",
+      "count": 1,
+      "lut": 5,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC5_bb",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc5",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC6_bb",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc6",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC1_bb",
+      "count": 1,
+      "lut": 7,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc1",
+      "count": 1,
+      "lut": 7,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC2_bb",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc2",
+      "count": 1,
+      "lut": 6,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC4_bb",
+      "count": 1,
+      "lut": 7,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc4",
+      "count": 1,
+      "lut": 7,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC8_bb",
+      "count": 1,
+      "lut": 5,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc8",
+      "count": 1,
+      "lut": 5,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC3_bb",
+      "count": 1,
+      "lut": 8,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc3",
+      "count": 1,
+      "lut": 8,
+      "ff": 0
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39
+     }
+    ],
+    "lut": 650,
+    "ff": 620,
+    "dsp": 0,
+    "slice": 280,
+    "bram": 0,
+    "achievedNs": 5.368,
+    "timingMet": "FALSE",
+    "carry4": 118
+   }
   },
   {
    "case": "fir_dse2_lut60_rtl_ir",
@@ -9130,8 +9814,68 @@
     "mismatches": 0,
     "total": 1009
    },
-   "hls": null,
-   "impl": null
+   "hls": {
+    "estClockNs": 3.733,
+    "latencyBest": 1031,
+    "latencyWorst": 1031,
+    "intervalMin": 1032,
+    "lut": 3256,
+    "ff": 2089,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "samples",
+      "trip": 1009,
+      "latency": 1029,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 22
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 107,
+      "ff": 1
+     },
+     {
+      "module": "u_ADD16_TRUNC7_bb",
+      "count": 9,
+      "lut": 42,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc7",
+      "count": 9,
+      "lut": 42,
+      "ff": 0
+     },
+     {
+      "module": "u_ADD16_TRUNC6_bb",
+      "count": 6,
+      "lut": 37,
+      "ff": 0
+     },
+     {
+      "module": "add16_trunc6",
+      "count": 6,
+      "lut": 37,
+      "ff": 0
+     }
+    ],
+    "lut": 666,
+    "ff": 547,
+    "dsp": 0,
+    "slice": 240,
+    "bram": 0,
+    "achievedNs": 4.598,
+    "timingMet": "TRUE",
+    "carry4": 42
+   }
   }
  ]
 }

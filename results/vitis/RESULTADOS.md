@@ -2,18 +2,18 @@
 
 Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-1. Cada caso é o mesmo projeto no simulador e no Vitis HLS 2022.2 (o C++ exportado do projeto elaborado, `_ir`, ou o código original, `_src`), com multiplicadores na lógica (sem DSP). LUT e FF do modelo vêm da síntese das unidades (Yosys `synth_xilinx`, ou o Vivado quando há data/vivado-units.json), mais as peças do modelo (multiplexadores, comparadores, registradores, contadores e a seleção de banco). A referência de recursos e de período é o Vivado depois do roteamento; a estimativa do csynth fica na tabela só para comparação. "Exportação" é a previsão feita quando o caso foi gerado (o modelo antes da primeira rodada, nos 23 primeiros casos; o calibrado com a primeira rodada, nos da segunda); "modelo" é o atual, para as mesmas atribuições de unidades, com LUT, CARRY4 e atrasos das unidades caracterizadas no Vivado (data/vivado-units.json).
 
-45 de 55 casos com relatório do csynth; 45 com o Vivado (impl); 55 com csim.
+55 de 55 casos com relatório do csynth; 55 com o Vivado (impl); 55 com csim.
 
 #### Erro médio do modelo (desvio relativo médio entre o modelo e a medida)
 
 | Grandeza | Casos | Exportação | Modelo |
 | --- | ---: | ---: | ---: |
-| Latência (ciclos), com pipeline | 43 | 1,0% | 0,4% |
+| Latência (ciclos), com pipeline | 53 | 0,8% | 0,3% |
 | Latência (ciclos), sem pipeline | 2 | 60,9% | 8,4% |
-| Latência (ciclos), todos | 45 | 3,6% | 0,7% |
-| LUT (Vivado) | 45 | 27,5% | 14,1% |
-| FF (Vivado) | 45 | 36,7% | 19,4% |
-| Período (Vivado) | 45 | - | 18,9% |
+| Latência (ciclos), todos | 55 | 3,0% | 0,6% |
+| LUT (Vivado) | 55 | 26,1% | 15,1% |
+| FF (Vivado) | 55 | 32,6% | 18,5% |
+| Período (Vivado) | 55 | - | 18,0% |
 
 #### Execução: csim do Vitis contra a execução bit a bit do simulador
 
@@ -124,16 +124,16 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_inl_ir | 1015 | 1021 | 1036 | 0,986 | 4,98 | 3,73 | 4,42 |
 | gauss_dse2_lut40_inl_ir | 72217 | 72219 | 72220 | 1,000 | 4,95 | 7,05 | 5,71 |
 | fir_dse2_lut60_inl_ir | 1016 | 1020 | 1030 | 0,990 | 5,00 | 3,73 | 4,51 |
-| gauss_drum6_rtl_ir | 72220 | 72220 | - | - | 4,03 | - | - |
-| gauss_t8c_loa6_rtl_ir | 72220 | 72220 | - | - | 4,22 | - | - |
-| sobel_loa4_rtl_ir | 72218 | 72218 | - | - | 4,93 | - | - |
-| sharpen_kul_rtl_ir | 72218 | 72218 | - | - | 4,77 | - | - |
-| fir_t8c_loa11_rtl_ir | 1027 | 1027 | - | - | 4,52 | - | - |
-| dot_t4_rtl_ir | 260 | 260 | - | - | 4,98 | - | - |
-| gauss_dse_op40_rtl_ir | 72219 | 72219 | - | - | 4,87 | - | - |
-| fir_dse_op60_rtl_ir | 1021 | 1021 | - | - | 4,98 | - | - |
-| gauss_dse2_lut40_rtl_ir | 72219 | 72219 | - | - | 4,95 | - | - |
-| fir_dse2_lut60_rtl_ir | 1020 | 1020 | - | - | 5,00 | - | - |
+| gauss_drum6_rtl_ir | 72220 | 72220 | 72218 | 1,000 | 4,03 | 7,05 | 7,03 |
+| gauss_t8c_loa6_rtl_ir | 72220 | 72220 | 72224 | 1,000 | 4,22 | 7,05 | 5,60 |
+| sobel_loa4_rtl_ir | 72218 | 72218 | 72220 | 1,000 | 4,93 | 7,05 | 5,70 |
+| sharpen_kul_rtl_ir | 72218 | 72218 | 72218 | 1,000 | 4,77 | 7,05 | 5,33 |
+| fir_t8c_loa11_rtl_ir | 1027 | 1027 | 1031 | 0,996 | 4,52 | 3,73 | 4,03 |
+| dot_t4_rtl_ir | 260 | 260 | 260 | 1,000 | 4,98 | 4,03 | 5,22 |
+| gauss_dse_op40_rtl_ir | 72219 | 72219 | 72224 | 1,000 | 4,87 | 7,05 | 5,63 |
+| fir_dse_op60_rtl_ir | 1021 | 1021 | 1031 | 0,990 | 4,98 | 3,73 | 4,75 |
+| gauss_dse2_lut40_rtl_ir | 72219 | 72219 | 72224 | 1,000 | 4,95 | 7,05 | 5,37 |
+| fir_dse2_lut60_rtl_ir | 1020 | 1020 | 1031 | 0,989 | 5,00 | 3,73 | 4,60 |
 
 #### Recursos de FPGA
 
@@ -184,16 +184,16 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_inl_ir | 938 | 1046 | 10762 | 1063 | 30 | 35 | 556 | 626 | 10844 | 1062 |
 | gauss_dse2_lut40_inl_ir | 618 | 674 | 3772 | 815 | 30 | 160 | 546 | 616 | 1670 | 646 |
 | fir_dse2_lut60_inl_ir | 709 | 845 | 8958 | 1025 | 39 | 85 | 656 | 610 | 7508 | 935 |
-| gauss_drum6_rtl_ir | 877 | 877 | - | - | 51 | - | 635 | 635 | - | - |
-| gauss_t8c_loa6_rtl_ir | 795 | 795 | - | - | 19 | - | 635 | 635 | - | - |
-| sobel_loa4_rtl_ir | 728 | 728 | - | - | 35 | - | 516 | 516 | - | - |
-| sharpen_kul_rtl_ir | 556 | 556 | - | - | 23 | - | 455 | 455 | - | - |
-| fir_t8c_loa11_rtl_ir | 978 | 978 | - | - | 12 | - | 733 | 733 | - | - |
-| dot_t4_rtl_ir | 124 | 124 | - | - | 12 | - | 89 | 89 | - | - |
-| gauss_dse_op40_rtl_ir | 709 | 709 | - | - | 23 | - | 624 | 624 | - | - |
-| fir_dse_op60_rtl_ir | 1046 | 1046 | - | - | 30 | - | 626 | 626 | - | - |
-| gauss_dse2_lut40_rtl_ir | 674 | 674 | - | - | 30 | - | 616 | 616 | - | - |
-| fir_dse2_lut60_rtl_ir | 845 | 845 | - | - | 39 | - | 610 | 610 | - | - |
+| gauss_drum6_rtl_ir | 877 | 877 | 1921 | 806 | 51 | 120 | 635 | 635 | 1152 | 583 |
+| gauss_t8c_loa6_rtl_ir | 795 | 795 | 2043 | 638 | 19 | 111 | 635 | 635 | 1682 | 630 |
+| sobel_loa4_rtl_ir | 728 | 728 | 1986 | 667 | 35 | 112 | 516 | 516 | 1396 | 609 |
+| sharpen_kul_rtl_ir | 556 | 556 | 1640 | 497 | 23 | 94 | 455 | 455 | 1015 | 459 |
+| fir_t8c_loa11_rtl_ir | 978 | 978 | 3256 | 665 | 12 | 12 | 733 | 733 | 2089 | 487 |
+| dot_t4_rtl_ir | 124 | 124 | 118 | 116 | 12 | 13 | 89 | 89 | 74 | 64 |
+| gauss_dse_op40_rtl_ir | 709 | 709 | 1965 | 631 | 23 | 109 | 624 | 624 | 1690 | 603 |
+| fir_dse_op60_rtl_ir | 1046 | 1046 | 3256 | 729 | 30 | 28 | 626 | 626 | 2089 | 560 |
+| gauss_dse2_lut40_rtl_ir | 674 | 674 | 1939 | 650 | 30 | 118 | 616 | 616 | 1682 | 620 |
+| fir_dse2_lut60_rtl_ir | 845 | 845 | 3256 | 666 | 39 | 42 | 610 | 610 | 2089 | 547 |
 
 #### Efeito da aproximação: LUTs contra o projeto exato do mesmo kernel
 
@@ -229,6 +229,16 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_inl_ir | - | -2,1% | -13,1% | 940 | 1063 |
 | gauss_dse2_lut40_inl_ir | - | 10,4% | -11,8% | 729 | 815 |
 | fir_dse2_lut60_inl_ir | - | 17,5% | -9,0% | 940 | 1025 |
+| gauss_drum6_rtl_ir | - | -16,6% | -10,6% | 729 | 806 |
+| gauss_t8c_loa6_rtl_ir | - | -5,7% | 12,5% | 729 | 638 |
+| sobel_loa4_rtl_ir | - | -6,6% | 1,0% | 674 | 667 |
+| sharpen_kul_rtl_ir | - | -2,4% | -0,2% | 496 | 497 |
+| fir_t8c_loa11_rtl_ir | - | 4,5% | 29,3% | 940 | 665 |
+| dot_t4_rtl_ir | - | 9,5% | -4,5% | 111 | 116 |
+| gauss_dse_op40_rtl_ir | - | 5,7% | 13,4% | 729 | 631 |
+| fir_dse_op60_rtl_ir | - | -2,1% | 22,4% | 940 | 729 |
+| gauss_dse2_lut40_rtl_ir | - | 10,4% | 10,8% | 729 | 650 |
+| fir_dse2_lut60_rtl_ir | - | 17,5% | 29,1% | 940 | 666 |
 
 #### Economia de LUTs prevista contra a medida, por forma de exportação das unidades
 
@@ -237,7 +247,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | INLINE off (o Vitis divide a netlist em estágios) | 10 | 25,5 p.p. | 5 de 10 | -5,0% |
 | combinacional (INLINE off, LATENCY 0) | 10 | 16,5 p.p. | 6 de 10 | 32,8% |
 | em linha (INLINE) | 10 | 18,9 p.p. | 6 de 10 | 27,0% |
-| RTL (caixa preta) | 0 | - | 0 de 0 | - |
+| RTL (caixa preta) | 10 | 11,7 p.p. | 6 de 10 | 29,3% |
 
 #### Unidades aproximadas no Vivado (funções com INLINE off): instâncias, LUT e FF por instância
 
@@ -278,6 +288,32 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | gauss_dse_op40_lat0_ir | MUL8_T6_A4c | 1 | 1 | 2 | 7 | 0 |
 | fir_dse2_lut60_lat0_ir | ADD32_ADD16_TRUNC7_ADD16_exato | 2 | 4 | 4 | 6 | 0 |
 | fir_dse2_lut60_lat0_ir | ADD16_TRUNC7 | 2 | 5 | 4 | 5 | 0 |
+| gauss_t8c_loa6_rtl_ir | ADD16_LOA6_bb | 4 | - | 7 | - | 0 |
+| gauss_t8c_loa6_rtl_ir | MUL8_T8_C_bb | 1 | - | 23 | - | 0 |
+| sobel_loa4_rtl_ir | ADD16_LOA4_bb | 3 | - | 11 | - | 0 |
+| sharpen_kul_rtl_ir | MUL8_KUL_bb | 1 | - | 13 | - | 0 |
+| dot_t4_rtl_ir | MUL8_T4_bb | 1 | - | 70 | - | 0 |
+| gauss_dse_op40_rtl_ir | ADD16_LOA8_bb | 2 | - | 6 | - | 0 |
+| gauss_dse_op40_rtl_ir | MUL8_T8_C_bb | 1 | - | 24 | - | 0 |
+| gauss_dse_op40_rtl_ir | MUL8_T6_A4c_bb | 1 | - | 2 | - | 0 |
+| gauss_dse_op40_rtl_ir | ADD16_LOA9_bb | 1 | - | 5 | - | 0 |
+| gauss_dse_op40_rtl_ir | ADD16_LOA7_bb | 1 | - | 5 | - | 0 |
+| gauss_dse_op40_rtl_ir | ADD16_TRUNC7_bb | 1 | - | 6 | - | 0 |
+| gauss_dse_op40_rtl_ir | ADD16_TRUNC8_bb | 1 | - | 5 | - | 0 |
+| fir_dse_op60_rtl_ir | ADD16_LOA8_bb | 6 | - | 5 | - | 0 |
+| fir_dse_op60_rtl_ir | ADD16_LOA9_bb | 3 | - | 5 | - | 0 |
+| fir_dse_op60_rtl_ir | ADD16_LOA10_bb | 1 | - | 6 | - | 0 |
+| gauss_dse2_lut40_rtl_ir | MUL8_T8_C_bb | 1 | - | 23 | - | 0 |
+| gauss_dse2_lut40_rtl_ir | ADD16_TRUNC7_bb | 1 | - | 5 | - | 0 |
+| gauss_dse2_lut40_rtl_ir | ADD16_TRUNC5_bb | 1 | - | 6 | - | 0 |
+| gauss_dse2_lut40_rtl_ir | ADD16_TRUNC6_bb | 1 | - | 6 | - | 0 |
+| gauss_dse2_lut40_rtl_ir | ADD16_TRUNC1_bb | 1 | - | 7 | - | 0 |
+| gauss_dse2_lut40_rtl_ir | ADD16_TRUNC2_bb | 1 | - | 6 | - | 0 |
+| gauss_dse2_lut40_rtl_ir | ADD16_TRUNC4_bb | 1 | - | 7 | - | 0 |
+| gauss_dse2_lut40_rtl_ir | ADD16_TRUNC8_bb | 1 | - | 5 | - | 0 |
+| gauss_dse2_lut40_rtl_ir | ADD16_TRUNC3_bb | 1 | - | 8 | - | 0 |
+| fir_dse2_lut60_rtl_ir | ADD16_TRUNC7_bb | 9 | - | 5 | - | 0 |
+| fir_dse2_lut60_rtl_ir | ADD16_TRUNC6_bb | 6 | - | 6 | - | 0 |
 
 #### Laços: II, iteração (profundidade com pipeline) e latência, em ciclos
 
@@ -334,8 +370,18 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_inl_ir | samples | pipeline | 1009 | 1 | 1 | 12 | 27 | 1021 | 1034 |
 | gauss_dse2_lut40_inl_ir | rows_cols | achatado | 36100 | 2 | 2 | 20 | 21 | 72219 | 72218 |
 | fir_dse2_lut60_inl_ir | samples | pipeline | 1009 | 1 | 1 | 11 | 21 | 1020 | 1028 |
+| gauss_drum6_rtl_ir | rows_cols | achatado | 36100 | 2 | 2 | 21 | 19 | 72220 | 72216 |
+| gauss_t8c_loa6_rtl_ir | rows_cols | achatado | 36100 | 2 | 2 | 21 | 25 | 72220 | 72222 |
+| sobel_loa4_rtl_ir | rows_cols | achatado | 36100 | 2 | 2 | 19 | 21 | 72218 | 72218 |
+| sharpen_kul_rtl_ir | rows_cols | achatado | 36100 | 2 | 2 | 19 | 19 | 72218 | 72216 |
+| fir_t8c_loa11_rtl_ir | samples | pipeline | 1009 | 1 | 1 | 18 | 22 | 1027 | 1029 |
+| dot_t4_rtl_ir | acc | pipeline | 256 | 1 | 1 | 3 | 4 | 259 | 258 |
+| gauss_dse_op40_rtl_ir | rows_cols | achatado | 36100 | 2 | 2 | 20 | 25 | 72219 | 72222 |
+| fir_dse_op60_rtl_ir | samples | pipeline | 1009 | 1 | 1 | 12 | 22 | 1021 | 1029 |
+| gauss_dse2_lut40_rtl_ir | rows_cols | achatado | 36100 | 2 | 2 | 20 | 25 | 72219 | 72222 |
+| fir_dse2_lut60_rtl_ir | samples | pipeline | 1009 | 1 | 1 | 11 | 22 | 1020 | 1029 |
 
 ### Resíduos depois da calibração
 
-Medianas: iteração de laço sequencial, Vitis menos modelo, 5 ciclos; entrada e saída do pipeline no Vitis (latência menos profundidade menos N menos 1 vezes o II) -1 ciclos; LUT Vivado / modelo 1,01; FF 1,10; latência Vitis / modelo 1,000; período Vivado / modelo 1,14. Valores em `results/vitis/calibracao.json`, com as constantes do modelo (`MODEL` em `js/hls/sched.js`).
+Medianas: iteração de laço sequencial, Vitis menos modelo, 5 ciclos; entrada e saída do pipeline no Vitis (latência menos profundidade menos N menos 1 vezes o II) -1 ciclos; LUT Vivado / modelo 0,98; FF 1,05; latência Vitis / modelo 1,000; período Vivado / modelo 1,13. Valores em `results/vitis/calibracao.json`, com as constantes do modelo (`MODEL` em `js/hls/sched.js`).
 
