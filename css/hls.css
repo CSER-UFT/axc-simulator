@@ -41,8 +41,16 @@
 .fig-svg .h-cmp, .fig-svg .h-mux { fill: #c2410c; }
 .fig-svg .h-logic { fill: #8a6d3b; }
 .fig-svg .h-free { fill: var(--panel-2); }
-.fig-svg.hls-dfg .node.h-free { fill: var(--panel-2); }
-.fig-svg.hls-dfg .node:not(.h-free) + text { fill: #fff; }
+/* DFG: caixa clara tingida com a cor da classe, borda na cor e texto escuro em negrito. */
+.fig-svg.hls-dfg .node { stroke-width: 1.5; }
+.fig-svg.hls-dfg .node.h-mul { fill: color-mix(in srgb, #7a3fb8 16%, var(--panel)); stroke: #7a3fb8; }
+.fig-svg.hls-dfg .node.h-add { fill: color-mix(in srgb, #2f6fdf 16%, var(--panel)); stroke: #2f6fdf; }
+.fig-svg.hls-dfg .node.h-mem { fill: color-mix(in srgb, #0f8b8d 16%, var(--panel)); stroke: #0f8b8d; }
+.fig-svg.hls-dfg .node.h-cmp, .fig-svg.hls-dfg .node.h-mux { fill: color-mix(in srgb, #c2410c 14%, var(--panel)); stroke: #c2410c; }
+.fig-svg.hls-dfg .node.h-logic { fill: color-mix(in srgb, #8a6d3b 16%, var(--panel)); stroke: #8a6d3b; }
+.fig-svg.hls-dfg .node.h-free { fill: var(--panel); stroke: var(--line-strong); stroke-dasharray: 3 2; }
+.fig-svg.hls-dfg .lbl { fill: var(--ink); font-weight: 700; }
+.fig-svg.hls-dfg .wid { fill: var(--ink); font-weight: 600; opacity: .7; }
 .fig-svg.hls-dfg .edge { stroke: var(--muted); stroke-width: 1; fill: none; }
 .fig-svg.hls-dfg .edge.rec { stroke: var(--accent); stroke-dasharray: 5 3; stroke-width: 1.5; }
 .fig-svg .arrow-head { fill: var(--muted); }

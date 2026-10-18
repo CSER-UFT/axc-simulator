@@ -122,8 +122,8 @@ export function dfgSvg(seg, sch) {
         const me = sch.info.get(n.id);
         const label = n.op === 'load' || n.op === 'store' ? `${opLabel(n)} ${n.array}` : n.op === 'carry' ? `φ ${n.name}` : opLabel(n);
         s += `<g><rect class="node h-${opClass(n)}" x="${p.x}" y="${p.y}" width="${NW}" height="${NH}" rx="4"><title>${esc(`${n.id}: ${n.op}${n.text ? ` ${n.text}` : ''} [${n.range.join(', ')}]${me?.unit ? ` · ${me.unit.name}` : ''}`)}</title></rect>`
-            + `<text class="small mono" x="${p.x + NW / 2}" y="${p.y + 12}" text-anchor="middle">${esc(label.slice(0, 10))}</text>`
-            + `<text class="tiny mono muted" x="${p.x + NW / 2}" y="${p.y + 22}" text-anchor="middle">${me?.W ? `${me.W}b` : ''}</text></g>`;
+            + `<text class="small mono lbl" x="${p.x + NW / 2}" y="${p.y + 12}" text-anchor="middle">${esc(label.slice(0, 10))}</text>`
+            + `<text class="tiny mono wid" x="${p.x + NW / 2}" y="${p.y + 22}" text-anchor="middle">${me?.W ? `${me.W}b` : ''}</text></g>`;
     }
     return `${s}</svg>`;
 }
