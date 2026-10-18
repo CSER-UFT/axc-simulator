@@ -56,8 +56,6 @@
 .hls-table tr.grp td { background: var(--panel-2); font-weight: 600; }
 .hls-table td.expr { text-align: left; font-family: var(--mono); font-size: 12px; white-space: normal; min-width: 180px; }
 .hls-table td.dim { color: var(--muted); }
-.hls-main.wide { grid-template-columns: minmax(0, 1fr); }
-.hls-main.wide > div:first-child { display: none; }
 @media (max-width: 1000px) { .hls-main { grid-template-columns: 1fr; } .page-nav { margin-left: 4px; } }
 /* Exploração: heurísticas em azul, laranja e verde-água (paleta validada para pares de pontos, claro e escuro) e a
    aleatória como referência em cinza vazado; a forma do ponto também identifica a heurística. */

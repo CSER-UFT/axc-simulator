@@ -160,7 +160,6 @@ function renderTab() {
     for (const b of $('tabs').querySelectorAll('[data-tab]')) b.classList.toggle('sel', b.dataset.tab === tab);
     for (const p of document.querySelectorAll('.pane')) p.classList.toggle('hidden', p.id !== `pane-${tab}`);
     // A biblioteca não depende do kernel e a exploração precisa de espaço: as duas ocupam a página toda.
-    document.querySelector('.hls-main').classList.toggle('wide', tab === 'lib' || tab === 'dse');
     if (tab === 'lib' && synthData) renderLibrary();
     if (!result) return;
     const sg = result.segs[+$('segSel').value] ?? result.segs[0];

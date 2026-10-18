@@ -23,7 +23,7 @@
     <body>
         <header id="header">
             <div class="brand"><span class="icon i-cpu brand-mark" aria-hidden="true"></span><span class="brand-name" data-i18n-html="ui.appTitle">Simulador de Computação <b>Aproximada</b></span></div>
-            <nav class="page-nav"><a href="./index.html" class="sel" aria-current="page" data-i18n="nav.units">Unidades</a><a href="./hls.html" data-i18n="nav.hls">Síntese de alto nível</a></nav>
+            <nav class="page-nav"><a href="./index.html" class="sel" aria-current="page" data-i18n="nav.units">Unidades</a><a href="./lenet.html" data-i18n="nav.nn">Rede neural</a><a href="./hls.html" data-i18n="nav.hls">Síntese de alto nível</a></nav>
             <div class="tools">
                 <label class="lang"><span class="sr-only" data-i18n="ui.language">Idioma</span><select id="lang-select"></select></label>
                 <button type="button" id="shareLink" class="btn" data-i18n="ui.link" data-i18n-title="ui.linkHelp">Copiar link</button>
@@ -80,6 +80,7 @@
                     <p class="note" id="evalNote"></p>
                     <div class="row" style="margin-top:8px">
                         <button type="button" class="btn primary" id="addCmp" data-i18n="unit.addCmp">Adicionar à comparação</button>
+                        <a class="btn outline" id="toNN" href="lenet.html" data-i18n="unit.toNN">Usar na LeNet-5</a>
                     </div>
                 </section>
                 <section style="margin-top:16px">
@@ -93,7 +94,6 @@
                         <button type="button" class="btn" data-tab="struct" data-i18n="tab.struct">Estrutura</button>
                         <button type="button" class="btn" data-tab="error" data-i18n="tab.error">Erro</button>
                         <button type="button" class="btn" data-tab="cmp" data-i18n="tab.cmp">Comparação</button>
-                        <button type="button" class="btn" data-tab="nn" data-i18n="tab.nn">Rede neural</button>
                         <button type="button" class="btn" data-tab="vos" data-i18n="tab.vos">Tensão e memória</button>
                         <button type="button" class="btn" data-tab="sc" data-i18n="tab.sc">Estocástica</button>
                     </div>
@@ -223,22 +223,6 @@
                             <figure><canvas id="scBin"></canvas><figcaption data-i18n="sc.imgBin">binária com bits errados</figcaption></figure>
                         </div>
                         <div id="scImgTable"></div>
-                    </div>
-
-                    <div class="pane" id="pane-nn">
-                        <p class="note" data-i18n="nn.intro">Uma LeNet-5 treinada no MNIST e quantizada em 8 bits classifica 1000 dígitos de teste. Nas camadas marcadas, os produtos são feitos pelo multiplicador da esquerda e as somas pelo somador escolhido (ou pelo da esquerda, quando ele é um somador). A referência é a mesma rede exata.</p>
-                        <div class="row" id="nnLayers"><span data-i18n="nn.layers">Camadas com a unidade aproximada:</span></div>
-                        <div class="row" style="margin-top:6px">
-                            <label style="margin:0"><span data-i18n="nn.adder">Somador das acumulações</span> <select id="nnAdder"></select></label>
-                            <button type="button" class="btn outline" id="nnSensBtn" data-i18n="nn.sensBtn">Sensibilidade por camada</button>
-                            <span class="note" id="nnStatus"></span>
-                        </div>
-                        <div class="graph-pair">
-                            <div><div id="nnTable"></div><p class="note" id="nnNote"></p><div id="nnSens"></div></div>
-                            <div><h3 data-i18n="nn.conf">Matriz de confusão (linhas: dígito real; colunas: previsto)</h3><div class="scroll-box" id="nnConf"></div></div>
-                        </div>
-                        <h3 data-i18n="nn.broke">Dígitos que a rede exata acerta e a aproximada erra</h3>
-                        <div id="nnBroke" class="digit-grid"></div>
                     </div>
 
                 </section>

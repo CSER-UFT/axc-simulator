@@ -16,7 +16,7 @@ const walk = (d) => { for (const f of readdirSync(d)) { const p = join(d, f); if
 walk(join(dir, 'js'));
 const imports = Object.fromEntries(files.map((f) => { const r = `./${relative(dir, f).split('\\').join('/')}`; return [r, `${r}?v=${version}`]; }));
 // Cada página com o seu módulo principal.
-for (const [page, main] of [['index.html', 'app.js'], ['hls.html', 'hls-app.js']]) {
+for (const [page, main] of [['index.html', 'app.js'], ['hls.html', 'hls-app.js'], ['lenet.html', 'lenet-app.js']]) {
     const file = join(dir, page);
     let html;
     try { html = readFileSync(file, 'utf8'); } catch { continue; }
