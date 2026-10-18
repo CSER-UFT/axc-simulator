@@ -57,9 +57,9 @@ test('caixa preta de RTL: JSON, Verilog com as portas do Vitis e modelo C para c
     const bb = blackboxFiles(lib, ['MUL8 T4', 'ADD32 (ADD16 LOA8 + ADD16 exato)']);
     assert.deepEqual(bb.jsons.sort(), ['u_ADD16_LOA8_bb.json', 'u_MUL8_T4_bb.json']); // o de 32 bits entra pelo de baixo
     const j = JSON.parse(bb.files['u_MUL8_T4_bb.json']);
-    assert.equal(j.rtl_top_module_name, 'bb_mul8_t4');
+    assert.equal(j.rtl_top_module_name, 'u_MUL8_T4_bb');
     assert.equal(j.rtl_performance.latency, '0');
-    const v = bb.files['bb_mul8_t4.v'];
+    const v = bb.files['u_MUL8_T4_bb.v'];
     for (const p of ['ap_clk', 'ap_rst', 'ap_ce', 'ap_return']) assert.ok(v.includes(p));
     assert.equal(j.c_return.rtl_ports.data_write_out, 'ap_return');
     assert.match(bb.files['u_MUL8_T4_bb.cpp'], /ap_uint<16> u_MUL8_T4_bb\(ap_uint<8> a, ap_uint<8> b\)/);

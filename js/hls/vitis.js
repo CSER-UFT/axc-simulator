@@ -145,7 +145,7 @@ export function blackboxFiles(lib, names) {
     const files = {}, jsons = [];
     for (const name of netUnits(lib, names)) {
         const u = lib.unitByName(name), unit = buildUnit(u.cfg);
-        const N = u.cfg.width, W = unit.net.outputs.length, f = cName(name), mod = moduleName(u.cfg), top = `bb_${mod}`;
+        const N = u.cfg.width, W = unit.net.outputs.length, f = cName(name), mod = moduleName(u.cfg), top = `${f}_bb`; // o módulo de RTL com o mesmo nome da função: o Vitis o instancia pelo nome da função
         files[`${f}_bb.cpp`] = `${HEADER(`${name}, modelo C da caixa preta`)}
 ${unitFunction(u.cfg, name, { inline: true })}
 
