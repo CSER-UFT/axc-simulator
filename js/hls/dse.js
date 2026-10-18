@@ -33,7 +33,7 @@ import { rng } from '../axc/metrics.js';
 
 export const OBJECTIVES = ['area', 'luts', 'energy', 'latency', 'interval', 'weighted'];
 export const HEURISTICS = ['sequential', 'efficiency', 'exhaustive', 'random'];
-export const GRANULARITIES = ['class', 'line', 'op'];
+export const GRANULARITIES = ['class', 'line', 'source', 'op'];
 
 /** Variantes de diretivas: cada linha #pragma HLS de pipeline, unroll ou array_partition ligada ou desligada. */
 export function pragmaVariants(src, maxPragmas = 4) {
@@ -115,7 +115,7 @@ export function groupsOf(v, { granularity = 'class', objective = 'area', weights
     const ops = v.base.ops.list.filter((o) => o.candidates.length > 1);
     const by = new Map();
     for (const o of ops) {
-        const k = granularity === 'op' ? o.id : granularity === 'line' ? o.group : `${o.cls}${o.W}`;
+        const k = granularity === 'op' ? o.id : granularity === 'source' ? o.origin : granularity === 'line' ? o.group : `${o.cls}${o.W}`;
         if (!by.has(k)) by.set(k, []);
         by.get(k).push(o);
     }
@@ -143,7 +143,7 @@ export function groupsOf(v, { granularity = 'class', objective = 'area', weights
         const front = allUnits ? rows : rows.filter((a, i) => i === 0 || !rows.some((b) => b !== a && b.cost <= a.cost && b.own <= a.own && (b.cost < a.cost || b.own < a.own)));
         // A exata primeiro (ela fica mesmo dominada, como referência); as outras em ordem de erro próprio.
         front.sort((a, b) => (b.name === names[0]) - (a.name === names[0]) || a.own - b.own || a.cost - b.cost);
-        const label = granularity === 'op' ? `${list[0].id} (${list[0].text})` : granularity === 'line' ? `linha ${list[0].node.line}, ${list[0].cls}${list[0].W}` : key;
+        const label = granularity === 'op' ? `${list[0].id} (${list[0].text})` : granularity === 'source' ? `${list[0].id} (${list[0].text})${list.length > 1 ? ` e ${list.length - 1} cópia${list.length > 2 ? 's' : ''}` : ''}` : granularity === 'line' ? `linha ${list[0].node.line}, ${list[0].cls}${list[0].W}` : key;
         groups.push({ key, label, cls: list[0].cls, W: list[0].W, line: list[0].node.line, ops: list, exact: names[0], cands: front.map((x) => x.name), all: names.length, ownOf: new Map(front.map((x) => [x.name, x.own])) });
     }
     return groups;

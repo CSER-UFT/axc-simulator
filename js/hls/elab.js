@@ -151,6 +151,17 @@ export function elaborate(ast, { ports = 2 } = {}) {
     const closeSeg = () => { seg = null; };
     const PURE = new Set(['add', 'sub', 'mul', 'shl', 'shr', 'and', 'or', 'xor', 'not', 'cmp', 'sel', 'trunc']);
     const COMM = new Set(['add', 'mul', 'and', 'or', 'xor']);
+    // Origem de cada operação: a expressão do código e as iterações dos laços desenrolados por estarem dentro de um
+    // pipeline (cópias diferentes, como os pesos de uma janela). As cópias pedidas com a diretiva unroll (com ou sem
+    // fator) têm a mesma origem: fazem o mesmo trabalho sobre dados diferentes.
+    const astIds = new WeakMap();
+    let astCount = 0, exprNow = null;
+    const copyStack = [];
+    const originOf = () => {
+        if (!exprNow) return null;
+        if (!astIds.has(exprNow)) astIds.set(exprNow, ++astCount);
+        return `e${astIds.get(exprNow)}${copyStack.length ? `@${copyStack.join(',')}` : ''}`;
+    };
     const emit = (op, args, range, line, extra = {}) => {
         const s = curSeg();
         // Subexpressões comuns: a mesma operação sobre os mesmos operandos, no mesmo trecho, é reaproveitada; e a
@@ -163,7 +174,7 @@ export function elaborate(ast, { ports = 2 } = {}) {
         } else if (op === 'load') key = `load:${extra.text}`;
         if (key && s.cse.has(key)) return s.cse.get(key);
         if (op === 'store' && !dryDepth) for (const k of [...s.cse.keys()]) if (k.startsWith(`load:${extra.array}[`)) s.cse.delete(k);
-        const node = { id: `${s.id}.${s.nodes.length}`, op, args, range, line, ...extra };
+        const node = { id: `${s.id}.${s.nodes.length}`, op, args, range, line, origin: originOf(), ...extra };
         if (dryDepth) { s.dryCount = (s.dryCount ?? 0) + 1; node.id = `${s.id}.d${s.dryCount}`; } else s.nodes.push(node);
         const v = { k: 'node', id: node.id, seg: s, range, node };
         if (key) s.cse.set(key, v);
@@ -254,6 +265,11 @@ export function elaborate(ast, { ports = 2 } = {}) {
 
     /** Expressão: valor simbólico. */
     function evalExpr(e, env) {
+        const prev = exprNow;
+        exprNow = e;
+        try { return evalExpr0(e, env); } finally { exprNow = prev; }
+    }
+    function evalExpr0(e, env) {
         switch (e.k) {
             case 'num': return cval(e.v);
             case 'var': {
@@ -412,7 +428,7 @@ export function elaborate(ast, { ports = 2 } = {}) {
         const t = s.target;
         const cur = () => evalExpr(t, env);
         let v = evalExpr(s.e, env);
-        if (s.op !== '=') v = op2(s.op.slice(0, -1), cur(), v, s.line);
+        if (s.op !== '=') { const prev = exprNow; exprNow = s; try { v = op2(s.op.slice(0, -1), cur(), v, s.line); } finally { exprNow = prev; } }
         if (t.k === 'var') {
             const sym = env.get(t.name);
             if (!sym) throw new HlsError(`variável ${t.name} não declarada`, s.line);
@@ -500,10 +516,14 @@ export function elaborate(ast, { ports = 2 } = {}) {
         if (full) {
             info.mode = 'unrolled'; // no passo seco a entrada é descartada depois
             if (trip > MAX_UNROLL) throw new HlsError(`desenrolar ${name} geraria ${trip} cópias do corpo`, s.line);
+            // Desenrolado por estar dentro de um pipeline: cada iteração é uma origem diferente; pela diretiva unroll,
+            // as iterações são cópias da mesma origem.
+            const implicit = !(dir.unroll && (dir.unroll.factor === null || dir.unroll.factor >= trip));
             for (const v of values) {
                 const sc = new Scope(env);
                 sc.declare(s.v, { type: typeOf('int'), value: cval(v), loopVar: true });
-                exec(s.body.k === 'block' ? s.body.body : [s.body], sc, ctx);
+                if (implicit) copyStack.push(`${info.id}=${v}`);
+                try { exec(s.body.k === 'block' ? s.body.body : [s.body], sc, ctx); } finally { if (implicit) copyStack.pop(); }
             }
             return;
         }

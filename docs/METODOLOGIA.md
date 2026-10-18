@@ -53,7 +53,7 @@ O erro de um valor é o aproximado menos o exato. Para cada nó do DFG, o modelo
 
 * **Avaliação**: cada ponto é sintetizado de novo (de 1 a 4 ms, porque a elaboração é feita uma vez por variante) e o erro vem do modelo estático (por amostras com todas as execuções guardadas no perfil, até 2048 por trecho, ou analítico). Com menos amostras a busca fica mais rápida, mas o ruído da estimativa favorece, entre milhares de pontos, os estimados com folga a mais: no FIR com grupos por operação e 512 amostras, os pontos escolhidos perto de 60 dB mediram cerca de 0,6 dB a menos.
 * **Objetivo**: área ASIC, LUT + CARRY4, energia por execução, latência, intervalo entre resultados, ou a soma ponderada de área, energia e latência, cada uma dividida pela do projeto exato. **Restrição**: PSNR mínimo ou MSE máximo, em todas as saídas.
-* **Grupos**: a unidade é escolhida por classe (todas as operações da mesma classe e largura), por linha do código ou por operação.
+* **Grupos**: a unidade é escolhida por classe (todas as operações da mesma classe e largura), por linha do código, por operação do código ou por operação. Na granularidade por operação do código, as cópias de uma operação criadas pela diretiva `unroll` (com ou sem fator) formam um grupo e recebem a mesma unidade; as cópias criadas pelo desenrolamento implícito dos laços internos de um laço com pipeline (os pesos de uma janela, por exemplo) continuam separadas, porque fazem contas diferentes. A elaboração marca cada operação com a expressão do código de onde veio e as iterações desses laços implícitos.
 * **Candidatas**: em cada grupo, as unidades da fronteira de Pareto entre o custo da unidade no objetivo e o erro próprio nas operações do grupo.
 * **Heurísticas**:
   * sequencial: os grupos na ordem do código, multiplicações antes das somas; em cada grupo, a candidata de menor custo que mantém a restrição (a busca usada na pesquisa anterior do autor);
@@ -110,7 +110,7 @@ Configuração: parte `xc7a100tcsg324-1`; multiplicadores em LUT (`config_op mul
 
 ```
 npm test                               # 59 testes, inclusive execução exata contra referência e precisão do modelo
-npm run experiments                    # estudos de caso E1 a E5, saída em results/ (cerca de 15 a 30 min)
+npm run experiments                    # estudos de caso E1 a E6, saída em results/ (cerca de 15 a 30 min)
 node scripts/experiments.mjs --only E2 # só um experimento
 node scripts/experiments.mjs --quick   # versão reduzida, para conferir o ambiente (menos de 1 min)
 ```
@@ -145,4 +145,5 @@ Os números dos estudos de caso estão em [`results/RESULTADOS.md`](../results/R
 * **Kernels com subtrações (Sobel e realce)**: economia pequena (até 7% no Sobel, por operação; nenhuma por classe), porque subtrações e somas com sinal ficam exatas e os somadores exatos já são uma unidade por operação. No realce, a única multiplicação é por 5, que a síntese faz com uma soma: o MUL8 KUL (exato para esse coeficiente) quase não economiza (0,4%), ao contrário do modelo anterior, que comparava com um multiplicador inteiro.
 * **Fronteiras verificadas (E3)**: ao longo das fronteiras, a diferença média entre o PSNR estimado e o medido é de 0,2 dB (no máximo 4,7 dB); no limite de 40 dB, nenhum ponto foi aceito pelo modelo e rejeitado pela medida, nem o contrário.
 * **Diretivas e período (E4)**: no gaussiano, o objetivo ponderado e o de latência escolhem o período de 2,5 ns com pipeline; o de área escolhe tirar o pipeline e a partição (4986 µm², mas 24 vezes a latência).
+* **Unroll (E6)**: com `unroll factor=2` no laço com pipeline, a busca por operação deixa as cópias de uma mesma operação com unidades diferentes em 10 de 13 operações do gaussiano e 5 de 13 do Sobel. Por operação do código, as cópias ficam iguais por construção: no gaussiano, a economia é a mesma (34,9% contra 34,4%, com o erro distribuído pela imagem inteira); no Sobel e no realce, não sobra economia. Com o unroll, o II passa a 2 (portas da memória), as duas cópias ficam em ciclos diferentes e passam a dividir uma unidade aproximada por um multiplexador, como o Vitis faz com as funções das unidades; o multiplexador custa quase o que o somador aproximado economiza. A economia que a busca por operação achava vinha de aproximar só uma das cópias, o que evita o multiplexador e concentra o erro em colunas alternadas da saída.
 * **Dados (E5)**: o projeto escolhido com entradas uniformes não mantém os 40 dB na imagem (39,7 dB no gaussiano); o escolhido com a imagem mantém nas uniformes. O perfil deve vir de dados representativos da aplicação.

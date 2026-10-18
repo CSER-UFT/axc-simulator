@@ -1,6 +1,6 @@
 # Resultados dos estudos de caso
 
-Gerado por `scripts/experiments.mjs` em 2026-10-18 (commit 578da86, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
+Gerado por `scripts/experiments.mjs` em 2026-10-18 (commit d3ab47d, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
 
 ### E1. Precisão do modelo estático de erro
 
@@ -83,14 +83,14 @@ Objetivo: área ASIC; restrição: PSNR mínimo (estimado na busca, conferido bi
 
 | Heurística | Grupos | Avaliações | Tempo (s) |
 | --- | --- | ---: | ---: |
-| Sequencial | classe | 31 | 0,3 |
-| Sequencial | operação | 189 | 1,4 |
-| Eficiência | classe | 145 | 1,7 |
-| Eficiência | operação | 2062 | 21,2 |
-| Exaustiva | classe | 378 | 3,8 |
-| Exaustiva | operação | 1180 | 12,0 |
-| Aleatória | classe | 74 | 0,7 |
-| Aleatória | operação | 153 | 1,3 |
+| Sequencial | classe | 31 | 0,2 |
+| Sequencial | operação | 189 | 0,9 |
+| Eficiência | classe | 145 | 1,1 |
+| Eficiência | operação | 2062 | 13,1 |
+| Exaustiva | classe | 378 | 2,5 |
+| Exaustiva | operação | 1180 | 6,9 |
+| Aleatória | classe | 74 | 0,4 |
+| Aleatória | operação | 153 | 0,8 |
 
 Verificação: o primeiro ponto (o mais barato estimado como viável) passou na execução bit a bit em 90 de 90 casos; nos outros, a busca verificou em média 0,0 pontos até achar um que passa (no máximo 1).
 
@@ -136,5 +136,20 @@ O projeto escolhido (exaustiva por classe, área, PSNR de pelo menos 40 dB) com 
 | sharpen | uniformes | 0,4% | ∞ | ∞ | sim |
 | sharpen | imagem | 0,4% | ∞ | ∞ | sim |
 
-Tempo total: 748 s.
+### E6. Unroll: cópias com a mesma unidade
+
+Kernels com `unroll factor=2` no laço com pipeline; objetivo área, PSNR de pelo menos 40 dB, heurística de eficiência. Por operação, cada cópia é um grupo; por operação do código, as cópias de uma operação recebem a mesma unidade. A última coluna conta as operações do código cujas cópias ficaram com unidades diferentes.
+
+#### E6: grupos por operação contra por operação do código, com unroll de 2
+
+| Kernel | Grupos | Avaliações | Economia de área | PSNR medido | Operações aproximadas | Cópias diferentes |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| gauss | operação | 1506 | 34,4% | 41,1 | 22 | 10 de 13 |
+| gauss | operação do código | 1925 | 34,9% | 40,2 | 24 | 0 de 13 |
+| sobel | operação | 603 | 6,8% | 41,0 | 6 | 5 de 13 |
+| sobel | operação do código | 14 | 0,0% | ∞ | 0 | 0 de 13 |
+| sharpen | operação | 36 | 0,4% | ∞ | 2 | 1 de 5 |
+| sharpen | operação do código | 7 | 0,0% | ∞ | 0 | 0 de 5 |
+
+Tempo total: 507 s.
 

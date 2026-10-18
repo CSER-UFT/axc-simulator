@@ -86,7 +86,7 @@ Os detalhes, as tabelas e as causas de cada diferença estão em [`results/vitis
 
 ### Metodologia e estudos de caso
 
-As hipóteses dos modelos de custo e de erro, as ameaças à validade e o passo a passo de reprodução estão em [`docs/METODOLOGIA.md`](docs/METODOLOGIA.md). Os estudos de caso (precisão do modelo de erro, comparação das heurísticas, fronteiras verificadas bit a bit, diretivas e período, sensibilidade aos dados) rodam com `npm run experiments` e ficam em [`results/`](results/RESULTADOS.md), em CSV, Markdown e LaTeX.
+As hipóteses dos modelos de custo e de erro, as ameaças à validade e o passo a passo de reprodução estão em [`docs/METODOLOGIA.md`](docs/METODOLOGIA.md). Os estudos de caso (precisão do modelo de erro, comparação das heurísticas, fronteiras verificadas bit a bit, diretivas e período, sensibilidade aos dados, unroll e grupos) rodam com `npm run experiments` e ficam em [`results/`](results/RESULTADOS.md), em CSV, Markdown e LaTeX.
 
 ### Exploração do espaço de projeto
 
@@ -94,7 +94,7 @@ A aba Exploração (e o comando `dse`) procura as unidades, e opcionalmente as d
 
 * **avaliação**: cada ponto é sintetizado de novo (o compartilhamento das unidades, os multiplexadores e o II entram no custo, por isso o custo de uma troca não é a soma dos custos das unidades) e o erro das saídas vem do modelo estático; a elaboração e o perfil exato são feitos uma vez por variante de diretivas;
 * **objetivo**: área ASIC, LUT + CARRY4, energia por execução, latência, intervalo entre resultados, ou a soma ponderada de área, energia e latência divididas pelas do projeto exato; **restrição**: PSNR mínimo ou MSE máximo em todas as saídas;
-* **grupos**: a unidade é escolhida por classe (todas as multiplicações de 8 bits juntas), por linha do código ou por operação; **candidatas**: em cada grupo, as unidades da fronteira de Pareto entre o custo da unidade e o erro próprio sobre os operandos reais do grupo;
+* **grupos**: a unidade é escolhida por classe (todas as multiplicações de 8 bits juntas), por linha do código, por operação do código (as cópias criadas pela diretiva `unroll` recebem a mesma unidade) ou por operação; **candidatas**: em cada grupo, as unidades da fronteira de Pareto entre o custo da unidade e o erro próprio sobre os operandos reais do grupo;
 * **heurísticas**: sequencial (os grupos na ordem do código, multiplicações antes das somas, em cada um a candidata de menor custo que mantém a restrição), eficiência (a partir do exato, a troca com a maior economia por aumento de erro, até nenhuma economizar; com grupos menores que a classe, também a troca da classe inteira), exaustiva com poda (em ordem de custo: o primeiro viável é o ótimo do modelo) e aleatória;
 * **verificação**: o ponto viável mais barato de cada heurística é executado bit a bit; se o erro medido passar do limite, o próximo viável em ordem de custo é verificado.
 * **passo a passo**: cada heurística registra as suas iterações (o que avaliou, o que escolheu e por quê, a poda, a ordem de custo da exaustiva, as verificações), e a página as anima sobre o gráfico de custo contra PSNR, com a explicação e a tabela do que foi avaliado em cada iteração.

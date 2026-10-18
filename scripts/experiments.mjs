@@ -11,7 +11,8 @@
  *   E3  fronteiras de Pareto (área contra PSNR) com todos os pontos verificados bit a bit: o estimado ao longo da
  *       fronteira contra o medido;
  *   E4  diretivas e período junto com as unidades (objetivo ponderado e latência);
- *   E5  sensibilidade aos dados: o projeto escolhido com entradas uniformes, verificado na imagem, e o contrário.
+ *   E5  sensibilidade aos dados: o projeto escolhido com entradas uniformes, verificado na imagem, e o contrário;
+ *   E6  unroll: grupos por operação contra por operação do código (as cópias do unroll com a mesma unidade).
  *
  *   node scripts/experiments.mjs [--only E1,E3] [--quick] [--out results]
  */
@@ -30,7 +31,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2);
 const opt = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; };
 const QUICK = argv.includes('--quick');
-const ONLY = new Set((opt('--only', 'E1,E2,E3,E4,E5')).split(','));
+const ONLY = new Set((opt('--only', 'E1,E2,E3,E4,E5,E6')).split(','));
 const OUT = resolve(ROOT, opt('--out', 'results'));
 mkdirSync(OUT, { recursive: true });
 
@@ -217,6 +218,36 @@ function e4() {
     table('E4: melhor ponto verificado por objetivo', ['Objetivo', 'Variante', 'Área (µm²)', 'Energia (nJ)', 'Latência (µs)', 'PSNR medido', 'Unidades'], tab, ['l', 'l', 'r', 'r', 'r', 'r', 'l']);
 }
 
+// E6: unroll e grupos -----------------------------------------------------------------------------------------------
+function e6() {
+    const rows = [['kernel', 'granularity', 'psnr_min', 'groups', 'evaluations', 'ms', 'area_saving', 'psnr_measured', 'approx_ops', 'copy_groups', 'asymmetric_groups', 'units']];
+    const tab = [];
+    for (const k of ['gauss', 'sobel', 'sharpen']) {
+        const src = KCODE[k].replace('#pragma HLS pipeline II=1', '#pragma HLS pipeline II=1\n#pragma HLS unroll factor=2');
+        const base = synthesize(src, { synth, cells });
+        const originOf = (id) => base.ops.byId.get(id).origin;
+        const copies = new Map();
+        for (const o of base.ops.list) { if (!copies.has(o.origin)) copies.set(o.origin, []); copies.get(o.origin).push(o.id); }
+        const multi = [...copies.values()].filter((l) => l.length > 1);
+        for (const g of ['op', 'source']) {
+            const t = Date.now();
+            const r = explore(src, { synth, cells, objective: 'area', constraint: { metric: 'psnr', value: 40 }, granularity: g, heuristic: 'efficiency' });
+            const run = r.runs[0], p = run.chosen;
+            const unitOf = (id) => p?.assign.get(id) ?? 'exato';
+            const asym = multi.filter((l) => new Set(l.map(unitOf)).size > 1).length;
+            const psnr = p ? Math.min(...p.outs.map((o) => o.PSNR)) : null;
+            const saving = p ? 1 - p.score / r.refScore : null;
+            log('E6', k, g);
+            rows.push([k, g, 40, g === 'op' ? base.ops.list.length : copies.size, run.evals, Date.now() - t, saving, psnr, p ? p.assign.size : 0, multi.length, asym, p?.units.join(' + ') ?? '']);
+            tab.push([k, g === 'op' ? 'operação' : 'operação do código', String(run.evals), saving === null ? '-' : pctBr(saving), br(psnr, 1), String(p ? p.assign.size : 0), `${asym} de ${multi.length}`]);
+            void originOf;
+        }
+    }
+    save('e6_unroll_grupos.csv', csv(rows));
+    md.push('### E6. Unroll: cópias com a mesma unidade\n', 'Kernels com `unroll factor=2` no laço com pipeline; objetivo área, PSNR de pelo menos 40 dB, heurística de eficiência. Por operação, cada cópia é um grupo; por operação do código, as cópias de uma operação recebem a mesma unidade. A última coluna conta as operações do código cujas cópias ficaram com unidades diferentes.\n');
+    table('E6: grupos por operação contra por operação do código, com unroll de 2', ['Kernel', 'Grupos', 'Avaliações', 'Economia de área', 'PSNR medido', 'Operações aproximadas', 'Cópias diferentes'], tab, ['l', 'l', 'r', 'r', 'r', 'r', 'r']);
+}
+
 // E5: sensibilidade aos dados ------------------------------------------------------------------------------------------
 function e5() {
     const tab = [];
@@ -246,6 +277,7 @@ if (ONLY.has('E2')) e2();
 if (ONLY.has('E3')) e3();
 if (ONLY.has('E4')) e4();
 if (ONLY.has('E5')) e5();
+if (ONLY.has('E6')) e6();
 meta.seconds = Math.round((Date.now() - t0) / 1000);
 md.push(`Tempo total: ${meta.seconds} s.`, '');
 save('RESULTADOS.md', `${md.join('\n')}\n`);

@@ -66,7 +66,7 @@ export function approxOps(design, lib) {
                 candidates = candidates.filter((name) => lib.unit(name).cfg.method !== 'booth' || fitsSigned);
             }
             const text = `${argText(seg, n.args[0], design.loops, 1)} ${SYM[n.op]} ${argText(seg, n.args[1], design.loops, 1)}`;
-            list.push({ id: n.id, node: n, seg, cls, W, candidates, reason, text, label: `${n.op} de ${W} bits`, group: `${n.line}:${n.op}${W}` });
+            list.push({ id: n.id, node: n, seg, cls, W, candidates, reason, text, label: `${n.op} de ${W} bits`, group: `${n.line}:${n.op}${W}`, origin: `${n.origin ?? n.id}:${cls}${W}` });
         }
     }
     const groups = new Map();

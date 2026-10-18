@@ -96,14 +96,14 @@ fir & operação & 70 & 32,3\% (70,0) & 33,6\% (70,1) & - & 0,0\% ($\infty$) \\ 
 \hline
 \rowcolor{tabAzul}\color{white}Heurística & \color{white}Grupos & \color{white}Avaliações & \color{white}Tempo (s) \\
 \hline
-Sequencial & classe & 31 & 0,3 \\ \hline
-Sequencial & operação & 189 & 1,4 \\ \hline
-Eficiência & classe & 145 & 1,7 \\ \hline
-Eficiência & operação & 2062 & 21,2 \\ \hline
-Exaustiva & classe & 378 & 3,8 \\ \hline
-Exaustiva & operação & 1180 & 12,0 \\ \hline
-Aleatória & classe & 74 & 0,7 \\ \hline
-Aleatória & operação & 153 & 1,3 \\ \hline
+Sequencial & classe & 31 & 0,2 \\ \hline
+Sequencial & operação & 189 & 0,9 \\ \hline
+Eficiência & classe & 145 & 1,1 \\ \hline
+Eficiência & operação & 2062 & 13,1 \\ \hline
+Exaustiva & classe & 378 & 2,5 \\ \hline
+Exaustiva & operação & 1180 & 6,9 \\ \hline
+Aleatória & classe & 74 & 0,4 \\ \hline
+Aleatória & operação & 153 & 0,8 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -147,5 +147,21 @@ sobel & uniformes & 0,0\% & $\infty$ & $\infty$ & sim \\ \hline
 sobel & imagem & 0,0\% & $\infty$ & $\infty$ & sim \\ \hline
 sharpen & uniformes & 0,4\% & $\infty$ & $\infty$ & sim \\ \hline
 sharpen & imagem & 0,4\% & $\infty$ & $\infty$ & sim \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{E6: grupos por operação contra por operação do código, com unroll de 2}
+\begin{tabular}{|l|l|r|r|r|r|r|}
+\hline
+\rowcolor{tabAzul}\color{white}Kernel & \color{white}Grupos & \color{white}Avaliações & \color{white}Economia de área & \color{white}PSNR medido & \color{white}Operações aproximadas & \color{white}Cópias diferentes \\
+\hline
+gauss & operação & 1506 & 34,4\% & 41,1 & 22 & 10 de 13 \\ \hline
+gauss & operação do código & 1925 & 34,9\% & 40,2 & 24 & 0 de 13 \\ \hline
+sobel & operação & 603 & 6,8\% & 41,0 & 6 & 5 de 13 \\ \hline
+sobel & operação do código & 14 & 0,0\% & $\infty$ & 0 & 0 de 13 \\ \hline
+sharpen & operação & 36 & 0,4\% & $\infty$ & 2 & 1 de 5 \\ \hline
+sharpen & operação do código & 7 & 0,0\% & $\infty$ & 0 & 0 de 5 \\ \hline
 \end{tabular}
 \end{table}

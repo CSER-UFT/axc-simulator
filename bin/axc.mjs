@@ -12,7 +12,7 @@
  *   node bin/axc.mjs hls <kernel.c | --example gauss|sobel|sharpen|fir|dot> [--clock ns] [--flow delay|area|iso] [--ports n]
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
- *        [--weights 1,1,1] [--psnr dB | --mse v] [--granularity class|line|op] [--heuristic sequential|efficiency|
+ *        [--weights 1,1,1] [--psnr dB | --mse v] [--granularity class|line|source|op] [--heuristic sequential|efficiency|
  *        exhaustive|random|all] [--directives] [--clocks 5,2.5] [--input image|uniform] [--model sampled|analytic]
  *        [--all-units] [--samples n] [--verify-front n] [--csv]
  *

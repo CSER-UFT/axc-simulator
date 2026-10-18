@@ -50,3 +50,20 @@ test('dse: grupos por operação, restrição em MSE e caminho da eficiência', 
     assert.ok(r.best.score <= res.refScore);
     if (r.chosen) assert.ok(r.chosen.measured[0].MSE <= 30);
 });
+
+test('grupos por operação do código: as cópias do unroll juntas, os pesos da janela separados', () => {
+    const sob = KERNELS.find((k) => k.id === 'sobel').code.replace('#pragma HLS pipeline II=1', '#pragma HLS pipeline II=1\n#pragma HLS unroll factor=2');
+    const v = prepare(sob, { synth, cells });
+    const ops = groupsOf(v, { granularity: 'op' }), src = groupsOf(v, { granularity: 'source' });
+    assert.equal(src.length * 2, ops.length);
+    assert.ok(src.every((g) => g.ops.length === 2));
+    // No gaussiano, os laços da janela são desenrolados por estarem no pipeline: cada peso é uma origem.
+    const g = prepare(KERNELS.find((k) => k.id === 'gauss').code, { synth, cells });
+    assert.equal(groupsOf(g, { granularity: 'source' }).length, groupsOf(g, { granularity: 'op' }).length);
+    // Com unroll nos laços da janela, as nove multiplicações viram uma origem.
+    const dot4 = 'void f(u8 a[64], u8 b[64], u32 r[1]) {\n    u32 acc = 0;\n    for (int i = 0; i < 64; i++) {\n#pragma HLS unroll factor=4\n        acc += a[i] * b[i];\n    }\n    r[0] = acc;\n}';
+    const d = prepare(dot4, { synth, cells });
+    const dm = groupsOf(d, { granularity: 'source' }).filter((x) => x.cls === 'mul');
+    assert.equal(dm.length, 1);
+    assert.equal(dm[0].ops.length, 4);
+});
