@@ -2763,11 +2763,11 @@
     "timeNs": 361100,
     "intervalNs": 10,
     "critPs": 4216,
-    "luts": 795,
-    "carry4": 19,
+    "luts": 718,
+    "carry4": 28,
     "ff": 635,
-    "areaUm2": 15562.686538531512,
-    "energyFj": 2047056003.7872453,
+    "areaUm2": 14325.837064847301,
+    "energyFj": 2047056270.1270032,
     "loops": [
      {
       "label": "rows_cols",
@@ -2782,16 +2782,16 @@
     "addrLuts": 464,
     "units": [
      {
+      "unit": "ADD16 LOA6",
+      "count": 8,
+      "luts": 105,
+      "carry4": 19
+     },
+     {
       "unit": "MUL8 T8 +C",
       "count": 5,
       "luts": 36,
       "carry4": 4
-     },
-     {
-      "unit": "ADD16 LOA6",
-      "count": 4,
-      "luts": 54,
-      "carry4": 10
      }
     ],
     "model": {
@@ -2930,11 +2930,11 @@
     "timeNs": 361090,
     "intervalNs": 10,
     "critPs": 4930,
-    "luts": 728,
-    "carry4": 35,
+    "luts": 676,
+    "carry4": 37,
     "ff": 516,
-    "areaUm2": 12815.99403996004,
-    "energyFj": 1297462541.3727987,
+    "areaUm2": 11799.615578421579,
+    "energyFj": 1297462620.0348663,
     "loops": [
      {
       "label": "rows_cols",
@@ -2949,16 +2949,16 @@
     "addrLuts": 442,
     "units": [
      {
+      "unit": "ADD16 LOA4",
+      "count": 5,
+      "luts": 36,
+      "carry4": 8
+     },
+     {
       "unit": "ADD16 exato",
       "count": 8,
       "luts": 62,
       "carry4": 19
-     },
-     {
-      "unit": "ADD16 LOA4",
-      "count": 3,
-      "luts": 24,
-      "carry4": 6
      }
     ],
     "model": {
@@ -3270,12 +3270,6 @@
     "addrLuts": 522,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 14,
-      "luts": 78,
-      "carry4": 8
-     },
-     {
       "unit": "ADD16 LOA11",
       "count": 11,
       "luts": 137,
@@ -3286,6 +3280,12 @@
       "count": 4,
       "luts": 44,
       "carry4": 0
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 14,
+      "luts": 78,
+      "carry4": 8
      }
     ],
     "model": {
@@ -3555,11 +3555,11 @@
     "timeNs": 361095,
     "intervalNs": 10,
     "critPs": 4874,
-    "luts": 709,
-    "carry4": 23,
+    "luts": 689,
+    "carry4": 25,
     "ff": 624,
-    "areaUm2": 13224.494939549715,
-    "energyFj": 1872584301.395856,
+    "areaUm2": 12838.40391914155,
+    "energyFj": 1872584355.7811844,
     "loops": [
      {
       "label": "rows_cols",
@@ -3574,12 +3574,6 @@
     "addrLuts": 464,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 4,
-      "luts": 31,
-      "carry4": 4
-     },
-     {
       "unit": "ADD16 LOA7",
       "count": 1,
       "luts": 11,
@@ -3587,15 +3581,9 @@
      },
      {
       "unit": "ADD16 LOA8",
-      "count": 2,
-      "luts": 26,
-      "carry4": 5
-     },
-     {
-      "unit": "MUL8 T6 A4c",
-      "count": 1,
-      "luts": 7,
-      "carry4": 0
+      "count": 3,
+      "luts": 38,
+      "carry4": 7
      },
      {
       "unit": "ADD16 TRUNC8",
@@ -3620,6 +3608,18 @@
       "count": 1,
       "luts": 12,
       "carry4": 1
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 4,
+      "luts": 31,
+      "carry4": 4
+     },
+     {
+      "unit": "MUL8 T6 A4c",
+      "count": 1,
+      "luts": 7,
+      "carry4": 0
      }
     ],
     "model": {
@@ -3836,6 +3836,48 @@
     "addrLuts": 522,
     "units": [
      {
+      "unit": "ADD16 LOA15",
+      "count": 1,
+      "luts": 8,
+      "carry4": 0
+     },
+     {
+      "unit": "ADD16 LOA10",
+      "count": 1,
+      "luts": 8,
+      "carry4": 1
+     },
+     {
+      "unit": "ADD16 LOA9",
+      "count": 5,
+      "luts": 63,
+      "carry4": 7
+     },
+     {
+      "unit": "ADD16 LOA8",
+      "count": 4,
+      "luts": 50,
+      "carry4": 9
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
+      "count": 2,
+      "luts": 25,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
+      "count": 1,
+      "luts": 10,
+      "carry4": 1
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
+      "count": 1,
+      "luts": 8,
+      "carry4": 0
+     },
+     {
       "unit": "MUL8 DRUM4",
       "count": 2,
       "luts": 62,
@@ -3866,57 +3908,15 @@
       "carry4": 0
      },
      {
-      "unit": "ADD16 LOA15",
-      "count": 1,
-      "luts": 8,
-      "carry4": 0
-     },
-     {
       "unit": "MUL8 DRUM3 +C",
       "count": 1,
       "luts": 36,
       "carry4": 0
      },
      {
-      "unit": "ADD16 LOA10",
-      "count": 1,
-      "luts": 8,
-      "carry4": 1
-     },
-     {
-      "unit": "ADD16 LOA9",
-      "count": 5,
-      "luts": 63,
-      "carry4": 7
-     },
-     {
-      "unit": "ADD16 LOA8",
-      "count": 4,
-      "luts": 50,
-      "carry4": 9
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
-      "count": 2,
-      "luts": 25,
-      "carry4": 4
-     },
-     {
       "unit": "MUL8 DRUM3",
       "count": 1,
       "luts": 36,
-      "carry4": 0
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
-      "count": 1,
-      "luts": 10,
-      "carry4": 1
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
-      "count": 1,
-      "luts": 8,
       "carry4": 0
      }
     ],
@@ -4181,12 +4181,6 @@
     "addrLuts": 464,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 5,
-      "luts": 36,
-      "carry4": 4
-     },
-     {
       "unit": "ADD16 TRUNC2",
       "count": 1,
       "luts": 11,
@@ -4233,6 +4227,12 @@
       "count": 1,
       "luts": 8,
       "carry4": 2
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 5,
+      "luts": 36,
+      "carry4": 4
      }
     ],
     "model": {
@@ -4423,6 +4423,24 @@
     "addrLuts": 522,
     "units": [
      {
+      "unit": "ADD16 TRUNC7",
+      "count": 5,
+      "luts": 27,
+      "carry4": 9
+     },
+     {
+      "unit": "ADD16 TRUNC6",
+      "count": 6,
+      "luts": 47,
+      "carry4": 14
+     },
+     {
+      "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
+      "count": 4,
+      "luts": 24,
+      "carry4": 8
+     },
+     {
       "unit": "MUL8 T8 +C",
       "count": 6,
       "luts": 51,
@@ -4441,28 +4459,10 @@
       "carry4": 0
      },
      {
-      "unit": "ADD16 TRUNC7",
-      "count": 5,
-      "luts": 27,
-      "carry4": 9
-     },
-     {
-      "unit": "ADD16 TRUNC6",
-      "count": 6,
-      "luts": 47,
-      "carry4": 14
-     },
-     {
       "unit": "MUL8 T10 +C",
       "count": 1,
       "luts": 0,
       "carry4": 0
-     },
-     {
-      "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
-      "count": 4,
-      "luts": 24,
-      "carry4": 8
      }
     ],
     "model": {
@@ -4787,11 +4787,11 @@
     "timeNs": 361100,
     "intervalNs": 10,
     "critPs": 4216,
-    "luts": 795,
-    "carry4": 19,
+    "luts": 718,
+    "carry4": 28,
     "ff": 635,
-    "areaUm2": 15562.686538531512,
-    "energyFj": 2047056003.7872453,
+    "areaUm2": 14325.837064847301,
+    "energyFj": 2047056270.1270032,
     "loops": [
      {
       "label": "rows_cols",
@@ -4806,16 +4806,16 @@
     "addrLuts": 464,
     "units": [
      {
+      "unit": "ADD16 LOA6",
+      "count": 8,
+      "luts": 105,
+      "carry4": 19
+     },
+     {
       "unit": "MUL8 T8 +C",
       "count": 5,
       "luts": 36,
       "carry4": 4
-     },
-     {
-      "unit": "ADD16 LOA6",
-      "count": 4,
-      "luts": 54,
-      "carry4": 10
      }
     ],
     "model": {
@@ -4940,11 +4940,11 @@
     "timeNs": 361090,
     "intervalNs": 10,
     "critPs": 4930,
-    "luts": 728,
-    "carry4": 35,
+    "luts": 676,
+    "carry4": 37,
     "ff": 516,
-    "areaUm2": 12815.99403996004,
-    "energyFj": 1297462541.3727987,
+    "areaUm2": 11799.615578421579,
+    "energyFj": 1297462620.0348663,
     "loops": [
      {
       "label": "rows_cols",
@@ -4959,16 +4959,16 @@
     "addrLuts": 442,
     "units": [
      {
+      "unit": "ADD16 LOA4",
+      "count": 5,
+      "luts": 36,
+      "carry4": 8
+     },
+     {
       "unit": "ADD16 exato",
       "count": 8,
       "luts": 62,
       "carry4": 19
-     },
-     {
-      "unit": "ADD16 LOA4",
-      "count": 3,
-      "luts": 24,
-      "carry4": 6
      }
     ],
     "model": {
@@ -5264,12 +5264,6 @@
     "addrLuts": 522,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 14,
-      "luts": 78,
-      "carry4": 8
-     },
-     {
       "unit": "ADD16 LOA11",
       "count": 11,
       "luts": 137,
@@ -5280,6 +5274,12 @@
       "count": 4,
       "luts": 44,
       "carry4": 0
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 14,
+      "luts": 78,
+      "carry4": 8
      }
     ],
     "model": {
@@ -5535,11 +5535,11 @@
     "timeNs": 361095,
     "intervalNs": 10,
     "critPs": 4874,
-    "luts": 709,
-    "carry4": 23,
+    "luts": 689,
+    "carry4": 25,
     "ff": 624,
-    "areaUm2": 13224.494939549715,
-    "energyFj": 1872584301.395856,
+    "areaUm2": 12838.40391914155,
+    "energyFj": 1872584355.7811844,
     "loops": [
      {
       "label": "rows_cols",
@@ -5554,12 +5554,6 @@
     "addrLuts": 464,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 4,
-      "luts": 31,
-      "carry4": 4
-     },
-     {
       "unit": "ADD16 LOA7",
       "count": 1,
       "luts": 11,
@@ -5567,15 +5561,9 @@
      },
      {
       "unit": "ADD16 LOA8",
-      "count": 2,
-      "luts": 26,
-      "carry4": 5
-     },
-     {
-      "unit": "MUL8 T6 A4c",
-      "count": 1,
-      "luts": 7,
-      "carry4": 0
+      "count": 3,
+      "luts": 38,
+      "carry4": 7
      },
      {
       "unit": "ADD16 TRUNC8",
@@ -5600,6 +5588,18 @@
       "count": 1,
       "luts": 12,
       "carry4": 1
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 4,
+      "luts": 31,
+      "carry4": 4
+     },
+     {
+      "unit": "MUL8 T6 A4c",
+      "count": 1,
+      "luts": 7,
+      "carry4": 0
      }
     ],
     "model": {
@@ -5784,6 +5784,48 @@
     "addrLuts": 522,
     "units": [
      {
+      "unit": "ADD16 LOA15",
+      "count": 1,
+      "luts": 8,
+      "carry4": 0
+     },
+     {
+      "unit": "ADD16 LOA10",
+      "count": 1,
+      "luts": 8,
+      "carry4": 1
+     },
+     {
+      "unit": "ADD16 LOA9",
+      "count": 5,
+      "luts": 63,
+      "carry4": 7
+     },
+     {
+      "unit": "ADD16 LOA8",
+      "count": 4,
+      "luts": 50,
+      "carry4": 9
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
+      "count": 2,
+      "luts": 25,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
+      "count": 1,
+      "luts": 10,
+      "carry4": 1
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
+      "count": 1,
+      "luts": 8,
+      "carry4": 0
+     },
+     {
       "unit": "MUL8 DRUM4",
       "count": 2,
       "luts": 62,
@@ -5814,57 +5856,15 @@
       "carry4": 0
      },
      {
-      "unit": "ADD16 LOA15",
-      "count": 1,
-      "luts": 8,
-      "carry4": 0
-     },
-     {
       "unit": "MUL8 DRUM3 +C",
       "count": 1,
       "luts": 36,
       "carry4": 0
      },
      {
-      "unit": "ADD16 LOA10",
-      "count": 1,
-      "luts": 8,
-      "carry4": 1
-     },
-     {
-      "unit": "ADD16 LOA9",
-      "count": 5,
-      "luts": 63,
-      "carry4": 7
-     },
-     {
-      "unit": "ADD16 LOA8",
-      "count": 4,
-      "luts": 50,
-      "carry4": 9
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
-      "count": 2,
-      "luts": 25,
-      "carry4": 4
-     },
-     {
       "unit": "MUL8 DRUM3",
       "count": 1,
       "luts": 36,
-      "carry4": 0
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
-      "count": 1,
-      "luts": 10,
-      "carry4": 1
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
-      "count": 1,
-      "luts": 8,
       "carry4": 0
      }
     ],
@@ -6068,12 +6068,6 @@
     "addrLuts": 464,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 5,
-      "luts": 36,
-      "carry4": 4
-     },
-     {
       "unit": "ADD16 TRUNC2",
       "count": 1,
       "luts": 11,
@@ -6120,6 +6114,12 @@
       "count": 1,
       "luts": 8,
       "carry4": 2
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 5,
+      "luts": 36,
+      "carry4": 4
      }
     ],
     "model": {
@@ -6304,6 +6304,24 @@
     "addrLuts": 522,
     "units": [
      {
+      "unit": "ADD16 TRUNC7",
+      "count": 5,
+      "luts": 27,
+      "carry4": 9
+     },
+     {
+      "unit": "ADD16 TRUNC6",
+      "count": 6,
+      "luts": 47,
+      "carry4": 14
+     },
+     {
+      "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
+      "count": 4,
+      "luts": 24,
+      "carry4": 8
+     },
+     {
       "unit": "MUL8 T8 +C",
       "count": 6,
       "luts": 51,
@@ -6322,28 +6340,10 @@
       "carry4": 0
      },
      {
-      "unit": "ADD16 TRUNC7",
-      "count": 5,
-      "luts": 27,
-      "carry4": 9
-     },
-     {
-      "unit": "ADD16 TRUNC6",
-      "count": 6,
-      "luts": 47,
-      "carry4": 14
-     },
-     {
       "unit": "MUL8 T10 +C",
       "count": 1,
       "luts": 0,
       "carry4": 0
-     },
-     {
-      "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
-      "count": 4,
-      "luts": 24,
-      "carry4": 8
      }
     ],
     "model": {
@@ -6650,11 +6650,11 @@
     "timeNs": 361100,
     "intervalNs": 10,
     "critPs": 4216,
-    "luts": 795,
-    "carry4": 19,
+    "luts": 718,
+    "carry4": 28,
     "ff": 635,
-    "areaUm2": 15562.686538531512,
-    "energyFj": 2047056003.7872453,
+    "areaUm2": 14325.837064847301,
+    "energyFj": 2047056270.1270032,
     "loops": [
      {
       "label": "rows_cols",
@@ -6669,16 +6669,16 @@
     "addrLuts": 464,
     "units": [
      {
+      "unit": "ADD16 LOA6",
+      "count": 8,
+      "luts": 105,
+      "carry4": 19
+     },
+     {
       "unit": "MUL8 T8 +C",
       "count": 5,
       "luts": 36,
       "carry4": 4
-     },
-     {
-      "unit": "ADD16 LOA6",
-      "count": 4,
-      "luts": 54,
-      "carry4": 10
      }
     ],
     "model": {
@@ -6803,11 +6803,11 @@
     "timeNs": 361090,
     "intervalNs": 10,
     "critPs": 4930,
-    "luts": 728,
-    "carry4": 35,
+    "luts": 676,
+    "carry4": 37,
     "ff": 516,
-    "areaUm2": 12815.99403996004,
-    "energyFj": 1297462541.3727987,
+    "areaUm2": 11799.615578421579,
+    "energyFj": 1297462620.0348663,
     "loops": [
      {
       "label": "rows_cols",
@@ -6822,16 +6822,16 @@
     "addrLuts": 442,
     "units": [
      {
+      "unit": "ADD16 LOA4",
+      "count": 5,
+      "luts": 36,
+      "carry4": 8
+     },
+     {
       "unit": "ADD16 exato",
       "count": 8,
       "luts": 62,
       "carry4": 19
-     },
-     {
-      "unit": "ADD16 LOA4",
-      "count": 3,
-      "luts": 24,
-      "carry4": 6
      }
     ],
     "model": {
@@ -7127,12 +7127,6 @@
     "addrLuts": 522,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 14,
-      "luts": 78,
-      "carry4": 8
-     },
-     {
       "unit": "ADD16 LOA11",
       "count": 11,
       "luts": 137,
@@ -7143,6 +7137,12 @@
       "count": 4,
       "luts": 44,
       "carry4": 0
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 14,
+      "luts": 78,
+      "carry4": 8
      }
     ],
     "model": {
@@ -7404,11 +7404,11 @@
     "timeNs": 361095,
     "intervalNs": 10,
     "critPs": 4874,
-    "luts": 709,
-    "carry4": 23,
+    "luts": 689,
+    "carry4": 25,
     "ff": 624,
-    "areaUm2": 13224.494939549715,
-    "energyFj": 1872584301.395856,
+    "areaUm2": 12838.40391914155,
+    "energyFj": 1872584355.7811844,
     "loops": [
      {
       "label": "rows_cols",
@@ -7423,12 +7423,6 @@
     "addrLuts": 464,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 4,
-      "luts": 31,
-      "carry4": 4
-     },
-     {
       "unit": "ADD16 LOA7",
       "count": 1,
       "luts": 11,
@@ -7436,15 +7430,9 @@
      },
      {
       "unit": "ADD16 LOA8",
-      "count": 2,
-      "luts": 26,
-      "carry4": 5
-     },
-     {
-      "unit": "MUL8 T6 A4c",
-      "count": 1,
-      "luts": 7,
-      "carry4": 0
+      "count": 3,
+      "luts": 38,
+      "carry4": 7
      },
      {
       "unit": "ADD16 TRUNC8",
@@ -7469,6 +7457,18 @@
       "count": 1,
       "luts": 12,
       "carry4": 1
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 4,
+      "luts": 31,
+      "carry4": 4
+     },
+     {
+      "unit": "MUL8 T6 A4c",
+      "count": 1,
+      "luts": 7,
+      "carry4": 0
      }
     ],
     "model": {
@@ -7653,6 +7653,48 @@
     "addrLuts": 522,
     "units": [
      {
+      "unit": "ADD16 LOA15",
+      "count": 1,
+      "luts": 8,
+      "carry4": 0
+     },
+     {
+      "unit": "ADD16 LOA10",
+      "count": 1,
+      "luts": 8,
+      "carry4": 1
+     },
+     {
+      "unit": "ADD16 LOA9",
+      "count": 5,
+      "luts": 63,
+      "carry4": 7
+     },
+     {
+      "unit": "ADD16 LOA8",
+      "count": 4,
+      "luts": 50,
+      "carry4": 9
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
+      "count": 2,
+      "luts": 25,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
+      "count": 1,
+      "luts": 10,
+      "carry4": 1
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
+      "count": 1,
+      "luts": 8,
+      "carry4": 0
+     },
+     {
       "unit": "MUL8 DRUM4",
       "count": 2,
       "luts": 62,
@@ -7683,57 +7725,15 @@
       "carry4": 0
      },
      {
-      "unit": "ADD16 LOA15",
-      "count": 1,
-      "luts": 8,
-      "carry4": 0
-     },
-     {
       "unit": "MUL8 DRUM3 +C",
       "count": 1,
       "luts": 36,
       "carry4": 0
      },
      {
-      "unit": "ADD16 LOA10",
-      "count": 1,
-      "luts": 8,
-      "carry4": 1
-     },
-     {
-      "unit": "ADD16 LOA9",
-      "count": 5,
-      "luts": 63,
-      "carry4": 7
-     },
-     {
-      "unit": "ADD16 LOA8",
-      "count": 4,
-      "luts": 50,
-      "carry4": 9
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
-      "count": 2,
-      "luts": 25,
-      "carry4": 4
-     },
-     {
       "unit": "MUL8 DRUM3",
       "count": 1,
       "luts": 36,
-      "carry4": 0
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
-      "count": 1,
-      "luts": 10,
-      "carry4": 1
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
-      "count": 1,
-      "luts": 8,
       "carry4": 0
      }
     ],
@@ -7943,12 +7943,6 @@
     "addrLuts": 464,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 5,
-      "luts": 36,
-      "carry4": 4
-     },
-     {
       "unit": "ADD16 TRUNC2",
       "count": 1,
       "luts": 11,
@@ -7995,6 +7989,12 @@
       "count": 1,
       "luts": 8,
       "carry4": 2
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 5,
+      "luts": 36,
+      "carry4": 4
      }
     ],
     "model": {
@@ -8185,6 +8185,24 @@
     "addrLuts": 522,
     "units": [
      {
+      "unit": "ADD16 TRUNC7",
+      "count": 5,
+      "luts": 27,
+      "carry4": 9
+     },
+     {
+      "unit": "ADD16 TRUNC6",
+      "count": 6,
+      "luts": 47,
+      "carry4": 14
+     },
+     {
+      "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
+      "count": 4,
+      "luts": 24,
+      "carry4": 8
+     },
+     {
       "unit": "MUL8 T8 +C",
       "count": 6,
       "luts": 51,
@@ -8203,28 +8221,10 @@
       "carry4": 0
      },
      {
-      "unit": "ADD16 TRUNC7",
-      "count": 5,
-      "luts": 27,
-      "carry4": 9
-     },
-     {
-      "unit": "ADD16 TRUNC6",
-      "count": 6,
-      "luts": 47,
-      "carry4": 14
-     },
-     {
       "unit": "MUL8 T10 +C",
       "count": 1,
       "luts": 0,
       "carry4": 0
-     },
-     {
-      "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
-      "count": 4,
-      "luts": 24,
-      "carry4": 8
      }
     ],
     "model": {
@@ -8525,11 +8525,11 @@
     "timeNs": 361100,
     "intervalNs": 10,
     "critPs": 4216,
-    "luts": 795,
-    "carry4": 19,
+    "luts": 718,
+    "carry4": 28,
     "ff": 635,
-    "areaUm2": 15562.686538531512,
-    "energyFj": 2047056003.7872453,
+    "areaUm2": 14325.837064847301,
+    "energyFj": 2047056270.1270032,
     "loops": [
      {
       "label": "rows_cols",
@@ -8544,16 +8544,16 @@
     "addrLuts": 464,
     "units": [
      {
+      "unit": "ADD16 LOA6",
+      "count": 8,
+      "luts": 105,
+      "carry4": 19
+     },
+     {
       "unit": "MUL8 T8 +C",
       "count": 5,
       "luts": 36,
       "carry4": 4
-     },
-     {
-      "unit": "ADD16 LOA6",
-      "count": 4,
-      "luts": 54,
-      "carry4": 10
      }
     ],
     "model": {
@@ -8702,11 +8702,11 @@
     "timeNs": 361090,
     "intervalNs": 10,
     "critPs": 4930,
-    "luts": 728,
-    "carry4": 35,
+    "luts": 676,
+    "carry4": 37,
     "ff": 516,
-    "areaUm2": 12815.99403996004,
-    "energyFj": 1297462541.3727987,
+    "areaUm2": 11799.615578421579,
+    "energyFj": 1297462620.0348663,
     "loops": [
      {
       "label": "rows_cols",
@@ -8721,16 +8721,16 @@
     "addrLuts": 442,
     "units": [
      {
+      "unit": "ADD16 LOA4",
+      "count": 5,
+      "luts": 36,
+      "carry4": 8
+     },
+     {
       "unit": "ADD16 exato",
       "count": 8,
       "luts": 62,
       "carry4": 19
-     },
-     {
-      "unit": "ADD16 LOA4",
-      "count": 3,
-      "luts": 24,
-      "carry4": 6
      }
     ],
     "model": {
@@ -9050,12 +9050,6 @@
     "addrLuts": 522,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 14,
-      "luts": 78,
-      "carry4": 8
-     },
-     {
       "unit": "ADD16 LOA11",
       "count": 11,
       "luts": 137,
@@ -9066,6 +9060,12 @@
       "count": 4,
       "luts": 44,
       "carry4": 0
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 14,
+      "luts": 78,
+      "carry4": 8
      }
     ],
     "model": {
@@ -9334,11 +9334,11 @@
     "timeNs": 361095,
     "intervalNs": 10,
     "critPs": 4874,
-    "luts": 709,
-    "carry4": 23,
+    "luts": 689,
+    "carry4": 25,
     "ff": 624,
-    "areaUm2": 13224.494939549715,
-    "energyFj": 1872584301.395856,
+    "areaUm2": 12838.40391914155,
+    "energyFj": 1872584355.7811844,
     "loops": [
      {
       "label": "rows_cols",
@@ -9353,12 +9353,6 @@
     "addrLuts": 464,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 4,
-      "luts": 31,
-      "carry4": 4
-     },
-     {
       "unit": "ADD16 LOA7",
       "count": 1,
       "luts": 11,
@@ -9366,15 +9360,9 @@
      },
      {
       "unit": "ADD16 LOA8",
-      "count": 2,
-      "luts": 26,
-      "carry4": 5
-     },
-     {
-      "unit": "MUL8 T6 A4c",
-      "count": 1,
-      "luts": 7,
-      "carry4": 0
+      "count": 3,
+      "luts": 38,
+      "carry4": 7
      },
      {
       "unit": "ADD16 TRUNC8",
@@ -9399,6 +9387,18 @@
       "count": 1,
       "luts": 12,
       "carry4": 1
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 4,
+      "luts": 31,
+      "carry4": 4
+     },
+     {
+      "unit": "MUL8 T6 A4c",
+      "count": 1,
+      "luts": 7,
+      "carry4": 0
      }
     ],
     "model": {
@@ -9661,6 +9661,48 @@
     "addrLuts": 522,
     "units": [
      {
+      "unit": "ADD16 LOA15",
+      "count": 1,
+      "luts": 8,
+      "carry4": 0
+     },
+     {
+      "unit": "ADD16 LOA10",
+      "count": 1,
+      "luts": 8,
+      "carry4": 1
+     },
+     {
+      "unit": "ADD16 LOA9",
+      "count": 5,
+      "luts": 63,
+      "carry4": 7
+     },
+     {
+      "unit": "ADD16 LOA8",
+      "count": 4,
+      "luts": 50,
+      "carry4": 9
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
+      "count": 2,
+      "luts": 25,
+      "carry4": 4
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
+      "count": 1,
+      "luts": 10,
+      "carry4": 1
+     },
+     {
+      "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
+      "count": 1,
+      "luts": 8,
+      "carry4": 0
+     },
+     {
       "unit": "MUL8 DRUM4",
       "count": 2,
       "luts": 62,
@@ -9691,57 +9733,15 @@
       "carry4": 0
      },
      {
-      "unit": "ADD16 LOA15",
-      "count": 1,
-      "luts": 8,
-      "carry4": 0
-     },
-     {
       "unit": "MUL8 DRUM3 +C",
       "count": 1,
       "luts": 36,
       "carry4": 0
      },
      {
-      "unit": "ADD16 LOA10",
-      "count": 1,
-      "luts": 8,
-      "carry4": 1
-     },
-     {
-      "unit": "ADD16 LOA9",
-      "count": 5,
-      "luts": 63,
-      "carry4": 7
-     },
-     {
-      "unit": "ADD16 LOA8",
-      "count": 4,
-      "luts": 50,
-      "carry4": 9
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
-      "count": 2,
-      "luts": 25,
-      "carry4": 4
-     },
-     {
       "unit": "MUL8 DRUM3",
       "count": 1,
       "luts": 36,
-      "carry4": 0
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
-      "count": 1,
-      "luts": 10,
-      "carry4": 1
-     },
-     {
-      "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
-      "count": 1,
-      "luts": 8,
       "carry4": 0
      }
     ],
@@ -9981,12 +9981,6 @@
     "addrLuts": 464,
     "units": [
      {
-      "unit": "MUL8 T8 +C",
-      "count": 5,
-      "luts": 36,
-      "carry4": 4
-     },
-     {
       "unit": "ADD16 TRUNC2",
       "count": 1,
       "luts": 11,
@@ -10033,6 +10027,12 @@
       "count": 1,
       "luts": 8,
       "carry4": 2
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 5,
+      "luts": 36,
+      "carry4": 4
      }
     ],
     "model": {
@@ -10325,6 +10325,24 @@
     "addrLuts": 522,
     "units": [
      {
+      "unit": "ADD16 TRUNC7",
+      "count": 5,
+      "luts": 27,
+      "carry4": 9
+     },
+     {
+      "unit": "ADD16 TRUNC6",
+      "count": 6,
+      "luts": 47,
+      "carry4": 14
+     },
+     {
+      "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
+      "count": 4,
+      "luts": 24,
+      "carry4": 8
+     },
+     {
       "unit": "MUL8 T8 +C",
       "count": 6,
       "luts": 51,
@@ -10343,28 +10361,10 @@
       "carry4": 0
      },
      {
-      "unit": "ADD16 TRUNC7",
-      "count": 5,
-      "luts": 27,
-      "carry4": 9
-     },
-     {
-      "unit": "ADD16 TRUNC6",
-      "count": 6,
-      "luts": 47,
-      "carry4": 14
-     },
-     {
       "unit": "MUL8 T10 +C",
       "count": 1,
       "luts": 0,
       "carry4": 0
-     },
-     {
-      "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
-      "count": 4,
-      "luts": 24,
-      "carry4": 8
      }
     ],
     "model": {
@@ -10549,24 +10549,6 @@
     "addrLuts": 464,
     "units": [
      {
-      "unit": "MUL8 T4 +C",
-      "count": 1,
-      "luts": 17,
-      "carry4": 2
-     },
-     {
-      "unit": "MUL8 T8",
-      "count": 1,
-      "luts": 2,
-      "carry4": 1
-     },
-     {
-      "unit": "MUL8 T8 +C",
-      "count": 3,
-      "luts": 27,
-      "carry4": 3
-     },
-     {
       "unit": "ADD16 TRUNC7",
       "count": 1,
       "luts": 6,
@@ -10613,6 +10595,24 @@
       "count": 1,
       "luts": 8,
       "carry4": 2
+     },
+     {
+      "unit": "MUL8 T4 +C",
+      "count": 1,
+      "luts": 17,
+      "carry4": 2
+     },
+     {
+      "unit": "MUL8 T8",
+      "count": 1,
+      "luts": 2,
+      "carry4": 1
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 3,
+      "luts": 27,
+      "carry4": 3
      }
     ],
     "model": {
@@ -10914,7 +10914,7 @@
     "luts": 620,
     "carry4": 29,
     "ff": 599,
-    "areaUm2": 11622.048563121594,
+    "areaUm2": 11622.048563121596,
     "energyFj": 1421201672.4518628,
     "loops": [
      {
@@ -10930,24 +10930,6 @@
     "addrLuts": 464,
     "units": [
      {
-      "unit": "MUL8 T8",
-      "count": 1,
-      "luts": 2,
-      "carry4": 1
-     },
-     {
-      "unit": "MUL8 T8 A8c",
-      "count": 1,
-      "luts": 0,
-      "carry4": 0
-     },
-     {
-      "unit": "MUL8 T6",
-      "count": 1,
-      "luts": 18,
-      "carry4": 2
-     },
-     {
       "unit": "ADD16 TRUNC7",
       "count": 1,
       "luts": 6,
@@ -10960,22 +10942,10 @@
       "carry4": 2
      },
      {
-      "unit": "MUL8 T4 +C",
-      "count": 1,
-      "luts": 17,
-      "carry4": 2
-     },
-     {
       "unit": "ADD16 TRUNC4",
       "count": 1,
       "luts": 10,
       "carry4": 3
-     },
-     {
-      "unit": "MUL8 T8 +C",
-      "count": 1,
-      "luts": 5,
-      "carry4": 1
      },
      {
       "unit": "ADD16 TRUNC3",
@@ -11006,6 +10976,36 @@
       "count": 1,
       "luts": 8,
       "carry4": 2
+     },
+     {
+      "unit": "MUL8 T8",
+      "count": 1,
+      "luts": 2,
+      "carry4": 1
+     },
+     {
+      "unit": "MUL8 T8 A8c",
+      "count": 1,
+      "luts": 0,
+      "carry4": 0
+     },
+     {
+      "unit": "MUL8 T6",
+      "count": 1,
+      "luts": 18,
+      "carry4": 2
+     },
+     {
+      "unit": "MUL8 T4 +C",
+      "count": 1,
+      "luts": 17,
+      "carry4": 2
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 1,
+      "luts": 5,
+      "carry4": 1
      }
     ],
     "model": {
@@ -11358,34 +11358,10 @@
       "carry4": 3
      },
      {
-      "unit": "×29 (2 somas)",
-      "count": 1,
-      "luts": 18,
-      "carry4": 6
-     },
-     {
-      "unit": "MUL8 T6 A10c",
-      "count": 4,
-      "luts": 5,
-      "carry4": 0
-     },
-     {
-      "unit": "MUL8 T16",
-      "count": 1,
-      "luts": 0,
-      "carry4": 0
-     },
-     {
       "unit": "ADD16 TRUNC7",
       "count": 6,
       "luts": 36,
       "carry4": 12
-     },
-     {
-      "unit": "MUL8 T10 +C",
-      "count": 1,
-      "luts": 3,
-      "carry4": 0
      },
      {
       "unit": "ADD16 TRUNC5",
@@ -11394,10 +11370,10 @@
       "carry4": 9
      },
      {
-      "unit": "MUL8 T8 +C",
-      "count": 4,
-      "luts": 31,
-      "carry4": 3
+      "unit": "×29 (2 somas)",
+      "count": 1,
+      "luts": 18,
+      "carry4": 6
      },
      {
       "unit": "ADD16 TRUNC6",
@@ -11416,6 +11392,30 @@
       "count": 2,
       "luts": 14,
       "carry4": 4
+     },
+     {
+      "unit": "MUL8 T6 A10c",
+      "count": 4,
+      "luts": 5,
+      "carry4": 0
+     },
+     {
+      "unit": "MUL8 T16",
+      "count": 1,
+      "luts": 0,
+      "carry4": 0
+     },
+     {
+      "unit": "MUL8 T10 +C",
+      "count": 1,
+      "luts": 3,
+      "carry4": 0
+     },
+     {
+      "unit": "MUL8 T8 +C",
+      "count": 4,
+      "luts": 31,
+      "carry4": 3
      },
      {
       "unit": "MUL8 T6",
@@ -11659,15 +11659,15 @@
     "addrLuts": 0,
     "units": [
      {
-      "unit": "MUL8 T14 +C",
-      "count": 1,
-      "luts": 1,
-      "carry4": 0
-     },
-     {
       "unit": "ADD32 (ADD16 TRUNC13 + ADD16 exato)",
       "count": 1,
       "luts": 4,
+      "carry4": 0
+     },
+     {
+      "unit": "MUL8 T14 +C",
+      "count": 1,
+      "luts": 1,
       "carry4": 0
      }
     ],
@@ -11769,5 +11769,5 @@
    }
   }
  ],
- "compared": "2026-10-19T11:00:48.890Z"
+ "compared": "2026-10-19T22:22:47.273Z"
 }

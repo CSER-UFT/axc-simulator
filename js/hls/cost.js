@@ -1,8 +1,10 @@
 /**
  * Ligação e custo de um projeto escalonado.
  *
- *   unidades     somadores e multiplicadores são compartilhados: sem pipeline, operações cujos ciclos não se
- *                sobrepõem usam a mesma unidade (algoritmo de left edge); com pipeline, a quantidade é o maior número
+ *   unidades     a mesma regra para exatas e aproximadas: somadores e multiplicações por constante têm uma
+ *                unidade por operação; as multiplicações entre variáveis são compartilhadas quando isso economiza
+ *                (instâncias e multiplexadores contra uma unidade por operação): sem pipeline, operações cujos ciclos
+ *                não se sobrepõem usam a mesma unidade (algoritmo de left edge); com pipeline, a quantidade é o maior número
  *                de usos num mesmo ciclo da tabela de reservas. Trechos diferentes rodam em momentos diferentes e
  *                reaproveitam as mesmas unidades. Comparadores, seleções e lógica não são compartilhados (são baratos
  *                e o multiplexador custaria mais que eles);
@@ -115,6 +117,7 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
                 B.add(src[1]);
                 while (u.known.length <= op.slot) u.known.push(null);
                 u.known[op.slot] = u.known[op.slot] ? [meet(u.known[op.slot][0], kn[0]), meet(u.known[op.slot][1], kn[1])] : kn;
+                (u.ops ??= []).push({ me: op.me, kn });
             }
             for (const op of list) op.me.binding = `${key}#${op.slot}`;
         }
@@ -150,6 +153,26 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
             for (const b of slots.values()) { regBits += b; regs.push({ seg: seg.id, bits: b, kind: 'compartilhado' }); }
         }
     }
+    // Compartilhar só quando economiza: uma unidade por operação (com os bits conhecidos de cada uma) contra as
+    // instâncias compartilhadas com os multiplexadores de entrada, no custo do alvo (LUT + CARRY4 no FPGA, área no
+    // ASIC). A mesma regra vale para unidades exatas e aproximadas; com allocation, o limite manda.
+    const measure = (x) => (lib.target === 'fpga' ? (x.luts ?? 0) + (x.carry4 ?? 0) : x.area ?? 0);
+    for (const u of units.values()) {
+        if (u.perOp || !u.ops || u.ops.length <= u.count || design.allocation?.[u.cls]) continue;
+        const eff = (kn) => (kn ? lib.effective(u.unit, { a: kn[0], b: kn[1] }) : u.unit);
+        let shared = 0;
+        for (let k = 0; k < u.count; k++) {
+            shared += measure(eff(u.known[k]));
+            for (const side of [0, 1]) { const n = u.sources[k]?.[side].size ?? 0; if (n > 1) shared += measure(lib.mux(n, u.W)); }
+        }
+        const alone = u.ops.reduce((s, o) => s + measure(eff(o.kn)), 0);
+        if (alone > shared) continue;
+        u.perOp = true;
+        u.count = u.ops.length;
+        u.known = u.ops.map((o) => o.kn);
+        u.sources = [];
+        u.ops.forEach((o, k) => { o.me.binding = `${u.key}#${k}`; });
+    }
     // Multiplexadores de entrada das unidades compartilhadas.
     const muxes = [];
     for (const u of units.values()) {
@@ -181,7 +204,7 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
             return kn ? lib.effective(u.unit, { a: kn[0], b: kn[1] }) : u.unit;
         });
         const tot = (f) => insts.reduce((x, i) => x + (i[f] ?? 0), 0);
-        return { ...u, sources: undefined, known: undefined, area: tot('area'), luts: Math.round(tot('luts')), carry4: Math.round(tot('carry4')), leakage: tot('leakage'), fullLuts: u.count * u.unit.luts };
+        return { ...u, sources: undefined, known: undefined, ops: undefined, area: tot('area'), luts: Math.round(tot('luts')), carry4: Math.round(tot('carry4')), leakage: tot('leakage'), fullLuts: u.count * u.unit.luts };
     });
     const cellGroups = new Map();
     for (const { me } of opsCells) {

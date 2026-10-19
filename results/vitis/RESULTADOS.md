@@ -11,7 +11,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | Latência (ciclos), com pipeline | 57 | 0,8% | 0,3% |
 | Latência (ciclos), sem pipeline | 2 | 60,9% | 8,4% |
 | Latência (ciclos), todos | 59 | 2,8% | 0,6% |
-| LUT (Vivado) | 59 | 24,7% | 14,5% |
+| LUT (Vivado) | 59 | 24,7% | 14,8% |
 | FF (Vivado) | 59 | 33,9% | 20,7% |
 | Período (Vivado) | 59 | - | 17,6% |
 
@@ -163,42 +163,42 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | gauss_2p5ns_ir | 735 | 792 | 2285 | 903 | 70 | 123 | 703 | 784 | 3217 | 926 |
 | gauss_10ns_ir | 549 | 713 | 2160 | 700 | 70 | 135 | 225 | 518 | 1159 | 480 |
 | gauss_drum6_ir | 555 | 877 | 4422 | 886 | 51 | 147 | 309 | 635 | 2651 | 845 |
-| gauss_t8c_loa6_ir | 397 | 795 | 3879 | 917 | 19 | 141 | 234 | 635 | 2666 | 901 |
-| sobel_loa4_ir | 404 | 728 | 2400 | 758 | 35 | 117 | 180 | 516 | 1807 | 776 |
+| gauss_t8c_loa6_ir | 397 | 718 | 3879 | 917 | 28 | 141 | 234 | 635 | 2666 | 901 |
+| sobel_loa4_ir | 404 | 676 | 2400 | 758 | 37 | 117 | 180 | 516 | 1807 | 776 |
 | sharpen_kul_ir | 245 | 556 | 1773 | 590 | 23 | 101 | 88 | 455 | 1128 | 487 |
 | fir_t8c_loa11_ir | 1027 | 978 | 10117 | 1255 | 12 | - | 469 | 733 | 4784 | 806 |
 | dot_t4_ir | 140 | 124 | 917 | 167 | 12 | 28 | 73 | 89 | 501 | 169 |
-| gauss_dse_op40_ir | 355 | 709 | 3564 | 774 | 23 | 123 | 211 | 624 | 2329 | 788 |
+| gauss_dse_op40_ir | 355 | 689 | 3564 | 774 | 25 | 123 | 211 | 624 | 2329 | 788 |
 | fir_dse_op60_ir | 1161 | 1046 | 8715 | 1399 | 30 | 53 | 506 | 626 | 4777 | 1026 |
 | gauss_dse2_lut40_ir | 618 | 674 | 4143 | 861 | 30 | 173 | 546 | 616 | 2084 | 687 |
 | fir_dse2_lut60_ir | 709 | 845 | 7919 | 987 | 39 | 128 | 656 | 610 | 2444 | 648 |
 | gauss_drum6_lat0_ir | 749 | 877 | 3834 | 856 | 51 | 150 | 592 | 635 | 1181 | 621 |
-| gauss_t8c_loa6_lat0_ir | 730 | 795 | 3775 | 789 | 19 | 137 | 546 | 635 | 1682 | 616 |
-| sobel_loa4_lat0_ir | 691 | 728 | 2247 | 727 | 35 | 114 | 492 | 516 | 1390 | 607 |
+| gauss_t8c_loa6_lat0_ir | 730 | 718 | 3775 | 789 | 28 | 137 | 546 | 635 | 1682 | 616 |
+| sobel_loa4_lat0_ir | 691 | 676 | 2247 | 727 | 37 | 114 | 492 | 516 | 1390 | 607 |
 | sharpen_kul_lat0_ir | 530 | 556 | 1840 | 526 | 23 | 101 | 384 | 455 | 1015 | 458 |
 | fir_t8c_loa11_lat0_ir | 782 | 978 | 9442 | 632 | 12 | - | 519 | 733 | 1785 | 489 |
 | dot_t4_lat0_ir | 124 | 124 | 757 | 174 | 12 | 28 | 73 | 89 | 74 | 65 |
-| gauss_dse_op40_lat0_ir | 669 | 709 | 3550 | 727 | 23 | 123 | 507 | 624 | 1722 | 610 |
+| gauss_dse_op40_lat0_ir | 669 | 689 | 3550 | 727 | 25 | 123 | 507 | 624 | 1722 | 610 |
 | fir_dse_op60_lat0_ir | 938 | 1046 | 7811 | 806 | 30 | 50 | 556 | 626 | 1683 | 552 |
 | gauss_dse2_lut40_lat0_ir | 618 | 674 | 3933 | 826 | 30 | 173 | 546 | 616 | 1465 | 574 |
 | fir_dse2_lut60_lat0_ir | 709 | 845 | 7855 | 934 | 39 | 129 | 656 | 610 | 1785 | 531 |
 | gauss_drum6_inl_ir | 749 | 877 | 4044 | 1000 | 51 | 169 | 592 | 635 | 1275 | 645 |
-| gauss_t8c_loa6_inl_ir | 730 | 795 | 4133 | 867 | 19 | 162 | 546 | 635 | 2259 | 753 |
-| sobel_loa4_inl_ir | 691 | 728 | 2305 | 692 | 35 | 112 | 492 | 516 | 1508 | 613 |
+| gauss_t8c_loa6_inl_ir | 730 | 718 | 4133 | 867 | 28 | 162 | 546 | 635 | 2259 | 753 |
+| sobel_loa4_inl_ir | 691 | 676 | 2305 | 692 | 37 | 112 | 492 | 516 | 1508 | 613 |
 | sharpen_kul_inl_ir | 530 | 556 | 1847 | 531 | 23 | 101 | 384 | 455 | 1025 | 464 |
 | fir_t8c_loa11_inl_ir | 782 | 978 | 8789 | 686 | 12 | - | 519 | 733 | 6899 | 770 |
 | dot_t4_inl_ir | 124 | 124 | 821 | 166 | 12 | 30 | 73 | 89 | 409 | 143 |
-| gauss_dse_op40_inl_ir | 669 | 709 | 3519 | 727 | 23 | 125 | 507 | 624 | 1880 | 712 |
+| gauss_dse_op40_inl_ir | 669 | 689 | 3519 | 727 | 25 | 125 | 507 | 624 | 1880 | 712 |
 | fir_dse_op60_inl_ir | 938 | 1046 | 10762 | 1063 | 30 | 35 | 556 | 626 | 10844 | 1062 |
 | gauss_dse2_lut40_inl_ir | 618 | 674 | 3772 | 815 | 30 | 160 | 546 | 616 | 1670 | 646 |
 | fir_dse2_lut60_inl_ir | 709 | 845 | 8958 | 1025 | 39 | 85 | 656 | 610 | 7508 | 935 |
 | gauss_drum6_rtl_ir | 877 | 877 | 1921 | 806 | 51 | 120 | 635 | 635 | 1152 | 583 |
-| gauss_t8c_loa6_rtl_ir | 795 | 795 | 2043 | 638 | 19 | 111 | 635 | 635 | 1682 | 630 |
-| sobel_loa4_rtl_ir | 728 | 728 | 1986 | 667 | 35 | 112 | 516 | 516 | 1396 | 609 |
+| gauss_t8c_loa6_rtl_ir | 795 | 718 | 2043 | 638 | 28 | 111 | 635 | 635 | 1682 | 630 |
+| sobel_loa4_rtl_ir | 728 | 676 | 1986 | 667 | 37 | 112 | 516 | 516 | 1396 | 609 |
 | sharpen_kul_rtl_ir | 556 | 556 | 1640 | 497 | 23 | 94 | 455 | 455 | 1015 | 459 |
 | fir_t8c_loa11_rtl_ir | 978 | 978 | 3256 | 665 | 12 | 12 | 733 | 733 | 2089 | 487 |
 | dot_t4_rtl_ir | 124 | 124 | 118 | 116 | 12 | 13 | 89 | 89 | 74 | 64 |
-| gauss_dse_op40_rtl_ir | 709 | 709 | 1965 | 631 | 23 | 109 | 624 | 624 | 1690 | 603 |
+| gauss_dse_op40_rtl_ir | 709 | 689 | 1965 | 631 | 25 | 109 | 624 | 624 | 1690 | 603 |
 | fir_dse_op60_rtl_ir | 1046 | 1046 | 3256 | 729 | 30 | 28 | 626 | 626 | 2089 | 560 |
 | gauss_dse2_lut40_rtl_ir | 674 | 674 | 1939 | 650 | 30 | 118 | 616 | 616 | 1682 | 620 |
 | fir_dse2_lut60_rtl_ir | 845 | 845 | 3256 | 666 | 39 | 42 | 610 | 610 | 2089 | 547 |
@@ -212,42 +212,42 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | Caso | Economia na exportação | Economia modelo | Economia Vivado | LUT Vivado exato | LUT Vivado aprox. |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | gauss_drum6_ir | -1,1% | -16,6% | -21,5% | 729 | 886 |
-| gauss_t8c_loa6_ir | 27,7% | -5,7% | -25,8% | 729 | 917 |
-| sobel_loa4_ir | -0,7% | -6,6% | -12,5% | 674 | 758 |
+| gauss_t8c_loa6_ir | 27,7% | 4,5% | -25,8% | 729 | 917 |
+| sobel_loa4_ir | -0,7% | 1,0% | -12,5% | 674 | 758 |
 | sharpen_kul_ir | 8,2% | -2,4% | -19,0% | 496 | 590 |
 | fir_t8c_loa11_ir | 41,0% | 4,5% | -33,5% | 940 | 1255 |
 | dot_t4_ir | 9,7% | 9,5% | -50,5% | 111 | 167 |
-| gauss_dse_op40_ir | 35,3% | 5,7% | -6,2% | 729 | 774 |
+| gauss_dse_op40_ir | 35,3% | 8,4% | -6,2% | 729 | 774 |
 | fir_dse_op60_ir | 33,3% | -2,1% | -48,8% | 940 | 1399 |
 | gauss_dse2_lut40_ir | - | 10,4% | -18,1% | 729 | 861 |
 | fir_dse2_lut60_ir | - | 17,5% | -5,0% | 940 | 987 |
 | gauss_drum6_lat0_ir | - | -16,6% | -17,4% | 729 | 856 |
-| gauss_t8c_loa6_lat0_ir | - | -5,7% | -8,2% | 729 | 789 |
-| sobel_loa4_lat0_ir | - | -6,6% | -7,9% | 674 | 727 |
+| gauss_t8c_loa6_lat0_ir | - | 4,5% | -8,2% | 729 | 789 |
+| sobel_loa4_lat0_ir | - | 1,0% | -7,9% | 674 | 727 |
 | sharpen_kul_lat0_ir | - | -2,4% | -6,0% | 496 | 526 |
 | fir_t8c_loa11_lat0_ir | - | 4,5% | 32,8% | 940 | 632 |
 | dot_t4_lat0_ir | - | 9,5% | -56,8% | 111 | 174 |
-| gauss_dse_op40_lat0_ir | - | 5,7% | 0,3% | 729 | 727 |
+| gauss_dse_op40_lat0_ir | - | 8,4% | 0,3% | 729 | 727 |
 | fir_dse_op60_lat0_ir | - | -2,1% | 14,3% | 940 | 806 |
 | gauss_dse2_lut40_lat0_ir | - | 10,4% | -13,3% | 729 | 826 |
 | fir_dse2_lut60_lat0_ir | - | 17,5% | 0,6% | 940 | 934 |
 | gauss_drum6_inl_ir | - | -16,6% | -37,2% | 729 | 1000 |
-| gauss_t8c_loa6_inl_ir | - | -5,7% | -18,9% | 729 | 867 |
-| sobel_loa4_inl_ir | - | -6,6% | -2,7% | 674 | 692 |
+| gauss_t8c_loa6_inl_ir | - | 4,5% | -18,9% | 729 | 867 |
+| sobel_loa4_inl_ir | - | 1,0% | -2,7% | 674 | 692 |
 | sharpen_kul_inl_ir | - | -2,4% | -7,1% | 496 | 531 |
 | fir_t8c_loa11_inl_ir | - | 4,5% | 27,0% | 940 | 686 |
 | dot_t4_inl_ir | - | 9,5% | -49,5% | 111 | 166 |
-| gauss_dse_op40_inl_ir | - | 5,7% | 0,3% | 729 | 727 |
+| gauss_dse_op40_inl_ir | - | 8,4% | 0,3% | 729 | 727 |
 | fir_dse_op60_inl_ir | - | -2,1% | -13,1% | 940 | 1063 |
 | gauss_dse2_lut40_inl_ir | - | 10,4% | -11,8% | 729 | 815 |
 | fir_dse2_lut60_inl_ir | - | 17,5% | -9,0% | 940 | 1025 |
 | gauss_drum6_rtl_ir | - | -16,6% | -10,6% | 729 | 806 |
-| gauss_t8c_loa6_rtl_ir | - | -5,7% | 12,5% | 729 | 638 |
-| sobel_loa4_rtl_ir | - | -6,6% | 1,0% | 674 | 667 |
+| gauss_t8c_loa6_rtl_ir | - | 4,5% | 12,5% | 729 | 638 |
+| sobel_loa4_rtl_ir | - | 1,0% | 1,0% | 674 | 667 |
 | sharpen_kul_rtl_ir | - | -2,4% | -0,2% | 496 | 497 |
 | fir_t8c_loa11_rtl_ir | - | 4,5% | 29,3% | 940 | 665 |
 | dot_t4_rtl_ir | - | 9,5% | -4,5% | 111 | 116 |
-| gauss_dse_op40_rtl_ir | - | 5,7% | 13,4% | 729 | 631 |
+| gauss_dse_op40_rtl_ir | - | 8,4% | 13,4% | 729 | 631 |
 | fir_dse_op60_rtl_ir | - | -2,1% | 22,4% | 940 | 729 |
 | gauss_dse2_lut40_rtl_ir | - | 10,4% | 10,8% | 729 | 650 |
 | fir_dse2_lut60_rtl_ir | - | 17,5% | 29,1% | 940 | 666 |
@@ -260,19 +260,19 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 
 | Exportação | Casos | Erro médio | Mesmo sentido | Maior economia medida |
 | --- | ---: | ---: | ---: | ---: |
-| INLINE off (o Vitis divide a netlist em estágios) | 10 | 25,5 p.p. | 5 de 10 | -5,0% |
-| combinacional (INLINE off, LATENCY 0) | 10 | 16,5 p.p. | 6 de 10 | 32,8% |
-| em linha (INLINE) | 10 | 18,9 p.p. | 6 de 10 | 27,0% |
-| RTL (caixa preta) | 14 | 9,4 p.p. | 10 de 14 | 69,4% |
+| INLINE off (o Vitis divide a netlist em estágios) | 10 | 27,5 p.p. | 3 de 10 | -5,0% |
+| combinacional (INLINE off, LATENCY 0) | 10 | 18,6 p.p. | 4 de 10 | 32,8% |
+| em linha (INLINE) | 10 | 20,2 p.p. | 4 de 10 | 27,0% |
+| RTL (caixa preta) | 14 | 7,9 p.p. | 12 de 14 | 69,4% |
 
 #### Unidades aproximadas no Vivado (funções com INLINE off): instâncias, LUT e FF por instância
 
 | Caso | Unidade | Inst. Vivado | Inst. modelo | LUT Vivado | LUT modelo | FF Vivado |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | gauss_drum6_ir | MUL8_DRUM6 | 3 | 5 | 87 | 38 | 53 |
-| gauss_t8c_loa6_ir | ADD16_LOA6 | 4 | 4 | 65 | 14 | 43 |
+| gauss_t8c_loa6_ir | ADD16_LOA6 | 4 | 8 | 65 | 13 | 43 |
 | gauss_t8c_loa6_ir | MUL8_T8_C | 3 | 5 | 26 | 7 | 33 |
-| sobel_loa4_ir | ADD16_LOA4 | 3 | 3 | 40 | 8 | 30 |
+| sobel_loa4_ir | ADD16_LOA4 | 3 | 5 | 40 | 7 | 30 |
 | sharpen_kul_ir | MUL8_KUL | 1 | 1 | 46 | 14 | 20 |
 | fir_t8c_loa11_ir | ADD16_LOA11 | 14 | 11 | 6 | 12 | 9 |
 | fir_t8c_loa11_ir | ADD32_ADD16_LOA11_ADD16_exato | 4 | 4 | 12 | 11 | 15 |
@@ -280,7 +280,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | dot_t4_ir | MUL8_T4 | 1 | 1 | 120 | 76 | 102 |
 | gauss_dse_op40_ir | ADD16_LOA10 | 1 | 1 | 32 | 12 | 16 |
 | gauss_dse_op40_ir | ADD16_LOA7 | 1 | 1 | 15 | 11 | 15 |
-| gauss_dse_op40_ir | ADD16_LOA8 | 2 | 2 | 38 | 13 | 34 |
+| gauss_dse_op40_ir | ADD16_LOA8 | 2 | 3 | 38 | 13 | 34 |
 | gauss_dse_op40_ir | ADD16_LOA9 | 1 | 1 | 27 | 13 | 16 |
 | gauss_dse_op40_ir | MUL8_T6_A4c | 1 | 1 | 4 | 7 | 6 |
 | gauss_dse_op40_ir | MUL8_T8_C | 2 | 4 | 26 | 8 | 38 |
@@ -427,5 +427,5 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 
 ### Resíduos depois da calibração
 
-Medianas: iteração de laço sequencial, Vitis menos modelo, 5 ciclos; entrada e saída do pipeline no Vitis (latência menos profundidade menos N menos 1 vezes o II) -1 ciclos; LUT Vivado / modelo 0,98; FF 1,05; latência Vitis / modelo 1,000; período Vivado / modelo 1,13. Valores em `results/vitis/calibracao.json`, com as constantes do modelo (`MODEL` em `js/hls/sched.js`).
+Medianas: iteração de laço sequencial, Vitis menos modelo, 5 ciclos; entrada e saída do pipeline no Vitis (latência menos profundidade menos N menos 1 vezes o II) -1 ciclos; LUT Vivado / modelo 0,99; FF 1,05; latência Vitis / modelo 1,000; período Vivado / modelo 1,13. Valores em `results/vitis/calibracao.json`, com as constantes do modelo (`MODEL` em `js/hls/sched.js`).
 

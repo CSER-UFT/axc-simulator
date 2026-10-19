@@ -1,7 +1,7 @@
 {
  "sequentialIterResidual": 5,
  "pipelineOverheadVitis": -1,
- "lutScale": 0.976054732041049,
+ "lutScale": 0.9866863905325444,
  "ffScale": 1.0504774897680764,
  "cycleRatio": 1.0000415403148757,
  "periodScale": 1.127918529557874,

@@ -36,8 +36,10 @@ test('dse: as quatro heurísticas no gaussiano, com verificação bit a bit', ()
         assert.ok(r.chosen.measured[0].PSNR >= 40 && r.chosen.outs[0].PSNR >= 40);
         assert.ok(r.chosen.score < res.refScore);
     }
-    // Por classe, a exaustiva é o ótimo do modelo: nenhuma outra acha ponto viável mais barato.
-    for (const h of ['sequential', 'efficiency', 'random']) assert.ok(by.exhaustive.best.score <= by[h].best.score + 1e-9, h);
+    // Por classe, a exaustiva com poda não perde para a sequencial nem para a aleatória. A poda é heurística (o erro de
+    // uma combinação não é monótono no erro de cada grupo, porque erros de sinais opostos se compensam): a eficiência
+    // pode achar um ponto que a poda descartou.
+    for (const h of ['sequential', 'random']) assert.ok(by.exhaustive.best.score <= by[h].best.score + 1e-9, h);
     // Fronteira: custo crescente, erro decrescente.
     const f = paretoPoints(by.efficiency.points);
     for (let k = 1; k < f.length; k++) assert.ok(f[k].score >= f[k - 1].score && f[k].err < f[k - 1].err);

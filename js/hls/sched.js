@@ -54,9 +54,12 @@ export function scheduleSegment(seg, ctx) {
             else unit = name ? lib.unitByName(name) : lib.exactUnit(cls, W);
             if (name && (unit.cfg.kind !== (cls === 'mul' ? 'mul' : 'add') || unit.cfg.width !== W)) throw new Error(`${n.id}: ${name} não serve para uma operação ${cls} de ${W} bits`);
             delay = unit.delay;
-            // Como no Vitis: somador exato e multiplicação exata por constante não são compartilhados (o multiplexador
-            // custaria quase o mesmo que a unidade), a não ser com allocation. As unidades aproximadas (funções) são.
-            noShare = !name && !ctx.allocation?.[cls] && (cls === 'add' || !!unit.constMul);
+            // A mesma regra para unidades exatas e aproximadas: somadores e multiplicações por constante não são
+            // compartilhados (os multiplexadores das duas entradas custam tanto quanto o somador, e um multiplicador
+            // por constante compartilhado deixa de ser por constante), a não ser com allocation. As multiplicações
+            // são compartilhadas quando isso economiza (decidido na ligação, com o custo de cada instância e dos
+            // multiplexadores).
+            noShare = !ctx.allocation?.[cls] && (cls === 'add' || !!unit.constMul);
         } else if (['cmp', 'mux', 'logic'].includes(cls)) { unit = lib.cell(cls, W); delay = unit.delay; }
         const k = delay > Tc ? Math.ceil((delay + overhead) / clockPs) : 1;
         // Recurso: o banco de memória, ou o tipo de unidade (exatas e aproximadas da mesma largura não se misturam).
