@@ -18,8 +18,9 @@ test('dse: variantes de diretivas e candidatas na fronteira de Pareto', () => {
     for (const g of groups) {
         assert.equal(g.cands[0], g.exact);
         assert.ok(g.cands.length < g.all);
-        // Nenhuma candidata é dominada por outra (área da unidade e erro próprio).
-        const area = (n) => p.base.lib.unitByName(n).area;
+        // Nenhuma candidata é dominada por outra (economia no contexto e erro próprio), e todas economizam e erram.
+        const area = (n) => g.costOf.get(n);
+        for (const a of g.cands.slice(1)) assert.ok(area(a) < 0 && g.ownOf.get(a) > 0, a);
         for (const a of g.cands.slice(1)) for (const b of g.cands) {
             if (a === b) continue;
             assert.ok(!(area(b) <= area(a) && g.ownOf.get(b) <= g.ownOf.get(a) && (area(b) < area(a) || g.ownOf.get(b) < g.ownOf.get(a))), `${b} domina ${a}`);
@@ -36,10 +37,8 @@ test('dse: as quatro heurísticas no gaussiano, com verificação bit a bit', ()
         assert.ok(r.chosen.measured[0].PSNR >= 40 && r.chosen.outs[0].PSNR >= 40);
         assert.ok(r.chosen.score < res.refScore);
     }
-    // Por classe, a exaustiva com poda não perde para a sequencial nem para a aleatória. A poda é heurística (o erro de
-    // uma combinação não é monótono no erro de cada grupo, porque erros de sinais opostos se compensam): a eficiência
-    // pode achar um ponto que a poda descartou.
-    for (const h of ['sequential', 'random']) assert.ok(by.exhaustive.best.score <= by[h].best.score + 1e-9, h);
+    // Por classe, as combinações cabem no limite e a exaustiva não poda: é o ótimo do modelo entre as candidatas.
+    for (const h of ['sequential', 'efficiency', 'random']) assert.ok(by.exhaustive.best.score <= by[h].best.score + 1e-9, h);
     // Fronteira: custo crescente, erro decrescente.
     const f = paretoPoints(by.efficiency.points);
     for (let k = 1; k < f.length; k++) assert.ok(f[k].score >= f[k - 1].score && f[k].err < f[k - 1].err);

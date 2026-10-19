@@ -123,7 +123,18 @@ function evaluate(v, assign, ctx) {
     return p;
 }
 
-/** Grupos de operações e as unidades candidatas de cada um. */
+/**
+ * Grupos de operações e as unidades candidatas de cada um.
+ *
+ * Candidatas: em cada grupo, as unidades da fronteira de Pareto entre a economia no contexto e o erro próprio nas
+ * operações do grupo. A economia no contexto é a do projeto inteiro com só aquele grupo trocado (síntese: a unidade
+ * com os bits conhecidos de cada operação, o compartilhamento e os multiplexadores), não a da unidade isolada na
+ * biblioteca, que pode ordenar as unidades de outro jeito (um truncado fica mais barato que um LOA no contexto e não
+ * na tabela). Saem também as unidades que não erram em nenhuma amostra das operações do grupo: com os mesmos
+ * resultados nos operandos reais (por exemplo, um segmentado com a divisão nos bits altos que são sempre zero), a
+ * síntese faz delas o mesmo circuito do exato, e qualquer diferença de custo seria ruído do modelo. Com allUnits,
+ * ficam todas as que economizam sozinhas.
+ */
 export function groupsOf(v, { granularity = 'class', objective = 'area', weights, allUnits = false } = {}) {
     const ops = v.base.ops.list.filter((o) => o.candidates.length > 1);
     const by = new Map();
@@ -132,32 +143,27 @@ export function groupsOf(v, { granularity = 'class', objective = 'area', weights
         if (!by.has(k)) by.set(k, []);
         by.get(k).push(o);
     }
-    const lib = v.base.lib;
-    const w = { area: 1, energy: 1, latency: 1, ...weights };
-    const unitCost = (name, ex) => {
-        const u = lib.unitByName(name);
-        switch (objective) {
-            case 'luts': return u.luts + u.carry4;
-            case 'energy': return u.energy;
-            case 'latency': case 'interval': return u.delay;
-            case 'weighted': return w.area * (u.area / ex.area) + w.energy * (u.energy / ex.energy) + w.latency * (u.delay / ex.delay);
-            default: return u.area;
-        }
-    };
+    const score = scoreFn(objective, weights, costOf(v.base));
+    const base = score(costOf(v.base));
     const groups = [];
     for (const [key, list] of by) {
         const names = list[0].candidates.filter((n) => list.every((o) => o.candidates.includes(n)));
-        const ex = lib.unitByName(names[0]);
-        const rows = names.map((name) => {
-            const own = name === names[0] ? 0 : list.reduce((s, o) => s + unitErrors(v.base, v.prof.stats, new Map([[o.id, name]]), v.ownCache).get(o.id).m2, 0);
-            return { name, cost: unitCost(name, ex), own };
-        });
-        // Fronteira de Pareto (custo da unidade, erro próprio no grupo); a exata fica sempre.
+        const rows = [{ name: names[0], cost: 0, own: 0 }];
+        for (const name of names.slice(1)) {
+            const errs = unitErrors(v.base, v.prof.stats, new Map(list.map((o) => [o.id, name])), v.ownCache);
+            const own = list.reduce((s, o) => s + errs.get(o.id).m2, 0);
+            if (own === 0) continue; // equivalente ao exato nos operandos reais
+            const a = new Map(list.map((o) => [o.id, name]));
+            const cost = score(costOf(synthesize(v.src, { ...v.syn, design: v.design, assign: a }))) - base;
+            if (cost >= 0) continue; // não economiza nem sozinha
+            rows.push({ name, cost, own });
+        }
+        // Fronteira de Pareto (custo no contexto, erro próprio); a exata fica sempre.
         const front = allUnits ? rows : rows.filter((a, i) => i === 0 || !rows.some((b) => b !== a && b.cost <= a.cost && b.own <= a.own && (b.cost < a.cost || b.own < a.own)));
-        // A exata primeiro (ela fica mesmo dominada, como referência); as outras em ordem de erro próprio.
+        // A exata primeiro (referência); as outras em ordem de erro próprio.
         front.sort((a, b) => (b.name === names[0]) - (a.name === names[0]) || a.own - b.own || a.cost - b.cost);
         const label = granularity === 'op' ? `${list[0].id} (${list[0].text})` : granularity === 'source' ? `${list[0].id} (${list[0].text})${list.length > 1 ? ` e ${list.length - 1} cópia${list.length > 2 ? 's' : ''}` : ''}` : granularity === 'line' ? `linha ${list[0].node.line}, ${list[0].cls}${list[0].W}` : key;
-        groups.push({ key, label, cls: list[0].cls, W: list[0].W, line: list[0].node.line, ops: list, exact: names[0], cands: front.map((x) => x.name), all: names.length, ownOf: new Map(front.map((x) => [x.name, x.own])) });
+        groups.push({ key, label, cls: list[0].cls, W: list[0].W, line: list[0].node.line, ops: list, exact: names[0], cands: front.map((x) => x.name), all: names.length, ownOf: new Map(front.map((x) => [x.name, x.own])), costOf: new Map(front.map((x) => [x.name, x.cost])) });
     }
     return groups;
 }
@@ -293,8 +299,12 @@ function efficiency(v, groups, ctx, { granularity, fullBelow = 400, refresh = 40
 function exhaustive(v, groups, ctx, { maxCombos = 20000, frontEvals = 3000 }) {
     const exact = evaluate(v, expand(groups, groups.map((g) => g.exact)), ctx);
     step(ctx, { kind: 'start', state: stateOf(exact) });
-    // Poda: em cada grupo, as unidades (em ordem de erro próprio) até a primeira que sozinha já viola a restrição.
-    const lists = groups.map((g, i) => {
+    // Sem poda quando todas as combinações cabem no limite: a exaustiva é então o ótimo do modelo entre as candidatas.
+    // Com mais, a poda: em cada grupo, as unidades (em ordem de erro próprio) até a primeira que sozinha já viola a
+    // restrição. A poda é heurística, porque erros de sinais opostos se compensam (um somador truncado, que erra para
+    // baixo, com um multiplicador com compensação, que erra para cima).
+    const full = groups.reduce((s, g) => s * g.cands.length, 1);
+    const lists = full <= maxCombos ? groups.map((g) => g.cands) : groups.map((g, i) => {
         const keep = [g.exact];
         const tries = [];
         let cut = null;
