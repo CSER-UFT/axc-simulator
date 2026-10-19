@@ -69,7 +69,7 @@ export const sections = [
     <li>exact multiplication by a constant as a sum of shifts (signed digit representation), not shared, as Vitis does; exact adders are not shared either; approximate units and multiplications between variables are;</li>
     <li>multiplexers at the inputs of shared units, registers for the lifetime of each value (with chains of 3 or more stages in SRLs on FPGA), loop counters, addresses and bank selection.</li>
 </ul>
-<p>The <strong>Model and limitations</strong> box, at the end of the tab, lists the assumptions with the numbers of the cells used. Over the 55 validation cases, the mean model error against Vivado is 0.3% for pipelined latency, 8% without pipelining, 15% for LUTs, 18% for FFs and about 18% for the period (details in the validation section). The numbers are meant to compare designs with each other; the final decision needs the full synthesis.</p>`,
+<p>The <strong>Model and limitations</strong> box, at the end of the tab, lists the assumptions with the numbers of the cells used. Over the 59 validation cases, the mean model error against Vivado is 0.3% for pipelined latency, 8% without pipelining, 15% for LUTs, 21% for FFs and about 18% for the period (details in the validation section). The numbers are meant to compare designs with each other; the final decision needs the full synthesis.</p>`,
     },
     {
         id: 'hls-sched',
@@ -122,8 +122,8 @@ export const sections = [
     <tr><td><code>_inl</code></td><td>the function inlined (<code>INLINE</code>)</td><td>Vitis optimizes the netlist together with the rest</td></tr>
     <tr><td><code>_rtl</code></td><td>RTL blackbox (<code>add_files -blackbox</code>) with the library Verilog</td><td>Vivado synthesizes exactly the characterized unit</td></tr>
 </table>
-<p>The RTL blackbox is the reference form: it reproduces the characterized unit and is the one the model describes best (the predicted saving errs by 11.7 percentage points on average, against 16.5 for the best C++ form). Measured this way, 7 of the 10 approximate designs are smaller than the exact one, up to 29% for the FIR. A limitation: Vitis does not know the blackbox delay and chains it as if it were instantaneous, so the Vivado period may get worse (7.0 ns for the Gaussian with DRUM6).</p>
-<p>In the 55 cases of the three rounds, the Vitis csim gives the same output as the bit exact execution of the simulator at every position. The reports are in <code>results/vitis/</code>, and <code>node scripts/vitis.mjs compare</code> redoes the comparison with the current model without Vitis. The full analysis, round by round, is in <code>docs/METODOLOGIA.md</code>, section 6.</p>`,
+<p>The RTL blackbox is the reference form: it reproduces the characterized unit and is the one the model describes best (the predicted saving errs by 9.4 percentage points on average over the 14 designs measured this way, against 16.5 for the best C++ form). In the fourth round, four points chosen by the exploration with the current model were 9% to 69% smaller than the exact design, with the predicted saving 3.6 points from the measured one on average; but the model does not reliably rank neighboring points of the front, so it is worth measuring the two or three cheapest. A limitation: Vitis does not know the blackbox delay and chains it as if it were instantaneous, so the Vivado period may get worse (7.0 ns for the Gaussian with DRUM6).</p>
+<p>In the 59 cases of the four rounds, the Vitis csim gives the same output as the bit exact execution of the simulator at every position. The reports are in <code>results/vitis/</code>, and <code>node scripts/vitis.mjs compare</code> redoes the comparison with the current model without Vitis. The full analysis, round by round, is in <code>docs/METODOLOGIA.md</code>, section 6.</p>`,
     },
     {
         id: 'hls-cli',

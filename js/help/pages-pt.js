@@ -70,7 +70,7 @@ export const sections = [
     <li>multiplicação exata por constante como soma de deslocamentos (dígitos em representação com sinal), sem compartilhamento, como o Vitis faz; somadores exatos também não são compartilhados; as unidades aproximadas e as multiplicações entre variáveis são;</li>
     <li>multiplexadores na entrada das unidades compartilhadas, registradores pela vida de cada valor (com as cadeias de 3 ou mais estágios em SRL no FPGA), contadores dos laços, endereços e escolha de banco.</li>
 </ul>
-<p>O quadro <strong>Modelo e limitações</strong>, no fim da aba, lista as hipóteses com os números das células usadas. Nos 55 casos da validação, o erro médio do modelo contra o Vivado é de 0,3% na latência com pipeline, 8% sem pipeline, 15% nas LUTs, 18% nos FFs e cerca de 18% no período (detalhes na seção de validação). Os números servem para comparar projetos entre si; a decisão final pede a síntese completa.</p>`,
+<p>O quadro <strong>Modelo e limitações</strong>, no fim da aba, lista as hipóteses com os números das células usadas. Nos 59 casos da validação, o erro médio do modelo contra o Vivado é de 0,3% na latência com pipeline, 8% sem pipeline, 15% nas LUTs, 21% nos FFs e cerca de 18% no período (detalhes na seção de validação). Os números servem para comparar projetos entre si; a decisão final pede a síntese completa.</p>`,
     },
     {
         id: 'hls-sched',
@@ -123,8 +123,8 @@ export const sections = [
     <tr><td><code>_inl</code></td><td>a função em linha (<code>INLINE</code>)</td><td>o Vitis otimiza a netlist junto com o resto</td></tr>
     <tr><td><code>_rtl</code></td><td>caixa preta de RTL (<code>add_files -blackbox</code>) com o Verilog da biblioteca</td><td>o Vivado sintetiza exatamente a unidade caracterizada</td></tr>
 </table>
-<p>A caixa preta de RTL é a forma de referência: é a que reproduz a unidade caracterizada e a que o modelo descreve melhor (a economia prevista erra em média 11,7 pontos percentuais, contra 16,5 da melhor forma em C++). Medidos assim, 7 dos 10 projetos aproximados ficam menores que o exato, até 29% no FIR. Uma limitação: o Vitis não conhece o atraso da caixa preta e encadeia como se ela fosse instantânea, então o período do Vivado pode piorar (7,0 ns no gaussiano com DRUM6).</p>
-<p>Nos 55 casos das três rodadas, a csim do Vitis dá a mesma saída que a execução bit a bit do simulador em todas as posições. Os relatórios ficam em <code>results/vitis/</code>, e <code>node scripts/vitis.mjs compare</code> refaz a comparação com o modelo atual sem precisar do Vitis. A análise completa, rodada a rodada, está em <code>docs/METODOLOGIA.md</code>, seção 6.</p>`,
+<p>A caixa preta de RTL é a forma de referência: é a que reproduz a unidade caracterizada e a que o modelo descreve melhor (a economia prevista erra em média 9,4 pontos percentuais nos 14 projetos medidos assim, contra 16,5 da melhor forma em C++). Na quarta rodada, quatro pontos escolhidos pela exploração com o modelo atual ficaram de 9% a 69% menores que o exato, com a economia prevista a 3,6 pontos da medida, em média; mas o modelo não ordena com segurança pontos vizinhos da fronteira, então vale medir os dois ou três mais baratos. Uma limitação: o Vitis não conhece o atraso da caixa preta e encadeia como se ela fosse instantânea, então o período do Vivado pode piorar (7,0 ns no gaussiano com DRUM6).</p>
+<p>Nos 59 casos das quatro rodadas, a csim do Vitis dá a mesma saída que a execução bit a bit do simulador em todas as posições. Os relatórios ficam em <code>results/vitis/</code>, e <code>node scripts/vitis.mjs compare</code> refaz a comparação com o modelo atual sem precisar do Vitis. A análise completa, rodada a rodada, está em <code>docs/METODOLOGIA.md</code>, seção 6.</p>`,
     },
     {
         id: 'hls-cli',
