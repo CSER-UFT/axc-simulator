@@ -69,7 +69,7 @@ O erro de um valor é o aproximado menos o exato. Para cada nó do DFG, o modelo
 
 **Interna (os modelos).**
 * O custo é de pré síntese: sem posicionamento, roteamento, fios e árvore de relógio. As constantes de laço, memória e partição, a multiplicação por constante e a lógica de memória foram calibradas com o Vitis HLS e o Vivado (seção 6), em cinco kernels; fora deles (outras partições, laços imperfeitos, `if`) a calibração não foi conferida.
-* No FPGA, as LUTs e os atrasos das unidades vêm da síntese fora de contexto no Vivado (sem posicionamento), e o período previsto ainda fica cerca de 19% abaixo do obtido depois do roteamento. A economia de LUTs prevista para um projeto aproximado erra em média 16 pontos percentuais e o sentido em 4 de 10 casos (seção 6): no FPGA, o modelo serve para descartar aproximações que não economizam, não para garantir a economia de um ponto; o ponto escolhido deve ser medido no Vivado. A netlist de uma unidade passada pelo Vitis pode custar mais que o mesmo Verilog no Vivado (o MUL8 T4, cerca do dobro).
+* No FPGA, as LUTs e os atrasos das unidades vêm da síntese fora de contexto no Vivado (sem posicionamento), e o período previsto fica em média 18% longe do obtido depois do roteamento, quase sempre abaixo (mediana do Vivado sobre o modelo: 1,13). Com as unidades como caixa preta de RTL, a forma de referência, a economia de LUTs prevista para um projeto aproximado erra em média 11,7 pontos percentuais e o sentido (economiza ou não) bate em 6 de 10 casos (seção 6): no FPGA, o modelo serve para descartar aproximações que não economizam e para ordenar os candidatos, não para garantir a economia de um ponto; o ponto escolhido deve ser medido no Vivado. Com a netlist reescrita em C++, a unidade passada pelo Vitis pode custar mais que o mesmo Verilog no Vivado (o MUL8 T4, cerca do dobro). Com a caixa preta, o Vitis não conhece o atraso da unidade e o período medido não valida o modelo de atraso.
 * A energia das unidades é a de entradas uniformes; com os dados de uma aplicação ela pode mudar bastante (na biblioteca, a vantagem de energia do MUL8 DRUM3 cai de 63% para 7% com os operandos da LeNet-5). A biblioteca já tem a energia com os operandos da LeNet-5 e do filtro, mas o modelo de HLS ainda não a usa.
 * O modelo de erro supõe, entre trechos, erros independentes e normais. Somadores truncados ou segmentados dentro de um acumulador são estimados como se o acumulador tivesse bits baixos quaisquer, o que superestima o erro do truncado (até cerca de 13 vezes no produto escalar). A verificação bit a bit corrige a decisão final, mas a busca pode descartar pontos bons nesses casos.
 * A poda da exaustiva é heurística; a gulosa de eficiência pode parar num mínimo local.
@@ -122,7 +122,7 @@ Daqui em diante, a forma de exportação de referência para medir unidades apro
 ## 7. Como reproduzir
 
 ```
-npm test                               # 59 testes, inclusive execução exata contra referência e precisão do modelo
+npm test                               # 62 testes, inclusive execução exata contra referência e precisão do modelo
 npm run experiments                    # estudos de caso E1 a E7, saída em results/ (cerca de 15 a 30 min)
 node scripts/experiments.mjs --only E2 # só um experimento
 node scripts/experiments.mjs --quick   # versão reduzida, para conferir o ambiente (menos de 1 min)

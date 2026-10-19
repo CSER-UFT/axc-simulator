@@ -1,6 +1,6 @@
 # Resultados dos estudos de caso
 
-Gerado por `scripts/experiments.mjs` em 2026-10-18 (commit daecf30, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
+Gerado por `scripts/experiments.mjs` em 2026-10-19 (commit 53c494e, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
 
 ### E1. Precisão do modelo estático de erro
 
@@ -83,14 +83,14 @@ Objetivo: área ASIC; restrição: PSNR mínimo (estimado na busca, conferido bi
 
 | Heurística | Grupos | Avaliações | Tempo (s) |
 | --- | --- | ---: | ---: |
-| Sequencial | classe | 31 | 0,5 |
-| Sequencial | operação | 189 | 1,5 |
-| Eficiência | classe | 145 | 1,4 |
-| Eficiência | operação | 2062 | 19,8 |
-| Exaustiva | classe | 378 | 2,8 |
-| Exaustiva | operação | 1180 | 14,7 |
-| Aleatória | classe | 74 | 0,7 |
-| Aleatória | operação | 153 | 1,6 |
+| Sequencial | classe | 31 | 0,4 |
+| Sequencial | operação | 189 | 1,4 |
+| Eficiência | classe | 145 | 1,2 |
+| Eficiência | operação | 2062 | 17,9 |
+| Exaustiva | classe | 378 | 2,4 |
+| Exaustiva | operação | 1180 | 14,6 |
+| Aleatória | classe | 74 | 0,6 |
+| Aleatória | operação | 153 | 1,5 |
 
 Verificação: o primeiro ponto (o mais barato estimado como viável) passou na execução bit a bit em 90 de 90 casos; nos outros, a busca verificou em média 0,0 pontos até achar um que passa (no máximo 1).
 
@@ -177,5 +177,5 @@ SSIM padrão (janela gaussiana 11 × 11, σ = 1,5) na saída de imagem, com a im
 | sharpen | 0,98 | 9 | 0,4% | 1,0000 | 1,0000 | ∞ | 1 |
 | sharpen | 0,99 | 9 | 0,4% | 1,0000 | 1,0000 | ∞ | 1 |
 
-Tempo total: 991 s.
+Tempo total: 844 s.
 

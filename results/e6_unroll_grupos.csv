@@ -1,7 +1,7 @@
 kernel,granularity,psnr_min,groups,evaluations,ms,area_saving,psnr_measured,approx_ops,copy_groups,asymmetric_groups,units
-gauss,op,40,26,1506,32281,0.343876,41.0769,22,13,10,4 × ADD16 exato + 2 × MUL8 A2c + 1 × MUL8 T8 +C + 1 × ADD16 LOA8 + 1 × MUL8 T8 A8c + 1 × ADD16 TRUNC8 + 1 × MUL8 KUL6 + 1 × ADD16 LOA10 + 1 × ADD16 LOA7 + 1 × ADD16 LOA3 + 1 × ADD16 LOA2 + 1 × ADD16 LOA6 + 1 × ADD16 LOA9 + 1 × ADD16 SEG L6 P12 + 1 × MUL8 T6 A4c + 1 × ADD16 LOA4 + 1 × ADD16 LOA11 + 1 × ADD16 SEG L6 P14
-gauss,source,40,13,1925,54821,0.349017,40.1561,24,13,0,2 × ADD16 exato + 1 × MUL8 T6 A10c + 2 × MUL8 T6 A4c + 1 × ADD16 LOA9 + 1 × MUL8 T8 +C + 6 × ADD16 LOA7 + 1 × MUL8 T6 +C
-sobel,op,40,26,603,11148,0.0678691,41.0079,6,13,5,20 × ADD16 exato + 1 × ADD16 LOA2 + 1 × ADD16 LOA3 + 1 × ADD16 LOA6 + 1 × ADD16 LOA4 + 1 × ADD16 SEG L12 P6 + 1 × ADD16 LOA7
-sobel,source,40,13,14,2292,0,Infinity,0,13,0,26 × ADD16 exato
-sharpen,op,40,10,36,1346,0.00434772,Infinity,2,5,1,8 × ADD16 exato + 1 × MUL8 KUL + 1 × MUL8 KUL14
-sharpen,source,40,5,7,795,0,Infinity,0,5,0,2 × ×5 (1 soma) + 8 × ADD16 exato
+gauss,op,40,26,1506,24668,0.343876,41.0769,22,13,10,4 × ADD16 exato + 2 × MUL8 A2c + 1 × MUL8 T8 +C + 1 × ADD16 LOA8 + 1 × MUL8 T8 A8c + 1 × ADD16 TRUNC8 + 1 × MUL8 KUL6 + 1 × ADD16 LOA10 + 1 × ADD16 LOA7 + 1 × ADD16 LOA3 + 1 × ADD16 LOA2 + 1 × ADD16 LOA6 + 1 × ADD16 LOA9 + 1 × ADD16 SEG L6 P12 + 1 × MUL8 T6 A4c + 1 × ADD16 LOA4 + 1 × ADD16 LOA11 + 1 × ADD16 SEG L6 P14
+gauss,source,40,13,1925,36134,0.349017,40.1561,24,13,0,2 × ADD16 exato + 1 × MUL8 T6 A10c + 2 × MUL8 T6 A4c + 1 × ADD16 LOA9 + 1 × MUL8 T8 +C + 6 × ADD16 LOA7 + 1 × MUL8 T6 +C
+sobel,op,40,26,603,9760,0.0678691,41.0079,6,13,5,20 × ADD16 exato + 1 × ADD16 LOA2 + 1 × ADD16 LOA3 + 1 × ADD16 LOA6 + 1 × ADD16 LOA4 + 1 × ADD16 SEG L12 P6 + 1 × ADD16 LOA7
+sobel,source,40,13,14,2178,0,Infinity,0,13,0,26 × ADD16 exato
+sharpen,op,40,10,36,861,0.00434772,Infinity,2,5,1,8 × ADD16 exato + 1 × MUL8 KUL + 1 × MUL8 KUL14
+sharpen,source,40,5,7,598,0,Infinity,0,5,0,2 × ×5 (1 soma) + 8 × ADD16 exato
