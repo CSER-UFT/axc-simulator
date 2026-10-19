@@ -1,19 +1,19 @@
 # Validação contra o Vitis HLS e o Vivado
 
-Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-1. Cada caso é o mesmo projeto no simulador e no Vitis HLS 2022.2 (o C++ exportado do projeto elaborado, `_ir`, ou o código original, `_src`), com multiplicadores na lógica (sem DSP). LUT e FF do modelo vêm da síntese das unidades (Yosys `synth_xilinx`, ou o Vivado quando há data/vivado-units.json), mais as peças do modelo (multiplexadores, comparadores, registradores, contadores e a seleção de banco). A referência de recursos e de período é o Vivado depois do roteamento; a estimativa do csynth fica na tabela só para comparação. "Exportação" é a previsão feita quando o caso foi gerado (o modelo antes da primeira rodada, nos 23 primeiros casos; o calibrado com a primeira rodada, nos da segunda); "modelo" é o atual, para as mesmas atribuições de unidades, com LUT, CARRY4 e atrasos das unidades caracterizadas no Vivado (data/vivado-units.json).
+Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-1. Cada caso é o mesmo projeto no simulador e no Vitis HLS 2022.2 (o C++ exportado do projeto elaborado, `_ir`, ou o código original, `_src`), com multiplicadores na lógica (sem DSP). LUT e FF do modelo vêm da síntese das unidades (Yosys `synth_xilinx`, ou o Vivado quando há data/vivado-units.json), mais as peças do modelo (multiplexadores, comparadores, registradores, contadores e a seleção de banco). A referência de recursos e de período é o Vivado depois do roteamento; a estimativa do csynth fica na tabela só para comparação. "Exportação" é a previsão feita quando o caso foi gerado (o modelo antes da primeira rodada, nos 23 primeiros casos; o calibrado com a primeira rodada, nos da segunda); "modelo" é o atual, para as mesmas atribuições de unidades, com LUT, CARRY4 e atrasos das unidades caracterizadas no Vivado (data/vivado-units.json).
 
-55 de 55 casos com relatório do csynth; 55 com o Vivado (impl); 55 com csim.
+59 de 59 casos com relatório do csynth; 59 com o Vivado (impl); 59 com csim.
 
 #### Erro médio do modelo (desvio relativo médio entre o modelo e a medida)
 
 | Grandeza | Casos | Exportação | Modelo |
 | --- | ---: | ---: | ---: |
-| Latência (ciclos), com pipeline | 53 | 0,8% | 0,3% |
+| Latência (ciclos), com pipeline | 57 | 0,8% | 0,3% |
 | Latência (ciclos), sem pipeline | 2 | 60,9% | 8,4% |
-| Latência (ciclos), todos | 55 | 3,0% | 0,6% |
-| LUT (Vivado) | 55 | 26,1% | 15,1% |
-| FF (Vivado) | 55 | 32,6% | 18,5% |
-| Período (Vivado) | 55 | - | 18,0% |
+| Latência (ciclos), todos | 59 | 2,8% | 0,6% |
+| LUT (Vivado) | 59 | 24,7% | 14,5% |
+| FF (Vivado) | 59 | 33,9% | 20,7% |
+| Período (Vivado) | 59 | - | 17,6% |
 
 #### Execução: csim do Vitis contra a execução bit a bit do simulador
 
@@ -74,6 +74,10 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_rtl_ir | 0 | 1009 |
 | gauss_dse2_lut40_rtl_ir | 0 | 36100 |
 | fir_dse2_lut60_rtl_ir | 0 | 1009 |
+| gauss_dse3_lut40_rtl_ir | 0 | 36100 |
+| gauss_dse3_ssim98_rtl_ir | 0 | 36100 |
+| fir_dse3_lut60_rtl_ir | 0 | 1009 |
+| dot_dse3_lut40_rtl_ir | 0 | 1 |
 
 #### Latência (ciclos) e período
 
@@ -134,6 +138,10 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_rtl_ir | 1021 | 1021 | 1031 | 0,990 | 4,98 | 3,73 | 4,75 |
 | gauss_dse2_lut40_rtl_ir | 72219 | 72219 | 72224 | 1,000 | 4,95 | 7,05 | 5,37 |
 | fir_dse2_lut60_rtl_ir | 1020 | 1020 | 1031 | 0,989 | 5,00 | 3,73 | 4,60 |
+| gauss_dse3_lut40_rtl_ir | 72218 | 72218 | 72224 | 1,000 | 4,99 | 7,05 | 5,66 |
+| gauss_dse3_ssim98_rtl_ir | 72218 | 72218 | 72224 | 1,000 | 5,00 | 7,05 | 5,51 |
+| fir_dse3_lut60_rtl_ir | 1018 | 1018 | 1031 | 0,987 | 4,95 | 6,36 | 4,20 |
+| dot_dse3_lut40_rtl_ir | 259 | 259 | 259 | 1,000 | 3,80 | 7,38 | 3,59 |
 
 #### Recursos de FPGA
 
@@ -194,6 +202,10 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_rtl_ir | 1046 | 1046 | 3256 | 729 | 30 | 28 | 626 | 626 | 2089 | 560 |
 | gauss_dse2_lut40_rtl_ir | 674 | 674 | 1939 | 650 | 30 | 118 | 616 | 616 | 1682 | 620 |
 | fir_dse2_lut60_rtl_ir | 845 | 845 | 3256 | 666 | 39 | 42 | 610 | 610 | 2089 | 547 |
+| gauss_dse3_lut40_rtl_ir | 632 | 632 | 1939 | 661 | 30 | 121 | 586 | 586 | 1682 | 631 |
+| gauss_dse3_ssim98_rtl_ir | 620 | 620 | 1913 | 621 | 29 | 117 | 599 | 599 | 1700 | 646 |
+| fir_dse3_lut60_rtl_ir | 795 | 795 | 3355 | 716 | 50 | 59 | 562 | 562 | 2087 | 569 |
+| dot_dse3_lut40_rtl_ir | 37 | 37 | 102 | 34 | 4 | - | 73 | 73 | 55 | 25 |
 
 #### Efeito da aproximação: LUTs contra o projeto exato do mesmo kernel
 
@@ -239,6 +251,10 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_rtl_ir | - | -2,1% | 22,4% | 940 | 729 |
 | gauss_dse2_lut40_rtl_ir | - | 10,4% | 10,8% | 729 | 650 |
 | fir_dse2_lut60_rtl_ir | - | 17,5% | 29,1% | 940 | 666 |
+| gauss_dse3_lut40_rtl_ir | - | 16,0% | 9,3% | 729 | 661 |
+| gauss_dse3_ssim98_rtl_ir | - | 17,6% | 14,8% | 729 | 621 |
+| fir_dse3_lut60_rtl_ir | - | 22,4% | 23,8% | 940 | 716 |
+| dot_dse3_lut40_rtl_ir | - | 73,0% | 69,4% | 111 | 34 |
 
 #### Economia de LUTs prevista contra a medida, por forma de exportação das unidades
 
@@ -247,7 +263,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | INLINE off (o Vitis divide a netlist em estágios) | 10 | 25,5 p.p. | 5 de 10 | -5,0% |
 | combinacional (INLINE off, LATENCY 0) | 10 | 16,5 p.p. | 6 de 10 | 32,8% |
 | em linha (INLINE) | 10 | 18,9 p.p. | 6 de 10 | 27,0% |
-| RTL (caixa preta) | 10 | 11,7 p.p. | 6 de 10 | 29,3% |
+| RTL (caixa preta) | 14 | 9,4 p.p. | 10 de 14 | 69,4% |
 
 #### Unidades aproximadas no Vivado (funções com INLINE off): instâncias, LUT e FF por instância
 
@@ -314,6 +330,30 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | gauss_dse2_lut40_rtl_ir | ADD16_TRUNC3_bb | 1 | - | 8 | - | 0 |
 | fir_dse2_lut60_rtl_ir | ADD16_TRUNC7_bb | 9 | - | 5 | - | 0 |
 | fir_dse2_lut60_rtl_ir | ADD16_TRUNC6_bb | 6 | - | 6 | - | 0 |
+| gauss_dse3_lut40_rtl_ir | MUL8_T8_C_bb | 1 | - | 23 | - | 0 |
+| gauss_dse3_lut40_rtl_ir | ADD16_TRUNC4_bb | 1 | - | 7 | - | 0 |
+| gauss_dse3_lut40_rtl_ir | ADD16_TRUNC2_bb | 1 | - | 8 | - | 0 |
+| gauss_dse3_lut40_rtl_ir | ADD16_TRUNC6_bb | 1 | - | 6 | - | 0 |
+| gauss_dse3_lut40_rtl_ir | MUL8_T4_C_bb | 1 | - | 19 | - | 0 |
+| gauss_dse3_lut40_rtl_ir | ADD16_TRUNC3_bb | 1 | - | 8 | - | 0 |
+| gauss_dse3_lut40_rtl_ir | ADD16_TRUNC7_bb | 1 | - | 6 | - | 0 |
+| gauss_dse3_lut40_rtl_ir | ADD16_TRUNC8_bb | 1 | - | 6 | - | 0 |
+| gauss_dse3_lut40_rtl_ir | ADD16_TRUNC5_bb | 1 | - | 8 | - | 0 |
+| gauss_dse3_lut40_rtl_ir | ADD16_LOA5_bb | 1 | - | 5 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | MUL8_T4_C_bb | 1 | - | 8 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | ADD16_TRUNC9_bb | 1 | - | 6 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | ADD16_TRUNC2_bb | 1 | - | 4 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | MUL8_T8_C_bb | 1 | - | 4 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | ADD16_TRUNC6_bb | 1 | - | 6 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | ADD16_TRUNC3_bb | 1 | - | 8 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | ADD16_TRUNC7_bb | 1 | - | 5 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | ADD16_TRUNC8_bb | 1 | - | 5 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | ADD16_TRUNC5_bb | 1 | - | 8 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | ADD16_TRUNC4_bb | 1 | - | 5 | - | 0 |
+| gauss_dse3_ssim98_rtl_ir | MUL8_T6_bb | 1 | - | 8 | - | 0 |
+| fir_dse3_lut60_rtl_ir | ADD16_TRUNC6_bb | 3 | - | 5 | - | 0 |
+| fir_dse3_lut60_rtl_ir | ADD16_TRUNC7_bb | 7 | - | 5 | - | 0 |
+| fir_dse3_lut60_rtl_ir | ADD16_TRUNC5_bb | 4 | - | 6 | - | 0 |
 
 #### Laços: II, iteração (profundidade com pipeline) e latência, em ciclos
 
@@ -380,6 +420,10 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-18; parte xc7a100tcsg324-
 | fir_dse_op60_rtl_ir | samples | pipeline | 1009 | 1 | 1 | 12 | 22 | 1021 | 1029 |
 | gauss_dse2_lut40_rtl_ir | rows_cols | achatado | 36100 | 2 | 2 | 20 | 25 | 72219 | 72222 |
 | fir_dse2_lut60_rtl_ir | samples | pipeline | 1009 | 1 | 1 | 11 | 22 | 1020 | 1029 |
+| gauss_dse3_lut40_rtl_ir | rows_cols | achatado | 36100 | 2 | 2 | 19 | 25 | 72218 | 72222 |
+| gauss_dse3_ssim98_rtl_ir | rows_cols | achatado | 36100 | 2 | 2 | 19 | 25 | 72218 | 72222 |
+| fir_dse3_lut60_rtl_ir | samples | pipeline | 1009 | 1 | 1 | 9 | 22 | 1018 | 1029 |
+| dot_dse3_lut40_rtl_ir | acc | pipeline | 256 | 1 | 1 | 2 | 3 | 258 | 257 |
 
 ### Resíduos depois da calibração
 
