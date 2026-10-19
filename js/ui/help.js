@@ -14,10 +14,12 @@ export class Help {
     /**
      * @param {HTMLElement} root elemento #readme (sobreposto à página)
      * @param {() => void} onClose chamado quando a ajuda sobreposta é fechada
+     * @param {{page?: 'units'|'hls'|'lenet'}} opts a página: escolhe as seções e o título
      */
-    constructor(root, onClose) {
+    constructor(root, onClose, { page = 'units' } = {}) {
         this.root = root;
         this.onClose = onClose;
+        this.page = page;
         this.render();
 
         root.addEventListener('click', (e) => {
@@ -40,8 +42,12 @@ export class Help {
     /** Monta a ajuda no idioma atual. */
     render() {
         const c = CONTENT[getLanguage()] ?? pt;
-        const toc = c.sections.map((s) => `<li><a href="#h-${s.id}" data-sec="${s.id}">${s.title}</a></li>`).join('');
-        const body = c.sections.map((s) => `<section class="help-section" id="h-${s.id}"><h2>${s.title}</h2>${s.html}</section>`).join('');
+        const ids = c.pages?.[this.page];
+        const byId = new Map(c.sections.map((s) => [s.id, s]));
+        const sections = ids ? ids.map((id) => byId.get(id)).filter(Boolean) : c.sections;
+        const head = c.heads?.[this.page] ?? c;
+        const toc = sections.map((s) => `<li><a href="#h-${s.id}" data-sec="${s.id}">${s.title}</a></li>`).join('');
+        const body = sections.map((s) => `<section class="help-section" id="h-${s.id}"><h2>${s.title}</h2>${s.html}</section>`).join('');
         this.root.innerHTML = `
             <div class="help">
                 <aside class="help-toc">
@@ -53,8 +59,8 @@ export class Help {
                 <article class="help-body">
                     <header class="help-head">
                         <div>
-                            <h1>${c.title}</h1>
-                            <p class="help-lead">${c.lead}</p>
+                            <h1>${head.title}</h1>
+                            <p class="help-lead">${head.lead}</p>
                         </div>
                     </header>
                     ${body}

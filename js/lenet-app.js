@@ -7,6 +7,8 @@ import { buildUnit, unitName } from './axc/units.js';
 import { testInputs, errorMetrics } from './axc/metrics.js';
 import { LAYERS, decodeModel, decodeTestSet, productTable, classifyRange, classifyBatch, adderAccumulate, summarize, macsPerLayer } from './axc/lenet.js';
 import { esc } from './ui/plots.js';
+import { Help } from './ui/help.js';
+import { initFigureExport } from './ui/figexport.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale, dec } from './i18n/index.js';
 
 const $ = (id) => document.getElementById(id);
@@ -208,6 +210,14 @@ $('nnSensBtn').onclick = async () => {
 };
 
 // Idioma e tema ------------------------------------------------------------------------------------------------
+const help = new Help($('readme'), null, { page: 'lenet' });
+$('open-ajuda').addEventListener('click', () => (help.isOverlay() ? help.close() : help.open()));
+document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[data-help]');
+    if (a) { e.preventDefault(); help.open(a.dataset.help); }
+});
+initFigureExport(() => ({ title: t('fig.export'), svg: t('fig.svg'), png: t('fig.png') }));
+
 const langSelect = $('lang-select');
 langSelect.innerHTML = Object.entries(LANGUAGES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
 function applyDomTranslations() {
@@ -217,6 +227,7 @@ function applyDomTranslations() {
     for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
     for (const el of document.querySelectorAll('[data-i18n-html]')) el.innerHTML = t(el.dataset.i18nHtml);
     for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle);
+    help.render();
     if (synth) { fillSelects(); render(); }
 }
 langSelect.addEventListener('change', () => { setLanguage(langSelect.value); applyDomTranslations(); });

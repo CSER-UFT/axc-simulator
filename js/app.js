@@ -8,6 +8,7 @@ import { testInputs, errorMetrics, histogram, errorGrid, paretoFront, rng, loadO
 import { testImage, applyFilter, psnr, ssim } from './axc/image.js';
 import { lineChartSvg, stagesSvg, dotDiagram, adderDiagram, histogramSvg, drawHeatmap, rampLegend, paretoSvg, drawGray, drawDiff, esc } from './ui/plots.js';
 import { Help } from './ui/help.js';
+import { initFigureExport, exportFigure } from './ui/figexport.js';
 import { SC_GENERATORS, scCurve, binaryError, streamDemo, scCost, faultError, scFilter, flipPixelBits } from './axc/stochastic.js';
 import { timingTrace, capturedOutputs, vosCurve, randomSequence, outputDepths, delayFactor, corruptImage, expectedMemoryMSE, DELAY_MODELS } from './axc/vos.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale, dec } from './i18n/index.js';
@@ -431,11 +432,7 @@ $('cmpCsv').onclick = () => {
 };
 $('cmpSvg').onclick = () => {
     const svg = $('paretoFig').querySelector('svg');
-    if (!svg) return;
-    const clone = svg.cloneNode(true);
-    const css = '.axis{stroke:#555}.small{font:11px sans-serif}.mono{font-family:monospace}.muted{fill:#555}.front{fill:none;stroke:#1650ff;stroke-width:1.5}.pt{fill:#999}.pt.front{fill:#1650ff;stroke:none}.pt.cur{stroke:#d99700;stroke-width:3}';
-    clone.insertAdjacentHTML('afterbegin', `<style>${css}</style>`);
-    download('pareto.svg', clone.outerHTML, 'image/svg+xml');
+    if (svg) exportFigure(svg, 'svg', 'pareto');
 };
 
 // Tensão e memória ------------------------------------------------------------------------------------------
@@ -842,7 +839,8 @@ themeButton.addEventListener('click', () => {
     if (cur) { dirty.error = true; renderTab(tab); }
 });
 updateThemeIcon();
-const help = new Help($('readme'));
+const help = new Help($('readme'), null, { page: 'units' });
+initFigureExport(() => ({ title: t('fig.export'), svg: t('fig.svg'), png: t('fig.png') }));
 $('open-ajuda').addEventListener('click', () => (help.isOverlay() ? help.close() : help.open()));
 document.addEventListener('click', (e) => {
     const a = e.target.closest('a[data-help]');

@@ -8,6 +8,7 @@ import { testInputs, errorMetrics, paretoFront } from '../axc/metrics.js';
 import { scatterSvg, designSpaceSvg, esc } from './plots.js';
 import { toVerilog, testbench, vectors, moduleName } from '../axc/verilog.js';
 import { t, locale, getLanguage, dec } from '../i18n/index.js';
+import { exportFigure } from './figexport.js';
 
 const $ = (id) => document.getElementById(id);
 const nf = (v, d = 2) => (Number.isInteger(v) ? v.toLocaleString(locale()) : v.toLocaleString(locale(), { maximumFractionDigits: d }));
@@ -208,13 +209,7 @@ $('dsJson').onclick = () => {
 };
 $('dsSvg').onclick = () => {
     const svg = $('dsFig').querySelector('svg');
-    if (!svg) return;
-    const clone = svg.cloneNode(true);
-    const colors = { exact: '#222', array: '#2f6fdf', booth: '#7a3fb8', kulkarni: '#c2410c', drum: '#0f8b8d', mitchell: '#b8860b', trunc: '#c03060', loa: '#2b9a66', seg: '#8a6d3b' };
-    const css = '.axis{stroke:#555}.grid{stroke:#ddd}.small{font:11px sans-serif}.mono{font-family:monospace}.muted{fill:#555}.front{fill:none;stroke:#111;stroke-width:1.2;stroke-dasharray:4 3}.pt{stroke:#fff;stroke-width:1;fill-opacity:.55}.pt.on{fill-opacity:1;stroke:#111}'
-        + Object.entries(colors).map(([k, c]) => `.t-${k}{fill:${c}}`).join('') + '.pt.t-evo{fill:none;fill-opacity:1;stroke:#e0457b;stroke-width:1.6}';
-    clone.insertAdjacentHTML('afterbegin', `<style>${css}</style>`);
-    download(`axc-${$('dsGroup').value}.svg`, clone.outerHTML, 'image/svg+xml');
+    if (svg) exportFigure(svg, 'svg', `axc-${$('dsGroup').value}`);
 };
 $('synthTarget').addEventListener('change', () => renderSynth());
 $('synthTable').addEventListener('click', (e) => {

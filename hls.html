@@ -26,8 +26,10 @@
             <div class="tools">
                 <label class="lang"><span class="sr-only" data-i18n="ui.language">Idioma</span><select id="lang-select"></select></label>
                 <button type="button" id="theme-toggle" class="btn icon-btn" data-i18n-title="ui.theme"><span class="icon i-moon" aria-hidden="true"></span><span class="sr-only" data-i18n="ui.theme">Alternar contraste</span></button>
+                <button type="button" id="open-ajuda" class="btn" data-i18n="ui.help">Ajuda</button>
             </div>
         </header>
+        <div id="readme" class="readme"></div>
         <main class="hls-main">
             <div>
                 <section>
@@ -50,6 +52,7 @@
                     <details class="hls-lang">
                         <summary data-i18n="hls.langTitle">Linguagem e diretivas</summary>
                         <div data-i18n-html="hls.langHelp"></div>
+                        <p class="note"><a href="#" data-help="hls-lang" data-i18n="ui.moreHelp">Mais na ajuda</a></p>
                     </details>
                 </section>
             </div>
@@ -76,6 +79,7 @@
                         <details class="hls-lang">
                             <summary data-i18n="hls.modelTitle">Modelo e limitações</summary>
                             <div id="modelNotes"></div>
+                        <p class="note"><a href="#" data-help="hls-cost" data-i18n="ui.moreHelp">Mais na ajuda</a></p>
                         </details>
                     </div>
                     <div class="pane hidden" id="pane-sched">
@@ -107,6 +111,7 @@
                         <details class="hls-lang">
                             <summary data-i18n="hls.ap.modelTitle">Modelo de erro e verificação</summary>
                             <div data-i18n-html="hls.ap.modelHelp"></div>
+                        <p class="note"><a href="#" data-help="hls-err" data-i18n="ui.moreHelp">Mais na ajuda</a></p>
                         </details>
                     </div>
                     <div class="pane hidden" id="pane-lib">
@@ -190,6 +195,7 @@
                         <details class="hls-lang">
                             <summary data-i18n="dse.helpTitle">Como a exploração funciona</summary>
                             <div data-i18n-html="dse.help"></div>
+                        <p class="note"><a href="#" data-help="hls-dse" data-i18n="ui.moreHelp">Mais na ajuda</a></p>
                         </details>
                     </div>
                     <div class="pane hidden" id="pane-ir">

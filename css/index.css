@@ -802,3 +802,42 @@ label.check { display: inline-flex; align-items: center; gap: 4px; }
 #pane-opt .graph-pair { grid-template-columns: 1fr; }
 #pane-opt .graph-pair .fig-box { margin-top: 0; }
 .tabs [hidden] { display: none; }
+
+
+/* Exportação das figuras */
+
+.fig-export {
+    position: absolute;
+    z-index: 30;
+    display: flex;
+    gap: 2px;
+    padding: 2px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.15);
+}
+
+.fig-export[hidden] {
+    display: none;
+}
+
+.fig-export button {
+    font: 600 0.6875rem/1 var(--mono, monospace);
+    color: var(--ink);
+    background: transparent;
+    border: 0;
+    border-radius: calc(var(--radius) - 1px);
+    padding: 4px 6px;
+    cursor: pointer;
+}
+
+.fig-export button:hover {
+    background: var(--panel-2);
+}
+
+@media print {
+    .fig-export {
+        display: none;
+    }
+}

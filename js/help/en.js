@@ -3,11 +3,12 @@
  * Citations point to the References section, built from js/refs.js (with the DOIs).
  */
 import { cite, refHtml, REF_GROUPS } from '../refs.js';
+import { heads, sections as pageSections, common } from './pages-en.js';
 
 const c = (...keys) => keys.map((k) => `<a class="cite" href="#h-refs">${cite(k, 'en')}</a>`).join('; ');
 const GROUP_TITLES = { nn: 'Neural network', arith: 'Approximate arithmetic circuits', eval: 'Evaluation: metrics, image quality, selection and energy', vos: 'Voltage and memory', sc: 'Stochastic computing', tools: 'Tools and PDK' };
 
-export default {
+const base = {
     title: 'Approximate Computing Simulator',
     lead: 'Educational simulator of approximate computing: approximate adders and multipliers built gate by gate, evaluated against the exact version with the error metrics of the literature, compared by cost on the Pareto front and applied to an image filter. Everything runs in the browser.',
     searchPlaceholder: 'Search the help',
@@ -22,7 +23,7 @@ export default {
 <ol>
     <li>Choose the type of unit (multiplier or adder), the width and the approximation technique on the left panel. Everything is recomputed on each change.</li>
     <li>The <strong>Summary</strong> shows the estimated area and delay, compared with the exact unit, and the error metrics.</li>
-    <li><strong>Structure</strong> shows where the approximation happens; <strong>Error</strong> shows for which operands it fails and by how much; <strong>Comparison</strong> puts several configurations on a cost against error chart; <strong>Neural network</strong> shows the effect on LeNet-5; <strong>Voltage and memory</strong> and <strong>Stochastic</strong> deal with other sources of approximation. The FPGA and ASIC numbers of the synthesized units are in the <strong>Library</strong> tab of the high level synthesis page.</li>
+    <li><strong>Structure</strong> shows where the approximation happens; <strong>Error</strong> shows for which operands it fails and by how much; <strong>Comparison</strong> puts several configurations on a cost against error chart; <strong>Voltage and memory</strong> and <strong>Stochastic</strong> deal with other sources of approximation. The <strong>Use in LeNet-5</strong> button takes the unit to the neural network page. The FPGA and ASIC numbers of the synthesized units are in the <strong>Library</strong> tab of the high level synthesis page.</li>
     <li><strong>Copy link</strong> stores the unit configuration, the tab and the controls of the tabs in the page address: whoever opens the link sees the same screen. The language is in the selector of the header.</li>
 </ol>
 <p class="tip">To start: 8 bit multiplier, 4 truncated columns and no approximate ones. MED is 12.25 and WCE is 49. Then switch to 6 approximate columns and compare the two error maps.</p>`,
@@ -207,3 +208,12 @@ ${REF_GROUPS.map((g) => `<h3>${GROUP_TITLES[g.key]}</h3>\n<ol class="refs">${g.k
         },
     ],
 };
+
+/** Seções de cada página, na ordem do índice. */
+const PAGES = {
+    units: ['start', 'mul', 'mul2', 'add', 'metrics', 'cost', 'vos', 'sc', 'cmp', 'synth', 'figs', 'pages', 'next', 'refs'],
+    hls: ['hls-start', 'hls-lang', 'hls-cost', 'hls-sched', 'hls-err', 'hls-dse', 'hls-vitis', 'hls-cli', 'synth', 'figs', 'pages', 'refs'],
+    lenet: ['nn-start', 'nn', 'figs', 'pages', 'refs'],
+};
+
+export default { ...base, heads: { units: { title: base.title, lead: base.lead }, ...heads }, sections: [...base.sections, ...pageSections, ...common], pages: PAGES };

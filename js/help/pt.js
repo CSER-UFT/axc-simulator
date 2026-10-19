@@ -3,11 +3,12 @@
  * As citações apontam para a seção Referências, montada a partir de js/refs.js (com os DOIs).
  */
 import { cite, refHtml, REF_GROUPS } from '../refs.js';
+import { heads, sections as pageSections, common } from './pages-pt.js';
 
 const c = (...keys) => keys.map((k) => `<a class="cite" href="#h-refs">${cite(k, 'pt')}</a>`).join('; ');
 const GROUP_TITLES = { nn: 'Rede neural', arith: 'Circuitos aritméticos aproximados', eval: 'Avaliação: métricas, qualidade de imagem, escolha e energia', vos: 'Tensão e memória', sc: 'Computação estocástica', tools: 'Ferramentas e PDK' };
 
-export default {
+const base = {
     title: 'Simulador de Computação Aproximada',
     lead: 'Simulador didático de computação aproximada: somadores e multiplicadores aproximados construídos porta a porta, avaliados contra a versão exata com as métricas de erro da literatura, comparados pelo custo na fronteira de Pareto e aplicados a um filtro de imagem. Tudo roda no navegador.',
     searchPlaceholder: 'Buscar na ajuda',
@@ -22,7 +23,7 @@ export default {
 <ol>
     <li>Escolha o tipo de unidade (multiplicador ou somador), a largura e a técnica de aproximação no painel da esquerda. Tudo é recalculado a cada mudança.</li>
     <li>O <strong>Resumo</strong> traz a área e o atraso estimados, comparados com a unidade exata, e as métricas de erro.</li>
-    <li><strong>Estrutura</strong> mostra onde a aproximação acontece; <strong>Erro</strong> mostra para quais operandos ela erra e quanto; <strong>Comparação</strong> junta várias configurações num gráfico de custo contra erro; <strong>Rede neural</strong> mostra o efeito na LeNet-5; <strong>Tensão e memória</strong> e <strong>Estocástica</strong> tratam de outras fontes de aproximação. Os números de FPGA e de ASIC das unidades sintetizadas ficam na aba <strong>Biblioteca</strong> da página de síntese de alto nível.</li>
+    <li><strong>Estrutura</strong> mostra onde a aproximação acontece; <strong>Erro</strong> mostra para quais operandos ela erra e quanto; <strong>Comparação</strong> junta várias configurações num gráfico de custo contra erro; <strong>Tensão e memória</strong> e <strong>Estocástica</strong> tratam de outras fontes de aproximação. O botão <strong>Usar na LeNet-5</strong> leva a unidade para a página da rede neural. Os números de FPGA e de ASIC das unidades sintetizadas ficam na aba <strong>Biblioteca</strong> da página de síntese de alto nível.</li>
     <li><strong>Copiar link</strong> guarda a configuração da unidade, a aba e os controles das abas no endereço da página: quem abrir o link vê a mesma tela. O idioma fica no seletor do cabeçalho.</li>
 </ol>
 <p class="tip">Para começar: multiplicador de 8 bits, 4 colunas truncadas e nenhuma aproximada. O MED dá 12,25 e o WCE dá 49. Depois troque por 6 colunas aproximadas e compare os dois mapas de erro.</p>`,
@@ -207,3 +208,12 @@ ${REF_GROUPS.map((g) => `<h3>${GROUP_TITLES[g.key]}</h3>\n<ol class="refs">${g.k
         },
     ],
 };
+
+/** Seções de cada página, na ordem do índice. */
+const PAGES = {
+    units: ['start', 'mul', 'mul2', 'add', 'metrics', 'cost', 'vos', 'sc', 'cmp', 'synth', 'figs', 'pages', 'next', 'refs'],
+    hls: ['hls-start', 'hls-lang', 'hls-cost', 'hls-sched', 'hls-err', 'hls-dse', 'hls-vitis', 'hls-cli', 'synth', 'figs', 'pages', 'refs'],
+    lenet: ['nn-start', 'nn', 'figs', 'pages', 'refs'],
+};
+
+export default { ...base, heads: { units: { title: base.title, lead: base.lead }, ...heads }, sections: [...base.sections, ...pageSections, ...common], pages: PAGES };
