@@ -168,9 +168,9 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | sharpen_kul_ir | 245 | 556 | 1773 | 590 | 23 | 101 | 88 | 455 | 1128 | 487 |
 | fir_t8c_loa11_ir | 1027 | 978 | 10117 | 1255 | 12 | - | 469 | 733 | 4784 | 806 |
 | dot_t4_ir | 140 | 124 | 917 | 167 | 12 | 28 | 73 | 89 | 501 | 169 |
-| gauss_dse_op40_ir | 355 | 689 | 3564 | 774 | 25 | 123 | 211 | 624 | 2329 | 788 |
+| gauss_dse_op40_ir | 355 | 689 | 3564 | 774 | 24 | 123 | 211 | 624 | 2329 | 788 |
 | fir_dse_op60_ir | 1161 | 1046 | 8715 | 1399 | 30 | 53 | 506 | 626 | 4777 | 1026 |
-| gauss_dse2_lut40_ir | 618 | 674 | 4143 | 861 | 30 | 173 | 546 | 616 | 2084 | 687 |
+| gauss_dse2_lut40_ir | 618 | 674 | 4143 | 861 | 29 | 173 | 546 | 616 | 2084 | 687 |
 | fir_dse2_lut60_ir | 709 | 845 | 7919 | 987 | 39 | 128 | 656 | 610 | 2444 | 648 |
 | gauss_drum6_lat0_ir | 749 | 877 | 3834 | 856 | 51 | 150 | 592 | 635 | 1181 | 621 |
 | gauss_t8c_loa6_lat0_ir | 730 | 718 | 3775 | 789 | 28 | 137 | 546 | 635 | 1682 | 616 |
@@ -178,9 +178,9 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | sharpen_kul_lat0_ir | 530 | 556 | 1840 | 526 | 23 | 101 | 384 | 455 | 1015 | 458 |
 | fir_t8c_loa11_lat0_ir | 782 | 978 | 9442 | 632 | 12 | - | 519 | 733 | 1785 | 489 |
 | dot_t4_lat0_ir | 124 | 124 | 757 | 174 | 12 | 28 | 73 | 89 | 74 | 65 |
-| gauss_dse_op40_lat0_ir | 669 | 689 | 3550 | 727 | 25 | 123 | 507 | 624 | 1722 | 610 |
+| gauss_dse_op40_lat0_ir | 669 | 689 | 3550 | 727 | 24 | 123 | 507 | 624 | 1722 | 610 |
 | fir_dse_op60_lat0_ir | 938 | 1046 | 7811 | 806 | 30 | 50 | 556 | 626 | 1683 | 552 |
-| gauss_dse2_lut40_lat0_ir | 618 | 674 | 3933 | 826 | 30 | 173 | 546 | 616 | 1465 | 574 |
+| gauss_dse2_lut40_lat0_ir | 618 | 674 | 3933 | 826 | 29 | 173 | 546 | 616 | 1465 | 574 |
 | fir_dse2_lut60_lat0_ir | 709 | 845 | 7855 | 934 | 39 | 129 | 656 | 610 | 1785 | 531 |
 | gauss_drum6_inl_ir | 749 | 877 | 4044 | 1000 | 51 | 169 | 592 | 635 | 1275 | 645 |
 | gauss_t8c_loa6_inl_ir | 730 | 718 | 4133 | 867 | 28 | 162 | 546 | 635 | 2259 | 753 |
@@ -188,9 +188,9 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | sharpen_kul_inl_ir | 530 | 556 | 1847 | 531 | 23 | 101 | 384 | 455 | 1025 | 464 |
 | fir_t8c_loa11_inl_ir | 782 | 978 | 8789 | 686 | 12 | - | 519 | 733 | 6899 | 770 |
 | dot_t4_inl_ir | 124 | 124 | 821 | 166 | 12 | 30 | 73 | 89 | 409 | 143 |
-| gauss_dse_op40_inl_ir | 669 | 689 | 3519 | 727 | 25 | 125 | 507 | 624 | 1880 | 712 |
+| gauss_dse_op40_inl_ir | 669 | 689 | 3519 | 727 | 24 | 125 | 507 | 624 | 1880 | 712 |
 | fir_dse_op60_inl_ir | 938 | 1046 | 10762 | 1063 | 30 | 35 | 556 | 626 | 10844 | 1062 |
-| gauss_dse2_lut40_inl_ir | 618 | 674 | 3772 | 815 | 30 | 160 | 546 | 616 | 1670 | 646 |
+| gauss_dse2_lut40_inl_ir | 618 | 674 | 3772 | 815 | 29 | 160 | 546 | 616 | 1670 | 646 |
 | fir_dse2_lut60_inl_ir | 709 | 845 | 8958 | 1025 | 39 | 85 | 656 | 610 | 7508 | 935 |
 | gauss_drum6_rtl_ir | 877 | 877 | 1921 | 806 | 51 | 120 | 635 | 635 | 1152 | 583 |
 | gauss_t8c_loa6_rtl_ir | 795 | 718 | 2043 | 638 | 28 | 111 | 635 | 635 | 1682 | 630 |
@@ -198,14 +198,14 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | sharpen_kul_rtl_ir | 556 | 556 | 1640 | 497 | 23 | 94 | 455 | 455 | 1015 | 459 |
 | fir_t8c_loa11_rtl_ir | 978 | 978 | 3256 | 665 | 12 | 12 | 733 | 733 | 2089 | 487 |
 | dot_t4_rtl_ir | 124 | 124 | 118 | 116 | 12 | 13 | 89 | 89 | 74 | 64 |
-| gauss_dse_op40_rtl_ir | 709 | 689 | 1965 | 631 | 25 | 109 | 624 | 624 | 1690 | 603 |
+| gauss_dse_op40_rtl_ir | 709 | 689 | 1965 | 631 | 24 | 109 | 624 | 624 | 1690 | 603 |
 | fir_dse_op60_rtl_ir | 1046 | 1046 | 3256 | 729 | 30 | 28 | 626 | 626 | 2089 | 560 |
-| gauss_dse2_lut40_rtl_ir | 674 | 674 | 1939 | 650 | 30 | 118 | 616 | 616 | 1682 | 620 |
+| gauss_dse2_lut40_rtl_ir | 674 | 674 | 1939 | 650 | 29 | 118 | 616 | 616 | 1682 | 620 |
 | fir_dse2_lut60_rtl_ir | 845 | 845 | 3256 | 666 | 39 | 42 | 610 | 610 | 2089 | 547 |
-| gauss_dse3_lut40_rtl_ir | 632 | 632 | 1939 | 661 | 30 | 121 | 586 | 586 | 1682 | 631 |
-| gauss_dse3_ssim98_rtl_ir | 620 | 620 | 1913 | 621 | 29 | 117 | 599 | 599 | 1700 | 646 |
+| gauss_dse3_lut40_rtl_ir | 632 | 632 | 1939 | 661 | 29 | 121 | 586 | 586 | 1682 | 631 |
+| gauss_dse3_ssim98_rtl_ir | 620 | 620 | 1913 | 621 | 27 | 117 | 599 | 599 | 1700 | 646 |
 | fir_dse3_lut60_rtl_ir | 795 | 795 | 3355 | 716 | 50 | 59 | 562 | 562 | 2087 | 569 |
-| dot_dse3_lut40_rtl_ir | 37 | 37 | 102 | 34 | 4 | - | 73 | 73 | 55 | 25 |
+| dot_dse3_lut40_rtl_ir | 37 | 36 | 102 | 34 | 4 | - | 73 | 73 | 55 | 25 |
 
 #### Efeito da aproximação: LUTs contra o projeto exato do mesmo kernel
 
@@ -254,7 +254,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | gauss_dse3_lut40_rtl_ir | - | 16,0% | 9,3% | 729 | 661 |
 | gauss_dse3_ssim98_rtl_ir | - | 17,6% | 14,8% | 729 | 621 |
 | fir_dse3_lut60_rtl_ir | - | 22,4% | 23,8% | 940 | 716 |
-| dot_dse3_lut40_rtl_ir | - | 73,0% | 69,4% | 111 | 34 |
+| dot_dse3_lut40_rtl_ir | - | 73,7% | 69,4% | 111 | 34 |
 
 #### Economia de LUTs prevista contra a medida, por forma de exportação das unidades
 
@@ -263,7 +263,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | INLINE off (o Vitis divide a netlist em estágios) | 10 | 27,5 p.p. | 3 de 10 | -5,0% |
 | combinacional (INLINE off, LATENCY 0) | 10 | 18,6 p.p. | 4 de 10 | 32,8% |
 | em linha (INLINE) | 10 | 20,2 p.p. | 4 de 10 | 27,0% |
-| RTL (caixa preta) | 14 | 7,9 p.p. | 12 de 14 | 69,4% |
+| RTL (caixa preta) | 14 | 8,0 p.p. | 12 de 14 | 69,4% |
 
 #### Unidades aproximadas no Vivado (funções com INLINE off): instâncias, LUT e FF por instância
 

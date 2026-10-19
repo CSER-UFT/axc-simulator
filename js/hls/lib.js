@@ -81,9 +81,23 @@ export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic', fpg
     function unit(name) {
         const d = byName.get(name);
         if (!d) throw new HlsError(`unidade ${name} não está na biblioteca sintetizada`);
-        const f = d.asic.flows[flow] ?? d.asic.flows.delay;
+        let f = d.asic.flows[flow] ?? d.asic.flows.delay;
         const v = vivOf(name);
-        return { name, short: name.replace(/ \(.*\)/, ''), cfg: d.cfg, area: f.area, delay: vDelay(v) ?? f.delay, energy: f.energy, leakage: f.leakage, luts: v?.luts ?? d.luts, carry4: v?.carry4 ?? d.carry4, err: d.err, vivado: !!v };
+        let luts = v?.luts ?? d.luts, carry4 = v?.carry4 ?? d.carry4;
+        // Somador truncado em k bits: os k bits baixos são fios (zero), o resto é um somador exato de W - k bits. O
+        // custo é o do exato da mesma largura e fluxo na proporção (W - k) / W, e nunca mais que o sintetizado: no
+        // fluxo de atraso mínimo, o ABC dimensiona as células pelo atraso e o truncado em 1 a 3 bits saía com mais
+        // área que o exato (880 contra 731 µm² no ADD16 TRUNC1), o que não tem sentido estrutural.
+        if (d.cfg.kind === 'add' && d.cfg.adder === 'trunc' && d.cfg.k > 0) {
+            const W = d.cfg.width, k = Math.min(d.cfg.k, W), r = (W - k) / W;
+            const ex = byName.get(exactName('add', W));
+            const fe = ex.asic.flows[flow] ?? ex.asic.flows.delay;
+            f = { ...f, area: Math.min(f.area, fe.area * r), energy: Math.min(f.energy, fe.energy * r), leakage: Math.min(f.leakage ?? Infinity, (fe.leakage ?? 0) * r), delay: Math.min(f.delay, fe.delay) };
+            const ve = vivOf(exactName('add', W));
+            luts = Math.min(luts, Math.ceil((ve?.luts ?? ex.luts) * r));
+            carry4 = Math.min(carry4, Math.ceil((W - k) / 4));
+        }
+        return { name, short: name.replace(/ \(.*\)/, ''), cfg: d.cfg, area: f.area, delay: vDelay(v) ?? f.delay, energy: f.energy, leakage: f.leakage, luts, carry4, err: d.err, vivado: !!v };
     }
     const exactName = (cls, W) => `${cls === 'mul' ? 'MUL' : 'ADD'}${W} exato`;
     /** Somador de 32 bits: a cascata de dois de 16 (o de baixo pode ser aproximado; o vai um passa para o de cima). */
