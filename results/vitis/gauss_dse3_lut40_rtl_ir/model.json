@@ -1,0 +1,124 @@
+{
+ "case": "gauss_dse3_lut40_rtl_ir",
+ "kernel": "gauss",
+ "kind": "ir",
+ "note": "exploração (modelo atual, atrasos do Vivado): LUTs, por operação, PSNR >= 40 dB, unidades em RTL (caixa preta) (1 × MUL8 T4 +C, 1 × MUL8 T8, 3 × MUL8 T8 +C, 1 × ADD16 TRUNC7, 1 × ADD16 TRUNC8, 1 × ADD16 LOA5, 1 × ADD16 TRUNC3, 1 × ADD16 TRUNC5, 1 × ADD16 TRUNC4, 1 × ADD16 TRUNC2, 1 × ADD16 TRUNC6)",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "gauss",
+ "assign": {
+  "S1.1": "MUL8 T4 +C",
+  "S1.4": "ADD16 TRUNC7",
+  "S1.6": "MUL8 T8",
+  "S1.7": "ADD16 TRUNC8",
+  "S1.10": "ADD16 LOA5",
+  "S1.12": "MUL8 T8 +C",
+  "S1.13": "ADD16 TRUNC3",
+  "S1.16": "ADD16 TRUNC5",
+  "S1.18": "MUL8 T8 +C",
+  "S1.19": "ADD16 TRUNC4",
+  "S1.22": "ADD16 TRUNC2",
+  "S1.24": "MUL8 T8 +C",
+  "S1.25": "ADD16 TRUNC6"
+ },
+ "prediction": {
+  "cycles": 72218,
+  "timeNs": 361090,
+  "intervalNs": 10,
+  "critPs": 4991,
+  "luts": 632,
+  "carry4": 30,
+  "ff": 586,
+  "areaUm2": 11643.105935797246,
+  "energyFj": 1380397637.9442823,
+  "loops": [
+   {
+    "label": "rows_cols",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 36100,
+    "II": 2,
+    "iterLatency": 19,
+    "latency": 72218
+   }
+  ],
+  "addrLuts": 464,
+  "units": [
+   {
+    "unit": "MUL8 T4 +C",
+    "count": 1,
+    "luts": 17,
+    "carry4": 2
+   },
+   {
+    "unit": "MUL8 T8",
+    "count": 1,
+    "luts": 2,
+    "carry4": 1
+   },
+   {
+    "unit": "MUL8 T8 +C",
+    "count": 3,
+    "luts": 27,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 TRUNC7",
+    "count": 1,
+    "luts": 6,
+    "carry4": 2
+   },
+   {
+    "unit": "ADD16 TRUNC8",
+    "count": 1,
+    "luts": 5,
+    "carry4": 2
+   },
+   {
+    "unit": "ADD16 LOA5",
+    "count": 1,
+    "luts": 13,
+    "carry4": 2
+   },
+   {
+    "unit": "ADD16 TRUNC3",
+    "count": 1,
+    "luts": 11,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 TRUNC5",
+    "count": 1,
+    "luts": 9,
+    "carry4": 2
+   },
+   {
+    "unit": "ADD16 TRUNC4",
+    "count": 1,
+    "luts": 10,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 TRUNC2",
+    "count": 1,
+    "luts": 12,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 TRUNC6",
+    "count": 1,
+    "luts": 8,
+    "carry4": 2
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}

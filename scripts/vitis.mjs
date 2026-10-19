@@ -81,6 +81,16 @@ function cases() {
     // E com as unidades como caixa preta de RTL (o Verilog exportado da netlist; na csim, o modelo C): o Vivado
     // sintetiza o mesmo Verilog da caracterização das unidades.
     for (const c of approx) list.push({ ...c, id: c.id.replace(/_ir$/, '_rtl_ir'), inline: 'rtl', base: c.id, note: `${c.note}, unidades em RTL (caixa preta)` });
+    // Quarta rodada: pontos escolhidos pela exploração com o modelo atual (LUT e CARRY4 e atrasos do Vivado, quando
+    // há data/vivado-units.json), objetivo em LUTs, já exportados como caixa preta de RTL: confere se o modelo escolhe
+    // bem, não só se prevê bem.
+    const dse3 = [
+        ['gauss', 'gauss_dse3_lut40_rtl_ir', { granularity: 'op', metric: 'psnr', value: 40 }, 'PSNR >= 40 dB'],
+        ['gauss', 'gauss_dse3_ssim98_rtl_ir', { granularity: 'op', metric: 'ssim', value: 0.98 }, 'SSIM >= 0,98'],
+        ['fir', 'fir_dse3_lut60_rtl_ir', { granularity: 'op', metric: 'psnr', value: 60 }, 'PSNR >= 60 dB'],
+        ['dot', 'dot_dse3_lut40_rtl_ir', { granularity: 'op', metric: 'psnr', value: 40 }, 'PSNR >= 40 dB'],
+    ];
+    for (const [k, id, d, lim] of dse3) list.push({ id, kernel: k, src: code(k), kind: 'ir', clockNs: 5, inline: 'rtl', dse: { ...d, objective: 'luts' }, note: `exploração (modelo atual, atrasos do Vivado): LUTs, por operação, ${lim}, unidades em RTL (caixa preta)` });
     return list.filter((c) => !only || only.has(c.id) || only.has(c.kernel));
 }
 
@@ -178,7 +188,7 @@ function doExport() {
         else if (c.spec) assign = parseAssign(base.ops, c.spec);
         else if (c.dse && saved) { assign = new Map(Object.entries(saved.assign ?? {})); c.note = saved.note; }
         else if (c.dse) {
-            const res = explore(c.src, { ...syn, objective: c.dse.objective ?? 'area', constraint: { metric: 'psnr', value: c.dse.psnr }, granularity: c.dse.granularity, heuristic: 'efficiency' });
+            const res = explore(c.src, { ...syn, objective: c.dse.objective ?? 'area', constraint: c.dse.metric ? { metric: c.dse.metric, value: c.dse.value } : { metric: 'psnr', value: c.dse.psnr }, granularity: c.dse.granularity, heuristic: 'efficiency' });
             const p = res.runs[0].chosen ?? res.runs[0].best;
             assign = new Map(p.assign);
             c.note += ` (${p.units.join(', ')})`;
@@ -346,6 +356,12 @@ function doCollect() {
         if (old && !row.hls) Object.assign(row, { csim: old.csim, hls: old.hls, impl: old.impl });
         rows.push(row);
     }
+    // Uma exportação parcial (--only) não apaga as medidas dos outros casos: as linhas da coleta anterior continuam,
+    // na ordem da lista de casos.
+    const got = new Set(rows.map((r) => r.case));
+    for (const [id, r] of prev) if (!got.has(id)) rows.push(r);
+    const order = new Map(cases().map((c, k) => [c.id, k]));
+    rows.sort((a, b) => (order.get(a.case) ?? 1e9) - (order.get(b.case) ?? 1e9));
     writeFileSync(join(RES, 'summary.json'), `${JSON.stringify({ part: meta.part, collected: new Date().toISOString(), rows }, null, 1)}\n`);
     report(rows, meta);
 }
