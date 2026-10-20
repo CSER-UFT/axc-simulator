@@ -1,0 +1,515 @@
+% Models and search heuristics of the approximate high level synthesis in axc-simulator.
+% Single file; compile with pdflatex (two passes for the references).
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage[table]{xcolor}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+\definecolor{tabAzul}{RGB}{31,78,121}
+
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cost}{C}
+\newcommand{\Feas}{\mathcal{F}}
+
+\title{Approximate high level synthesis in axc-simulator:\\ cost model, error model and search heuristics}
+\author{Prof. Dr. Tiago Almeida}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Notation}
+
+A kernel is elaborated into a set of segments (straight line bodies of loops, after unrolling). Each segment is a data
+flow graph (DFG) whose nodes are operations. The set of approximable operations is
+\[
+  O = \{ o_1, \dots, o_n \}, \qquad o_i \in \{\text{add}, \text{sub}, \text{mul}\},
+\]
+each with a width $W_i \in \{8, 16, 32\}$ chosen by range analysis and a list of library units $\mathcal{U}_i$ of that
+width, whose first element $u_i^{\star}$ is the exact unit. An \emph{assignment} is a map
+$u : O \to \bigcup_i \mathcal{U}_i$ with $u(o_i) \in \mathcal{U}_i$. For any value $v$ of the DFG, the error is
+\[
+  e_v = \tilde v - v,
+\]
+the approximate value minus the exact one. The static model keeps, for each value, the mean and the second moment
+\[
+  \mu_v = \E[e_v], \qquad m_v = \E[e_v^2], \qquad \sigma_v^2 = m_v - \mu_v^2 .
+\]
+Signal statistics ($\E[v]$, $\E[v^2]$ and samples of the operands of each operation) come from one exact execution of the
+kernel on the chosen input data (the \emph{profile}).
+
+\section{Cost model}
+
+\subsection{Scheduling}
+
+Let $T_c$ be the clock period, $t_{cq}$ the clock to output time and $t_{su}$ the setup time of the register. Operations
+are chained in one cycle while
+\[
+  \sum_{k \in \text{chain}} d_k \le T_c - t_{cq} - t_{su},
+\]
+where $d_k$ is the delay of the unit of operation $k$ (sky130 synthesis, or Vivado when the FPGA delays are chosen). An
+operation with $d_k > T_c - t_{cq} - t_{su}$ is a multicycle operation that takes
+$\lceil (d_k + t_{cq} + t_{su}) / T_c \rceil$ cycles.
+
+For a pipelined loop with requested interval $II_{\text{req}}$, the achieved interval is
+\[
+  II = \max\left( II_{\text{req}},\; \max_{r} \left\lceil \frac{U_r}{N_r} \right\rceil,\; II_{\text{rec}} \right),
+\]
+where $U_r$ is the number of uses of resource $r$ per iteration (memory bank ports, or units limited by
+\texttt{allocation}), $N_r$ the number of instances of $r$, and $II_{\text{rec}}$ the smallest interval that satisfies every
+recurrence (the latency of the cycle of each loop carried value). The latency of a pipelined loop with $N$ iterations
+and depth $D$ is
+\[
+  L_{\text{pipe}} = D + (N - 1)\, II + \ell_{\text{pipe}},
+\]
+and of a sequential loop with body latency $L_b$ and $s$ inner loops
+\[
+  L_{\text{seq}} = N \left( L_b + \ell_{\text{loop}} + s\, \ell_{\text{sub}} + \ell_{\text{addr}} \right),
+\]
+with the calibrated constants $\ell_{\text{pipe}} = 1$, $\ell_{\text{loop}} = 1$ and $\ell_{\text{sub}} = 2$, and
+$\ell_{\text{addr}}$ the latency of the bank remainder when the partition factor is not a power of 2. A sequential
+loop whose only body is a pipelined loop is flattened into one loop of $N_{\text{out}} N_{\text{in}}$ iterations, as
+Vitis HLS does.
+
+\subsection{Units in context}
+
+\paragraph{Constant propagation.} Each instance of a unit is costed with the bits of its inputs that are known (constant
+operands, high bits that the range proves zero). Let $\phi_g(u, K)$ and $\phi_c(u, K)$ be the fractions of gates and of
+carry chain cells of the netlist of $u$ that remain live under the known bits $K$. Then
+\begin{gather*}
+  A(u, K) = \phi_g(u, K)\, A(u), \qquad \text{LUT}(u, K) = \phi_g(u, K)\, \text{LUT}(u), \\
+  \text{CARRY4}(u, K) = \phi_c(u, K)\, \text{CARRY4}(u).
+\end{gather*}
+
+\paragraph{Exact multiplication by a constant.} A product $x \cdot c$ with $x$ of $w$ bits is a sum of shifts. With
+$d(c)$ the smaller number of nonzero digits between the binary and the canonical signed digit forms of $|c|$,
+\[
+  \text{LUT}(x \cdot c) = (d(c) - 1)(w + 1), \qquad
+  \text{delay}(x \cdot c) = \lceil \log_2 d(c) \rceil \, d_{\text{add}} .
+\]
+
+\paragraph{Truncated adders.} An adder of $W$ bits truncated in $k$ bits is an exact adder of $W - k$ bits plus wires:
+\[
+  q(\text{TRUNC}_k) = \min\left( q_{\text{synth}}(\text{TRUNC}_k),\; \frac{W - k}{W}\, q(\text{exact}_W) \right),
+  \qquad q \in \{ A, E, P_{\text{leak}}, \text{LUT} \},
+\]
+and $\text{CARRY4}(\text{TRUNC}_k) \le \lceil (W - k)/4 \rceil$.
+
+\paragraph{Sharing.} Adders and multiplications by a constant have one unit per operation (exact or approximate). A
+group $G$ of multiplications between variables that the schedule allows to share in $I$ instances is shared only if
+\[
+  \sum_{j=1}^{I} \left[ \kappa\big(u, K_j\big) + \sum_{s \in \{a,b\}} \kappa\big(\text{mux}(n_{j,s}, W)\big) \right]
+  \;<\; \sum_{o \in G} \kappa\big(u, K_o\big),
+\]
+where $\kappa$ is the area (ASIC target) or LUT plus CARRY4 (FPGA target), $K_j$ the known bits common to the operations
+bound to instance $j$, and $n_{j,s}$ the number of distinct sources at input $s$ of instance $j$. A multiplexer of $n$
+inputs and $W$ bits costs $(n - 1)$ two input multiplexers per bit (ASIC) and $W \lceil (n-1)/3 \rceil$ LUTs (FPGA).
+
+\paragraph{Registers.} A value produced in cycle $c_p$ and last used in cycle $c_\ell$ needs registers for
+$s = c_\ell - c_p$ stages; with pipelining each stage is a register of the width of the value. On FPGA, a chain of
+$s \ge 3$ stages of $b$ bits becomes a shift register: $b \lceil (s - 1)/32 \rceil$ LUTs plus $b$ output flip flops.
+
+\paragraph{Memory addressing.} With cyclic partitioning by a factor $F$ that is not a power of 2, each index needs a
+division by a constant ($6w$ LUTs for $w$ bits) and a remainder whose latency $w + 4$ cycles enters the depth.
+
+\paragraph{Energy per execution.}
+\[
+  E = \sum_{o} N_o\, E\big(u(o), K_o\big) \;+\; B_{\text{reg}}\, E_{\text{reg}}\, N_{\text{cyc}}
+      \;+\; E_{\text{ctrl}} N_{\text{cyc}} \;+\; \Big( \sum_{\text{inst}} P_{\text{leak}} + B_{\text{reg}} P_{\text{leak,reg}} \Big) t_{\text{exec}},
+\]
+with $N_o$ the number of executions of operation $o$, $B_{\text{reg}}$ the register bits and $N_{\text{cyc}}$ the
+cycles of the kernel.
+
+\section{Error metrics}
+
+For an output array with $N$ written positions and peak value $P$ (the maximum of its type),
+\[
+  \text{ME} = \frac{1}{N} \sum_{j} e_j, \qquad
+  \text{MSE} = \frac{1}{N} \sum_{j} e_j^2, \qquad
+  \text{PSNR} = 10 \log_{10} \frac{P^2}{\text{MSE}} .
+\]
+SSIM (Wang et al., 2004) uses an $11 \times 11$ Gaussian window with $\sigma = 1.5$, normalized, only at positions where
+the window fits, with $C_1 = (0.01 L)^2$, $C_2 = (0.03 L)^2$ and $L = 255$:
+\[
+  \text{SSIM}(X, Y) = \frac{1}{|\Omega|} \sum_{p \in \Omega}
+  \frac{(2 \mu_x \mu_y + C_1)(2 \sigma_{xy} + C_2)}{(\mu_x^2 + \mu_y^2 + C_1)(\sigma_x^2 + \sigma_y^2 + C_2)},
+\]
+where the local moments are the window weighted means at position $p$.
+
+\section{Static error model}
+
+\subsection{Own error of a unit}
+
+For an operation $o$ with exact result $x \circ y$ and unit function $f_u$, over the $S$ operand samples
+$(x_s, y_s)$ of the profile (up to 4096 per operation),
+\[
+  \mu_o^{\text{own}} = \frac{1}{S} \sum_{s} \big( f_u(x_s, y_s) - x_s \circ y_s \big), \qquad
+  m_o^{\text{own}} = \frac{1}{S} \sum_{s} \big( f_u(x_s, y_s) - x_s \circ y_s \big)^2 .
+\]
+The own error is added to the propagated one as an independent term:
+$\mu = \mu_{\text{prop}} + \mu^{\text{own}}$, $\sigma^2 = \sigma^2_{\text{prop}} + \sigma^{2,\text{own}}$.
+
+\subsection{Subtraction and signed addition}
+
+In two's complement with $W$ bits, signed and unsigned additions are the same modulo $2^W$, and
+\[
+  a - b \equiv \overline{\,\overline{a} + b\,} \pmod{2^W}, \qquad \overline{x} = 2^W - 1 - x,
+\]
+since $\overline{\overline{a} + b} = 2^W - 1 - (2^W - 1 - a + b) = a - b$. An approximate subtraction is therefore
+$\overline{f_u(\overline{a}, b)}$, with no carry in, and the result is read in the bits of the type of the node. With a
+unit truncated in $k$ bits, the subtraction error lies in $[0, 2(2^k - 1)]$. An operation stays exact when its result
+does not fit the $W$ bits of the unit.
+
+\subsection{Analytic propagation}
+
+Errors are assumed independent of each other and of the signals, except when the same value enters twice.
+\begin{align*}
+  \text{add, sub:}\quad & e = e_a \pm e_b, &&
+    \mu = \mu_a \pm \mu_b,\quad \sigma^2 = \sigma_a^2 + \sigma_b^2 \\
+  \text{mul:}\quad & e = a e_b + b e_a + e_a e_b, &&
+    \mu = \E[a]\mu_b + \E[b]\mu_a + \mu_a\mu_b \\
+  & && m = \E[a^2] m_b + \E[b^2] m_a + m_a m_b + 2\E[a]\E[b]\mu_a\mu_b \\
+  & && \qquad + 2\E[a]\mu_a m_b + 2\E[b]\mu_b m_a \\
+  x \ll k:\quad & e = 2^k e_x, && \mu = 2^k \mu_x,\quad m = 4^k m_x \\
+  x \gg k:\quad & && \mu = \mu_x / S,\quad
+     \sigma^2 = \frac{\sigma_x^2}{S^2} + \E\!\left[ \frac{q}{S}\Big(1 - \frac{q}{S}\Big) \right] \\
+  & && \text{with } S = 2^k,\; q = e \bmod S,\; e \sim \mathcal{N}(\mu_x, \sigma_x^2) \\
+  x \bmod 2^k:\quad & && \mu = 0,\quad m = \E\big[ q (S - q) \big]
+\end{align*}
+The second term of the right shift is the variance added by the rounding toward minus infinity.
+
+\paragraph{Comparison.} For $c = (a \bowtie b)$, the error of the difference $\delta = a - b$ is
+$e_\delta \sim \mathcal{N}(\mu_a - \mu_b, \sigma_a^2 + \sigma_b^2)$. For each sample with exact difference $d_s$ and exact
+outcome $c_s$, the probability that the approximate comparison is true is, for example for $<$,
+\[
+  \pi_s = \Pr[d_s + e_\delta \le -1] = \Phi\!\left( \frac{-1 + 0.5 - d_s - \mu_\delta}{\sigma_\delta} \right),
+\]
+and analogously for $\le$, $>$, $\ge$, $=$, $\ne$. Then
+$\mu_c = \frac{1}{S}\sum_s (\pi_s - c_s)$ and $m_c = \frac{1}{S}\sum_s \Pr[\text{outcome changes}]$.
+
+\paragraph{Selection.} For $y = c\,?\,A : B$ with flip probability $p_s$ (as above), chosen side error $e_{\text{ch}}$,
+other side error $e_{\text{ot}}$ and exact distance $D_s$ between the sides,
+\[
+  \mu_y = \frac{1}{S}\sum_s \Big[ (1 - p_s)\mu_{\text{ch}} + p_s (D_s + \mu_{\text{ot}}) \Big], \quad
+  m_y = \frac{1}{S}\sum_s \Big[ (1 - p_s) m_{\text{ch}} + p_s (D_s^2 + 2 D_s \mu_{\text{ot}} + m_{\text{ot}}) \Big].
+\]
+This covers \texttt{min}, \texttt{max}, \texttt{abs} and the conditional operator.
+
+\subsection{Sampled propagation}
+
+Inside each segment, the $R$ stored exact executions (up to 2048 per segment) are replayed with the approximate units.
+Values that enter the segment from other segments, recurrences or memory get a noise
+$\lfloor \mathcal{N}(\mu, \sigma^2) + U(0,1) \rfloor$ with their propagated moments. For each node,
+\[
+  \mu_v = \frac{1}{R} \sum_{r} (\tilde v_r - v_r), \qquad m_v = \frac{1}{R} \sum_{r} (\tilde v_r - v_r)^2 .
+\]
+Correlations inside the segment (an adder that already cleared the low bits of several terms, errors that depend on the
+low bits of the operands) are kept.
+
+\subsection{Recurrences}
+
+For a loop carried value with $T$ iterations, the increment per iteration $\delta = (\mu_\delta, \sigma_\delta^2)$ is
+measured with no input error, and the gain $g$ with the analytic model by a probe of size $p$:
+\[
+  g = \frac{\mu_{\text{out}}(p) - \mu_{\text{out}}(0)}{p}, \qquad
+  \mu_{t+1} = g\,\mu_t + \mu_\delta, \qquad \sigma^2_{t+1} = g^2 \sigma^2_t + \sigma^2_\delta .
+\]
+Uses inside the loop see the average over the iterations,
+$\bar\mu = \frac{1}{T}\sum_t \mu_t$, $\bar m = \frac{1}{T}\sum_t (\sigma_t^2 + \mu_t^2)$; uses after the loop see
+$(\mu_T, \sigma_T^2)$.
+
+\subsection{Memory}
+
+Each array keeps the mean of the errors written to it, weighted by the number of executions $w$ of each store:
+\[
+  \mu_{\text{arr}} = \frac{\sum w\, \mu}{\sum w}, \qquad m_{\text{arr}} = \frac{\sum w\, m}{\sum w}.
+\]
+Loads see $(\mu_{\text{arr}}, m_{\text{arr}})$; outputs give $\text{ME} = \mu$, $\text{MSE} = m$ and the PSNR.
+
+\subsection{SSIM estimate}
+
+Let $\mu_x, \sigma_x^2$ be the local moments of the exact image (computed once). With the error independent of the signal,
+with mean $\mu_e$ and variance $\sigma_e^2$,
+\[
+  \mu_y = \mu_x + \mu_e, \qquad \sigma_y^2 = \sigma_x^2 + \sigma_e^2, \qquad \sigma_{xy} = \sigma_x^2 .
+\]
+With a part proportional to the value, $e = a + b\,x + n$, $b = \operatorname{Cov}(x, e)/\Var(x)$,
+$a = \mu_e - b\,\E[x]$, $\sigma_n^2 = \max(0, \sigma_e^2 - b^2 \Var(x))$:
+\[
+  \mu_y = (1+b)\mu_x + a, \qquad \sigma_y^2 = (1+b)^2\sigma_x^2 + \sigma_n^2, \qquad \sigma_{xy} = (1+b)\sigma_x^2 .
+\]
+With the error conditioned on the exact value (sampled model), in $B = 32$ value bins with mean $m_\beta$ and variance
+$v_\beta$, and the blurred indicator maps $P_\beta = G * \mathbb{1}[x \in \beta]$ and $Q_\beta = G * (x\,\mathbb{1}[x \in \beta])$:
+\begin{gather*}
+  \mu_y = \mu_x + \sum_\beta m_\beta P_\beta, \qquad
+  \E[xy] = \E[x^2] + \sum_\beta m_\beta Q_\beta, \\
+  \E[y^2] = \E[x^2] + 2\sum_\beta m_\beta Q_\beta + \sum_\beta (m_\beta^2 + v_\beta) P_\beta,
+\end{gather*}
+and the local SSIM follows from these moments. All three assume errors independent between pixels.
+
+\section{Search problem}
+
+Given an objective $\Cost(u)$ (area, LUT plus CARRY4, energy, latency, interval or a weighted sum normalized by the exact
+design) and an error constraint on every output $k$ (PSNR $\ge \tau$, MSE $\le \tau$ or SSIM $\ge \tau$), the problem is
+\[
+  \min_{u} \; \Cost(u) \quad \text{subject to} \quad \Feas(u) = \bigwedge_k \text{constraint}\big(\hat E_k(u)\big),
+\]
+where $\hat E_k$ is the static estimate. Operations are partitioned into groups $\mathcal{G}$ (per operation, per source
+line, per source operation or per class) and all operations of a group get the same unit, so the decision is a vector
+$\mathbf{c} \in \prod_{g} \mathcal{C}_g$. The scalar error used to rank moves is
+\[
+  \varepsilon(u) = \sum_k \frac{\text{MSE}_k(u)}{P_k^2} \quad\text{(PSNR, MSE)}, \qquad
+  \varepsilon(u) = \sum_k \big(1 - \text{SSIM}_k(u)\big) \quad\text{(SSIM)}.
+\]
+Each evaluation synthesizes the whole design (binding, sharing and multiplexers included), so $\Cost$ is not additive in
+the groups.
+
+\begin{algorithm}[H]
+\caption{Candidates of a group}
+\begin{algorithmic}[1]
+\Require group $g$ with operations $O_g$, exact unit $u^\star$, exact design $u_0$
+\State $R \gets \{ (u^\star, 0, 0) \}$
+\For{$u \in \bigcap_{o \in O_g} \mathcal{U}_o \setminus \{u^\star\}$}
+  \State $\text{own} \gets \sum_{o \in O_g} m_o^{\text{own}}(u)$
+  \If{$\text{own} = 0$} \textbf{continue} \Comment{same results as the exact unit on the real operands}
+  \EndIf
+  \State $\Delta \gets \Cost(u_0[O_g \mapsto u]) - \Cost(u_0)$ \Comment{saving in context, full synthesis}
+  \If{$\Delta \ge 0$} \textbf{continue}
+  \EndIf
+  \State $R \gets R \cup \{(u, \Delta, \text{own})\}$
+\EndFor
+\State $\mathcal{C}_g \gets$ Pareto front of $R$ in $(\Delta, \text{own})$, exact unit first
+\State \Return $\mathcal{C}_g$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Evaluate}
+\begin{algorithmic}[1]
+\Require choice $\mathbf{c}$
+\If{$\mathbf{c}$ is in the cache} \Return cached point
+\EndIf
+\State $u \gets$ expand $\mathbf{c}$ to the operations; synthesize; $\Cost \gets$ objective of the synthesis
+\State $\hat E \gets$ static error estimate (own errors, propagation)
+\State \Return $(\mathbf{c}, \Cost, \varepsilon, \Feas)$, stored in the cache and in the list of evaluated points
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Constructive heuristics}
+
+\begin{algorithm}[H]
+\caption{Sequential}
+\begin{algorithmic}[1]
+\State $\mathbf{c} \gets \mathbf{c}^\star$ (all exact); order groups: multiplications first, then source order
+\For{each group $g$ in that order}
+  \State $\text{best} \gets \text{Evaluate}(\mathbf{c})$
+  \For{$u \in \mathcal{C}_g$}
+    \State $p \gets \text{Evaluate}(\mathbf{c}[g \mapsto u])$
+    \If{$p$ feasible \textbf{and} $\Cost(p) < \Cost(\text{best})$} $\text{best} \gets p$
+    \EndIf
+  \EndFor
+  \State $\mathbf{c} \gets \text{best}.\mathbf{c}$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Efficiency (greedy by saving per error, lazy evaluation)}
+\begin{algorithmic}[1]
+\State $\mathbf{c} \gets \mathbf{c}^\star$; $\text{cur} \gets \text{Evaluate}(\mathbf{c})$
+\State moves $M \gets \{(g, u) : u \in \mathcal{C}_g\} \cup \{(\text{class } k, u)\}$
+\Statex \hspace{\algorithmicindent} (whole class moves only when the groups are finer than the class)
+\State stored rate $\rho(m) \gets +\infty$ for all $m \in M$
+\Loop
+  \State reevaluate the moves with the largest stored $\rho$ (at least 40, all when $|M| \le 400$) until the best fresh
+  rate is not below the best stored one
+  \For{each reevaluated move $m$}
+    \State $\Delta C \gets \Cost(\text{cur}) - \Cost(\mathbf{c} \oplus m)$ \Comment{cost only, cheap}
+    \If{$\Delta C \le 0$} discard $m$; \textbf{continue}
+    \EndIf
+    \State $p \gets \text{Evaluate}(\mathbf{c} \oplus m)$; \; $\Delta\varepsilon \gets \varepsilon(p) - \varepsilon(\text{cur})$
+    \If{$p$ infeasible} discard $m$; \textbf{continue}
+    \EndIf
+    \State $\rho(m) \gets \Delta C / \Delta\varepsilon$ \; (or $10^{15} + \Delta C$ when $\Delta\varepsilon \le 0$)
+  \EndFor
+  \If{no feasible saving move} \textbf{break}
+  \EndIf
+  \State apply the move with the largest $\rho$; reset $\rho$ of the moves of the changed groups to $+\infty$
+\EndLoop
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Exhaustive (pruned only when needed)}
+\begin{algorithmic}[1]
+\If{$\prod_g |\mathcal{C}_g| \le 20000$} $L_g \gets \mathcal{C}_g$ for all $g$
+\Else
+  \For{each group $g$}: $L_g \gets$ units in increasing own error up to (excluding) the first that alone violates
+  \EndFor \Comment{heuristic: errors of opposite signs cancel}
+\EndIf
+\State compute $\Cost$ of every combination of $\prod_g L_g$ (synthesis only) and sort by cost
+\State evaluate the error in that order; the first feasible combination is the optimum among the candidates
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Random (reference)}
+\begin{algorithmic}[1]
+\For{$s = 1, \dots, S$}
+  \State for each group: exact with probability $1/3$, else a uniform candidate; Evaluate
+\EndFor
+\State \Return the cheapest feasible sample
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Improvement heuristics}
+
+All of them start from several points and keep the cheapest feasible result, so they never end worse than any
+starting point.
+
+\begin{algorithm}[H]
+\caption{Starting points}
+\begin{algorithmic}[1]
+\State $S \gets \{ \text{Evaluate}(\mathbf{c}^\star) \}$
+\If{groups are finer than the class}
+  \State $\mathbf{k} \gets$ Exhaustive on the class groups (one unit per operation class and width)
+  \State $\mathbf{c} \gets$ for each group, the unit of its class in $\mathbf{k}$ (exact if its operations disagree)
+  \State $S \gets S \cup \{\text{Evaluate}(\mathbf{c})\}$
+\EndIf
+\State $S \gets S \cup \{\text{Evaluate}(\text{Efficiency result})\}$
+\State \Return the distinct feasible points of $S$, cheapest first
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Local search with pair moves}
+\begin{algorithmic}[1]
+\Require start point $\text{cur}$, evaluation budget
+\Loop
+  \State $D \gets \{ \mathbf{c} = \text{cur}.\mathbf{c}[g \mapsto u] : u \in \mathcal{C}_g \cup \{u_g^\star\},\; \Cost(\mathbf{c}) < \Cost(\text{cur}) \}$, sorted by cost
+  \State $\text{next} \gets$ first feasible $\text{Evaluate}(\mathbf{c})$, $\mathbf{c} \in D$
+  \If{$\text{next} = \emptyset$}
+    \For{$m$ among the 12 cheapest evaluated moves of $D$ (all infeasible)}
+      \For{each other group $h$ and unit $w$ with own error below that of $m.\mathbf{c}[h]$}
+        \State $\mathbf{c}' \gets m.\mathbf{c}[h \mapsto w]$; keep it if $\Cost(\mathbf{c}') < \Cost(\text{cur})$
+      \EndFor
+    \EndFor
+    \State $\text{next} \gets$ first feasible $\text{Evaluate}(\mathbf{c}')$ in increasing cost
+  \EndIf
+  \If{$\text{next} = \emptyset$ \textbf{or} budget exhausted} \textbf{break}
+  \EndIf
+  \State $\text{cur} \gets \text{next}$
+\EndLoop
+\State \Return $\text{cur}$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Local (heuristic)}
+\begin{algorithmic}[1]
+\State \Return the cheapest of LocalSearch$(s)$ over the starting points $s$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Tabu search}
+\begin{algorithmic}[1]
+\For{each starting point $s$}
+  \State $\text{cur} \gets s$, $\text{run} \gets s$, tabu$(g) \gets 0$ for all groups
+  \For{$t = 1, \dots, 40$}
+    \State neighbors: all single group moves of $\text{cur}$ (cheaper or more expensive), sorted by cost
+    \State evaluate the 16 cheapest that are not tabu ($\text{tabu}(g) \ge t$), or tabu but cheaper than the best so far
+    \State $\text{cur} \gets$ cheapest feasible evaluated neighbor, or, with none feasible, the one with least error
+    \State $\text{tabu}(g_{\text{moved}}) \gets t + \theta$, \; $\theta = \min(7, \max(3, \lceil |\mathcal{G}|/3 \rceil))$
+    \If{$\text{cur}$ feasible \textbf{and} cheaper than $\text{run}$} $\text{run} \gets \text{cur}$
+    \EndIf
+  \EndFor
+  \State $\text{run} \gets \text{LocalSearch}(\text{run})$
+\EndFor
+\State \Return the cheapest $\text{run}$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{GRASP}
+\begin{algorithmic}[1]
+\State $\text{best} \gets$ cheapest of LocalSearch$(s)$ over the starting points
+\For{$i = 1, \dots, 6$}
+  \State $\mathbf{c} \gets \mathbf{c}^\star$; shuffle the groups (fixed seed)
+  \For{each group $g$ in that order}
+    \State $\text{RCL} \gets$ the first $\alpha = 3$ feasible moves among the saving moves of $g$, in cost order
+    \If{$\text{RCL} \ne \emptyset$} $\mathbf{c} \gets$ a uniform element of RCL
+    \EndIf
+  \EndFor
+  \State $p \gets \text{LocalSearch}(\text{Evaluate}(\mathbf{c}))$; keep the cheapest feasible
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Genetic algorithm}
+\begin{algorithmic}[1]
+\State population $P$: the starting points, the exact design, and mixes of a starting point and random genes
+  (each gene from the start with probability $1/2$; a random gene is exact with probability $0.3$), size 24
+\For{generation $= 1, \dots, 30$}
+  \State keep the 2 best (elitism), ranked by the feasibility rules:
+  \Statex \hspace{\algorithmicindent} feasible beats infeasible; among feasible, lower cost; among infeasible, lower $\varepsilon$
+  \While{$|P'| < 24$}
+    \State parents $a, b \gets$ binary tournaments with the same rules
+    \State child: uniform crossover of $a.\mathbf{c}$ and $b.\mathbf{c}$; each gene mutated with probability $1/|\mathcal{G}|$
+    \State $P' \gets P' \cup \{\text{Evaluate}(\text{child})\}$
+  \EndWhile
+  \State $P \gets P'$
+\EndFor
+\State \Return LocalSearch(cheapest feasible point found)
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Verification}
+
+\begin{algorithm}[H]
+\caption{Exploration driver}
+\begin{algorithmic}[1]
+\State elaborate, profile (exact execution), build the groups and candidates
+\For{each heuristic $h$}
+  \State run $h$; $F \gets$ feasible evaluated points sorted by cost
+  \For{$p \in F$ (up to 25)}
+    \State execute the approximate design bit by bit; measure the error of every output
+    \If{the measured error satisfies the constraint} \Return $p$
+    \EndIf
+  \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\section{Calibration summary}
+
+Mean relative deviation between the model and Vivado 2022.2 after placement and routing (part xc7a100tcsg324-1, 59
+cases), and error of the predicted LUT saving against the measured one for the units exported as RTL blackboxes.
+
+\begin{center}
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{|l|r|}
+\hline
+\rowcolor{tabAzul}\color{white} Quantity & \color{white} Mean error \\
+\hline
+Latency, pipelined loops & 0.3\% \\
+Latency, sequential loops & 8.4\% \\
+LUT & 14.8\% \\
+FF & 20.7\% \\
+Period & 17.6\% \\
+LUT saving (RTL blackbox, 14 designs) & 8.0 p.p. \\
+\hline
+\end{tabular}
+\end{center}
+
+\end{document}
