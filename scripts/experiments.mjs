@@ -145,8 +145,8 @@ function e2() {
     }
     save('e2_heuristicas.csv', csv(rows));
     md.push('### E2. Heurísticas de exploração\n', 'Objetivo: área ASIC; restrição: PSNR mínimo (estimado na busca, conferido bit a bit no ponto escolhido). Economia em relação ao projeto exato; "-" quando a heurística não roda (exaustiva por operação) ou nenhum ponto passa na verificação.\n');
-    const H = ['sequential', 'efficiency', 'exhaustive', 'random'];
-    const HN = { sequential: 'Sequencial', efficiency: 'Eficiência', exhaustive: 'Exaustiva', random: 'Aleatória' };
+    const H = ['sequential', 'efficiency', 'exhaustive', 'random', 'local', 'tabu', 'grasp', 'ga'];
+    const HN = { sequential: 'Sequencial', efficiency: 'Eficiência', exhaustive: 'Exaustiva', random: 'Aleatória', local: 'Local', tabu: 'Tabu', grasp: 'GRASP', ga: 'Genético' };
     const keys = [...new Set(res.map((x) => `${x.k}|${x.g}|${x.lim}`))];
     table('E2: economia de área do ponto escolhido (PSNR medido)', ['Kernel', 'Grupos', 'PSNR mín.', ...H.map((h) => HN[h])],
         keys.map((key) => {
@@ -155,7 +155,16 @@ function e2() {
                 const x = res.find((y) => `${y.k}|${y.g}|${y.lim}` === key && y.h === h);
                 return x?.p && x.verified ? `${pctBr(x.p.savings.area)} (${br(Math.min(...x.p.measured.map((o) => o.PSNR)), 1)})` : '-';
             })];
-        }), ['l', 'l', 'r', 'r', 'r', 'r', 'r']);
+        }), ['l', 'l', 'r', ...H.map(() => 'r')]);
+    // Distância ao melhor conhecido: em cada configuração, a menor área verificada entre todas as heurísticas.
+    const bestOf = new Map(keys.map((key) => [key, Math.min(...res.filter((y) => `${y.k}|${y.g}|${y.lim}` === key && y.p && y.verified).map((y) => y.p.cost.area))]));
+    table('E2: distância ao melhor conhecido (área a mais, em média e no pior caso, e em quantas configurações a heurística acha o melhor)', ['Heurística', 'Grupos', 'Média', 'Pior', 'Acha o melhor'],
+        H.flatMap((h) => grans.map((g) => {
+            const xs = res.filter((x) => x.h === h && x.g === g && x.p && x.verified && Number.isFinite(bestOf.get(`${x.k}|${x.g}|${x.lim}`)));
+            if (!xs.length) return [HN[h], g === 'op' ? 'operação' : 'classe', '-', '-', '-'];
+            const gaps = xs.map((x) => x.p.cost.area / bestOf.get(`${x.k}|${x.g}|${x.lim}`) - 1);
+            return [HN[h], g === 'op' ? 'operação' : 'classe', pctBr(gaps.reduce((a, b) => a + b, 0) / gaps.length), pctBr(Math.max(...gaps)), `${gaps.filter((d) => d < 1e-9).length} de ${gaps.length}`];
+        })), ['l', 'l', 'r', 'r', 'r']);
     table('E2: avaliações e tempo (média por configuração)', ['Heurística', 'Grupos', 'Avaliações', 'Tempo (s)'],
         H.flatMap((h) => grans.map((g) => {
             const xs = res.filter((x) => x.h === h && x.g === g && !x.error);

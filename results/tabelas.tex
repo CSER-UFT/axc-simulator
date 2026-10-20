@@ -58,34 +58,60 @@ uniformes & MUL DRUM6 + ADD LOA6 & 25961 & 25385 & 25601 \\ \hline
 \begin{table}[htbp]
 \centering
 \caption{E2: economia de área do ponto escolhido (PSNR medido)}
-\begin{tabular}{|l|l|r|r|r|r|r|}
+\begin{tabular}{|l|l|r|r|r|r|r|r|r|r|r|}
 \hline
-\rowcolor{tabAzul}\color{white}Kernel & \color{white}Grupos & \color{white}PSNR mín. & \color{white}Sequencial & \color{white}Eficiência & \color{white}Exaustiva & \color{white}Aleatória \\
+\rowcolor{tabAzul}\color{white}Kernel & \color{white}Grupos & \color{white}PSNR mín. & \color{white}Sequencial & \color{white}Eficiência & \color{white}Exaustiva & \color{white}Aleatória & \color{white}Local & \color{white}Tabu & \color{white}GRASP & \color{white}Genético \\
 \hline
-gauss & classe & 30 & 46,5\% (33,4) & 47,4\% (34,7) & 49,0\% (32,0) & 47,4\% (34,7) \\ \hline
-gauss & classe & 40 & 44,4\% (41,0) & 44,4\% (41,0) & 44,4\% (41,0) & 39,5\% (40,7) \\ \hline
-gauss & classe & 50 & 31,5\% (50,8) & 31,5\% (50,8) & 31,5\% (50,8) & 31,5\% (50,8) \\ \hline
-gauss & operação & 30 & 48,3\% (30,1) & 54,7\% (30,5) & - & 33,3\% (30,7) \\ \hline
-gauss & operação & 40 & 40,2\% (40,6) & 42,8\% (40,3) & - & 23,9\% (42,1) \\ \hline
-gauss & operação & 50 & 27,8\% (50,1) & 30,4\% (50,2) & - & 0,0\% ($\infty$) \\ \hline
-sobel & classe & 30 & 6,0\% (37,1) & 6,0\% (37,1) & 6,0\% (37,1) & 6,0\% (37,1) \\ \hline
-sobel & classe & 40 & 4,1\% (44,7) & 4,1\% (44,7) & 4,1\% (44,7) & 4,1\% (44,7) \\ \hline
-sobel & classe & 50 & 2,9\% (50,9) & 2,9\% (50,9) & 2,9\% (50,9) & 2,9\% (50,9) \\ \hline
-sobel & operação & 30 & 7,5\% (30,8) & 11,1\% (30,3) & - & 6,7\% (30,3) \\ \hline
-sobel & operação & 40 & 6,9\% (40,5) & 6,9\% (40,5) & 6,9\% (40,5) & 5,2\% (42,2) \\ \hline
-sobel & operação & 50 & 2,6\% (50,6) & 3,2\% (50,2) & 3,2\% (50,2) & 1,4\% (52,2) \\ \hline
-sharpen & classe & 30 & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) \\ \hline
-sharpen & classe & 40 & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) \\ \hline
-sharpen & classe & 50 & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) \\ \hline
-sharpen & operação & 30 & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) \\ \hline
-sharpen & operação & 40 & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) \\ \hline
-sharpen & operação & 50 & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) \\ \hline
-fir & classe & 50 & 40,3\% (50,1) & 51,0\% (50,1) & 51,0\% (50,1) & 37,3\% (50,3) \\ \hline
-fir & classe & 60 & 37,0\% (61,0) & 37,0\% (61,0) & 44,0\% (60,7) & 31,9\% (60,2) \\ \hline
-fir & classe & 70 & 22,7\% (70,5) & 26,7\% (70,4) & 26,7\% (70,4) & 25,9\% (76,1) \\ \hline
-fir & operação & 50 & 50,1\% (50,0) & 63,5\% (50,1) & - & 35,9\% (55,0) \\ \hline
-fir & operação & 60 & 38,9\% (60,2) & 45,1\% (60,1) & - & 0,0\% ($\infty$) \\ \hline
-fir & operação & 70 & 27,3\% (70,2) & 35,0\% (70,0) & - & 0,0\% ($\infty$) \\ \hline
+gauss & classe & 30 & 46,5\% (33,4) & 47,4\% (34,7) & 49,0\% (32,0) & 47,4\% (34,7) & 49,0\% (32,0) & 49,0\% (32,0) & 49,0\% (32,0) & 49,0\% (32,0) \\ \hline
+gauss & classe & 40 & 44,4\% (41,0) & 44,4\% (41,0) & 44,4\% (41,0) & 39,5\% (40,7) & 44,4\% (41,0) & 44,4\% (41,0) & 44,4\% (41,0) & 44,4\% (41,0) \\ \hline
+gauss & classe & 50 & 31,5\% (50,8) & 31,5\% (50,8) & 31,5\% (50,8) & 31,5\% (50,8) & 31,5\% (50,8) & 31,5\% (50,8) & 31,5\% (50,8) & 31,5\% (50,8) \\ \hline
+gauss & operação & 30 & 48,3\% (30,1) & 54,7\% (30,5) & - & 33,3\% (30,7) & 54,7\% (30,5) & 54,7\% (30,5) & 54,7\% (30,5) & 54,7\% (30,5) \\ \hline
+gauss & operação & 40 & 40,2\% (40,6) & 42,8\% (40,3) & - & 23,9\% (42,1) & 45,2\% (40,4) & 45,2\% (40,4) & 45,2\% (40,2) & 45,2\% (40,5) \\ \hline
+gauss & operação & 50 & 27,8\% (50,1) & 30,4\% (50,2) & - & 0,0\% ($\infty$) & 32,7\% (50,3) & 32,6\% (50,3) & 32,1\% (50,3) & 32,6\% (50,6) \\ \hline
+sobel & classe & 30 & 6,0\% (37,1) & 6,0\% (37,1) & 6,0\% (37,1) & 6,0\% (37,1) & 6,0\% (37,1) & 6,0\% (37,1) & 6,0\% (37,1) & 6,0\% (37,1) \\ \hline
+sobel & classe & 40 & 4,1\% (44,7) & 4,1\% (44,7) & 4,1\% (44,7) & 4,1\% (44,7) & 4,1\% (44,7) & 4,1\% (44,7) & 4,1\% (44,7) & 4,1\% (44,7) \\ \hline
+sobel & classe & 50 & 2,9\% (50,9) & 2,9\% (50,9) & 2,9\% (50,9) & 2,9\% (50,9) & 2,9\% (50,9) & 2,9\% (50,9) & 2,9\% (50,9) & 2,9\% (50,9) \\ \hline
+sobel & operação & 30 & 7,5\% (30,8) & 11,1\% (30,3) & - & 6,7\% (30,3) & 11,1\% (30,3) & 11,1\% (30,3) & 11,1\% (30,3) & 11,1\% (30,3) \\ \hline
+sobel & operação & 40 & 6,9\% (40,5) & 6,9\% (40,5) & 6,9\% (40,5) & 5,2\% (42,2) & 6,9\% (40,5) & 6,9\% (40,5) & 6,9\% (40,5) & 6,9\% (40,5) \\ \hline
+sobel & operação & 50 & 2,6\% (50,6) & 3,2\% (50,2) & 3,2\% (50,2) & 1,4\% (52,2) & 3,2\% (50,2) & 3,2\% (50,2) & 3,2\% (50,2) & 3,2\% (50,2) \\ \hline
+sharpen & classe & 30 & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) \\ \hline
+sharpen & classe & 40 & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) \\ \hline
+sharpen & classe & 50 & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) \\ \hline
+sharpen & operação & 30 & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) & 1,4\% (32,4) \\ \hline
+sharpen & operação & 40 & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) \\ \hline
+sharpen & operação & 50 & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) & 0,0\% ($\infty$) \\ \hline
+fir & classe & 50 & 40,3\% (50,1) & 51,0\% (50,1) & 51,0\% (50,1) & 37,3\% (50,3) & 51,0\% (50,1) & 51,0\% (50,1) & 51,0\% (50,1) & 51,0\% (50,1) \\ \hline
+fir & classe & 60 & 37,0\% (61,0) & 37,0\% (61,0) & 44,0\% (60,7) & 31,9\% (60,2) & 37,0\% (61,0) & 37,0\% (61,0) & 37,0\% (61,0) & 37,0\% (61,0) \\ \hline
+fir & classe & 70 & 22,7\% (70,5) & 26,7\% (70,4) & 26,7\% (70,4) & 25,9\% (76,1) & 26,7\% (70,4) & 26,7\% (70,4) & 26,7\% (70,4) & 26,7\% (70,4) \\ \hline
+fir & operação & 50 & 50,1\% (50,0) & 63,5\% (50,1) & - & 35,9\% (55,0) & 63,9\% (50,1) & 63,9\% (50,1) & 63,9\% (50,1) & 63,9\% (50,1) \\ \hline
+fir & operação & 60 & 38,9\% (60,2) & 45,1\% (60,1) & - & 0,0\% ($\infty$) & 48,1\% (60,0) & 46,3\% (60,3) & 46,3\% (60,3) & 45,2\% (60,1) \\ \hline
+fir & operação & 70 & 27,3\% (70,2) & 35,0\% (70,0) & - & 0,0\% ($\infty$) & 35,0\% (70,0) & 35,0\% (70,0) & 35,0\% (70,0) & 35,0\% (70,0) \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{E2: distância ao melhor conhecido (área a mais, em média e no pior caso, e em quantas configurações a heurística acha o melhor)}
+\begin{tabular}{|l|l|r|r|r|}
+\hline
+\rowcolor{tabAzul}\color{white}Heurística & \color{white}Grupos & \color{white}Média & \color{white}Pior & \color{white}Acha o melhor \\
+\hline
+Sequencial & classe & 3,7\% & 21,9\% & 8 de 12 \\ \hline
+Sequencial & operação & 8,6\% & 38,4\% & 4 de 12 \\ \hline
+Eficiência & classe & 1,3\% & 12,6\% & 10 de 12 \\ \hline
+Eficiência & operação & 1,2\% & 5,8\% & 8 de 12 \\ \hline
+Exaustiva & classe & 0,0\% & 0,0\% & 12 de 12 \\ \hline
+Exaustiva & operação & 0,0\% & 0,0\% & 5 de 5 \\ \hline
+Aleatória & classe & 5,2\% & 28,0\% & 7 de 12 \\ \hline
+Aleatória & operação & 30,6\% & 92,8\% & 3 de 12 \\ \hline
+Local & classe & 1,1\% & 12,6\% & 11 de 12 \\ \hline
+Local & operação & 0,0\% & 0,0\% & 11 de 12 \\ \hline
+Tabu & classe & 1,1\% & 12,6\% & 11 de 12 \\ \hline
+Tabu & operação & 0,3\% & 3,6\% & 9 de 12 \\ \hline
+GRASP & classe & 1,1\% & 12,6\% & 11 de 12 \\ \hline
+GRASP & operação & 0,4\% & 3,6\% & 9 de 12 \\ \hline
+Genético & classe & 1,1\% & 12,6\% & 11 de 12 \\ \hline
+Genético & operação & 0,5\% & 5,7\% & 10 de 12 \\ \hline
 \end{tabular}
 \end{table}
 
@@ -97,16 +123,23 @@ fir & operação & 70 & 27,3\% (70,2) & 35,0\% (70,0) & - & 0,0\% ($\infty$) \\ 
 \rowcolor{tabAzul}\color{white}Heurística & \color{white}Grupos & \color{white}Avaliações & \color{white}Tempo (s) \\
 \hline
 Sequencial & classe & 36 & 0,6 \\ \hline
-Sequencial & operação & 191 & 2,4 \\ \hline
-Eficiência & classe & 215 & 2,3 \\ \hline
-Eficiência & operação & 3630 & 53,8 \\ \hline
-Exaustiva & classe & 1717 & 15,2 \\ \hline
-Exaustiva & operação & 701 & 14,7 \\ \hline
-Aleatória & classe & 78 & 0,9 \\ \hline
-Aleatória & operação & 153 & 2,4 \\ \hline
+Sequencial & operação & 191 & 2,5 \\ \hline
+Eficiência & classe & 215 & 2,6 \\ \hline
+Eficiência & operação & 3630 & 59,1 \\ \hline
+Exaustiva & classe & 1717 & 15,0 \\ \hline
+Exaustiva & operação & 701 & 13,8 \\ \hline
+Aleatória & classe & 78 & 1,0 \\ \hline
+Aleatória & operação & 153 & 2,5 \\ \hline
+Local & classe & 298 & 3,1 \\ \hline
+Local & operação & 7886 & 112,8 \\ \hline
+Tabu & classe & 346 & 3,7 \\ \hline
+Tabu & operação & 6869 & 109,8 \\ \hline
+GRASP & classe & 427 & 4,1 \\ \hline
+GRASP & operação & 7751 & 112,7 \\ \hline
+Genético & classe & 345 & 3,6 \\ \hline
+Genético & operação & 5901 & 75,4 \\ \hline
 \end{tabular}
 \end{table}
-
 \begin{table}[htbp]
 \centering
 \caption{E3: PSNR estimado contra medido ao longo da fronteira}

@@ -13,7 +13,7 @@
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
  *        [--weights 1,1,1] [--psnr dB | --mse v | --ssim s] [--granularity class|line|source|op] [--heuristic sequential|efficiency|
- *        exhaustive|random|all] [--directives] [--clocks 5,2.5] [--input image|uniform] [--model sampled|analytic]
+ *        exhaustive|random|local|tabu|grasp|ga|all] [--directives] [--clocks 5,2.5] [--input image|uniform] [--model sampled|analytic]
  *        [--all-units] [--samples n] [--verify-front n] [--csv]
  *
  * A <unidade> é o nome mostrado na página (por exemplo "MUL8 DRUM4", "MUL16 T8 A8c", "ADD16 LOA8"), procurado no

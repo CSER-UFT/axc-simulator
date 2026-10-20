@@ -246,7 +246,7 @@ function renderDse() {
                 + `<td>${t('dse.sav', { a: pctS(p.savings.area), e: pctS(p.savings.energy), l: pctS(p.savings.latency) })}</td><td>${ps(minP(p.estimated))} / ${ps(minP(p.measured))}${r.chosen ? '' : ` <span class="note">${t('dse.notVerified')}</span>`}</td>`
                 + `<td class="units">${esc(p.variant)}<br>${esc(p.units.join(', '))}</td><td><button type="button" class="btn outline" data-apply="${k}:best">${t('dse.apply')}</button></td></tr>`;
         }).join('');
-    const names = { exact: t('dse.exact'), y: t('dse.yLabel'), ...Object.fromEntries(['efficiency', 'sequential', 'exhaustive', 'random'].map((h) => [h, hName(h)])) };
+    const names = { exact: t('dse.exact'), y: t('dse.yLabel'), ...Object.fromEntries(['efficiency', 'sequential', 'exhaustive', 'random', 'local', 'tabu', 'grasp', 'ga'].map((h) => [h, hName(h)])) };
     const xLabel = `${t(`dse.obj.${obj}`)}${obj === 'weighted' ? ` (${t('dse.exactIs', { v: nf(R.refScore, 2) })})` : ''}`;
     $('dseFig').innerHTML = dseSvg(R.runs.filter((r) => !r.error), { xLabel, psnrMin: R.opts.constraint.metric === 'psnr' ? R.opts.constraint.value : null, refScore: R.refScore, names, chosenLabel: t('dse.chosen') });
     $('dseFigNote').textContent = t('dse.figNote', { v: R.variants.map((v) => v.label + (v.error ? ` (${v.error})` : '')).join('; ') });
@@ -287,6 +287,8 @@ function stepText(st, obj) {
         case 'order': return t('dse.st.order', { n: nf(st.total) });
         case 'exh': return t(st.found ? 'dse.st.exhFound' : 'dse.st.exh', { a: st.from, b: st.to, n: nf(st.total), f: feas, found: st.found });
         case 'rnd': return t('dse.st.rnd', { a: st.from, b: st.to, n: st.total, f: feas, c: sc(st.state.score), p: ps(st.state.psnr) });
+        case 'seed': return t(st.feasible ? 'dse.st.seed' : 'dse.st.seedBad', { n: st.n ?? 1, u: st.units.join(', '), c: sc(st.state.score), p: ps(st.state.psnr) });
+        case 'imp': return t(`dse.st.${st.h}`, { k: st.n, n: st.tries.length, f: feas, m: st.chosen ?? '-', c: sc(st.state.score), p: ps(st.state.psnr) }) + ((st.h === 'local' || st.h === 'grasp') && !st.chosen ? ` ${t('dse.st.impNone')}` : '');
         case 'verify': return t(st.ok ? 'dse.st.verifyOk' : 'dse.st.verifyBad', { k: st.n, l: st.label, e: ps(st.psnr), m: ps(st.measured) });
         default: return '';
     }

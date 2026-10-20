@@ -33,7 +33,7 @@ test('dse: as quatro heurísticas no gaussiano, com verificação bit a bit', ()
     const res = explore(kernel('gauss'), { synth, cells, objective: 'area', constraint: { metric: 'psnr', value: 40 }, granularity: 'class', heuristic: 'all', samples: 60 });
     const by = Object.fromEntries(res.runs.map((r) => [r.heuristic, r]));
     for (const r of res.runs) {
-        assert.ok(r.chosen, r.heuristic);
+        assert.ok(r.chosen && !r.error, `${r.heuristic}: ${r.error}`);
         assert.ok(r.chosen.measured[0].PSNR >= 40 && r.chosen.outs[0].PSNR >= 40);
         assert.ok(r.chosen.score < res.refScore);
     }
@@ -67,4 +67,12 @@ test('grupos por operação do código: as cópias do unroll juntas, os pesos da
     const dm = groupsOf(d, { granularity: 'source' }).filter((x) => x.cls === 'mul');
     assert.equal(dm.length, 1);
     assert.equal(dm[0].ops.length, 4);
+});
+
+test('dse: busca local a partir do ótimo por classe nunca termina pior que ele', () => {
+    const o = { synth, cells, objective: 'area', constraint: { metric: 'psnr', value: 40 } };
+    const cls = explore(kernel('gauss'), { ...o, granularity: 'class', heuristic: 'exhaustive' }).runs[0].best;
+    const loc = explore(kernel('gauss'), { ...o, granularity: 'op', heuristic: 'local', maxEvals: 400 }).runs[0];
+    assert.ok(loc.best.feasible && loc.best.score <= cls.score + 1e-9);
+    assert.ok(loc.steps.some((s) => s.kind === 'seed') && loc.steps.some((s) => s.kind === 'imp'));
 });

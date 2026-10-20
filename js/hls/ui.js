@@ -128,7 +128,7 @@ export function dfgSvg(seg, sch) {
     return `${s}</svg>`;
 }
 
-const DSE_SHAPES = { efficiency: 'circle', sequential: 'square', exhaustive: 'triangle', random: 'ring' };
+const DSE_SHAPES = { efficiency: 'circle', sequential: 'square', exhaustive: 'triangle', random: 'ring', local: 'square', tabu: 'triangle', grasp: 'circle', ga: 'square' };
 const mark = (shape, x, y, r, cls) => {
     if (shape === 'square') return `<rect class="${cls}" x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" rx="1"/>`;
     if (shape === 'triangle') return `<path class="${cls}" d="M${x},${y - r * 1.2} L${x + r * 1.1},${y + r * 0.8} L${x - r * 1.1},${y + r * 0.8} Z"/>`;

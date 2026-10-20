@@ -1,6 +1,6 @@
 # Resultados dos estudos de caso
 
-Gerado por `scripts/experiments.mjs` em 2026-10-19 (commit 93c6187, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
+Gerado por `scripts/experiments.mjs` em 2026-10-20 (commit baa883f, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
 
 ### E1. Precisão do modelo estático de erro
 
@@ -52,47 +52,76 @@ Objetivo: área ASIC; restrição: PSNR mínimo (estimado na busca, conferido bi
 
 #### E2: economia de área do ponto escolhido (PSNR medido)
 
-| Kernel | Grupos | PSNR mín. | Sequencial | Eficiência | Exaustiva | Aleatória |
-| --- | --- | ---: | ---: | ---: | ---: | ---: |
-| gauss | classe | 30 | 46,5% (33,4) | 47,4% (34,7) | 49,0% (32,0) | 47,4% (34,7) |
-| gauss | classe | 40 | 44,4% (41,0) | 44,4% (41,0) | 44,4% (41,0) | 39,5% (40,7) |
-| gauss | classe | 50 | 31,5% (50,8) | 31,5% (50,8) | 31,5% (50,8) | 31,5% (50,8) |
-| gauss | operação | 30 | 48,3% (30,1) | 54,7% (30,5) | - | 33,3% (30,7) |
-| gauss | operação | 40 | 40,2% (40,6) | 42,8% (40,3) | - | 23,9% (42,1) |
-| gauss | operação | 50 | 27,8% (50,1) | 30,4% (50,2) | - | 0,0% (∞) |
-| sobel | classe | 30 | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) |
-| sobel | classe | 40 | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) |
-| sobel | classe | 50 | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) |
-| sobel | operação | 30 | 7,5% (30,8) | 11,1% (30,3) | - | 6,7% (30,3) |
-| sobel | operação | 40 | 6,9% (40,5) | 6,9% (40,5) | 6,9% (40,5) | 5,2% (42,2) |
-| sobel | operação | 50 | 2,6% (50,6) | 3,2% (50,2) | 3,2% (50,2) | 1,4% (52,2) |
-| sharpen | classe | 30 | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) |
-| sharpen | classe | 40 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
-| sharpen | classe | 50 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
-| sharpen | operação | 30 | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) |
-| sharpen | operação | 40 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
-| sharpen | operação | 50 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
-| fir | classe | 50 | 40,3% (50,1) | 51,0% (50,1) | 51,0% (50,1) | 37,3% (50,3) |
-| fir | classe | 60 | 37,0% (61,0) | 37,0% (61,0) | 44,0% (60,7) | 31,9% (60,2) |
-| fir | classe | 70 | 22,7% (70,5) | 26,7% (70,4) | 26,7% (70,4) | 25,9% (76,1) |
-| fir | operação | 50 | 50,1% (50,0) | 63,5% (50,1) | - | 35,9% (55,0) |
-| fir | operação | 60 | 38,9% (60,2) | 45,1% (60,1) | - | 0,0% (∞) |
-| fir | operação | 70 | 27,3% (70,2) | 35,0% (70,0) | - | 0,0% (∞) |
+| Kernel | Grupos | PSNR mín. | Sequencial | Eficiência | Exaustiva | Aleatória | Local | Tabu | GRASP | Genético |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| gauss | classe | 30 | 46,5% (33,4) | 47,4% (34,7) | 49,0% (32,0) | 47,4% (34,7) | 49,0% (32,0) | 49,0% (32,0) | 49,0% (32,0) | 49,0% (32,0) |
+| gauss | classe | 40 | 44,4% (41,0) | 44,4% (41,0) | 44,4% (41,0) | 39,5% (40,7) | 44,4% (41,0) | 44,4% (41,0) | 44,4% (41,0) | 44,4% (41,0) |
+| gauss | classe | 50 | 31,5% (50,8) | 31,5% (50,8) | 31,5% (50,8) | 31,5% (50,8) | 31,5% (50,8) | 31,5% (50,8) | 31,5% (50,8) | 31,5% (50,8) |
+| gauss | operação | 30 | 48,3% (30,1) | 54,7% (30,5) | - | 33,3% (30,7) | 54,7% (30,5) | 54,7% (30,5) | 54,7% (30,5) | 54,7% (30,5) |
+| gauss | operação | 40 | 40,2% (40,6) | 42,8% (40,3) | - | 23,9% (42,1) | 45,2% (40,4) | 45,2% (40,4) | 45,2% (40,2) | 45,2% (40,5) |
+| gauss | operação | 50 | 27,8% (50,1) | 30,4% (50,2) | - | 0,0% (∞) | 32,7% (50,3) | 32,6% (50,3) | 32,1% (50,3) | 32,6% (50,6) |
+| sobel | classe | 30 | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) |
+| sobel | classe | 40 | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) |
+| sobel | classe | 50 | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) |
+| sobel | operação | 30 | 7,5% (30,8) | 11,1% (30,3) | - | 6,7% (30,3) | 11,1% (30,3) | 11,1% (30,3) | 11,1% (30,3) | 11,1% (30,3) |
+| sobel | operação | 40 | 6,9% (40,5) | 6,9% (40,5) | 6,9% (40,5) | 5,2% (42,2) | 6,9% (40,5) | 6,9% (40,5) | 6,9% (40,5) | 6,9% (40,5) |
+| sobel | operação | 50 | 2,6% (50,6) | 3,2% (50,2) | 3,2% (50,2) | 1,4% (52,2) | 3,2% (50,2) | 3,2% (50,2) | 3,2% (50,2) | 3,2% (50,2) |
+| sharpen | classe | 30 | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) |
+| sharpen | classe | 40 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
+| sharpen | classe | 50 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
+| sharpen | operação | 30 | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) |
+| sharpen | operação | 40 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
+| sharpen | operação | 50 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
+| fir | classe | 50 | 40,3% (50,1) | 51,0% (50,1) | 51,0% (50,1) | 37,3% (50,3) | 51,0% (50,1) | 51,0% (50,1) | 51,0% (50,1) | 51,0% (50,1) |
+| fir | classe | 60 | 37,0% (61,0) | 37,0% (61,0) | 44,0% (60,7) | 31,9% (60,2) | 37,0% (61,0) | 37,0% (61,0) | 37,0% (61,0) | 37,0% (61,0) |
+| fir | classe | 70 | 22,7% (70,5) | 26,7% (70,4) | 26,7% (70,4) | 25,9% (76,1) | 26,7% (70,4) | 26,7% (70,4) | 26,7% (70,4) | 26,7% (70,4) |
+| fir | operação | 50 | 50,1% (50,0) | 63,5% (50,1) | - | 35,9% (55,0) | 63,9% (50,1) | 63,9% (50,1) | 63,9% (50,1) | 63,9% (50,1) |
+| fir | operação | 60 | 38,9% (60,2) | 45,1% (60,1) | - | 0,0% (∞) | 48,1% (60,0) | 46,3% (60,3) | 46,3% (60,3) | 45,2% (60,1) |
+| fir | operação | 70 | 27,3% (70,2) | 35,0% (70,0) | - | 0,0% (∞) | 35,0% (70,0) | 35,0% (70,0) | 35,0% (70,0) | 35,0% (70,0) |
+
+#### E2: distância ao melhor conhecido (área a mais, em média e no pior caso, e em quantas configurações a heurística acha o melhor)
+
+| Heurística | Grupos | Média | Pior | Acha o melhor |
+| --- | --- | ---: | ---: | ---: |
+| Sequencial | classe | 3,7% | 21,9% | 8 de 12 |
+| Sequencial | operação | 8,6% | 38,4% | 4 de 12 |
+| Eficiência | classe | 1,3% | 12,6% | 10 de 12 |
+| Eficiência | operação | 1,2% | 5,8% | 8 de 12 |
+| Exaustiva | classe | 0,0% | 0,0% | 12 de 12 |
+| Exaustiva | operação | 0,0% | 0,0% | 5 de 5 |
+| Aleatória | classe | 5,2% | 28,0% | 7 de 12 |
+| Aleatória | operação | 30,6% | 92,8% | 3 de 12 |
+| Local | classe | 1,1% | 12,6% | 11 de 12 |
+| Local | operação | 0,0% | 0,0% | 11 de 12 |
+| Tabu | classe | 1,1% | 12,6% | 11 de 12 |
+| Tabu | operação | 0,3% | 3,6% | 9 de 12 |
+| GRASP | classe | 1,1% | 12,6% | 11 de 12 |
+| GRASP | operação | 0,4% | 3,6% | 9 de 12 |
+| Genético | classe | 1,1% | 12,6% | 11 de 12 |
+| Genético | operação | 0,5% | 5,7% | 10 de 12 |
 
 #### E2: avaliações e tempo (média por configuração)
 
 | Heurística | Grupos | Avaliações | Tempo (s) |
 | --- | --- | ---: | ---: |
 | Sequencial | classe | 36 | 0,6 |
-| Sequencial | operação | 191 | 2,4 |
-| Eficiência | classe | 215 | 2,3 |
-| Eficiência | operação | 3630 | 53,8 |
-| Exaustiva | classe | 1717 | 15,2 |
-| Exaustiva | operação | 701 | 14,7 |
-| Aleatória | classe | 78 | 0,9 |
-| Aleatória | operação | 153 | 2,4 |
+| Sequencial | operação | 191 | 2,5 |
+| Eficiência | classe | 215 | 2,6 |
+| Eficiência | operação | 3630 | 59,1 |
+| Exaustiva | classe | 1717 | 15,0 |
+| Exaustiva | operação | 701 | 13,8 |
+| Aleatória | classe | 78 | 1,0 |
+| Aleatória | operação | 153 | 2,5 |
+| Local | classe | 298 | 3,1 |
+| Local | operação | 7886 | 112,8 |
+| Tabu | classe | 346 | 3,7 |
+| Tabu | operação | 6869 | 109,8 |
+| GRASP | classe | 427 | 4,1 |
+| GRASP | operação | 7751 | 112,7 |
+| Genético | classe | 345 | 3,6 |
+| Genético | operação | 5901 | 75,4 |
 
-Verificação: o primeiro ponto (o mais barato estimado como viável) passou na execução bit a bit em 84 de 89 casos; nos outros, a busca verificou em média 5,0 pontos até achar um que passa (no máximo 17).
+Verificação: o primeiro ponto (o mais barato estimado como viável) passou na execução bit a bit em 171 de 185 casos; nos outros, a busca verificou em média 3,1 pontos até achar um que passa (no máximo 17).
 
 Eficiência contra sequencial: melhor em 11 de 24 configurações, igual em 13, pior em 0; maior ganho 26,8% de área a menos que a sequencial.
 

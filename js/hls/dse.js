@@ -33,7 +33,7 @@ import { rng } from '../axc/metrics.js';
 import { outputSsimStats } from './exec.js';
 
 export const OBJECTIVES = ['area', 'luts', 'energy', 'latency', 'interval', 'weighted'];
-export const HEURISTICS = ['sequential', 'efficiency', 'exhaustive', 'random'];
+export const HEURISTICS = ['sequential', 'efficiency', 'exhaustive', 'random', 'local', 'tabu', 'grasp', 'ga'];
 export const GRANULARITIES = ['class', 'line', 'source', 'op'];
 
 /** Variantes de diretivas: cada linha #pragma HLS de pipeline, unroll ou array_partition ligada ou desligada. */
@@ -372,7 +372,249 @@ function random(v, groups, ctx, { samples = 200, seed = 11 }) {
     return { best, trace: [] };
 }
 
-const RUN = { sequential, efficiency, exhaustive, random };
+// Heurísticas de melhoria -----------------------------------------------------------------------------------------
+// A busca local, a tabu, o GRASP e o genético trabalham com uma escolha por grupo (choice[i] = unidade). O ponto de
+// partida, com grupos menores que a classe, é o ótimo por classe (a exaustiva nos grupos de classe, que cabe sem
+// poda nos kernels de exemplo) levado para os grupos: a busca nunca termina pior que ele.
+
+/** Avalia uma escolha por grupo, guardando a escolha no ponto. */
+function evalChoice(v, groups, c, ctx) {
+    const p = evaluate(v, expand(groups, c), ctx);
+    p.choice ??= [...c];
+    return p;
+}
+const costChoice = (v, groups, c, ctx) => costOnly(v, expand(groups, c), ctx);
+const labelOf = (groups, i, u) => `${groups[i].label} → ${u}`;
+
+/** Escolha por grupo de um ponto avaliado (a unidade da primeira operação de cada grupo). */
+const choiceOf = (groups, p) => groups.map((g) => p.assign.get(g.ops[0].id) ?? g.exact);
+
+/**
+ * Ponto de partida: o melhor viável entre o ótimo por classe levado para os grupos (com grupos menores que a classe)
+ * e o resultado da eficiência. Assim as heurísticas de melhoria nunca terminam pior que nenhum dos dois.
+ */
+function seedOf(v, groups, ctx, o) {
+    const exact = evalChoice(v, groups, groups.map((g) => g.exact), ctx);
+    const seeds = [exact];
+    const quiet = { ...ctx, steps: null };
+    if ((o.granularity ?? 'class') !== 'class') {
+        v.classGroups ??= groupsOf(v, { ...o, granularity: 'class' });
+        const cg = v.classGroups;
+        if (cg.reduce((s, g) => s * g.cands.length, 1) <= 20000) {
+            const r = exhaustive(v, cg, quiet, { maxCombos: 20000, frontEvals: 1 });
+            const unitOf = new Map();
+            cg.forEach((g) => { for (const op of g.ops) unitOf.set(op.id, r.best.assign.get(op.id) ?? g.exact); });
+            const c = groups.map((g) => {
+                const u = unitOf.get(g.ops[0].id) ?? g.exact;
+                return g.ops.every((op) => (unitOf.get(op.id) ?? g.exact) === u) ? u : g.exact;
+            });
+            seeds.push(evalChoice(v, groups, c, ctx));
+        }
+    }
+    const e = efficiency(v, groups, quiet, { granularity: o.granularity ?? 'class' }).best;
+    seeds.push(evalChoice(v, groups, choiceOf(groups, e), ctx));
+    // Os pontos de partida viáveis e distintos: partir de cada um alcança ótimos locais diferentes (no FIR por
+    // operação, a busca local a partir do ótimo por classe chega a 48% de economia, e a partir da eficiência, a 45%).
+    const list = [...new Map(seeds.filter((p) => p.feasible).map((p) => [p.key, p])).values()].sort((a, b) => a.score - b.score);
+    if (!list.length) list.push(exact);
+    step(ctx, { kind: 'seed', state: stateOf(list[0]), units: list[0].units, n: list.length, feasible: true });
+    return list;
+}
+
+/** Trocas de um grupo: todas as candidatas e a exata (nas duas direções de custo). */
+const optionsOf = (g, cur) => [...new Set([g.exact, ...g.cands, cur])];
+
+/**
+ * Busca local a partir de um ponto: (1) as trocas de um grupo que reduzem o custo, em ordem de custo, até a primeira
+ * viável; (2) sem nenhuma, os pares: uma troca que economiza mas viola, com outra, noutro grupo, que reduz o erro
+ * (unidade de erro próprio menor, inclusive a exata) e mantém o custo total abaixo do atual.
+ */
+function improve(v, groups, ctx, start, { maxEvals = 1500, top = 12, h = 'local' } = {}) {
+    let cur = start;
+    const e0 = v.evals;
+    for (let it = 1; v.evals - e0 < maxEvals; it++) {
+        const tries = [];
+        const down = [];
+        groups.forEach((g, i) => {
+            for (const u of optionsOf(g, cur.choice[i])) {
+                if (u === cur.choice[i]) continue;
+                const c = [...cur.choice]; c[i] = u;
+                const k = costChoice(v, groups, c, ctx);
+                if (k < cur.score - 1e-9) down.push({ c, k, i, u });
+            }
+        });
+        down.sort((a, b) => a.k - b.k);
+        let next = null, how = null;
+        const tried = [];
+        for (const m of down) {
+            if (v.evals - e0 >= maxEvals) break;
+            const p = evalChoice(v, groups, m.c, ctx);
+            tries.push(tryOf(p, labelOf(groups, m.i, m.u)));
+            tried.push({ ...m, p });
+            if (p.feasible) { next = p; how = labelOf(groups, m.i, m.u); break; }
+        }
+        if (!next) {
+            // Pares: as trocas que economizam mais (e violam) com uma troca que devolve erro noutro grupo.
+            const pairs = [];
+            for (const m of tried.slice(0, top)) {
+                groups.forEach((g, j) => {
+                    if (j === m.i) return;
+                    const own = g.ownOf.get(m.c[j]) ?? (m.c[j] === g.exact ? 0 : Infinity);
+                    for (const w of optionsOf(g, m.c[j])) {
+                        if (w === m.c[j]) continue;
+                        if ((g.ownOf.get(w) ?? (w === g.exact ? 0 : Infinity)) >= own) continue;
+                        const c = [...m.c]; c[j] = w;
+                        const k = costChoice(v, groups, c, ctx);
+                        if (k < cur.score - 1e-9) pairs.push({ c, k, lbl: `${labelOf(groups, m.i, m.u)} + ${labelOf(groups, j, w)}` });
+                    }
+                });
+            }
+            pairs.sort((a, b) => a.k - b.k);
+            for (const m of pairs) {
+                if (v.evals - e0 >= maxEvals) break;
+                const p = evalChoice(v, groups, m.c, ctx);
+                tries.push(tryOf(p, m.lbl));
+                if (p.feasible) { next = p; how = m.lbl; break; }
+            }
+        }
+        step(ctx, { kind: 'imp', h, n: it, tries, chosen: how, state: stateOf(next ?? cur) });
+        if (!next) break;
+        cur = next;
+    }
+    return cur;
+}
+
+/** Busca local a partir do ótimo por classe. */
+function local(v, groups, ctx, o) {
+    let best = null;
+    for (const s0 of seedOf(v, groups, ctx, o)) {
+        const p = improve(v, groups, ctx, s0, { maxEvals: o.maxEvals ?? 2000 });
+        if (!best || p.score < best.score) best = p;
+    }
+    return { best, trace: [] };
+}
+
+/**
+ * Busca tabu: a cada iteração, entre as trocas de um grupo (as que economizam e as que encarecem), avalia as mais
+ * baratas que não estão na lista tabu e vai para a melhor viável, mesmo que mais cara que a atual; sem nenhuma viável,
+ * para a de menor erro. O grupo trocado fica tabu por algumas iterações (a não ser que a troca dê o melhor ponto até
+ * ali). Termina com uma busca local no melhor ponto.
+ */
+function tabu(v, groups, ctx, o) {
+    const iters = o.tabuIters ?? 40, width = o.tabuWidth ?? 16, tenure = o.tenure ?? Math.max(3, Math.min(7, Math.ceil(groups.length / 3)));
+    let best = null;
+    for (const s0 of seedOf(v, groups, ctx, o)) {
+    let cur = s0, runBest = s0;
+    const tabuUntil = new Map();
+    for (let it = 1; it <= iters; it++) {
+        const moves = [];
+        groups.forEach((g, i) => {
+            for (const u of optionsOf(g, cur.choice[i])) {
+                if (u === cur.choice[i]) continue;
+                const c = [...cur.choice]; c[i] = u;
+                moves.push({ c, i, u, k: costChoice(v, groups, c, ctx) });
+            }
+        });
+        moves.sort((a, b) => a.k - b.k);
+        const tries = [];
+        let pick = null, fallback = null, n = 0;
+        for (const m of moves) {
+            if (n >= width) break;
+            const isTabu = (tabuUntil.get(m.i) ?? 0) >= it;
+            if (isTabu && m.k >= Math.min(runBest.score, best?.score ?? Infinity) - 1e-9) continue;
+            n++;
+            const p = evalChoice(v, groups, m.c, ctx);
+            tries.push(tryOf(p, labelOf(groups, m.i, m.u)));
+            if (p.feasible && (!pick || p.score < pick.p.score)) pick = { p, m };
+            if (!fallback || p.err < fallback.p.err) fallback = { p, m };
+        }
+        const go = pick ?? fallback;
+        if (!go) break;
+        cur = go.p;
+        tabuUntil.set(go.m.i, it + tenure);
+        if (cur.feasible && cur.score < runBest.score) runBest = cur;
+        step(ctx, { kind: 'imp', h: 'tabu', n: it, tries, chosen: labelOf(groups, go.m.i, go.m.u), state: stateOf(runBest) });
+    }
+    runBest = improve(v, groups, ctx, runBest, { maxEvals: 400 });
+    if (!best || runBest.score < best.score) best = runBest;
+    }
+    return { best, trace: [] };
+}
+
+/**
+ * GRASP: construções gulosas aleatorizadas, cada uma seguida de busca local. Na construção, os grupos em ordem
+ * sorteada; em cada um, as trocas que economizam mais (lista restrita de candidatas, as alpha mais baratas que
+ * mantêm a restrição), e uma delas sorteada.
+ */
+function grasp(v, groups, ctx, o) {
+    const rand = rng(o.seed ?? 11), iters = o.graspIters ?? 6, alpha = o.alpha ?? 3;
+    let best = null;
+    for (const s0 of seedOf(v, groups, ctx, o)) {
+        const p = improve(v, groups, ctx, s0, { maxEvals: 300, h: 'grasp' });
+        if (!best || p.score < best.score) best = p;
+    }
+    for (let it = 1; it <= iters; it++) {
+        let cur = evalChoice(v, groups, groups.map((g) => g.exact), ctx);
+        const order = groups.map((g, i) => i).sort(() => rand() - 0.5);
+        const tries = [];
+        for (const i of order) {
+            const opts = groups[i].cands.filter((u) => u !== cur.choice[i]).map((u) => { const c = [...cur.choice]; c[i] = u; return { c, u, k: costChoice(v, groups, c, ctx) }; }).filter((m) => m.k < cur.score).sort((a, b) => a.k - b.k);
+            const rcl = [];
+            for (const m of opts) {
+                if (rcl.length >= alpha) break;
+                const p = evalChoice(v, groups, m.c, ctx);
+                tries.push(tryOf(p, labelOf(groups, i, m.u)));
+                if (p.feasible) rcl.push(p);
+            }
+            if (rcl.length) cur = rcl[Math.floor(rand() * rcl.length)];
+        }
+        step(ctx, { kind: 'imp', h: 'graspBuild', n: it, tries, chosen: null, state: stateOf(cur) });
+        cur = improve(v, groups, ctx, cur, { maxEvals: 300, h: 'grasp' });
+        if (cur.feasible && cur.score < best.score) best = cur;
+    }
+    return { best, trace: [] };
+}
+
+/**
+ * Algoritmo genético: um gene por grupo (a unidade). População inicial com o ótimo por classe, o exato e escolhas
+ * sorteadas; seleção por torneio com as regras de viabilidade (viável ganha de inviável; entre viáveis, o mais barato;
+ * entre inviáveis, o de menor erro), cruzamento uniforme, mutação de um gene com probabilidade 1/n e elitismo.
+ * Termina com uma busca local no melhor viável.
+ */
+function ga(v, groups, ctx, o) {
+    const rand = rng(o.seed ?? 11), size = o.popSize ?? 24, gens = o.generations ?? 30, n = groups.length;
+    const better = (a, b) => (a.feasible !== b.feasible ? a.feasible : a.feasible ? a.score < b.score : a.err < b.err);
+    const randomGene = (i) => (rand() < 0.3 ? groups[i].exact : groups[i].cands[Math.floor(rand() * groups[i].cands.length)]);
+    const seeds = seedOf(v, groups, ctx, o), seed = seeds[0];
+    let pop = [...seeds, evalChoice(v, groups, groups.map((g) => g.exact), ctx)];
+    while (pop.length < size) {
+        const base = seeds[pop.length % seeds.length];
+        const c = base.choice.map((u, i) => (rand() < 0.5 ? u : randomGene(i)));
+        pop.push(evalChoice(v, groups, c, ctx));
+    }
+    const pickOne = () => { const a = pop[Math.floor(rand() * pop.length)], b = pop[Math.floor(rand() * pop.length)]; return better(a, b) ? a : b; };
+    let best = pop.filter((p) => p.feasible).sort((a, b) => a.score - b.score)[0] ?? seed;
+    for (let g = 1; g <= gens; g++) {
+        const sorted = [...pop].sort((a, b) => (better(a, b) ? -1 : better(b, a) ? 1 : 0));
+        const next = sorted.slice(0, 2);
+        const tries = [];
+        while (next.length < size) {
+            const a = pickOne(), b = pickOne();
+            const c = a.choice.map((u, i) => (rand() < 0.5 ? u : b.choice[i]));
+            for (let i = 0; i < n; i++) if (rand() < 1 / n) c[i] = randomGene(i);
+            const p = evalChoice(v, groups, c, ctx);
+            tries.push(tryOf(p, p.units.join(', ')));
+            next.push(p);
+        }
+        pop = next;
+        for (const p of pop) if (p.feasible && p.score < best.score) best = p;
+        step(ctx, { kind: 'imp', h: 'ga', n: g, tries, chosen: null, state: stateOf(best) });
+    }
+    best = improve(v, groups, ctx, best, { maxEvals: 400 });
+    return { best, trace: [] };
+}
+
+const RUN = { sequential, efficiency, exhaustive, random, local, tabu, grasp, ga };
 
 /** Fronteira de Pareto (custo do objetivo contra erro) entre os pontos avaliados. */
 export function paretoPoints(points) {

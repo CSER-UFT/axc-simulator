@@ -67,8 +67,8 @@
 @media (max-width: 1000px) { .hls-main { grid-template-columns: 1fr; } .page-nav { margin-left: 4px; } }
 /* Exploração: heurísticas em azul, laranja e verde-água (paleta validada para pares de pontos, claro e escuro) e a
    aleatória como referência em cinza vazado; a forma do ponto também identifica a heurística. */
-:root { --h-eff: #2a78d6; --h-seq: #eb6834; --h-exh: #1baf7a; --h-rnd: #8b8f97; }
-:root[data-theme="dark"] { --h-eff: #3987e5; --h-seq: #d95926; --h-exh: #199e70; --h-rnd: #9aa0a8; }
+:root { --h-eff: #2a78d6; --h-seq: #eb6834; --h-exh: #1baf7a; --h-rnd: #8b8f97; --h-loc: #8a4fd1; --h-tab: #c2410c; --h-gra: #0f8b8d; --h-ga: #b8860b; }
+:root[data-theme="dark"] { --h-eff: #3987e5; --h-seq: #d95926; --h-exh: #199e70; --h-rnd: #9aa0a8; --h-loc: #a273e6; --h-tab: #e2622a; --h-gra: #22a8aa; --h-ga: #d6a521; }
 .fig-svg.hls-dse { width: 100%; height: auto; max-width: 1100px; display: block; }
 .fig-svg.hls-dse .grid { stroke: var(--line); }
 .fig-svg.hls-dse .axis { stroke: var(--muted); }
@@ -83,6 +83,10 @@
 .fig-svg.hls-dse .h-sequential { fill: var(--h-seq); } .fig-svg.hls-dse .front.h-sequential, .fig-svg.hls-dse .chosen.h-sequential { stroke: var(--h-seq); fill: none; }
 .fig-svg.hls-dse .h-exhaustive { fill: var(--h-exh); } .fig-svg.hls-dse .front.h-exhaustive, .fig-svg.hls-dse .chosen.h-exhaustive { stroke: var(--h-exh); fill: none; }
 .fig-svg.hls-dse .front.h-random, .fig-svg.hls-dse .chosen.h-random { stroke: var(--h-rnd); fill: none; }
+.fig-svg.hls-dse .h-local { fill: var(--h-loc); } .fig-svg.hls-dse .front.h-local, .fig-svg.hls-dse .chosen.h-local { stroke: var(--h-loc); fill: none; }
+.fig-svg.hls-dse .h-tabu { fill: var(--h-tab); } .fig-svg.hls-dse .front.h-tabu, .fig-svg.hls-dse .chosen.h-tabu { stroke: var(--h-tab); fill: none; }
+.fig-svg.hls-dse .h-grasp { fill: var(--h-gra); } .fig-svg.hls-dse .front.h-grasp, .fig-svg.hls-dse .chosen.h-grasp { stroke: var(--h-gra); fill: none; }
+.fig-svg.hls-dse .h-ga { fill: var(--h-ga); } .fig-svg.hls-dse .front.h-ga, .fig-svg.hls-dse .chosen.h-ga { stroke: var(--h-ga); fill: none; }
 .dse-controls .row { margin-bottom: 6px; }
 .dse-controls input[type=number] { width: 5.5em; }
 .dse-controls input.w { width: 3.5em; }
