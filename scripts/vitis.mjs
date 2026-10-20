@@ -90,6 +90,10 @@ function cases() {
         ['fir', 'fir_dse3_lut60_rtl_ir', { granularity: 'op', metric: 'psnr', value: 60 }, 'PSNR >= 60 dB'],
         ['dot', 'dot_dse3_lut40_rtl_ir', { granularity: 'op', metric: 'psnr', value: 40 }, 'PSNR >= 40 dB'],
     ];
+    // Subtrações e somas com sinal aproximadas (a - b = ~(~a + b), módulo 2^W): o Sobel com TRUNC3 em todas as somas e
+    // subtrações e o realce com TRUNC2 nas subtrações, como caixa preta de RTL.
+    list.push({ id: 'sobel_sub_trunc3_rtl_ir', kernel: 'sobel', src: code('sobel'), kind: 'ir', clockNs: 5, inline: 'rtl', spec: '*=ADD16 TRUNC3', note: 'somas e subtrações com ADD16 TRUNC3, unidades em RTL (caixa preta)' });
+    list.push({ id: 'sharpen_sub_trunc2_rtl_ir', kernel: 'sharpen', src: code('sharpen'), kind: 'ir', clockNs: 5, inline: 'rtl', spec: '*=ADD16 TRUNC2', note: 'subtrações com ADD16 TRUNC2, unidades em RTL (caixa preta)' });
     for (const [k, id, d, lim] of dse3) list.push({ id, kernel: k, src: code(k), kind: 'ir', clockNs: 5, inline: 'rtl', dse: { ...d, objective: 'luts' }, note: `exploração (modelo atual, atrasos do Vivado): LUTs, por operação, ${lim}, unidades em RTL (caixa preta)` });
     return list.filter((c) => !only || only.has(c.id) || only.has(c.kernel));
 }

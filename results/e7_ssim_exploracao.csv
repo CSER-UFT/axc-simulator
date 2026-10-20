@@ -2,9 +2,9 @@ kernel,ssim_min,evaluations,area_saving,ssim_est,ssim_measured,psnr_measured,ver
 gauss,0.95,7603,0.523264,0.952895,0.970483,26.2318,1,true,6 × ADD16 TRUNC8 + 2 × ADD16 TRUNC9 + 2 × MUL8 T8 + 2 × MUL8 T8 A6c + 1 × MUL8 T6 A8c
 gauss,0.98,6944,0.485486,0.981732,0.989063,33.3787,1,true,1 × ADD16 TRUNC7 + 5 × ADD16 TRUNC8 + 1 × ADD16 LOA9 + 1 × ADD16 LOA8 + 2 × MUL8 T8 +C + 2 × MUL8 T8 A6c + 1 × MUL8 T6
 gauss,0.99,6227,0.419141,0.990001,0.992615,36.9241,1,true,3 × ADD16 TRUNC7 + 3 × ADD16 TRUNC8 + 1 × ADD16 LOA9 + 1 × ADD16 LOA8 + 3 × MUL8 T6
-sobel,0.95,569,0.0829985,0.960127,0.95378,28.1355,9,true,3 × ADD16 LOA3 + 1 × ADD16 LOA4 + 8 × ADD16 exato + 1 × ADD16 LOA15
-sobel,0.98,484,0.0396599,0.984228,0.980077,47.0575,3,true,2 × ADD16 LOA3 + 2 × ADD16 LOA2 + 8 × ADD16 exato + 1 × ADD16 LOA4
-sobel,0.99,398,0.0318318,0.992003,0.990423,49.2425,4,true,4 × ADD16 LOA2 + 1 × ADD16 LOA3 + 8 × ADD16 exato
-sharpen,0.95,12,0,1,1,Infinity,1,true,1 × ×5 (1 soma) + 4 × ADD16 exato
-sharpen,0.98,12,0,1,1,Infinity,1,true,1 × ×5 (1 soma) + 4 × ADD16 exato
-sharpen,0.99,12,0,1,1,Infinity,1,true,1 × ×5 (1 soma) + 4 × ADD16 exato
+sobel,0.95,2312,0.16054,0.961881,0.954576,40.6793,20,true,2 × ADD16 LOA2 + 5 × ADD16 LOA3 + 5 × ADD16 LOA4 + 1 × ADD16 LOA7
+sobel,0.98,1363,,,,,25,false,
+sobel,0.99,848,,,,,25,false,
+sharpen,0.95,236,0.0467742,0.963412,0.96934,40.0314,1,true,1 × ×5 (1 soma) + 4 × ADD16 LOA2
+sharpen,0.98,149,0.0227582,0.983052,0.984618,45.1211,1,true,1 × ×5 (1 soma) + 2 × ADD16 LOA2 + 2 × ADD16 exato
+sharpen,0.99,109,0.012008,0.991485,0.992864,47.8549,1,true,1 × ×5 (1 soma) + 3 × ADD16 exato + 1 × ADD16 LOA2

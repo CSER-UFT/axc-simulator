@@ -13,7 +13,7 @@
  */
 import { buildUnit, adderFunction } from '../axc/units.js';
 import { opClass, opWidth } from './lib.js';
-import { affSource } from './elab.js';
+import { affSource, bitsFor } from './elab.js';
 
 const SYM = { add: '+', sub: '−', mul: '×' };
 
@@ -57,9 +57,10 @@ export function approxOps(design, lib) {
             let candidates = lib.candidates(cls, W);
             let reason = null;
             if (cls === 'add') {
-                if (n.op !== 'add') reason = 'sub';
-                else if (ranges.some((r) => r[0] < 0) || n.range[0] < 0) reason = 'signed';
-                if (reason) candidates = candidates.slice(0, 1);
+                // Subtração e soma com sinal: em complemento de 2, a mesma unidade, módulo 2^W (a - b = ~(~a + b), sem
+                // vem um). Só quando o resultado cabe nos W bits da unidade; senão, só a exata.
+                const signedOp = n.op !== 'add' || ranges.some((r) => r[0] < 0) || n.range[0] < 0;
+                if (signedOp && bitsFor(n.range) > W) { reason = n.op !== 'add' ? 'sub' : 'signed'; candidates = candidates.slice(0, 1); }
             } else {
                 const lo = -(2 ** (W - 1)), hi = 2 ** (W - 1) - 1;
                 const fitsSigned = ranges.every((r) => r[0] >= lo && r[1] <= hi);
@@ -130,7 +131,18 @@ export function unitFunction(lib, name) {
 /** Função (x, y) -> valor da operação do nó feita pela unidade (valores inteiros com sinal, como no kernel). */
 export function opFunction(lib, op, name) {
     const { f, signed, cfg } = unitFunction(lib, name);
-    if (op.cls === 'add') return f;
+    if (op.cls === 'add') {
+        const n = op.node;
+        const ranges = n.args.map((a) => (a.c !== undefined ? [a.c, a.c] : op.seg.byId.get(a.n).range));
+        if (n.op === 'add' && !ranges.some((r) => r[0] < 0) && n.range[0] >= 0) return f;
+        // Complemento de 2 com W bits: os operandos como códigos de W bits; a subtração como ~(~a + b), que não
+        // precisa de vem um; o resultado nos bits do tipo do nó (como o cast do C++), com sinal se a faixa tiver.
+        const W = cfg.width, M = 2 ** W, code = (v) => ((v % M) + M) % M;
+        const T = bitsFor(n.range), MT = 2 ** T, neg = n.range[0] < 0;
+        const wrap = (v) => { const r = ((v % MT) + MT) % MT; return neg && r >= MT / 2 ? r - MT : r; };
+        if (n.op === 'sub') return (x, y) => wrap(M - 1 - (f(M - 1 - code(x), code(y)) % M));
+        return (x, y) => wrap(f(code(x), code(y)) % M);
+    }
     if (signed) {
         const M = 2 ** cfg.width;
         const code = (v) => ((v % M) + M) % M;

@@ -83,7 +83,7 @@ export const sections = [
         id: 'hls-err',
         title: 'Approximation and error model',
         html: `
-<p>The <strong>operations</strong> table lists each addition and multiplication of the DFG after unrolling. Each one can use any library unit of its width; the group row changes every operation of the same source line, and <strong>All exact</strong> undoes everything. Each operation shows its own error (that of the unit over the actual operands of that operation: a multiplier errs differently with coefficient 19 and with 52) and the error it alone would cause at the output.</p>
+<p>The <strong>operations</strong> table lists each addition and multiplication of the DFG after unrolling. Each one can use any library unit of its width; the group row changes every operation of the same source line, and <strong>All exact</strong> undoes everything. Subtractions and signed additions are included too: in two’s complement, the same unit does the signed addition, and a subtraction is computed as ~(~a + b), with no carry in; they stay exact only when the result does not fit the width of the unit. Each operation shows its own error (that of the unit over the actual operands of that operation: a multiplier errs differently with coefficient 19 and with 52) and the error it alone would cause at the output.</p>
 <p>The <strong>input data</strong> are the test image, uniform values over the range of each type or your own image (PNG, JPEG, PGM or PPM, converted to gray and fitted to the kernel size). The <strong>error model</strong> can be:</p>
 <ul>
     <li><strong>analytic</strong>: the mean and second moment of the error of each node are propagated by the rules of each operation, with errors assumed independent of each other and of the signals;</li>

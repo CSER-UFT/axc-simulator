@@ -275,7 +275,13 @@ export function exportIR(result, { inline = false } = {}) {
                 if (!name) { set(`${T}(${val(a[0])} ${n.op === 'add' ? '+' : n.op === 'sub' ? '-' : '*'} ${val(a[1])})`); return; }
                 const u = result.lib.unitByName(name), N = u.cfg.width, W = u.cfg.kind === 'mul' ? 2 * N : N + 1;
                 const f = cName(name);
-                if (u.cfg.kind === 'add') { set(`${T}(${f}(ap_uint<${N}>(${val(a[0])}), ap_uint<${N}>(${val(a[1])})))`); return; }
+                if (u.cfg.kind === 'add' && n.op === 'sub') { set(`${T}(ap_uint<${N}>(~ap_uint<${N}>(${f}(ap_uint<${N}>(~ap_uint<${N}>(${val(a[0])})), ap_uint<${N}>(${val(a[1])})))))`); return; }
+                if (u.cfg.kind === 'add') {
+                    // Soma com sinal: módulo 2^N (sem o vai um); sem sinal, o vai um faz parte do resultado.
+                    const sgn = n.range[0] < 0 || a.some((z) => (z.c !== undefined ? z.c < 0 : byId.get(z.n).range[0] < 0));
+                    set(sgn ? `${T}(ap_uint<${N}>(${f}(ap_uint<${N}>(${val(a[0])}), ap_uint<${N}>(${val(a[1])}))))` : `${T}(${f}(ap_uint<${N}>(${val(a[0])}), ap_uint<${N}>(${val(a[1])})))`);
+                    return;
+                }
                 if (u.cfg.method === 'booth') { set(`${T}(ap_int<${W}>(${f}(ap_uint<${N}>(${val(a[0])}), ap_uint<${N}>(${val(a[1])}))))`); return; }
                 // Sem sinal: os módulos na unidade e o sinal depois.
                 const x = val(a[0]), y = val(a[1]);

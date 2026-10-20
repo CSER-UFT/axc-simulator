@@ -72,7 +72,17 @@ test('atribuição: unidades por tipo, restrições e custo', () => {
     const dt = run(kernel('dot'), { assign: parseAssign(dot.ops, 'mul8=MUL8 T4') });
     assert.ok(dt.totals.area < dot.totals.area);
     const sob = run(kernel('sobel'));
-    assert.throws(() => parseAssign(sob.ops, 'S1.7=ADD16 LOA4'), /não serve/); // subtração
+    // Subtração em complemento de 2: a - b = ~(~a + b) com a mesma unidade, sem vem um. Exata com a unidade exata; com
+    // um truncado em k bits (os k bits baixos dos dois operandos descartados), o erro da soma invertida fica entre
+    // 0 e 2(2^k - 1), e o da subtração, com o sinal trocado pela inversão, também é positivo.
+    assert.equal(parseAssign(sob.ops, 'S1.7=ADD16 TRUNC4').get('S1.7'), 'ADD16 TRUNC4');
+    const sub = sob.ops.byId.get('S1.7');
+    const fx = opFunction(sob.lib, sub, 'ADD16 exato'), ft = opFunction(sob.lib, sub, 'ADD16 TRUNC4');
+    for (const [x, y] of [[0, 0], [1020, 255], [3, 200], [700, 699], [0, 255]]) {
+        assert.equal(fx(x, y), x - y);
+        const e = ft(x, y) - (x - y);
+        assert.ok(e >= 0 && e <= 30, `${x} - ${y}: erro ${e}`);
+    }
     // Atribuição inválida na síntese vira aviso, não erro.
     const w = run(kernel('gauss'), { assign: { 'S1.1': 'ADD16 LOA4' } });
     assert.equal(w.assign.size, 0);

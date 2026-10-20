@@ -62,6 +62,19 @@ function meet(x, y) {
     return { mask, value: (x.value & mask) >>> 0 };
 }
 
+/**
+ * Bits conhecidos nas duas entradas da unidade. A subtração entra como ~(~a + b): o primeiro operando chega
+ * invertido (os bits altos que eram zero viram um, também conhecidos).
+ */
+function knownOf(n, seg, unit) {
+    const kn = n.args.map((a) => knownBits(a, seg, n, unit));
+    if (n.op === 'sub') {
+        const W = unit.cfg?.width ?? unit.W ?? 16, full = W >= 32 ? 0xFFFFFFFF : (1 << W) - 1;
+        kn[0] = { mask: kn[0].mask, value: (~kn[0].value & kn[0].mask & full) >>> 0 };
+    }
+    return kn;
+}
+
 export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, addr = null }) {
     // Unidades compartilhadas: instâncias por chave (classe e largura) em cada trecho.
     const units = new Map(); // chave -> { unit, count, sources: Array<[Set, Set]> }
@@ -73,7 +86,7 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
         const byKey = new Map();
         for (const [id, s] of sch.sched) {
             const me = sch.info.get(id);
-            const opKnown = SHARED.has(me.cls) ? me.n.args.map((a) => knownBits(a, seg, me.n, me.unit)) : null;
+            const opKnown = SHARED.has(me.cls) ? knownOf(me.n, seg, me.unit) : null;
             if (me.noShare) {
                 // Uma unidade por operação (somador exato, multiplicação por constante), com os bits conhecidos dela.
                 const k = `${me.unit.name}·op`;
@@ -111,7 +124,7 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
                 const src = n.args.map((a) => (a.n !== undefined ? `${seg.id}:${a.n}` : `c${a.c}`));
                 // Operação comutativa: o operando vai para a entrada que já tem essa fonte, se houver.
                 const [A, B] = u.sources[op.slot];
-                let kn = n.args.map((a) => knownBits(a, seg, n, u.unit));
+                let kn = knownOf(n, seg, u.unit);
                 if (['add', 'mul'].includes(n.op) && (A.has(src[1]) || B.has(src[0]))) { src.reverse(); kn = kn.reverse(); }
                 A.add(src[0]);
                 B.add(src[1]);

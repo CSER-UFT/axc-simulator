@@ -1,17 +1,17 @@
 # Resultados dos estudos de caso
 
-Gerado por `scripts/experiments.mjs` em 2026-10-20 (commit baa883f, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
+Gerado por `scripts/experiments.mjs` em 2026-10-20 (commit ba43b7d, Node v22.22.0); biblioteca sintetizada de 2026-10-16 (sky130_fd_sc_hd, tt_025C_1v80). Período de 5 ns, fluxo de atraso mínimo, 2 portas por banco, salvo indicação. A metodologia e as limitações estão em `docs/METODOLOGIA.md`.
 
 ### E1. Precisão do modelo estático de erro
 
-72 casos (kernel, entrada e família de unidades) com saída de várias posições; razão entre o MSE estimado e o medido na execução bit a bit.
+78 casos (kernel, entrada e família de unidades) com saída de várias posições; razão entre o MSE estimado e o medido na execução bit a bit.
 
 #### E1: razão entre o MSE estimado e o medido
 
 | Modelo | Erro mediano (fator) | Dentro de 10% | Dentro de 25% | Dentro de 2 vezes | Pior caso (fator) | Com pipeline, dentro de 10% |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| analítico | 1,22× | 33% | 57% | 88% | 5,9× | 35% |
-| por amostras | 1,03× | 79% | 90% | 99% | 3,8× | 98% |
+| analítico | 1,25× | 31% | 51% | 79% | 5,9× | 32% |
+| por amostras | 1,02× | 79% | 91% | 99% | 3,8× | 97% |
 
 #### E1: os cinco casos de maior desvio do modelo por amostras
 
@@ -60,18 +60,18 @@ Objetivo: área ASIC; restrição: PSNR mínimo (estimado na busca, conferido bi
 | gauss | operação | 30 | 48,3% (30,1) | 54,7% (30,5) | - | 33,3% (30,7) | 54,7% (30,5) | 54,7% (30,5) | 54,7% (30,5) | 54,7% (30,5) |
 | gauss | operação | 40 | 40,2% (40,6) | 42,8% (40,3) | - | 23,9% (42,1) | 45,2% (40,4) | 45,2% (40,4) | 45,2% (40,2) | 45,2% (40,5) |
 | gauss | operação | 50 | 27,8% (50,1) | 30,4% (50,2) | - | 0,0% (∞) | 32,7% (50,3) | 32,6% (50,3) | 32,1% (50,3) | 32,6% (50,6) |
-| sobel | classe | 30 | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) | 6,0% (37,1) |
-| sobel | classe | 40 | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) | 4,1% (44,7) |
-| sobel | classe | 50 | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) | 2,9% (50,9) |
-| sobel | operação | 30 | 7,5% (30,8) | 11,1% (30,3) | - | 6,7% (30,3) | 11,1% (30,3) | 11,1% (30,3) | 11,1% (30,3) | 11,1% (30,3) |
-| sobel | operação | 40 | 6,9% (40,5) | 6,9% (40,5) | 6,9% (40,5) | 5,2% (42,2) | 6,9% (40,5) | 6,9% (40,5) | 6,9% (40,5) | 6,9% (40,5) |
-| sobel | operação | 50 | 2,6% (50,6) | 3,2% (50,2) | 3,2% (50,2) | 1,4% (52,2) | 3,2% (50,2) | 3,2% (50,2) | 3,2% (50,2) | 3,2% (50,2) |
-| sharpen | classe | 30 | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) |
-| sharpen | classe | 40 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
+| sobel | classe | 30 | 17,6% (37,9) | 17,6% (37,9) | 17,6% (37,9) | 17,6% (37,9) | 17,6% (37,9) | 17,6% (37,9) | 17,6% (37,9) | 17,6% (37,9) |
+| sobel | classe | 40 | 14,1% (43,0) | 14,1% (43,0) | 14,1% (43,0) | 14,1% (43,0) | 14,1% (43,0) | 14,1% (43,0) | 14,1% (43,0) | 14,1% (43,0) |
+| sobel | classe | 50 | 3,9% (55,2) | 3,9% (55,2) | 3,9% (55,2) | 3,9% (55,2) | 3,9% (55,2) | 3,9% (55,2) | 3,9% (55,2) | 3,9% (55,2) |
+| sobel | operação | 30 | 11,8% (30,0) | 26,7% (30,5) | - | 4,4% (41,6) | 26,7% (30,5) | 26,7% (30,5) | 26,7% (30,5) | 26,7% (30,5) |
+| sobel | operação | 40 | 12,8% (40,1) | 18,9% (40,1) | - | 4,4% (41,6) | 18,9% (40,1) | 18,9% (40,1) | 18,9% (40,1) | 18,9% (40,1) |
+| sobel | operação | 50 | 4,1% (50,3) | 10,5% (50,3) | - | 0,0% (∞) | 10,5% (50,3) | 10,5% (50,3) | 10,5% (50,3) | 10,5% (50,3) |
+| sharpen | classe | 30 | 7,9% (34,8) | 12,5% (32,6) | 12,5% (32,6) | 12,5% (32,6) | 12,5% (32,6) | 12,5% (32,6) | 12,5% (32,6) | 12,5% (32,6) |
+| sharpen | classe | 40 | 9,0% (40,2) | 9,0% (40,2) | 9,0% (40,2) | 9,0% (40,2) | 9,0% (40,2) | 9,0% (40,2) | 9,0% (40,2) | 9,0% (40,2) |
 | sharpen | classe | 50 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
-| sharpen | operação | 30 | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) | 1,4% (32,4) |
-| sharpen | operação | 40 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
-| sharpen | operação | 50 | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) | 0,0% (∞) |
+| sharpen | operação | 30 | 8,5% (30,6) | 14,2% (30,1) | 14,2% (30,1) | 5,5% (31,8) | 14,2% (30,1) | 14,2% (30,1) | 14,2% (30,1) | 14,2% (30,1) |
+| sharpen | operação | 40 | 2,7% (41,1) | 4,7% (40,0) | 4,7% (40,0) | 2,8% (40,4) | 10,9% (40,2) | 10,9% (40,2) | 10,9% (40,2) | 10,9% (40,0) |
+| sharpen | operação | 50 | 1,1% (50,5) | 1,1% (50,5) | 1,1% (50,5) | 0,0% (∞) | 1,1% (50,5) | 1,1% (50,5) | 1,1% (50,5) | 1,1% (50,5) |
 | fir | classe | 50 | 40,3% (50,1) | 51,0% (50,1) | 51,0% (50,1) | 37,3% (50,3) | 51,0% (50,1) | 51,0% (50,1) | 51,0% (50,1) | 51,0% (50,1) |
 | fir | classe | 60 | 37,0% (61,0) | 37,0% (61,0) | 44,0% (60,7) | 31,9% (60,2) | 37,0% (61,0) | 37,0% (61,0) | 37,0% (61,0) | 37,0% (61,0) |
 | fir | classe | 70 | 22,7% (70,5) | 26,7% (70,4) | 26,7% (70,4) | 25,9% (76,1) | 26,7% (70,4) | 26,7% (70,4) | 26,7% (70,4) | 26,7% (70,4) |
@@ -83,14 +83,14 @@ Objetivo: área ASIC; restrição: PSNR mínimo (estimado na busca, conferido bi
 
 | Heurística | Grupos | Média | Pior | Acha o melhor |
 | --- | --- | ---: | ---: | ---: |
-| Sequencial | classe | 3,7% | 21,9% | 8 de 12 |
-| Sequencial | operação | 8,6% | 38,4% | 4 de 12 |
+| Sequencial | classe | 4,2% | 21,9% | 7 de 12 |
+| Sequencial | operação | 12,5% | 38,4% | 1 de 12 |
 | Eficiência | classe | 1,3% | 12,6% | 10 de 12 |
-| Eficiência | operação | 1,2% | 5,8% | 8 de 12 |
+| Eficiência | operação | 1,8% | 7,0% | 7 de 12 |
 | Exaustiva | classe | 0,0% | 0,0% | 12 de 12 |
-| Exaustiva | operação | 0,0% | 0,0% | 5 de 5 |
+| Exaustiva | operação | 2,3% | 7,0% | 2 de 3 |
 | Aleatória | classe | 5,2% | 28,0% | 7 de 12 |
-| Aleatória | operação | 30,6% | 92,8% | 3 de 12 |
+| Aleatória | operação | 36,6% | 92,8% | 0 de 12 |
 | Local | classe | 1,1% | 12,6% | 11 de 12 |
 | Local | operação | 0,0% | 0,0% | 11 de 12 |
 | Tabu | classe | 1,1% | 12,6% | 11 de 12 |
@@ -104,26 +104,26 @@ Objetivo: área ASIC; restrição: PSNR mínimo (estimado na busca, conferido bi
 
 | Heurística | Grupos | Avaliações | Tempo (s) |
 | --- | --- | ---: | ---: |
-| Sequencial | classe | 36 | 0,6 |
-| Sequencial | operação | 191 | 2,5 |
-| Eficiência | classe | 215 | 2,6 |
-| Eficiência | operação | 3630 | 59,1 |
-| Exaustiva | classe | 1717 | 15,0 |
-| Exaustiva | operação | 701 | 13,8 |
-| Aleatória | classe | 78 | 1,0 |
-| Aleatória | operação | 153 | 2,5 |
-| Local | classe | 298 | 3,1 |
-| Local | operação | 7886 | 112,8 |
-| Tabu | classe | 346 | 3,7 |
-| Tabu | operação | 6869 | 109,8 |
-| GRASP | classe | 427 | 4,1 |
-| GRASP | operação | 7751 | 112,7 |
-| Genético | classe | 345 | 3,6 |
-| Genético | operação | 5901 | 75,4 |
+| Sequencial | classe | 37 | 1,3 |
+| Sequencial | operação | 227 | 6,3 |
+| Eficiência | classe | 218 | 4,5 |
+| Eficiência | operação | 4452 | 139,2 |
+| Exaustiva | classe | 1743 | 24,1 |
+| Exaustiva | operação | 353 | 13,5 |
+| Aleatória | classe | 92 | 2,3 |
+| Aleatória | operação | 201 | 6,7 |
+| Local | classe | 302 | 5,2 |
+| Local | operação | 9531 | 261,7 |
+| Tabu | classe | 356 | 6,0 |
+| Tabu | operação | 8112 | 238,6 |
+| GRASP | classe | 433 | 6,5 |
+| GRASP | operação | 9183 | 263,6 |
+| Genético | classe | 365 | 6,3 |
+| Genético | operação | 6902 | 177,2 |
 
-Verificação: o primeiro ponto (o mais barato estimado como viável) passou na execução bit a bit em 171 de 185 casos; nos outros, a busca verificou em média 3,1 pontos até achar um que passa (no máximo 17).
+Verificação: o primeiro ponto (o mais barato estimado como viável) passou na execução bit a bit em 162 de 183 casos; nos outros, a busca verificou em média 4,1 pontos até achar um que passa (no máximo 20).
 
-Eficiência contra sequencial: melhor em 11 de 24 configurações, igual em 13, pior em 0; maior ganho 26,8% de área a menos que a sequencial.
+Eficiência contra sequencial: melhor em 15 de 24 configurações, igual em 9, pior em 0; maior ganho 26,8% de área a menos que a sequencial.
 
 ### E3. Fronteiras de Pareto verificadas
 
@@ -136,7 +136,7 @@ Eficiência contra sequencial: melhor em 11 de 24 configurações, igual em 13, 
 | gauss | classe | exaustiva | 49 | 36 | 0,42 | 7,69 | 0 / 0 |
 | gauss | operação | eficiência | 177 | 167 | 0,23 | 4,70 | 0 / 0 |
 | fir | classe | exaustiva | 39 | 38 | 0,00 | 0,00 | 0 / 0 |
-| sobel | operação | eficiência | 63 | 52 | 0,15 | 0,91 | 1 / 0 |
+| sobel | operação | eficiência | 130 | 123 | 0,18 | 0,68 | 0 / 0 |
 
 ### E4. Diretivas e período junto com as unidades
 
@@ -160,10 +160,10 @@ O projeto escolhido (exaustiva por classe, área, PSNR de pelo menos 40 dB) com 
 | --- | --- | ---: | ---: | ---: | --- |
 | gauss | uniformes | 44,4% | 44,8 | 41,0 | sim |
 | gauss | imagem | 44,4% | 41,0 | 44,8 | sim |
-| sobel | uniformes | 5,7% | 40,1 | 38,9 | não |
-| sobel | imagem | 4,1% | 44,7 | 45,5 | sim |
-| sharpen | uniformes | 1,3% | 41,2 | 34,8 | não |
-| sharpen | imagem | 0,0% | ∞ | ∞ | sim |
+| sobel | uniformes | 14,1% | 42,5 | 43,0 | sim |
+| sobel | imagem | 14,1% | 43,0 | 42,5 | sim |
+| sharpen | uniformes | 12,5% | 41,0 | 32,6 | não |
+| sharpen | imagem | 9,0% | 40,2 | 46,4 | sim |
 
 ### E6. Unroll: cópias com a mesma unidade
 
@@ -175,22 +175,22 @@ Kernels com `unroll factor=2` no laço com pipeline; objetivo área, PSNR de pel
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | gauss | operação | 4422 | 45,1% | 40,1 | 26 | 11 de 13 |
 | gauss | operação do código | 9591 | 47,6% | 40,2 | 26 | 0 de 13 |
-| sobel | operação | 2740 | 10,7% | 40,5 | 10 | 3 de 13 |
-| sobel | operação do código | 505 | 10,4% | 41,1 | 10 | 0 de 13 |
-| sharpen | operação | 31 | 0,0% | ∞ | 0 | 0 de 5 |
-| sharpen | operação do código | 6 | 0,0% | ∞ | 0 | 0 de 5 |
+| sobel | operação | 18144 | 21,2% | 40,1 | 26 | 2 de 13 |
+| sobel | operação do código | 2458 | 18,2% | 40,5 | 24 | 0 de 13 |
+| sharpen | operação | 1047 | 5,1% | 40,1 | 7 | 3 de 5 |
+| sharpen | operação do código | 201 | 4,4% | 40,9 | 6 | 0 de 5 |
 
 ### E7. SSIM: estimativa e exploração
 
-SSIM padrão (janela gaussiana 11 × 11, σ = 1,5) na saída de imagem, com a imagem de teste; 27 casos (kernel e família de unidades, como no E1). A estimativa usa as estatísticas locais da imagem exata e o erro do modelo estático: pela faixa de valor da saída (média e variância do erro em 32 faixas, do modelo por amostras), como ruído independente do sinal, ou pelo modelo analítico (sem as faixas, o ganho é zero e cai na fórmula do ruído independente). "Abaixo do medido" é a fração dos casos em que a estimativa é conservadora.
+SSIM padrão (janela gaussiana 11 × 11, σ = 1,5) na saída de imagem, com a imagem de teste; 30 casos (kernel e família de unidades, como no E1). A estimativa usa as estatísticas locais da imagem exata e o erro do modelo estático: pela faixa de valor da saída (média e variância do erro em 32 faixas, do modelo por amostras), como ruído independente do sinal, ou pelo modelo analítico (sem as faixas, o ganho é zero e cai na fórmula do ruído independente). "Abaixo do medido" é a fração dos casos em que a estimativa é conservadora.
 
 #### E7: SSIM estimado contra o medido
 
 | Estimativa | Diferença mediana | Até 0,01 | Até 0,05 | Pior diferença | Abaixo do medido | Mediana com SSIM ≥ 0,95 (15 casos) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| por faixa de valor (amostras) | 0,0174 | 44% | 67% | 0,463 | 85% | 0,0008 |
-| ruído independente (amostras) | 0,0379 | 41% | 59% | 0,503 | 93% | 0,0016 |
-| analítico | 0,0316 | 41% | 59% | 0,524 | 78% | 0,0006 |
+| por faixa de valor (amostras) | 0,0275 | 40% | 60% | 0,224 | 83% | 0,0008 |
+| ruído independente (amostras) | 0,0701 | 37% | 50% | 0,503 | 90% | 0,0016 |
+| analítico | 0,0660 | 37% | 50% | 0,524 | 80% | 0,0006 |
 
 #### E7: exploração por operação com restrição em SSIM (heurística de eficiência, área)
 
@@ -199,12 +199,12 @@ SSIM padrão (janela gaussiana 11 × 11, σ = 1,5) na saída de imagem, com a im
 | gauss | 0,95 | 7603 | 52,3% | 0,9529 | 0,9705 | 26,2 | 1 |
 | gauss | 0,98 | 6944 | 48,5% | 0,9817 | 0,9891 | 33,4 | 1 |
 | gauss | 0,99 | 6227 | 41,9% | 0,9900 | 0,9926 | 36,9 | 1 |
-| sobel | 0,95 | 569 | 8,3% | 0,9601 | 0,9538 | 28,1 | 9 |
-| sobel | 0,98 | 484 | 4,0% | 0,9842 | 0,9801 | 47,1 | 3 |
-| sobel | 0,99 | 398 | 3,2% | 0,9920 | 0,9904 | 49,2 | 4 |
-| sharpen | 0,95 | 12 | 0,0% | 1,0000 | 1,0000 | ∞ | 1 |
-| sharpen | 0,98 | 12 | 0,0% | 1,0000 | 1,0000 | ∞ | 1 |
-| sharpen | 0,99 | 12 | 0,0% | 1,0000 | 1,0000 | ∞ | 1 |
+| sobel | 0,95 | 2312 | 16,1% | 0,9619 | 0,9546 | 40,7 | 20 |
+| sobel | 0,98 | 1363 | - | - | - | - | 25 |
+| sobel | 0,99 | 848 | - | - | - | - | 25 |
+| sharpen | 0,95 | 236 | 4,7% | 0,9634 | 0,9693 | 40,0 | 1 |
+| sharpen | 0,98 | 149 | 2,3% | 0,9831 | 0,9846 | 45,1 | 1 |
+| sharpen | 0,99 | 109 | 1,2% | 0,9915 | 0,9929 | 47,9 | 1 |
 
-Tempo total: 2592 s.
+Tempo total: 18428 s (E2 e os outros em paralelo).
 
