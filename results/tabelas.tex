@@ -161,12 +161,11 @@ sobel & operação & eficiência & 130 & 123 & 0,18 & 0,68 & 0 / 0 \\ \hline
 \hline
 \rowcolor{tabAzul}\color{white}Objetivo & \color{white}Variante & \color{white}Área ($\mu$m$^2$) & \color{white}Energia (nJ) & \color{white}Latência ($\mu$s) & \color{white}PSNR medido & \color{white}Unidades \\
 \hline
-ponderado & diretivas do código, 2.5 ns & 12187 & 1751 & 180,5 & 41,0 & 8 $\times$ ADD16 TRUNC7 + 5 $\times$ MUL8 T8 +C \\ \hline
-latência & diretivas do código, 2.5 ns & 15408 & 1912 & 180,5 & 52,9 & 8 $\times$ ADD16 TRUNC2 + 3 $\times$ MUL8 KUL6 \\ \hline
-área & sem array\_partition (linha 6), pipeline (linha 12), 2.5 ns & 5031 & 11211 & 4423,7 & 42,4 & 1 $\times$ ADD16 TRUNC5 + 1 $\times$ MUL8 T6 \\ \hline
+ponderado & 2.5 ns & 12187 & 1751 & 180,5 & 41,0 & 8 $\times$ ADD16 TRUNC7 + 5 $\times$ MUL8 T8 +C \\ \hline
+latência & 2.5 ns & 15408 & 1912 & 180,5 & 52,9 & 8 $\times$ ADD16 TRUNC2 + 3 $\times$ MUL8 KUL6 \\ \hline
+área & 10 ns & 7943 & 897 & 722,1 & 41,0 & 8 $\times$ ADD16 TRUNC7 + 5 $\times$ MUL8 T8 +C \\ \hline
 \end{tabular}
 \end{table}
-
 \begin{table}[htbp]
 \centering
 \caption{E5: o projeto otimizado com um conjunto de dados, medido no outro}

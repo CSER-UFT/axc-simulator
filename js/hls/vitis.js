@@ -419,3 +419,101 @@ ${outs.map((a) => `    {
 
 /** Faixa do tipo de um vetor (para conferir os dados). */
 export const arrRange = (a) => typeRange(a.type);
+
+/**
+ * Tcl do Vitis HLS 2022.2 para um projeto (caminhos relativos à pasta do projeto): csim, csynth e, com as variáveis
+ * de ambiente, a cosimulação (AXC_COSIM=1) e o Vivado com posicionamento e roteamento (AXC_IMPL=1).
+ * @param {{id: string, note?: string, clockNs: number}} c
+ */
+export function tclScript(c, top, part, dataFiles, blackboxes = [], { usage = 'vitis_hls -f run.tcl', by = 'axc-simulator' } = {}) {
+    return `# ${c.id}: ${c.note ?? ''}. Gerado por ${by} (Vitis HLS 2022.2).
+# Uso: ${usage}
+# Variáveis de ambiente: AXC_IMPL=1 roda também o Vivado (export_design -flow impl); AXC_COSIM=1 roda a cosimulação.
+set here [file dirname [file normalize [info script]]]
+cd $here
+open_project -reset proj
+set_top ${top}
+${blackboxes.map((j) => `add_files -blackbox ${j}`).join('\n')}
+add_files kernel.cpp -cflags "-I$here"
+add_files -tb tb.cpp -cflags "-I$here"
+${dataFiles.map((f) => `add_files -tb ${f}`).join('\n')}
+open_solution -reset solution1 -flow_target vivado
+set_part {${part}}
+create_clock -period ${c.clockNs} -name default
+# Como no modelo: sem DSP (multiplicadores em LUT), sem pipeline automático de laços, memórias de 1 ciclo.
+config_op mul -impl fabric
+config_compile -pipeline_loops 0
+# Uma diferença na csim (testbench devolve 1) não impede a síntese; o resultado fica no log.
+if {[catch {csim_design} err]} { puts "AXC_CSIM_FALHOU $err" }
+csynth_design
+if {[info exists ::env(AXC_COSIM)] && $::env(AXC_COSIM) == 1} { cosim_design }
+if {[info exists ::env(AXC_IMPL)] && $::env(AXC_IMPL) == 1} { export_design -flow impl -rtl verilog -format ip_catalog }
+exit
+`;
+}
+
+/** Previsões do modelo para um projeto (para comparar com o relatório do Vitis e do Vivado). */
+export function prediction(r) {
+    return {
+        cycles: r.totals.cycles, timeNs: r.totals.timeNs, intervalNs: r.totals.intervalNs, critPs: r.totals.critPs,
+        luts: r.totals.luts, carry4: r.totals.carry4, ff: r.totals.ff, areaUm2: r.totals.area, energyFj: r.totals.energy,
+        // Laços achatados aparecem como um só (rows_cols), como no relatório do Vitis.
+        loops: r.design.loops.filter((l) => l.mode !== 'unrolled' && !l.flatInto).map((l) => (l.flatLabel
+            ? { label: l.flatLabel, mode: 'pipelined', flattened: true, trip: l.flatTrip, II: l.IIachieved ?? null, iterLatency: l.iterLatency, latency: l.latency }
+            : { label: l.label ?? l.id, mode: l.mode, trip: l.tripHw, II: l.IIachieved ?? null, iterLatency: l.iterLatency, latency: l.latency })),
+        addrLuts: r.cost.addr?.luts ?? 0,
+        units: r.cost.units.map((u) => ({ unit: u.unit.name, count: u.count, luts: u.luts, carry4: u.carry4 })),
+        model: r.model,
+    };
+}
+
+/**
+ * Projeto completo para síntese e implementação locais (Vitis HLS e Vivado): o kernel elaborado com as unidades
+ * atribuídas como caixa preta de RTL (o Verilog da netlist com o invólucro de portas que o Vitis exige, o JSON e o
+ * modelo C para a csim), o testbench com as entradas e a saída esperada (a execução bit a bit do simulador), o Tcl,
+ * as previsões do modelo e um LEIAME.
+ * @param {object} result síntese com a atribuição
+ * @param {{inputs: Map, expected: object, part?: string, clockNs: number, id?: string, note?: string, target?: string}} o
+ * @returns {Record<string, string>} nome do arquivo -> conteúdo
+ */
+export function projectFiles(result, { inputs, expected, part = 'xc7a100tcsg324-1', clockNs, id = result.design.name, note = '', target = 'asic' }) {
+    const files = testbench(result.design, inputs, expected);
+    files['kernel.h'] = kernelHeader(result.design);
+    files['kernel.cpp'] = exportIR(result, { inline: 'rtl' });
+    const data = Object.keys(files).filter((f) => f.endsWith('.dat'));
+    const names = [...new Set(result.assign.values())];
+    let bbs = [];
+    if (names.length) { const bb = blackboxFiles(result.lib, names); Object.assign(files, bb.files); bbs = bb.jsons; }
+    files['run.tcl'] = tclScript({ id, note, clockNs }, result.design.name, part, data, bbs);
+    files['model.json'] = `${JSON.stringify({ id, note, clockNs, part, top: result.design.name, delays: target, assign: Object.fromEntries(result.assign), prediction: prediction(result) }, null, 1)}\n`;
+    const p = prediction(result);
+    files['LEIAME.txt'] = `Projeto ${id}: ${result.design.name}${note ? ` (${note})` : ''}
+Gerado pelo axc-simulator (https://github.com/CSER-UFT/axc-simulator) para o Vitis HLS 2022.2 e o Vivado.
+
+Conteúdo
+  kernel.cpp, kernel.h   o projeto elaborado pelo simulador: os mesmos laços, diretivas e larguras; cada operação
+                         aproximada chama a sua unidade.
+${names.length ? `  u_*_bb.v               cada unidade em Verilog: a netlist e o invólucro (módulo com o nome da função C e as
+                         portas ap_clk, ap_rst, ap_ce, a, b e ap_return que o Vitis exige numa caixa preta).
+  u_*_bb.json            a descrição da caixa preta para o Vitis (add_files -blackbox): latência 0, II 1.
+  u_*_bb.cpp             o modelo C da mesma netlist, usado na csim.
+` : ''}  tb.cpp, *.dat          o testbench: as entradas e a saída esperada, da execução bit a bit do simulador; a csim
+                         confere todas as posições e imprime AXC_MISMATCHES n OF total.
+  run.tcl                o script do Vitis HLS.
+  model.json             a atribuição das unidades e as previsões do modelo.
+
+Uso (com o Vitis HLS no PATH: source /tools/Xilinx/Vitis_HLS/2022.2/settings64.sh)
+  vitis_hls -f run.tcl                  csim e csynth (relatório em proj/solution1/syn/report)
+  AXC_IMPL=1 vitis_hls -f run.tcl       também o Vivado: síntese, posicionamento e roteamento
+                                        (relatório em proj/solution1/impl/report/verilog)
+  AXC_COSIM=1 vitis_hls -f run.tcl      também a cosimulação
+
+Configuração: parte ${part} (troque em set_part no run.tcl), período de ${clockNs} ns, multiplicadores em LUT (sem
+DSP), sem pipeline automático de laços. Com a caixa preta, o Vitis não conhece o atraso da unidade e a encadeia como
+se fosse instantânea: o período do Vivado é o que vale.
+
+Previsões do modelo (atrasos ${target === 'fpga' ? 'do Vivado' : 'do sky130'})
+  latência ${p.cycles} ciclos (${p.timeNs.toFixed(0)} ns), LUT ${p.luts} + CARRY4 ${p.carry4}, FF ${p.ff}, área sky130 ${p.areaUm2.toFixed(0)} µm²
+`;
+    return files;
+}

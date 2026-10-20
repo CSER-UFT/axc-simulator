@@ -138,17 +138,17 @@ Eficiência contra sequencial: melhor em 15 de 24 configurações, igual em 9, p
 | fir | classe | exaustiva | 39 | 38 | 0,00 | 0,00 | 0 / 0 |
 | sobel | operação | eficiência | 130 | 123 | 0,18 | 0,68 | 0 / 0 |
 
-### E4. Diretivas e período junto com as unidades
+### E4. Período junto com as unidades
 
-Gaussiano, PSNR de pelo menos 40 dB, grupos por classe, heurística de eficiência; variantes: cada diretiva ligada ou desligada e os períodos de 2,5, 5 e 10 ns.
+Gaussiano com as diretivas do código, PSNR de pelo menos 40 dB, grupos por classe, heurística de eficiência; períodos de 2,5, 5 e 10 ns.
 
 #### E4: melhor ponto verificado por objetivo
 
 | Objetivo | Variante | Área (µm²) | Energia (nJ) | Latência (µs) | PSNR medido | Unidades |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| ponderado | diretivas do código, 2.5 ns | 12187 | 1751 | 180,5 | 41,0 | 8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C |
-| latência | diretivas do código, 2.5 ns | 15408 | 1912 | 180,5 | 52,9 | 8 × ADD16 TRUNC2 + 3 × MUL8 KUL6 |
-| área | sem array_partition (linha 6), pipeline (linha 12), 2.5 ns | 5031 | 11211 | 4423,7 | 42,4 | 1 × ADD16 TRUNC5 + 1 × MUL8 T6 |
+| ponderado | 2.5 ns | 12187 | 1751 | 180,5 | 41,0 | 8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C |
+| latência | 2.5 ns | 15408 | 1912 | 180,5 | 52,9 | 8 × ADD16 TRUNC2 + 3 × MUL8 KUL6 |
+| área | 10 ns | 7943 | 897 | 722,1 | 41,0 | 8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C |
 
 ### E5. Sensibilidade aos dados de entrada
 

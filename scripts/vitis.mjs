@@ -25,7 +25,7 @@ import { synthesize, MODEL } from '../js/hls/index.js';
 import { KERNELS } from '../js/hls/kernels.js';
 import { parseAssign, opFunction } from '../js/hls/approx.js';
 import { execute, makeInputs } from '../js/hls/exec.js';
-import { exportIR, exportSource, kernelHeader, testbench, cName, blackboxFiles } from '../js/hls/vitis.js';
+import { exportIR, exportSource, kernelHeader, testbench, cName, blackboxFiles, tclScript, prediction } from '../js/hls/vitis.js';
 import { explore, pragmaVariants } from '../js/hls/dse.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -98,34 +98,6 @@ function cases() {
     return list.filter((c) => !only || only.has(c.id) || only.has(c.kernel));
 }
 
-/** Tcl do Vitis HLS para um caso (caminhos relativos à pasta do caso). */
-function tcl(c, top, part, dataFiles, blackboxes = []) {
-    return `# ${c.id}: ${c.note}. Gerado por scripts/vitis.mjs (Vitis HLS 2022.2).
-# Uso, da pasta do repositório: vitis_hls -f build/vitis/${c.id}/run.tcl
-# Variáveis de ambiente: AXC_IMPL=1 roda também o Vivado (export_design -flow impl); AXC_COSIM=1 roda a cosimulação.
-set here [file dirname [file normalize [info script]]]
-cd $here
-open_project -reset proj
-set_top ${top}
-${blackboxes.map((j) => `add_files -blackbox ${j}`).join('\n')}
-add_files kernel.cpp -cflags "-I$here"
-add_files -tb tb.cpp -cflags "-I$here"
-${dataFiles.map((f) => `add_files -tb ${f}`).join('\n')}
-open_solution -reset solution1 -flow_target vivado
-set_part {${part}}
-create_clock -period ${c.clockNs} -name default
-# Como no modelo: sem DSP (multiplicadores em LUT), sem pipeline automático de laços, memórias de 1 ciclo.
-config_op mul -impl fabric
-config_compile -pipeline_loops 0
-# Uma diferença na csim (testbench devolve 1) não impede a síntese; o coletor lê o resultado no log.
-if {[catch {csim_design} err]} { puts "AXC_CSIM_FALHOU $err" }
-csynth_design
-if {[info exists ::env(AXC_COSIM)] && $::env(AXC_COSIM) == 1} { cosim_design }
-if {[info exists ::env(AXC_IMPL)] && $::env(AXC_IMPL) == 1} { export_design -flow impl -rtl verilog -format ip_catalog }
-exit
-`;
-}
-
 function runAll(list) {
     return `#!/usr/bin/env bash
 # Roda o Vitis HLS em todos os casos de build/vitis (gerados por: node scripts/vitis.mjs export).
@@ -158,20 +130,6 @@ echo "Depois: node scripts/vitis.mjs collect"
 }
 
 /** Previsões do simulador para o caso (o mesmo projeto que o C++ descreve). */
-function prediction(r) {
-    return {
-        cycles: r.totals.cycles, timeNs: r.totals.timeNs, intervalNs: r.totals.intervalNs, critPs: r.totals.critPs,
-        luts: r.totals.luts, carry4: r.totals.carry4, ff: r.totals.ff, areaUm2: r.totals.area, energyFj: r.totals.energy,
-        // Laços achatados aparecem como um só (rows_cols), como no relatório do Vitis.
-        loops: r.design.loops.filter((l) => l.mode !== 'unrolled' && !l.flatInto).map((l) => (l.flatLabel
-            ? { label: l.flatLabel, mode: 'pipelined', flattened: true, trip: l.flatTrip, II: l.IIachieved ?? null, iterLatency: l.iterLatency, latency: l.latency }
-            : { label: l.label ?? l.id, mode: l.mode, trip: l.tripHw, II: l.IIachieved ?? null, iterLatency: l.iterLatency, latency: l.latency })),
-        addrLuts: r.cost.addr?.luts ?? 0,
-        units: r.cost.units.map((u) => ({ unit: u.unit.name, count: u.count, luts: u.luts, carry4: u.carry4 })),
-        model: MODEL,
-    };
-}
-
 function doExport() {
     const part = opt('--part', 'xc7a100tcsg324-1');
     mkdirSync(OUT, { recursive: true });
@@ -208,7 +166,7 @@ function doExport() {
         const data = Object.keys(files).filter((f) => f.endsWith('.dat'));
         let bbs = [];
         if (c.inline === 'rtl') { const bb = blackboxFiles(r.lib, [...new Set(r.assign.values())]); Object.assign(files, bb.files); bbs = bb.jsons; }
-        files['run.tcl'] = tcl(c, r.design.name, part, data, bbs);
+        files['run.tcl'] = tclScript(c, r.design.name, part, data, bbs, { usage: `vitis_hls -f build/vitis/${c.id}/run.tcl`, by: 'scripts/vitis.mjs' });
         files['model.json'] = `${JSON.stringify({ case: c.id, kernel: c.kernel, kind: c.kind, note: c.note, clockNs: c.clockNs, part, top: r.design.name, assign: Object.fromEntries(r.assign), prediction: prediction(r) }, null, 1)}\n`;
         for (const [f, text] of Object.entries(files)) writeFileSync(join(dir, f), text);
         index.push({ id: c.id, kernel: c.kernel, kind: c.kind, note: c.note, clockNs: c.clockNs, top: r.design.name });

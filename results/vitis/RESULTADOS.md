@@ -1,6 +1,6 @@
 # Validação contra o Vitis HLS e o Vivado
 
-Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-1. Cada caso é o mesmo projeto no simulador e no Vitis HLS 2022.2 (o C++ exportado do projeto elaborado, `_ir`, ou o código original, `_src`), com multiplicadores na lógica (sem DSP). LUT e FF do modelo vêm da síntese das unidades (Yosys `synth_xilinx`, ou o Vivado quando há data/vivado-units.json), mais as peças do modelo (multiplexadores, comparadores, registradores, contadores e a seleção de banco). A referência de recursos e de período é o Vivado depois do roteamento; a estimativa do csynth fica na tabela só para comparação. "Exportação" é a previsão feita quando o caso foi gerado (o modelo antes da primeira rodada, nos 23 primeiros casos; o calibrado com a primeira rodada, nos da segunda); "modelo" é o atual, para as mesmas atribuições de unidades, com LUT, CARRY4 e atrasos das unidades caracterizadas no Vivado (data/vivado-units.json).
+Gerado por `node scripts/vitis.mjs compare` em 2026-10-20; parte xc7a100tcsg324-1. Cada caso é o mesmo projeto no simulador e no Vitis HLS 2022.2 (o C++ exportado do projeto elaborado, `_ir`, ou o código original, `_src`), com multiplicadores na lógica (sem DSP). LUT e FF do modelo vêm da síntese das unidades (Yosys `synth_xilinx`, ou o Vivado quando há data/vivado-units.json), mais as peças do modelo (multiplexadores, comparadores, registradores, contadores e a seleção de banco). A referência de recursos e de período é o Vivado depois do roteamento; a estimativa do csynth fica na tabela só para comparação. "Exportação" é a previsão feita quando o caso foi gerado (o modelo antes da primeira rodada, nos 23 primeiros casos; o calibrado com a primeira rodada, nos da segunda); "modelo" é o atual, para as mesmas atribuições de unidades, com LUT, CARRY4 e atrasos das unidades caracterizadas no Vivado (data/vivado-units.json).
 
 59 de 59 casos com relatório do csynth; 59 com o Vivado (impl); 59 com csim.
 
@@ -149,8 +149,8 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | gauss_src | 549 | 752 | 2240 | 731 | 70 | 138 | 309 | 632 | 1321 | 618 |
 | gauss_ir | 549 | 752 | 2192 | 729 | 70 | 141 | 309 | 632 | 1137 | 590 |
-| sobel_src | 401 | 683 | 1892 | 655 | 43 | 118 | 180 | 516 | 1206 | 565 |
-| sobel_ir | 401 | 683 | 1913 | 674 | 43 | 118 | 180 | 516 | 1288 | 567 |
+| sobel_src | 401 | 702 | 1892 | 655 | 49 | 118 | 180 | 516 | 1206 | 565 |
+| sobel_ir | 401 | 702 | 1913 | 674 | 49 | 118 | 180 | 516 | 1288 | 567 |
 | sharpen_src | 267 | 543 | 1655 | 493 | 24 | 94 | 88 | 427 | 979 | 431 |
 | sharpen_ir | 267 | 543 | 1658 | 496 | 24 | 94 | 88 | 427 | 1015 | 468 |
 | fir_src | 1740 | 1024 | 3454 | 1108 | 114 | 125 | 736 | 582 | 1079 | 946 |
@@ -164,7 +164,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | gauss_10ns_ir | 549 | 713 | 2160 | 700 | 70 | 135 | 225 | 518 | 1159 | 480 |
 | gauss_drum6_ir | 555 | 877 | 4422 | 886 | 51 | 147 | 309 | 635 | 2651 | 845 |
 | gauss_t8c_loa6_ir | 397 | 718 | 3879 | 917 | 28 | 141 | 234 | 635 | 2666 | 901 |
-| sobel_loa4_ir | 404 | 676 | 2400 | 758 | 37 | 117 | 180 | 516 | 1807 | 776 |
+| sobel_loa4_ir | 404 | 695 | 2400 | 758 | 43 | 117 | 180 | 516 | 1807 | 776 |
 | sharpen_kul_ir | 245 | 556 | 1773 | 590 | 23 | 101 | 88 | 455 | 1128 | 487 |
 | fir_t8c_loa11_ir | 1027 | 978 | 10117 | 1255 | 12 | - | 469 | 733 | 4784 | 806 |
 | dot_t4_ir | 140 | 124 | 917 | 167 | 12 | 28 | 73 | 89 | 501 | 169 |
@@ -174,7 +174,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | fir_dse2_lut60_ir | 709 | 845 | 7919 | 987 | 39 | 128 | 656 | 610 | 2444 | 648 |
 | gauss_drum6_lat0_ir | 749 | 877 | 3834 | 856 | 51 | 150 | 592 | 635 | 1181 | 621 |
 | gauss_t8c_loa6_lat0_ir | 730 | 718 | 3775 | 789 | 28 | 137 | 546 | 635 | 1682 | 616 |
-| sobel_loa4_lat0_ir | 691 | 676 | 2247 | 727 | 37 | 114 | 492 | 516 | 1390 | 607 |
+| sobel_loa4_lat0_ir | 691 | 695 | 2247 | 727 | 43 | 114 | 492 | 516 | 1390 | 607 |
 | sharpen_kul_lat0_ir | 530 | 556 | 1840 | 526 | 23 | 101 | 384 | 455 | 1015 | 458 |
 | fir_t8c_loa11_lat0_ir | 782 | 978 | 9442 | 632 | 12 | - | 519 | 733 | 1785 | 489 |
 | dot_t4_lat0_ir | 124 | 124 | 757 | 174 | 12 | 28 | 73 | 89 | 74 | 65 |
@@ -184,7 +184,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | fir_dse2_lut60_lat0_ir | 709 | 845 | 7855 | 934 | 39 | 129 | 656 | 610 | 1785 | 531 |
 | gauss_drum6_inl_ir | 749 | 877 | 4044 | 1000 | 51 | 169 | 592 | 635 | 1275 | 645 |
 | gauss_t8c_loa6_inl_ir | 730 | 718 | 4133 | 867 | 28 | 162 | 546 | 635 | 2259 | 753 |
-| sobel_loa4_inl_ir | 691 | 676 | 2305 | 692 | 37 | 112 | 492 | 516 | 1508 | 613 |
+| sobel_loa4_inl_ir | 691 | 695 | 2305 | 692 | 43 | 112 | 492 | 516 | 1508 | 613 |
 | sharpen_kul_inl_ir | 530 | 556 | 1847 | 531 | 23 | 101 | 384 | 455 | 1025 | 464 |
 | fir_t8c_loa11_inl_ir | 782 | 978 | 8789 | 686 | 12 | - | 519 | 733 | 6899 | 770 |
 | dot_t4_inl_ir | 124 | 124 | 821 | 166 | 12 | 30 | 73 | 89 | 409 | 143 |
@@ -194,7 +194,7 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 | fir_dse2_lut60_inl_ir | 709 | 845 | 8958 | 1025 | 39 | 85 | 656 | 610 | 7508 | 935 |
 | gauss_drum6_rtl_ir | 877 | 877 | 1921 | 806 | 51 | 120 | 635 | 635 | 1152 | 583 |
 | gauss_t8c_loa6_rtl_ir | 795 | 718 | 2043 | 638 | 28 | 111 | 635 | 635 | 1682 | 630 |
-| sobel_loa4_rtl_ir | 728 | 676 | 1986 | 667 | 37 | 112 | 516 | 516 | 1396 | 609 |
+| sobel_loa4_rtl_ir | 728 | 695 | 1986 | 667 | 43 | 112 | 516 | 516 | 1396 | 609 |
 | sharpen_kul_rtl_ir | 556 | 556 | 1640 | 497 | 23 | 94 | 455 | 455 | 1015 | 459 |
 | fir_t8c_loa11_rtl_ir | 978 | 978 | 3256 | 665 | 12 | 12 | 733 | 733 | 2089 | 487 |
 | dot_t4_rtl_ir | 124 | 124 | 118 | 116 | 12 | 13 | 89 | 89 | 74 | 64 |
@@ -427,5 +427,5 @@ Gerado por `node scripts/vitis.mjs compare` em 2026-10-19; parte xc7a100tcsg324-
 
 ### Resíduos depois da calibração
 
-Medianas: iteração de laço sequencial, Vitis menos modelo, 5 ciclos; entrada e saída do pipeline no Vitis (latência menos profundidade menos N menos 1 vezes o II) -1 ciclos; LUT Vivado / modelo 0,99; FF 1,05; latência Vitis / modelo 1,000; período Vivado / modelo 1,13. Valores em `results/vitis/calibracao.json`, com as constantes do modelo (`MODEL` em `js/hls/sched.js`).
+Medianas: iteração de laço sequencial, Vitis menos modelo, 5 ciclos; entrada e saída do pipeline no Vitis (latência menos profundidade menos N menos 1 vezes o II) -1 ciclos; LUT Vivado / modelo 0,98; FF 1,05; latência Vitis / modelo 1,000; período Vivado / modelo 1,13. Valores em `results/vitis/calibracao.json`, com as constantes do modelo (`MODEL` em `js/hls/sched.js`).
 

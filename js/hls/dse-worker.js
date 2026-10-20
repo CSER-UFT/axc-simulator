@@ -2,7 +2,7 @@
  * Exploração em segundo plano (Web Worker), para a página não travar: recebe o código, as opções e os dados da
  * biblioteca; devolve o progresso e o resultado resumido (pontos avaliados, fronteiras, melhores pontos).
  */
-import { explore, pointSummary, pragmaVariants } from './dse.js';
+import { explore, pointSummary } from './dse.js';
 
 self.onmessage = (e) => {
     const { src, options, synth, cells } = e.data;
@@ -12,10 +12,8 @@ self.onmessage = (e) => {
             ...options, synth, cells,
             progress: (n) => { const now = Date.now(); if (now - last > 150) { last = now; self.postMessage({ type: 'progress', n }); } },
         });
-        // Código de cada variante de diretivas, para aplicar um ponto ao editor.
-        const codes = new Map((options.directives ? pragmaVariants(src) : [{ code: src, label: 'diretivas do código' }]).map((v) => [v.label, v.code]));
-        const codeOf = (p) => codes.get(p.variant.replace(/, [\d.]+ ns$/, '')) ?? src;
-        const sum = (p) => (p ? { ...pointSummary(p, res.ref), err: p.err, code: codeOf(p) } : null);
+        // As diretivas são as do código: aplicar um ponto não muda o editor.
+        const sum = (p) => (p ? { ...pointSummary(p, res.ref), err: p.err, code: src } : null);
         self.postMessage({
             type: 'done',
             result: {

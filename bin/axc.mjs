@@ -13,15 +13,15 @@
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
  *        [--weights 1,1,1] [--psnr dB | --mse v | --ssim s] [--granularity class|line|source|op] [--heuristic sequential|efficiency|
- *        exhaustive|random|local|tabu|grasp|ga|all] [--directives] [--clocks 5,2.5] [--input image|uniform] [--model sampled|analytic]
+ *        exhaustive|random|local|tabu|grasp|ga|all] [--clocks 5,2.5] [--input image|uniform] [--model sampled|analytic]
  *        [--all-units] [--samples n] [--verify-front n] [--csv]
  *
  * A <unidade> é o nome mostrado na página (por exemplo "MUL8 DRUM4", "MUL16 T8 A8c", "ADD16 LOA8"), procurado no
  * espaço de projeto e nas pré-definidas, ou uma configuração em JSON ({"kind":"mul","width":8,"method":"drum","k":4}).
  * No hls, --ops lista as somas e multiplicações que aceitam unidade aproximada; --approx atribui unidades (o alvo é
  * o nó, como S1.3, o grupo linha:operação, como 16:mul8, a classe, como mul8, ou *); --error estima o erro nas saídas
- * (modelo estático) e o mede na execução bit a bit. O dse explora as unidades (e, com --directives e --clocks, as
- * diretivas e o período) com a restrição de erro e o objetivo dados; --heuristic all compara as heurísticas.
+ * (modelo estático) e o mede na execução bit a bit. O dse explora as unidades (e, com --clocks, o período), com as
+ * diretivas do código, a restrição de erro e o objetivo dados; --heuristic all compara as heurísticas.
  * Todos os comandos aceitam --json.
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -215,7 +215,7 @@ switch (cmd) {
                 synth: synthData(), cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')),
                 flow: opt('--flow', 'delay'), ports: +opt('--ports', 2), input: opt('--input', 'image'), method: opt('--model', 'sampled'),
                 objective: opt('--objective', 'area'), weights: { area: w[0] ?? 1, energy: w[1] ?? 1, latency: w[2] ?? 1 }, constraint,
-                granularity: opt('--granularity', 'class'), heuristic: opt('--heuristic', 'efficiency'), directives: flag('--directives'),
+                granularity: opt('--granularity', 'op'), heuristic: opt('--heuristic', 'local'),
                 clocks: opt('--clocks', opt('--clock', '5')).split(',').map(Number), allUnits: flag('--all-units'),
                 samples: +opt('--samples', 200), verifyFront: +opt('--verify-front', 0),
             });

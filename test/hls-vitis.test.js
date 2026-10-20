@@ -64,3 +64,32 @@ test('caixa preta de RTL: JSON, Verilog com as portas do Vitis e modelo C para c
     assert.equal(j.c_return.rtl_ports.data_write_out, 'ap_return');
     assert.match(bb.files['u_MUL8_T4_bb.cpp'], /ap_uint<16> u_MUL8_T4_bb\(ap_uint<8> a, ap_uint<8> b\)/);
 });
+
+test('projeto para baixar: kernel, caixas pretas com invólucro, testbench, Tcl e LEIAME num .zip', async () => {
+    const { projectFiles } = await import('../js/hls/vitis.js');
+    const { makeZip } = await import('../js/ui/zip.js');
+    const { parseAssign } = await import('../js/hls/approx.js');
+    const { analyzeError } = await import('../js/hls/error.js');
+    const { makeInputs } = await import('../js/hls/exec.js');
+    const { synthesize } = await import('../js/hls/index.js');
+    const { KERNELS } = await import('../js/hls/kernels.js');
+    const { readFileSync } = await import('node:fs');
+    const synth = JSON.parse(readFileSync(new URL('../data/synth.json', import.meta.url)));
+    const cells = JSON.parse(readFileSync(new URL('../data/hls-cells.json', import.meta.url)));
+    const src = KERNELS.find((k) => k.id === 'sharpen').code;
+    const b = synthesize(src, { synth, cells });
+    const r = synthesize(src, { synth, cells, design: b.design, assign: parseAssign(b.ops, '*=ADD16 TRUNC2') });
+    const inputs = makeInputs(r.design, 'image');
+    const a = analyzeError(r, { inputs, budget: false });
+    const files = projectFiles(r, { inputs, expected: a.approx, clockNs: 5, id: 'teste' });
+    for (const f of ['kernel.cpp', 'kernel.h', 'tb.cpp', 'run.tcl', 'model.json', 'LEIAME.txt', 'u_ADD16_TRUNC2_bb.v', 'u_ADD16_TRUNC2_bb.json', 'u_ADD16_TRUNC2_bb.cpp']) assert.ok(files[f], f);
+    // O invólucro: o módulo com o nome da função C e as portas que o Vitis exige.
+    assert.match(files['u_ADD16_TRUNC2_bb.v'], /module u_ADD16_TRUNC2_bb\s*\(/);
+    assert.match(files['u_ADD16_TRUNC2_bb.v'], /ap_return/);
+    assert.match(files['run.tcl'], /add_files -blackbox u_ADD16_TRUNC2_bb\.json/);
+    const zip = makeZip(files);
+    const dv = new DataView(zip.buffer);
+    assert.equal(dv.getUint32(0, true), 0x04034b50);
+    assert.equal(dv.getUint32(zip.length - 22, true), 0x06054b50);
+    assert.equal(dv.getUint16(zip.length - 12, true), Object.keys(files).length);
+});

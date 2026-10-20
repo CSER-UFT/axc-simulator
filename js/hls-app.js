@@ -13,6 +13,8 @@ import { highlightC, highlightIR } from './hls/highlight.js';
 import { affSource } from './hls/elab.js';
 import { esc } from './ui/plots.js';
 import { Help } from './ui/help.js';
+import { projectFiles } from './hls/vitis.js';
+import { makeZip } from './ui/zip.js';
 import { initFigureExport } from './ui/figexport.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale } from './i18n/index.js';
 
@@ -177,18 +179,21 @@ function renderTab() {
 
 // Exploração ------------------------------------------------------------------------------------------------------
 let dseWorker = null, dseResult = null;
-for (const id of ['dseObj', 'dseMetric', 'dseValue', 'dseGran', 'dseHeur', 'dseClocks', 'dseDir', 'dseAll', 'dseWa', 'dseWe', 'dseWl']) {
+for (const id of ['dseObj', 'dseMetric', 'dseValue', 'dseGran', 'dseHeur', 'dseWa', 'dseWe', 'dseWl']) {
     const el = $(id), v = store.get(`hls.${id}`);
-    if (v !== null) { if (el.type === 'checkbox') el.checked = v === '1'; else el.value = v; }
+    // Um valor guardado que a página não oferece mais (por classe, exaustiva ...) volta para o padrão.
+    if (v !== null && (el.tagName !== 'SELECT' || [...el.options].some((o) => o.value === v))) { if (el.type === 'checkbox') el.checked = v === '1'; else el.value = v; }
     el.addEventListener('change', () => { store.set(`hls.${id}`, el.type === 'checkbox' ? (el.checked ? '1' : '0') : el.value); syncDse(); });
 }
 function syncDse() { $('dseWeights').style.display = $('dseObj').value === 'weighted' ? '' : 'none'; }
 syncDse();
+/** Heurísticas da página (a exaustiva e a aleatória ficam na linha de comando, para os estudos). */
+const PAGE_HEURISTICS = ['local', 'efficiency', 'sequential', 'tabu', 'grasp', 'ga'];
 const dseOptions = () => ({
     flow: $('flow').value, ports: +$('ports').value, target: $('target').value, fpga: fpgaData, input: $('apInput').value, image: $('apInput').value === 'own' ? ownImage : null, method: $('apModel').value,
     objective: $('dseObj').value, weights: { area: +$('dseWa').value, energy: +$('dseWe').value, latency: +$('dseWl').value },
     constraint: { metric: $('dseMetric').value, value: +$('dseValue').value }, granularity: $('dseGran').value, heuristic: $('dseHeur').value,
-    clocks: $('dseClocks').value.split(/[,; ]+/).map(Number).filter((x) => x > 0), directives: $('dseDir').checked, allUnits: $('dseAll').checked,
+    clocks: [+$('clock').value], heuristicList: PAGE_HEURISTICS,
     verifyFront: 6,
 });
 $('dseRun').addEventListener('click', () => {
@@ -244,7 +249,7 @@ function renderDse() {
             if (!p || r.error) return `<tr><td class="left">${esc(hName(r.heuristic))}</td><td>${nf(r.evals)}</td><td>${nf(r.ms / 1000, 1)} s</td><td colspan="5" class="left note">${esc(r.error ?? '-')}</td></tr>`;
             return `<tr><td class="left">${esc(hName(r.heuristic))}</td><td>${nf(r.evals)}</td><td>${nf(r.ms / 1000, 1)} s</td><td>${fmtScore(p.score, obj)}</td>`
                 + `<td>${t('dse.sav', { a: pctS(p.savings.area), e: pctS(p.savings.energy), l: pctS(p.savings.latency) })}</td><td>${ps(minP(p.estimated))} / ${ps(minP(p.measured))}${r.chosen ? '' : ` <span class="note">${t('dse.notVerified')}</span>`}</td>`
-                + `<td class="units">${esc(p.variant)}<br>${esc(p.units.join(', '))}</td><td><button type="button" class="btn outline" data-apply="${k}:best">${t('dse.apply')}</button></td></tr>`;
+                + `<td class="units">${esc(p.variant)}<br>${esc(p.units.join(', '))}</td><td><button type="button" class="btn outline" data-apply="${k}:best">${t('dse.apply')}</button> <button type="button" class="btn outline" data-apply="${k}:best" data-dl="1" title="${esc(t('hls.ap.projectHelp'))}">${t('dse.download')}</button></td></tr>`;
         }).join('');
     const names = { exact: t('dse.exact'), y: t('dse.yLabel'), ...Object.fromEntries(['efficiency', 'sequential', 'exhaustive', 'random', 'local', 'tabu', 'grasp', 'ga'].map((h) => [h, hName(h)])) };
     const xLabel = `${t(`dse.obj.${obj}`)}${obj === 'weighted' ? ` (${t('dse.exactIs', { v: nf(R.refScore, 2) })})` : ''}`;
@@ -257,7 +262,7 @@ function renderDse() {
     const bestKey = (r.chosen ?? r.best);
     $('dseFront').innerHTML = `<tr><th>${t('dse.th.cost')}</th><th>µm²</th><th>LUT</th><th>nJ</th><th>${t('dse.th.latency')}</th><th>PSNR (${t('dse.estMeas')})</th><th></th><th class="left">${t('dse.th.units')}</th><th></th></tr>`
         + r.front.map((p, i) => `<tr class="${bestKey && p.score === bestKey.score && p.variant === bestKey.variant ? 'best' : ''}"><td>${fmtScore(p.score, obj)}</td><td>${nf(p.cost.area)}</td><td>${nf(p.cost.luts)}</td><td>${nf(p.cost.energy / 1e6, 1)}</td><td>${nf(p.cost.latency, 0)} ns</td>`
-            + `<td>${ps(minP(p.estimated))} / ${ps(minP(p.measured))}</td><td>${p.feasible ? '✓' : ''}</td><td class="units">${esc(p.variant)}<br>${esc(p.units.join(', '))}</td><td><button type="button" class="btn outline" data-apply="${+sel.value || 0}:${i}">${t('dse.apply')}</button></td></tr>`).join('');
+            + `<td>${ps(minP(p.estimated))} / ${ps(minP(p.measured))}</td><td>${p.feasible ? '✓' : ''}</td><td class="units">${esc(p.variant)}<br>${esc(p.units.join(', '))}</td><td><button type="button" class="btn outline" data-apply="${+sel.value || 0}:${i}">${t('dse.apply')}</button> <button type="button" class="btn outline" data-apply="${+sel.value || 0}:${i}" data-dl="1" title="${esc(t('hls.ap.projectHelp'))}">${t('dse.download')}</button></td></tr>`).join('');
 }
 $('dseFrontSel').addEventListener('change', () => renderDse());
 
@@ -346,7 +351,28 @@ for (const id of ['dseRuns', 'dseFront']) $(id).addEventListener('click', (e) =>
     const [k, w] = b.dataset.apply.split(':');
     const r = dseResult.runs[+k];
     applyPoint(w === 'best' ? r.chosen ?? r.best : r.front[+w]);
+    if (b.dataset.dl) downloadProject();
 });
+/**
+ * Projeto para síntese e implementação locais: o kernel elaborado com as unidades atribuídas como caixa preta de RTL
+ * (com o invólucro), o testbench com a saída esperada, o Tcl do Vitis HLS, as previsões e o LEIAME, num .zip.
+ */
+function downloadProject() {
+    if (!result) return;
+    let a;
+    try { a = analysis(); } catch (e) { $('apStatus').textContent = e.message; return; }
+    const clk = +$('clock').value;
+    const id = `${result.design.name}_${result.assign.size ? `aprox${result.assign.size}` : 'exato'}_${String(clk).replace('.', 'p')}ns`;
+    const note = result.assign.size ? result.cost.units.filter((u) => result.assign.size && [...result.assign.values()].includes(u.unit.name)).map((u) => `${u.count} × ${u.unit.name}`).join(', ') : t('hls.ap.projectExact');
+    const files = projectFiles(result, { inputs: a.inputs, expected: a.approx, clockNs: clk, id, note, target: $('target').value });
+    const zip = makeZip(Object.fromEntries(Object.entries(files).map(([f, c]) => [`${id}/${f}`, c])));
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([zip], { type: 'application/zip' }));
+    link.download = `${id}.zip`;
+    document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+}
+$('apProject').addEventListener('click', downloadProject);
 function dlFile(name, text, type) {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([text], { type }));

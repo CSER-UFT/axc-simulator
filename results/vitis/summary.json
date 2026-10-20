@@ -359,11 +359,11 @@
     "timeNs": 361090,
     "intervalNs": 10,
     "critPs": 4774,
-    "luts": 683,
-    "carry4": 43,
+    "luts": 702,
+    "carry4": 49,
     "ff": 516,
-    "areaUm2": 12462.336467532468,
-    "energyFj": 1326381406.2080796,
+    "areaUm2": 13316.401402597401,
+    "energyFj": 1365369128.602238,
     "loops": [
      {
       "label": "rows_cols",
@@ -380,8 +380,8 @@
      {
       "unit": "ADD16 exato",
       "count": 13,
-      "luts": 105,
-      "carry4": 33
+      "luts": 124,
+      "carry4": 39
      }
     ],
     "model": {
@@ -502,11 +502,11 @@
     "timeNs": 361090,
     "intervalNs": 10,
     "critPs": 4774,
-    "luts": 683,
-    "carry4": 43,
+    "luts": 702,
+    "carry4": 49,
     "ff": 516,
-    "areaUm2": 12462.336467532468,
-    "energyFj": 1326381406.2080796,
+    "areaUm2": 13316.401402597401,
+    "energyFj": 1365369128.602238,
     "loops": [
      {
       "label": "rows_cols",
@@ -523,8 +523,8 @@
      {
       "unit": "ADD16 exato",
       "count": 13,
-      "luts": 105,
-      "carry4": 33
+      "luts": 124,
+      "carry4": 39
      }
     ],
     "model": {
@@ -2930,11 +2930,11 @@
     "timeNs": 361090,
     "intervalNs": 10,
     "critPs": 4930,
-    "luts": 676,
-    "carry4": 37,
+    "luts": 695,
+    "carry4": 43,
     "ff": 516,
-    "areaUm2": 11799.615578421579,
-    "energyFj": 1297462620.0348663,
+    "areaUm2": 12653.680513486512,
+    "energyFj": 1336450342.429025,
     "loops": [
      {
       "label": "rows_cols",
@@ -2957,8 +2957,8 @@
      {
       "unit": "ADD16 exato",
       "count": 8,
-      "luts": 62,
-      "carry4": 19
+      "luts": 81,
+      "carry4": 25
      }
     ],
     "model": {
@@ -4940,11 +4940,11 @@
     "timeNs": 361090,
     "intervalNs": 10,
     "critPs": 4930,
-    "luts": 676,
-    "carry4": 37,
+    "luts": 695,
+    "carry4": 43,
     "ff": 516,
-    "areaUm2": 11799.615578421579,
-    "energyFj": 1297462620.0348663,
+    "areaUm2": 12653.680513486512,
+    "energyFj": 1336450342.429025,
     "loops": [
      {
       "label": "rows_cols",
@@ -4967,8 +4967,8 @@
      {
       "unit": "ADD16 exato",
       "count": 8,
-      "luts": 62,
-      "carry4": 19
+      "luts": 81,
+      "carry4": 25
      }
     ],
     "model": {
@@ -6803,11 +6803,11 @@
     "timeNs": 361090,
     "intervalNs": 10,
     "critPs": 4930,
-    "luts": 676,
-    "carry4": 37,
+    "luts": 695,
+    "carry4": 43,
     "ff": 516,
-    "areaUm2": 11799.615578421579,
-    "energyFj": 1297462620.0348663,
+    "areaUm2": 12653.680513486512,
+    "energyFj": 1336450342.429025,
     "loops": [
      {
       "label": "rows_cols",
@@ -6830,8 +6830,8 @@
      {
       "unit": "ADD16 exato",
       "count": 8,
-      "luts": 62,
-      "carry4": 19
+      "luts": 81,
+      "carry4": 25
      }
     ],
     "model": {
@@ -8702,11 +8702,11 @@
     "timeNs": 361090,
     "intervalNs": 10,
     "critPs": 4930,
-    "luts": 676,
-    "carry4": 37,
+    "luts": 695,
+    "carry4": 43,
     "ff": 516,
-    "areaUm2": 11799.615578421579,
-    "energyFj": 1297462620.0348663,
+    "areaUm2": 12653.680513486512,
+    "energyFj": 1336450342.429025,
     "loops": [
      {
       "label": "rows_cols",
@@ -8729,8 +8729,8 @@
      {
       "unit": "ADD16 exato",
       "count": 8,
-      "luts": 62,
-      "carry4": 19
+      "luts": 81,
+      "carry4": 25
      }
     ],
     "model": {
@@ -11769,5 +11769,5 @@
    }
   }
  ],
- "compared": "2026-10-19T22:31:00.279Z"
+ "compared": "2026-10-20T18:14:05.999Z"
 }

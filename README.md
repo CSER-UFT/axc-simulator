@@ -90,20 +90,21 @@ As hipóteses dos modelos de custo e de erro, as ameaças à validade e o passo 
 
 ### Exploração do espaço de projeto
 
-A aba Exploração (e o comando `dse`) procura as unidades, e opcionalmente as diretivas e o período, que minimizam o objetivo com o erro dentro de um limite:
+A aba Exploração (e o comando `dse`) procura as unidades das somas, subtrações e multiplicações que minimizam o objetivo com o erro dentro de um limite, com as diretivas do código e o período do editor:
 
 * **avaliação**: cada ponto é sintetizado de novo (o compartilhamento das unidades, os multiplexadores e o II entram no custo, por isso o custo de uma troca não é a soma dos custos das unidades) e o erro das saídas vem do modelo estático; a elaboração e o perfil exato são feitos uma vez por variante de diretivas;
 * **objetivo**: área ASIC, LUT + CARRY4, energia por execução, latência, intervalo entre resultados, ou a soma ponderada de área, energia e latência divididas pelas do projeto exato; **restrição**: PSNR mínimo ou MSE máximo em todas as saídas, ou SSIM mínimo nas saídas de imagem (estimado na busca, medido na verificação);
-* **grupos**: a unidade é escolhida por classe (todas as multiplicações de 8 bits juntas), por linha do código, por operação do código (as cópias criadas pela diretiva `unroll` recebem a mesma unidade) ou por operação; **candidatas**: em cada grupo, as unidades da fronteira de Pareto entre o custo da unidade e o erro próprio sobre os operandos reais do grupo;
-* **heurísticas**: sequencial (os grupos na ordem do código, multiplicações antes das somas, em cada um a candidata de menor custo que mantém a restrição), eficiência (a partir do exato, a troca com a maior economia por aumento de erro, até nenhuma economizar; com grupos menores que a classe, também a troca da classe inteira), exaustiva com poda (em ordem de custo: o primeiro viável é o ótimo do modelo) e aleatória;
+* **grupos**: na página, por operação (cada operação do DFG depois do desenrolamento) ou por linha do código (as operações da mesma linha, classe e largura com a mesma unidade); na linha de comando, também por classe e por operação do código (as cópias do `unroll` juntas); **candidatas**: em cada grupo, as unidades da fronteira de Pareto entre a economia no contexto e o erro próprio sobre os operandos reais, sem as que dão o mesmo resultado que a exata;
+* **heurísticas**: busca local (padrão; parte da eficiência e do ótimo por classe, com trocas de um grupo e em pares), eficiência (a partir do exato, a troca com a maior economia por aumento de erro), sequencial, tabu, GRASP e genético; na linha de comando, também a exaustiva e a aleatória, para os estudos;
 * **verificação**: o ponto viável mais barato de cada heurística é executado bit a bit; se o erro medido passar do limite, o próximo viável em ordem de custo é verificado.
-* **passo a passo**: cada heurística registra as suas iterações (o que avaliou, o que escolheu e por quê, a poda, a ordem de custo da exaustiva, as verificações), e a página as anima sobre o gráfico de custo contra PSNR, com a explicação e a tabela do que foi avaliado em cada iteração.
+* **passo a passo**: cada heurística registra as suas iterações (o que avaliou, o que escolheu e por quê, as verificações), e a página as anima sobre o gráfico de custo contra PSNR, com a explicação e a tabela do que foi avaliado em cada iteração.
+* **projeto para baixar**: em cada ponto (e na aba Aproximação, para a atribuição atual), um .zip para o Vitis HLS e o Vivado com o kernel elaborado, cada unidade como caixa preta de RTL com o invólucro, o testbench com a saída esperada, o `run.tcl`, as previsões do modelo e um LEIAME.
 
 No gaussiano com PSNR de pelo menos 40 dB e área como objetivo, por classe as quatro heurísticas chegam ao mesmo ponto (8 × ADD16 TRUNC7 e 5 × MUL8 T8 +C, 44,4% menos área, 41,0 dB medidos), e a exaustiva, que cabe sem poda, é o ótimo do modelo entre as candidatas. Por operação, a eficiência chega a 42,8%: menos que o ótimo por classe, que está contido no espaço por operação, porque a gulosa para em ótimos locais. A busca local, que parte da eficiência e do ótimo por classe e aceita trocas em pares (uma que viola compensada por outra que devolve erro), chega a 45,2%; a tabu, o GRASP e o genético (`--heuristic local|tabu|grasp|ga`) ficam no mesmo ponto ou perto dele. Esses são números de área ASIC; no FPGA, a validação com o Vivado mostra economias bem menores (seção 6 da metodologia).
 
 ```
 node bin/axc.mjs dse --example gauss --psnr 40 --heuristic all --granularity op
-node bin/axc.mjs dse kernel.c --objective weighted --weights 1,1,1 --directives --clocks 5,2.5 --json
+node bin/axc.mjs dse kernel.c --objective weighted --weights 1,1,1 --clocks 5,2.5 --json
 node bin/axc.mjs dse --example fir --mse 100 --objective energy --csv > fronteira.csv
 ```
 
@@ -194,9 +195,9 @@ Os testes conferem as unidades exatas contra a aritmética (8 bits exaustivo), o
 
 ## Próximas etapas possíveis
 
-* Exploração: busca local depois da gulosa (trocas de duas unidades), diretivas com valores numéricos (II, fatores de unroll e de partição) e exploração em lote de vários kernels.
+* Exploração: diretivas com valores numéricos (II, fatores de unroll e de partição) e exploração em lote de vários kernels; estimativa do SSIM com erros correlacionados no espaço.
 * Recorrências com somadores aproximados no modelo de erro (execuções consecutivas no perfil).
-* Mais técnicas (codificador de Booth aproximado, outros somadores) e somas com sinal aproximadas.
+* Mais técnicas (codificador de Booth aproximado, outros somadores).
 
 ## Referências
 

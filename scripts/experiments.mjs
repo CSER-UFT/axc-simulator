@@ -10,7 +10,7 @@
  *       operação) e limite de PSNR;
  *   E3  fronteiras de Pareto (área contra PSNR) com todos os pontos verificados bit a bit: o estimado ao longo da
  *       fronteira contra o medido;
- *   E4  diretivas e período junto com as unidades (objetivo ponderado e latência);
+ *   E4  período junto com as unidades (objetivo ponderado, latência e área);
  *   E5  sensibilidade aos dados: o projeto escolhido com entradas uniformes, verificado na imagem, e o contrário;
  *   E6  unroll: grupos por operação contra por operação do código (as cópias do unroll com a mesma unidade);
  *   E7  SSIM: a estimativa (erro por faixa de valor, ruído independente, analítico) contra o medido, e a exploração
@@ -205,12 +205,12 @@ function e3() {
     table('E3: PSNR estimado contra medido ao longo da fronteira', ['Kernel', 'Grupos', 'Heurística', 'Pontos', 'Verificados', 'Diferença média (dB)', 'Maior diferença (dB)', 'Erros de decisão a 40 dB'], out, ['l', 'l', 'l', 'r', 'r', 'r', 'r', 'r']);
 }
 
-// E4: diretivas e período ----------------------------------------------------------------------------------------
+// E4: período ----------------------------------------------------------------------------------------
 function e4() {
     const rows = [['objective', 'variant', 'score', 'area_um2', 'energy_nJ', 'latency_ns', 'interval_ns', 'psnr_est', 'psnr_measured', 'units']];
     const tab = [];
     for (const objective of QUICK ? ['weighted'] : ['weighted', 'latency', 'area']) {
-        const r = explore(KCODE.gauss, { synth, cells, objective, constraint: { metric: 'psnr', value: 40 }, granularity: 'class', heuristic: 'efficiency', directives: true, clocks: QUICK ? [5] : [2.5, 5, 10] });
+        const r = explore(KCODE.gauss, { synth, cells, objective, constraint: { metric: 'psnr', value: 40 }, granularity: 'class', heuristic: 'efficiency', clocks: QUICK ? [5] : [2.5, 5, 10] });
         const run = r.runs[0];
         const best = pointSummary(run.chosen, r.ref);
         if (!best) { tab.push([{ weighted: 'ponderado', latency: 'latência', area: 'área' }[objective], 'nenhum ponto passou na verificação', '-', '-', '-', '-', '-']); continue; }
@@ -225,7 +225,7 @@ function e4() {
         log('E4', objective);
     }
     save('e4_diretivas.csv', csv(rows));
-    md.push('### E4. Diretivas e período junto com as unidades\n', 'Gaussiano, PSNR de pelo menos 40 dB, grupos por classe, heurística de eficiência; variantes: cada diretiva ligada ou desligada e os períodos de 2,5, 5 e 10 ns.\n');
+    md.push('### E4. Período junto com as unidades\n', 'Gaussiano com as diretivas do código, PSNR de pelo menos 40 dB, grupos por classe, heurística de eficiência; períodos de 2,5, 5 e 10 ns.\n');
     table('E4: melhor ponto verificado por objetivo', ['Objetivo', 'Variante', 'Área (µm²)', 'Energia (nJ)', 'Latência (µs)', 'PSNR medido', 'Unidades'], tab, ['l', 'l', 'r', 'r', 'r', 'r', 'l']);
 }
 

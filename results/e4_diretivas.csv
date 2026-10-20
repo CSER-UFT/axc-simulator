@@ -1,37 +1,10 @@
 objective,variant,score,area_um2,energy_nJ,latency_ns,interval_ns,psnr_est,psnr_measured,units
-weighted,"diretivas do código, 2.5 ns",2.01646,12187.3,1751.06,180548,5,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-weighted,"diretivas do código, 5 ns",2.70052,9044.24,1118.91,361080,10,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-weighted,"diretivas do código, 10 ns",4.58963,7943.18,897.475,722150,20,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-weighted,"sem array_partition (linha 6), 2.5 ns",3.75685,9744.91,2897.88,451258,12.5,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-weighted,"sem array_partition (linha 6), 5 ns",6.00115,8403.62,2223.66,902510,25,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-weighted,"sem array_partition (linha 6), 10 ns",10.9995,8403.62,2223.67,1805020,50,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-weighted,"sem pipeline (linha 12), 2.5 ns",53.5242,4975.87,21310.9,8484925,8484925,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-weighted,"sem pipeline (linha 12), 5 ns",90.9295,4975.87,19324.2,15345350,15345350,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-weighted,"sem pipeline (linha 12), 10 ns",175.917,4975.87,19324.2,30690700,30690700,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-weighted,"sem array_partition (linha 6), pipeline (linha 12), 2.5 ns",28.0213,4935.83,11180.2,4423675,4423675,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-weighted,"sem array_partition (linha 6), pipeline (linha 12), 5 ns",42.9447,4935.83,9229.69,7222850,7222850,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-weighted,"sem array_partition (linha 6), pipeline (linha 12), 10 ns",82.9472,4935.83,9229.7,14445700,14445700,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-latency,"diretivas do código, 2.5 ns",180548,15407.9,1912.24,180548,5,53.1217,,8 × ADD16 TRUNC2 + 3 × MUL8 KUL6
-latency,"diretivas do código, 5 ns",361085,16280,1704.02,361085,10,Infinity,,4 × ×19 (2 somas) + 8 × ADD16 exato + 1 × ×52 (2 somas)
-latency,"diretivas do código, 10 ns",722150,13450.2,1192.02,722150,20,58.5959,,4 × ×19 (2 somas) + 8 × ADD16 TRUNC1 + 1 × ×52 (2 somas)
-latency,"sem array_partition (linha 6), 2.5 ns",451258,13029.5,3059.07,451258,12.5,53.1217,,8 × ADD16 TRUNC2 + 1 × MUL8 KUL6
-latency,"sem array_partition (linha 6), 5 ns",902510,14498.3,2706.04,902510,25,Infinity,,4 × ×19 (2 somas) + 8 × ADD16 exato + 1 × ×52 (2 somas)
-latency,"sem array_partition (linha 6), 10 ns",1805020,14498.3,2706.05,1805020,50,Infinity,,4 × ×19 (2 somas) + 8 × ADD16 exato + 1 × ×52 (2 somas)
-latency,"sem pipeline (linha 12), 2.5 ns",8484925,6078.7,21653.6,8484925,8484925,53.115,,1 × ADD16 exato + 1 × MUL8 KUL6
-latency,"sem pipeline (linha 12), 5 ns",15345350,6341.01,19761.4,15345350,15345350,Infinity,,1 × ADD16 exato + 1 × MUL8 exato
-latency,"sem pipeline (linha 12), 10 ns",30690700,6341.01,19761.4,30690700,30690700,Infinity,,1 × ADD16 exato + 1 × MUL8 exato
-latency,"sem array_partition (linha 6), pipeline (linha 12), 2.5 ns",4423675,6038.67,11522.8,4423675,4423675,53.115,,1 × ADD16 exato + 1 × MUL8 KUL6
-latency,"sem array_partition (linha 6), pipeline (linha 12), 5 ns",7222850,6300.97,9666.83,7222850,7222850,Infinity,,1 × ADD16 exato + 1 × MUL8 exato
-latency,"sem array_partition (linha 6), pipeline (linha 12), 10 ns",14445700,6300.97,9666.85,14445700,14445700,Infinity,,1 × ADD16 exato + 1 × MUL8 exato
-area,"diretivas do código, 2.5 ns",12187.3,12187.3,1751.06,180548,5,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-area,"diretivas do código, 5 ns",9044.24,9044.24,1118.91,361080,10,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-area,"diretivas do código, 10 ns",7943.18,7943.18,897.475,722150,20,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-area,"sem array_partition (linha 6), 2.5 ns",9744.91,9744.91,2897.88,451258,12.5,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-area,"sem array_partition (linha 6), 5 ns",8403.62,8403.62,2223.66,902510,25,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-area,"sem array_partition (linha 6), 10 ns",8403.62,8403.62,2223.67,1805020,50,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-area,"sem pipeline (linha 12), 2.5 ns",4975.87,4975.87,21310.9,8484925,8484925,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-area,"sem pipeline (linha 12), 5 ns",4975.87,4975.87,19324.2,15345350,15345350,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-area,"sem pipeline (linha 12), 10 ns",4975.87,4975.87,19324.2,30690700,30690700,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-area,"sem array_partition (linha 6), pipeline (linha 12), 2.5 ns",4935.83,4935.83,11180.2,4423675,4423675,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-area,"sem array_partition (linha 6), pipeline (linha 12), 5 ns",4935.83,4935.83,9229.69,7222850,7222850,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
-area,"sem array_partition (linha 6), pipeline (linha 12), 10 ns",4935.83,4935.83,9229.7,14445700,14445700,42.1534,,1 × ADD16 LOA9 + 1 × MUL8 T6
+weighted,2.5 ns,2.01646,12187.3,1751.06,180548,5,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
+weighted,5 ns,2.70052,9044.24,1118.91,361080,10,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
+weighted,10 ns,4.58963,7943.18,897.475,722150,20,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
+latency,2.5 ns,180548,15407.9,1912.24,180548,5,53.1217,,8 × ADD16 TRUNC2 + 3 × MUL8 KUL6
+latency,5 ns,361085,16280,1704.02,361085,10,Infinity,,4 × ×19 (2 somas) + 8 × ADD16 exato + 1 × ×52 (2 somas)
+latency,10 ns,722150,13450.2,1192.02,722150,20,58.5959,,4 × ×19 (2 somas) + 8 × ADD16 TRUNC1 + 1 × ×52 (2 somas)
+area,2.5 ns,12187.3,12187.3,1751.06,180548,5,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
+area,5 ns,9044.24,9044.24,1118.91,361080,10,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
+area,10 ns,7943.18,7943.18,897.475,722150,20,40.8978,,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C

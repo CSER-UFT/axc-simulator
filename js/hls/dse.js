@@ -639,22 +639,23 @@ export function verifyPoint(p, ok) {
 /**
  * Exploração completa.
  * @param {string} src código do kernel
- * @param {object} o synth, cells, flow, ports, input, method; clocks (lista de períodos em ns); directives (variar as
- *   diretivas); objective, weights, constraint {metric, value}; granularity; heuristic (ou 'all' para comparar);
+ * @param {object} o synth, cells, flow, ports, input, method; clocks (lista de períodos em ns; as diretivas são as do
+ *   código); heuristicList (as heurísticas de 'all'); objective, weights, constraint {metric, value}; granularity; heuristic (ou 'all' para comparar);
  *   allUnits; samples, seed (aleatória); maxVerify; verifyFront (quantos pontos da fronteira verificar); progress(n)
  */
 export function explore(src, o = {}) {
     const t0 = Date.now();
     const clocks = o.clocks?.length ? o.clocks : [5];
-    const variants = o.directives ? pragmaVariants(src) : [{ code: src, label: 'diretivas do código', off: [] }];
-    const heuristics = o.heuristic === 'all' ? HEURISTICS : [o.heuristic ?? 'efficiency'];
+    // As diretivas são as do código; os períodos, os pedidos (o da página, ou uma lista na linha de comando).
+    const variants = [{ code: src, label: '', off: [] }];
+    const heuristics = o.heuristic === 'all' ? o.heuristicList ?? HEURISTICS : [o.heuristic ?? 'local'];
     const ok = constraintFn(o.constraint);
     const prepared = [];
     for (const vv of variants) for (const clk of clocks) {
         try {
-            prepared.push(prepare(vv.code, { ...o, clockNs: clk, label: `${vv.label}, ${clk} ns` }));
+            prepared.push(prepare(vv.code, { ...o, clockNs: clk, label: `${clk} ns` }));
         } catch (e) {
-            prepared.push({ label: `${vv.label}, ${clk} ns`, error: e.message });
+            prepared.push({ label: `${clk} ns`, error: e.message });
         }
     }
     const good = prepared.filter((v) => !v.error);
