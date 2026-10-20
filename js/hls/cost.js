@@ -63,12 +63,13 @@ function meet(x, y) {
 }
 
 /**
- * Bits conhecidos nas duas entradas da unidade. A subtração entra como ~(~a + b): o primeiro operando chega
- * invertido (os bits altos que eram zero viram um, também conhecidos).
+ * Bits conhecidos nas duas entradas da unidade. A subtração com uma unidade aproximada entra como ~(~a + b): o primeiro
+ * operando chega invertido (os bits altos que eram zero viram um, também conhecidos). A subtração exata é a nativa
+ * (a - b com vem um), estreitada pelos bits altos zero dos operandos, como antes (validada no Vivado).
  */
 function knownOf(n, seg, unit) {
     const kn = n.args.map((a) => knownBits(a, seg, n, unit));
-    if (n.op === 'sub') {
+    if (n.op === 'sub' && !/exato\)?$/.test(unit.name ?? '')) {
         const W = unit.cfg?.width ?? unit.W ?? 16, full = W >= 32 ? 0xFFFFFFFF : (1 << W) - 1;
         kn[0] = { mask: kn[0].mask, value: (~kn[0].value & kn[0].mask & full) >>> 0 };
     }
