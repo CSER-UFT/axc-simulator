@@ -1,7 +1,7 @@
 kernel,optimized_on,verified_on,psnr_min,area_saving,psnr_on_opt_data,psnr_on_other_data,units
 gauss,uniform,image,40,0.444457,44.8343,40.9733,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
 gauss,image,uniform,40,0.444457,40.9733,44.8343,8 × ADD16 TRUNC7 + 5 × MUL8 T8 +C
-sobel,uniform,image,40,0.140525,42.5018,42.9896,13 × ADD16 LOA3
-sobel,image,uniform,40,0.140525,42.9896,42.5018,13 × ADD16 LOA3
+sobel,uniform,image,40,0.0775788,42.5018,42.9896,13 × ADD16 LOA3
+sobel,image,uniform,40,0.0775788,42.9896,42.5018,13 × ADD16 LOA3
 sharpen,uniform,image,40,0.1247,41.0128,32.6258,1 × ×5 (1 soma) + 4 × ADD16 LOA3
 sharpen,image,uniform,40,0.0901817,40.2046,46.3537,1 × ×5 (1 soma) + 4 × ADD16 TRUNC1
