@@ -179,6 +179,7 @@ function renderTab() {
 
 // Exploração ------------------------------------------------------------------------------------------------------
 let dseWorker = null, dseResult = null;
+let dseCompare = [], dseSeq = 0; // execuções guardadas para comparar no gráfico
 for (const id of ['dseObj', 'dseMetric', 'dseValue', 'dseGran', 'dseHeur', 'dseWa', 'dseWe', 'dseWl']) {
     const el = $(id), v = store.get(`hls.${id}`);
     // Um valor guardado que a página não oferece mais (por classe, exaustiva ...) volta para o padrão.
@@ -211,7 +212,7 @@ $('dseRun').addEventListener('click', () => {
             $('dseRun').disabled = false; $('dseStop').disabled = true;
             dseWorker.terminate(); dseWorker = null;
             if (m.type === 'error') { $('dseStatus').textContent = m.message; return; }
-            dseResult = { ...m.result, opts };
+            dseResult = { ...m.result, opts, code: $('code').value, id: ++dseSeq };
             stopPlay();
             fillStepSel();
             $('dseStatus').textContent = t('dse.done', { s: nf(m.result.ms / 1000, 1), prep: nf(m.result.prepMs / 1000, 1), cand: nf(m.result.candMs / 1000, 1), v: m.result.variants.length });
@@ -253,11 +254,26 @@ function renderDse() {
         }).join('');
     const names = { exact: t('dse.exact'), y: t('dse.yLabel'), ...Object.fromEntries(['efficiency', 'sequential', 'exhaustive', 'random', 'local', 'tabu', 'grasp', 'ga'].map((h) => [h, hName(h)])) };
     const xLabel = `${t(`dse.obj.${obj}`)}${obj === 'weighted' ? ` (${t('dse.exactIs', { v: nf(R.refScore, 2) })})` : ''}`;
-    $('dseFig').innerHTML = dseSvg(R.runs.filter((r) => !r.error), { xLabel, psnrMin: R.opts.constraint.metric === 'psnr' ? R.opts.constraint.value : null, refScore: R.refScore, names, chosenLabel: t('dse.chosen') });
-    $('dseFigNote').textContent = t('dse.figNote', { v: R.variants.map((v) => v.label + (v.error ? ` (${v.error})` : '')).join('; ') });
     const sel = $('dseFrontSel'), prev = sel.value;
     sel.innerHTML = R.runs.map((r, k) => `<option value="${k}">${esc(hName(r.heuristic))}</option>`).join('');
     if (prev && +prev < R.runs.length) sel.value = prev;
+    // Com execuções na comparação, o gráfico mostra só elas e a heurística escolhida abaixo (e não todas as da execução
+    // atual), para comparar pares sem poluir. As de outro kernel, objetivo ou alvo ficam de fora (eixo diferente).
+    const key = cmpKeyOf(R);
+    const same = dseCompare.filter((e) => e.key === key), other = dseCompare.length - same.length;
+    let shown;
+    if (same.length) {
+        const curK = +sel.value || 0, cur = R.runs[curK];
+        shown = same.map((e) => e.run);
+        if (cur && !cur.error && !same.some((e) => e.id === `${R.id}:${curK}`)) shown.push({ ...cur, label: `${runLabel(R, cur)} (${t('dse.cmpCurrent')})` });
+        // Duas execuções da mesma heurística: a segunda em outra cor, com a fronteira tracejada.
+        const seen = new Set();
+        shown = shown.map((r) => { const dup = seen.has(r.heuristic); seen.add(r.heuristic); return dup ? { ...r, cls: 'h-alt', shape: 'ring' } : r; });
+    } else shown = R.runs.filter((r) => !r.error);
+    $('dseFig').innerHTML = dseSvg(shown, { xLabel, psnrMin: R.opts.constraint.metric === 'psnr' ? R.opts.constraint.value : null, refScore: R.refScore, names, chosenLabel: t('dse.chosen') });
+    $('dseFigNote').textContent = t('dse.figNote', { v: R.variants.map((v) => v.label + (v.error ? ` (${v.error})` : '')).join('; ') })
+        + (dseCompare.length ? ` ${t('dse.cmpNote', { n: same.length })}${other ? ` ${t('dse.cmpOther', { n: other })}` : ''}` : '');
+    $('dseCmpClear').disabled = !dseCompare.length;
     const r = R.runs[+sel.value || 0];
     const bestKey = (r.chosen ?? r.best);
     $('dseFront').innerHTML = `<tr><th>${t('dse.th.cost')}</th><th>µm²</th><th>LUT</th><th>nJ</th><th>${t('dse.th.latency')}</th><th>PSNR (${t('dse.estMeas')})</th><th></th><th class="left">${t('dse.th.units')}</th><th></th></tr>`
@@ -265,6 +281,19 @@ function renderDse() {
             + `<td>${ps(minP(p.estimated))} / ${ps(minP(p.measured))}</td><td>${p.feasible ? '✓' : ''}</td><td class="units">${esc(p.variant)}<br>${esc(p.units.join(', '))}</td><td><button type="button" class="btn outline" data-apply="${+sel.value || 0}:${i}">${t('dse.apply')}</button> <button type="button" class="btn outline" data-apply="${+sel.value || 0}:${i}" data-dl="1" title="${esc(t('hls.ap.projectHelp'))}">${t('dse.download')}</button></td></tr>`).join('');
 }
 $('dseFrontSel').addEventListener('change', () => renderDse());
+
+// Comparação entre execuções da exploração (pares de heurísticas, ou a mesma com grupos ou restrições diferentes).
+const cmpKeyOf = (R) => JSON.stringify([R.code, R.opts.objective, R.opts.target, R.opts.flow, R.opts.ports, R.opts.input, R.opts.clocks]);
+const runLabel = (R, r) => `${hName(r.heuristic)} · ${t(`dse.gran.${R.opts.granularity}`)} · ${R.opts.constraint.metric.toUpperCase()} ${R.opts.constraint.value}`;
+$('dseCmpAdd').addEventListener('click', () => {
+    if (!dseResult) return;
+    const k = +$('dseFrontSel').value || 0, r = dseResult.runs[k];
+    if (!r || r.error) return;
+    const id = `${dseResult.id}:${k}`;
+    if (!dseCompare.some((e) => e.id === id)) dseCompare.push({ id, key: cmpKeyOf(dseResult), run: { ...r, label: runLabel(dseResult, r) } });
+    renderDse();
+});
+$('dseCmpClear').addEventListener('click', () => { dseCompare = []; renderDse(); });
 
 // Passo a passo da busca: cada iteração registrada pela heurística, com o gráfico, a explicação e o que foi avaliado.
 let stTimer = null;

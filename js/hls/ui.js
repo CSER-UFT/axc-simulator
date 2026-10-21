@@ -138,7 +138,8 @@ const mark = (shape, x, y, r, cls) => {
 /**
  * Pontos avaliados pela exploração: custo do objetivo (x) contra o PSNR estimado da pior saída (y), com a fronteira
  * de cada heurística, a restrição e o projeto exato. Forma e cor identificam a heurística.
- * @param {object[]} runs resultado da exploração (pontos e fronteira de cada heurística)
+ * @param {object[]} runs resultado da exploração (pontos e fronteira de cada heurística); label, cls e shape opcionais
+ *   (a comparação usa para distinguir duas execuções da mesma heurística)
  * @param {{xLabel: string, psnrMin?: number, refScore: number, names: object}} o
  */
 export function dseSvg(runs, { xLabel, psnrMin = null, refScore, names, chosenLabel }) {
@@ -166,21 +167,23 @@ export function dseSvg(runs, { xLabel, psnrMin = null, refScore, names, chosenLa
     s += `<text class="small" transform="translate(14 ${(T + H - B) / 2}) rotate(-90)" text-anchor="middle">${esc(names.y)}</text>`;
     if (psnrMin !== null) s += `<line class="limit" x1="${L}" y1="${Y(psnrMin)}" x2="${W - R}" y2="${Y(psnrMin)}"/><text class="small muted" x="${W - R - 4}" y="${Y(psnrMin) - 5}" text-anchor="end">${esc(`${psnrMin} dB`)}</text>`;
     s += `<line class="ref" x1="${X(refScore)}" y1="${T}" x2="${X(refScore)}" y2="${H - B}"/><text class="small muted" x="${X(refScore) - 4}" y="${T + 10}" text-anchor="end">${esc(names.exact)}</text>`;
+    const nameOf = (r) => r.label ?? names[r.heuristic];
     runs.forEach((r) => {
-        const cls = `h-${r.heuristic}`, shape = DSE_SHAPES[r.heuristic] ?? 'circle';
+        const cls = r.cls ?? `h-${r.heuristic}`, shape = r.shape ?? DSE_SHAPES[r.heuristic] ?? 'circle';
         for (const p of r.points) {
             if (Number.isFinite(p.psnr) && p.psnr < yBot) continue;
-            s += `<g>${mark(shape, X(p.score), Y(p.psnr), 3.2, `pt ${cls}${p.feasible ? '' : ' off'}`)}<title>${esc(`${names[r.heuristic]}: ${fmt(p.score)}, ${Number.isFinite(p.psnr) ? p.psnr.toFixed(2) : '∞'} dB · ${p.variant}`)}</title></g>`;
+            s += `<g>${mark(shape, X(p.score), Y(p.psnr), 3.2, `pt ${cls}${p.feasible ? '' : ' off'}`)}<title>${esc(`${nameOf(r)}: ${fmt(p.score)}, ${Number.isFinite(p.psnr) ? p.psnr.toFixed(2) : '∞'} dB · ${p.variant}`)}</title></g>`;
         }
         const fr = r.front.filter((p) => !Number.isFinite(p.estimated[0]?.PSNR) || p.estimated.every((o) => o.PSNR >= yBot));
         if (fr.length > 1) s += `<path class="front ${cls}" d="${fr.map((p, k) => `${k ? 'L' : 'M'}${X(p.score)},${Y(Math.min(...p.estimated.map((o) => o.PSNR)))}`).join(' ')}"/>`;
         const c = r.chosen ?? r.best;
-        if (c) s += `<g>${mark(shape, X(c.score), Y(Math.min(...c.estimated.map((o) => o.PSNR))), 7, `chosen ${cls}`)}<title>${esc(`${names[r.heuristic]}: ${chosenLabel}`)}</title></g>`;
+        if (c) s += `<g>${mark(shape, X(c.score), Y(Math.min(...c.estimated.map((o) => o.PSNR))), 7, `chosen ${cls}`)}<title>${esc(`${nameOf(r)}: ${chosenLabel}`)}</title></g>`;
     });
     // Legenda: forma e cor de cada heurística.
+    const step = Math.min(runs.length <= 3 ? 320 : 240, (W - L - R) / Math.max(1, runs.length));
     runs.forEach((r, k) => {
-        const x = L + 8 + k * 190;
-        s += `${mark(DSE_SHAPES[r.heuristic] ?? 'circle', x, 16, 4.5, `pt h-${r.heuristic}`)}<text class="small" x="${x + 10}" y="20">${esc(names[r.heuristic])}</text>`;
+        const x = L + 8 + k * step;
+        s += `${mark(r.shape ?? DSE_SHAPES[r.heuristic] ?? 'circle', x, 16, 4.5, `pt ${r.cls ?? `h-${r.heuristic}`}`)}<text class="small" x="${x + 10}" y="20">${esc(nameOf(r).length > step / 6.2 ? `${nameOf(r).slice(0, Math.floor(step / 6.2) - 1)}…` : nameOf(r))}</text>`;
     });
     return `${s}</svg>`;
 }

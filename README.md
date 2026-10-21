@@ -195,6 +195,14 @@ Os testes conferem as unidades exatas contra a aritmética (8 bits exaustivo), o
 
 ## Próximas etapas possíveis
 
+Ajustes pendentes da síntese de alto nível, para retomar:
+
+* validar no Vitis HLS e no Vivado o que mudou desde a quarta rodada: os casos `sobel_sub_trunc3_rtl_ir` e `sharpen_sub_trunc2_rtl_ir` (subtrações aproximadas), o .zip baixado da página e uma quinta rodada com pontos escolhidos pela busca local atual;
+* reduzir o tempo da busca na página (orçamentos menores, parada quando não há melhora);
+* estimativa do SSIM com erros correlacionados no espaço (otimista no Sobel com subtrações truncadas), ou o SSIM medido na decisão;
+* calibrar o custo dos multiplicadores aproximados com operando constante (causa da ordenação errada no FIR da quarta rodada);
+* sintetizar e caracterizar as unidades de 9 a 15 bits (sky130 e Vivado), para custos medidos nessas larguras.
+
 * Exploração: diretivas com valores numéricos (II, fatores de unroll e de partição) e exploração em lote de vários kernels; estimativa do SSIM com erros correlacionados no espaço.
 * Recorrências com somadores aproximados no modelo de erro (execuções consecutivas no perfil).
 * Mais técnicas (codificador de Booth aproximado, outros somadores).
