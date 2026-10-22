@@ -15,6 +15,8 @@
  * aproximação (os "sites"): cada uma tem a sua tabela de produtos e a sua soma.
  */
 
+import { adderFunction } from './units.js';
+
 export const FORMAT = 'axc-nn/1';
 
 const fromB64 = (s) => {
@@ -156,7 +158,38 @@ export function productTable(unit) {
  * nos testes. Devolve add(acc, prod, n): acc[i] = acc[i] (+) prod[i] para i < n.
  */
 export function adderAccumulate(unit) {
-    const cfg = unit.cfg, N = cfg.width, M = (1 << N) - 1;
+    const cfg = unit.cfg, N = cfg.width;
+    if (N >= 32) {
+        // A unidade faz o acumulador inteiro: soma de 32 bits, e o resultado fica no int32 (o vai um que sai do bit 31
+        // se perde, como no int32 do C). Operações bit a bit do JavaScript (32 bits); os deslocamentos de 32, que o
+        // JavaScript faz como de 0, ficam de fora.
+        const type = cfg.adder === 'trunc' || cfg.adder === 'loa' || cfg.adder === 'seg' ? cfg.adder : 'exact';
+        const k = Math.min(cfg.k ?? 0, 32), km = k >= 31 ? (k === 31 ? 0x7fffffff : -1) : (1 << k) - 1;
+        const L = Math.max(1, cfg.L ?? 4), P = Math.max(0, cfg.P ?? 0);
+        return (acc, prod, n = acc.length) => {
+            for (let i = 0; i < n; i++) {
+                const x = acc[i], y = prod[i];
+                let r;
+                if (type === 'exact' || k === 0 && type !== 'seg') r = x + y;
+                else if (type === 'trunc') r = k >= 32 ? 0 : ((x >>> k) + (y >>> k)) << k;
+                else if (type === 'loa') {
+                    if (k >= 32) r = x | y;
+                    else r = (((x >>> k) + (y >>> k) + ((x >>> (k - 1)) & (y >>> (k - 1)) & 1)) << k) | ((x | y) & km);
+                } else {
+                    r = 0;
+                    for (let s = 0; s < 32; s += L) {
+                        const hi = s + L < 32 ? s + L : 32, w = hi - s, lo = s - P > 0 ? s - P : 0;
+                        const cin = s === 0 || P === 0 ? 0 : ((((x >>> lo) & ((1 << (s - lo)) - 1)) + ((y >>> lo) & ((1 << (s - lo)) - 1))) >>> (s - lo));
+                        const wm = w >= 32 ? -1 : (1 << w) - 1;
+                        r |= ((((x >>> s) & wm) + ((y >>> s) & wm) + cin) & wm) << s;
+                    }
+                }
+                acc[i] = r | 0;
+            }
+            return acc;
+        };
+    }
+    const M = (1 << N) - 1;
     // Mesma conta de adderFunction (units.js), escrita dentro do laço para ficar rápida.
     const type = cfg.adder === 'trunc' || cfg.adder === 'loa' || cfg.adder === 'seg' ? cfg.adder : 'exact';
     const k = Math.min(cfg.k ?? 0, N), km = (1 << k) - 1;
@@ -195,8 +228,42 @@ function requantize(l, acc, ch) {
     return clamp8(v + l.zOut);
 }
 
+/**
+ * Soma dos termos de todas as saídas com a unidade (fill(t, out) põe o termo t de cada saída em out):
+ *   tree = 1: em cadeia, como o laço do C (acc = 0; acc += termo, um por vez);
+ *   tree = U > 1: em árvores de U termos (os termos de cada grupo somados dois a dois, nível por nível, como a
+ *     expressão de um laço desenrolado com EXPRESSION_BALANCE), e cada árvore somada ao acumulador;
+ *   tree = 0: todos os termos numa árvore só (o laço inteiro desenrolado).
+ */
+export function sumTerms(nTerms, fill, n, add, tree, scratch = makeScratch()) {
+    const acc = scratch.acc(n);
+    acc.fill(0, 0, n);
+    const U = tree === 0 ? nTerms : Math.max(1, Math.min(tree ?? 1, nTerms));
+    if (U === 1) {
+        const p = scratch.prod(n);
+        for (let t = 0; t < nTerms; t++) { fill(t, p); add(acc, p, n); }
+        return acc;
+    }
+    const pool = scratch.terms(U, n);
+    for (let g = 0; g < nTerms; g += U) {
+        const m = Math.min(U, nTerms - g);
+        const level = pool.slice(0, m);
+        for (let j = 0; j < m; j++) fill(g + j, level[j]);
+        for (let len = m; len > 1;) {
+            let w = 0;
+            for (let i = 0; i < len; i += 2) {
+                if (i + 1 < len) add(level[i], level[i + 1], n);
+                level[w++] = level[i];
+            }
+            len = w;
+        }
+        if (g === 0) acc.set(level[0].subarray(0, n)); else add(acc, level[0], n);
+    }
+    return acc;
+}
+
 /** Convolução: acumuladores (sem o viés ainda) de todas as saídas, termo a termo na ordem ky, kx, canal. */
-function convAcc(l, x, T, add, scratch) {
+function convAcc(l, x, T, add, tree, scratch) {
     const [C, H, W] = l.inShape, [F, OH, OW] = l.outShape, k = l.k, pad = l.pad ?? 0, s = l.stride ?? 1, z = l.zIn;
     const n = F * OH * OW;
     const acc = scratch.acc(n);
@@ -227,29 +294,25 @@ function convAcc(l, x, T, add, scratch) {
         }
         return acc;
     }
-    const prod = scratch.prod(n);
-    for (let ky = 0; ky < k; ky++) {
-        for (let kx = 0; kx < k; kx++) {
-            for (let c = 0; c < C; c++) {
-                let i = 0;
-                for (let f = 0; f < F; f++) {
-                    const wo = (w[((f * C + c) * k + ky) * k + kx] + 128) * 256;
-                    for (let oy = 0; oy < OH; oy++) {
-                        const iy = oy * s + ky - pad;
-                        for (let ox = 0; ox < OW; ox++) {
-                            const ix = ox * s + kx - pad;
-                            prod[i++] = T[wo + (iy >= 0 && iy < H && ix >= 0 && ix < W ? x[(c * H + iy) * W + ix] : z)];
-                        }
-                    }
+    // Com a unidade, a ordem conta: termo t = (ky, kx, canal), a ordem dos laços do C.
+    const fill = (t, out) => {
+        const ky = Math.floor(t / (k * C)), kx = Math.floor(t / C) % k, c = t % C;
+        let i = 0;
+        for (let f = 0; f < F; f++) {
+            const wo = (w[((f * C + c) * k + ky) * k + kx] + 128) * 256;
+            for (let oy = 0; oy < OH; oy++) {
+                const iy = oy * s + ky - pad;
+                for (let ox = 0; ox < OW; ox++) {
+                    const ix = ox * s + kx - pad;
+                    out[i++] = T[wo + (iy >= 0 && iy < H && ix >= 0 && ix < W ? x[(c * H + iy) * W + ix] : z)];
                 }
-                add(acc, prod, n);
             }
         }
-    }
-    return acc;
+    };
+    return sumTerms(C * k * k, fill, n, add, tree, scratch);
 }
 
-function denseAcc(l, x, T, add, scratch) {
+function denseAcc(l, x, T, add, tree, scratch) {
     const O = l.out, I = x.length, w = l.w;
     const acc = scratch.acc(O);
     acc.fill(0, 0, O);
@@ -263,17 +326,18 @@ function denseAcc(l, x, T, add, scratch) {
         }
         return acc;
     }
-    const prod = scratch.prod(O);
-    for (let i = 0; i < I; i++) {
-        for (let o = 0; o < O; o++) prod[o] = T[(w[o * I + i] + 128) * 256 + x[i]];
-        add(acc, prod, O);
-    }
-    return acc;
+    const fill = (i, out) => { for (let o = 0; o < O; o++) out[o] = T[(w[o * I + i] + 128) * 256 + x[i]]; };
+    return sumTerms(I, fill, O, add, tree, scratch);
 }
 
 function makeScratch() {
     let A = new Int32Array(4096), P = new Int32Array(4096), B = new Int32Array(1), X = new Uint8Array(4096);
+    const pool = [];
     return {
+        terms: (U, n) => {
+            for (let j = 0; j < U; j++) if (!pool[j] || pool[j].length < n) pool[j] = new Int32Array(n);
+            return pool;
+        },
         acc: (n) => (A.length >= n ? A : (A = new Int32Array(n))),
         prod: (n) => (P.length >= n ? P : (P = new Int32Array(n))),
         padded: (n) => (X.length >= n ? X : (X = new Uint8Array(n))),
@@ -285,17 +349,19 @@ function makeScratch() {
  * Inferência de uma imagem (pixels uint8). Devolve a classe prevista e as saídas da última camada.
  * @param {Array<Int32Array>} tables tabela de produtos de cada camada com pesos
  * @param {Array<Function|null>} adds soma de cada camada com pesos (null: exata)
+ * @param {Array<number>} trees estrutura da soma de cada camada com pesos (1: em cadeia, o padrão; 0: árvore com todos
+ *   os termos; U: árvores de U termos). Com a soma exata, não muda nada.
  */
-export function infer(net, img, tables, adds = [], scratch = makeScratch()) {
+export function infer(net, img, tables, adds = [], scratch = makeScratch(), trees = []) {
     let x = new Uint8Array(img.length);
     const luts = net.inputLuts, plane = img.length / luts.length;
     for (let c = 0, i = 0; c < luts.length; c++) { const T = luts[c]; for (let e = i + plane; i < e; i++) x[i] = T[img[i]]; }
     let si = 0, out = null;
     for (const l of net.layers) {
         if (l.type === 'conv' || l.type === 'dense') {
-            const T = tables[si], add = adds[si] ?? null;
+            const T = tables[si], add = adds[si] ?? null, tree = trees[si] ?? 1;
             si++;
-            const acc = l.type === 'conv' ? convAcc(l, x, T, add, scratch) : denseAcc(l, x, T, add, scratch);
+            const acc = l.type === 'conv' ? convAcc(l, x, T, add, tree, scratch) : denseAcc(l, x, T, add, tree, scratch);
             const n = l.outShape.reduce((a, b) => a * b, 1), per = n / l.outShape[0];
             // O viés entra no fim, como no C: (soma dos produtos) + viés.
             const bias = scratch.one();
@@ -347,10 +413,10 @@ export function infer(net, img, tables, adds = [], scratch = makeScratch()) {
     return { pred, out };
 }
 
-/** Classifica as imagens [from, to) do conjunto de teste. */
-export function classifyRange(net, test, tables, adds, from, to, preds) {
+/** Classifica as imagens [from, to) do conjunto de teste (trees: a estrutura da soma de cada camada, veja infer). */
+export function classifyRange(net, test, tables, adds, from, to, preds, trees = []) {
     const scratch = makeScratch();
-    for (let k = from; k < to; k++) preds[k] = infer(net, test.images.subarray(k * test.size, (k + 1) * test.size), tables, adds, scratch).pred;
+    for (let k = from; k < to; k++) preds[k] = infer(net, test.images.subarray(k * test.size, (k + 1) * test.size), tables, adds, scratch, trees).pred;
     return preds;
 }
 

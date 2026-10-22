@@ -405,27 +405,32 @@ export function buildAdder(cfg) {
  */
 export function adderFunction(cfg) {
     const N = cfg.width;
-    const field = (x, lo, hi) => (x >>> lo) & ((1 << (hi - lo)) - 1);
+    // Aritmética em vez de operações bit a bit (as do JavaScript são de 32 bits com sinal): vale até N = 32.
+    const P = (n) => 2 ** n;
+    const field = (x, lo, hi) => Math.floor(x / P(lo)) % P(hi - lo);
+    const bit = (x, i) => Math.floor(x / P(i)) % 2;
     if (cfg.adder === 'trunc' || cfg.adder === 'loa') {
-        const k = Math.min(cfg.k ?? 0, N), m = (1 << k) - 1;
-        if (cfg.adder === 'trunc') return (a, b) => ((a >>> k) + (b >>> k)) * 2 ** k;
+        const k = Math.min(cfg.k ?? 0, N);
+        if (cfg.adder === 'trunc') return (a, b) => (Math.floor(a / P(k)) + Math.floor(b / P(k))) * P(k);
         return (a, b) => {
-            const cin = k > 0 ? (a >>> (k - 1)) & (b >>> (k - 1)) & 1 : 0;
-            return ((a >>> k) + (b >>> k) + cin) * 2 ** k + ((a | b) & m);
+            const cin = k > 0 ? bit(a, k - 1) & bit(b, k - 1) : 0;
+            // Bits baixos: a OU b, bit a bit (a | b sem sinal, nos k bits de baixo).
+            const low = k > 0 ? ((field(a, 0, k) | field(b, 0, k)) >>> 0) % P(k) : 0;
+            return (Math.floor(a / P(k)) + Math.floor(b / P(k)) + cin) * P(k) + low;
         };
     }
     if (cfg.adder === 'seg') {
-        const L = Math.max(1, cfg.L ?? 4), P = Math.max(0, cfg.P ?? 0);
+        const L = Math.max(1, cfg.L ?? 4), Pp = Math.max(0, cfg.P ?? 0);
         return (a, b) => {
             let res = 0, cout = 0;
             for (let s = 0; s < N; s += L) {
-                const hi = Math.min(N, s + L), lo = Math.max(0, s - P);
-                const cin = s === 0 || P === 0 ? 0 : (field(a, lo, s) + field(b, lo, s)) >>> (s - lo);
+                const hi = Math.min(N, s + L), lo = Math.max(0, s - Pp);
+                const cin = s === 0 || Pp === 0 ? 0 : Math.floor((field(a, lo, s) + field(b, lo, s)) / P(s - lo));
                 const sum = field(a, s, hi) + field(b, s, hi) + cin;
-                res += (sum & ((1 << (hi - s)) - 1)) * 2 ** s;
-                cout = sum >>> (hi - s);
+                res += (sum % P(hi - s)) * P(s);
+                cout = Math.floor(sum / P(hi - s));
             }
-            return res + cout * 2 ** N;
+            return res + cout * P(N);
         };
     }
     return (a, b) => a + b;

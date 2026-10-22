@@ -4,14 +4,16 @@
  * de registrador a registrador de cada unidade, das operações nativas do Vivado (a + b, a * b sem DSP) e das peças do
  * modelo (comparador, seleção, xor, registrador). Tudo roda a partir da pasta do repositório.
  *
- *   node scripts/vivado-units.mjs export [--part xc7a100tcsg324-1] [--only "MUL8 DRUM6,ADD16 LOA6"] [--chunks 4]
+ *   node scripts/vivado-units.mjs export [--part xc7a100tcsg324-1] [--only "MUL8 DRUM6,ADD16 LOA6"] [--missing] [--chunks 4]
  *       gera build/vivado-units/: um Verilog por unidade com um invólucro de registradores na entrada e na saída,
- *       os scripts Tcl (um por parte da lista) e run_units.sh;
+ *       os scripts Tcl (um por parte da lista) e run_units.sh; com --missing, só as unidades da biblioteca que ainda
+ *       não estão em data/vivado-units.json (por exemplo, os somadores de 24 e 32 bits);
  *   bash build/vivado-units/run_units.sh [-j 4] [--route]
  *       roda o Vivado em lote (síntese fora de contexto; com --route, também posicionamento e roteamento);
  *   node scripts/vivado-units.mjs collect
  *       lê os resultados e grava data/vivado-units.json, que a biblioteca usa no alvo FPGA (LUT, CARRY4 e atraso
- *       do Vivado no lugar dos do Yosys e do sky130).
+ *       do Vivado no lugar dos do Yosys e do sky130). As unidades que já estavam no arquivo e não foram medidas de
+ *       novo continuam lá (a rodada com --missing só acrescenta).
  *
  * O atraso é o do caminho de dados mais longo entre os registradores do invólucro (o que inclui o relógio para a
  * saída e o setup), com o relógio apertado (1 ns) para o Vivado otimizar para atraso.
@@ -70,8 +72,13 @@ function natives() {
 function doExport() {
     const part = opt('--part', 'xc7a100tcsg324-1');
     const chunks = +opt('--chunks', 4);
-    const only = opt('--only') ? new Set(opt('--only').split(',')) : null;
+    let only = opt('--only') ? new Set(opt('--only').split(',')) : null;
     const synth = JSON.parse(readFileSync(join(ROOT, 'data/synth.json'), 'utf8'));
+    if (argv.includes('--missing')) {
+        const have = existsSync(DATA) ? new Set(Object.keys(JSON.parse(readFileSync(DATA, 'utf8')).units)) : new Set();
+        only = new Set(synth.designs.map((d) => d.name).filter((n) => !have.has(n)));
+        log(`--missing: ${only.size} unidades da biblioteca fora de data/vivado-units.json`);
+    }
     rmSync(OUT, { recursive: true, force: true });
     mkdirSync(join(OUT, 'rtl'), { recursive: true });
     mkdirSync(join(OUT, 'out'), { recursive: true });
@@ -148,7 +155,9 @@ echo "Depois: node scripts/vivado-units.mjs collect"
 
 function doCollect() {
     const meta = JSON.parse(readFileSync(join(OUT, 'units.json'), 'utf8'));
-    const units = {};
+    // As unidades já medidas continuam; as desta rodada entram por cima.
+    const prev = existsSync(DATA) ? JSON.parse(readFileSync(DATA, 'utf8')) : null;
+    const units = { ...(prev?.units ?? {}) };
     const errors = [];
     let route = false;
     for (const f of readdirSync(join(OUT, 'out')).filter((x) => x.endsWith('.csv'))) {
@@ -160,7 +169,9 @@ function doCollect() {
         }
     }
     const missing = meta.items.filter((i) => !units[i.name]).map((i) => i.name);
-    writeFileSync(DATA, `${JSON.stringify({ part: meta.part, generated: new Date().toISOString(), tool: 'Vivado 2022.2', flow: route ? 'síntese fora de contexto, posicionamento e roteamento' : 'síntese fora de contexto', units }, null, 1)}\n`);
+    const flow = route ? 'síntese fora de contexto, posicionamento e roteamento' : 'síntese fora de contexto';
+    if (prev && prev.flow !== flow) log(`atenção: o arquivo anterior foi medido com outro fluxo (${prev.flow}); as unidades novas, com ${flow}`);
+    writeFileSync(DATA, `${JSON.stringify({ part: meta.part, generated: new Date().toISOString(), tool: 'Vivado 2022.2', flow: prev?.flow ?? flow, units }, null, 1)}\n`);
     log(`data/vivado-units.json: ${Object.keys(units).length} de ${meta.items.length}${missing.length ? `; faltam ${missing.length} (${missing.slice(0, 5).join(', ')}...)` : ''}${errors.length ? `; ${errors.length} com erro (${errors[0]})` : ''}`);
 }
 

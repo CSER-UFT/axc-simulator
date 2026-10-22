@@ -8,7 +8,7 @@
  *   node bin/axc.mjs sweep --group mul8 [--dist ...] [--format csv|json]
  *   node bin/axc.mjs synth <unidade>
  *   node bin/axc.mjs verilog <unidade> [--tb] [--out arquivo.v]
- *   node bin/axc.mjs lenet <multiplicador> [--add <somador>] [--model lenet5-mnist|minilenet-mnist] [--layers conv1,conv2,...]
+ *   node bin/axc.mjs lenet <multiplicador> [--add <somador>] [--tree] [--model lenet5-mnist|minilenet-mnist|...] [--layers conv1,conv2,...]
  *   node bin/axc.mjs hls <kernel.c | --example gauss|sobel|sharpen|fir|dot> [--clock ns] [--flow delay|area|iso] [--ports n]
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
@@ -140,12 +140,14 @@ switch (cmd) {
         const T = productTable(buildUnit(mul)), Tx = productTable(null);
         const acc = add ? adderAccumulate(buildUnit(add)) : null;
         const mask = names.map((l) => layers.includes(l));
-        const run = (tables, adds) => classifyRange(net, test, tables, adds, 0, test.n, new Uint8Array(test.n));
+        // --tree: a soma das camadas aproximadas em árvore (o laço desenrolado), em vez de em cadeia.
+        const trees = names.map(() => (flag('--tree') ? 0 : 1));
+        const run = (tables, adds) => classifyRange(net, test, tables, adds, 0, test.n, new Uint8Array(test.n), trees);
         const ref = run(names.map(() => Tx), []);
         const preds = run(mask.map((m) => (m ? T : Tx)), mask.map((m) => (m ? acc : null)));
         const s = summarize(test, preds, ref, net.classes), s0 = summarize(test, ref, null, net.classes);
-        const r = { model: net.id, mul: unitName(mul), add: add ? unitName(add) : null, layers, accuracy: s.accuracy, exactAccuracy: s0.accuracy, broke: s.broke.length, fixed: s.fixed };
-        out(r, () => `${net.name}, ${r.mul}${r.add ? ` + ${r.add}` : ''} em ${layers.join(', ')}: acurácia ${(100 * r.accuracy).toFixed(1)}% (exata ${(100 * r.exactAccuracy).toFixed(1)}%), ${r.broke} erradas a mais, ${r.fixed} corrigidas`);
+        const r = { model: net.id, mul: unitName(mul), add: add ? unitName(add) : null, sum: add ? (flag('--tree') ? 'tree' : 'chain') : null, layers, accuracy: s.accuracy, exactAccuracy: s0.accuracy, broke: s.broke.length, fixed: s.fixed };
+        out(r, () => `${net.name}, ${r.mul}${r.add ? ` + ${r.add} (${r.sum === 'tree' ? 'árvore' : 'cadeia'})` : ''} em ${layers.join(', ')}: acurácia ${(100 * r.accuracy).toFixed(1)}% (exata ${(100 * r.exactAccuracy).toFixed(1)}%), ${r.broke} erradas a mais, ${r.fixed} corrigidas`);
         break;
     }
     case 'hls': {

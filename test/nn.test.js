@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { decodeNet, decodeTestSet, productTable, classifyRange, infer, summarize, adderAccumulate, mulQ32, inputTable, macsPerSite } from '../js/axc/nn.js';
+import { decodeNet, decodeTestSet, productTable, classifyRange, infer, summarize, adderAccumulate, mulQ32, inputTable, macsPerSite, sumTerms } from '../js/axc/nn.js';
 import { buildUnit, adderFunction } from '../js/axc/units.js';
 import { archSvg } from '../js/axc/nnsvg.js';
 
@@ -11,7 +11,7 @@ const load = (id) => {
     return { json, net, test: decodeTestSet(readFileSync(new URL(`../${json.dataset.file}`, import.meta.url)), json.dataset) };
 };
 const lenet = load('lenet5-mnist'), mini = load('minilenet-mnist');
-const run = ({ net, test }, T, adds = [], n = test.n) => classifyRange(net, test, net.sites.map(() => T), adds, 0, n, new Uint8Array(n));
+const run = ({ net, test }, T, adds = [], n = test.n, trees = []) => classifyRange(net, test, net.sites.map(() => T), adds, 0, n, new Uint8Array(n), trees);
 
 const registry = JSON.parse(readFileSync(new URL('../data/nn/models.json', import.meta.url), 'utf8'));
 
@@ -121,4 +121,57 @@ test('diagrama da arquitetura: um SVG com as formas de cada tensor', () => {
         assert.ok(svg.endsWith('</svg>'));
         for (const l of m.net.layers.filter((x) => x.type !== 'flatten')) assert.ok(svg.includes(l.outShape.join('×')) || svg.includes(l.outShape.slice(1).join('×')), `${m.net.name} ${l.outShape}`);
     }
+});
+
+test('somadores de 24 e 32 bits na acumulação: os bits baixos pela unidade, e o int32 dá a volta como no C', () => {
+    const rnd = (() => { let x = 99; return () => { x = (x * 1103515245 + 12345) % 2147483648; return x; }; })();
+    const acc0 = Int32Array.from({ length: 400 }, () => (rnd() - 2 ** 30) * 2 - (rnd() % 3) * 2 ** 29);
+    const prod = Int32Array.from({ length: 400 }, (_, i) => (i % 4 === 0 ? -(rnd() % 40000) : (rnd() % 70000) - 30000));
+    for (const N of [24, 32]) {
+        const cfgs = [{ kind: 'add', width: N, adder: 'exact' }];
+        for (const k of [1, 6, 12, N]) cfgs.push({ kind: 'add', width: N, adder: 'trunc', k }, { kind: 'add', width: N, adder: 'loa', k });
+        for (const [L, P] of [[4, 0], [8, 4], [12, 8], [4, N]]) cfgs.push({ kind: 'add', width: N, adder: 'seg', L, P });
+        for (const cfg of cfgs) {
+            const f = adderFunction(cfg), got = adderAccumulate(buildUnit(cfg))(Int32Array.from(acc0), prod);
+            for (let i = 0; i < acc0.length; i++) {
+                const a = acc0[i], b = prod[i];
+                const want = N === 32 ? (f(a >>> 0, b >>> 0) % 2 ** 32) | 0
+                    : ((Math.floor(a / 2 ** N) + Math.floor(b / 2 ** N)) * 2 ** N + f(((a % 2 ** N) + 2 ** N) % 2 ** N, ((b % 2 ** N) + 2 ** N) % 2 ** N)) | 0;
+                assert.equal(got[i], want, `${JSON.stringify(cfg)} ${a} ${b}`);
+                if (cfg.adder === 'exact') assert.equal(got[i], (a + b) | 0);
+            }
+        }
+    }
+});
+
+test('estrutura da soma: em cadeia e em árvore conferem com a definição, e só mudam o resultado com a unidade aproximada', () => {
+    // O segmentado depende da estrutura; o truncado não (as somas parciais já são múltiplas de 2^k, e cada termo
+    // perde os bits baixos uma vez só, em qualquer ordem).
+    const add = adderAccumulate(buildUnit({ kind: 'add', width: 16, adder: 'seg', L: 4, P: 4 }));
+    const f1 = (a, b) => { const x = Int32Array.of(a); add(x, Int32Array.of(b), 1); return x[0]; };
+    const K = 25, n = 7;
+    const terms = Array.from({ length: K }, (_, t) => Int32Array.from({ length: n }, (_, j) => ((t * 7919 + j * 104729) % 65536) - 32768));
+    const fill = (t, out) => out.set(terms[t]);
+    const tree = (xs) => (xs.length === 1 ? xs[0] : tree(Array.from({ length: Math.ceil(xs.length / 2) }, (_, i) => (2 * i + 1 < xs.length ? f1(xs[2 * i], xs[2 * i + 1]) : xs[2 * i]))));
+    for (const [U, label] of [[1, 'cadeia'], [0, 'árvore'], [5, 'árvores de 5']]) {
+        const got = sumTerms(K, fill, n, add, U);
+        for (let j = 0; j < n; j++) {
+            const col = terms.map((t) => t[j]);
+            let want;
+            if (U === 1) want = col.reduce((a, b) => f1(a, b), 0);
+            else {
+                const G = U === 0 ? K : U;
+                want = null;
+                for (let g = 0; g < K; g += G) { const r = tree(col.slice(g, g + G)); want = want === null ? r : f1(want, r); }
+            }
+            assert.equal(got[j], want, `${label}, saída ${j}`);
+        }
+    }
+    // Com o somador exato, a estrutura não muda as classes; com o segmentado, muda a soma; com o truncado, não.
+    const ex = adderAccumulate(buildUnit({ kind: 'add', width: 16, adder: 'exact' }));
+    assert.deepEqual([...run(mini, productTable(null), mini.net.sites.map(() => ex), 100, mini.net.sites.map(() => 0))], [...mini.net.expected.subarray(0, 100)]);
+    const c = sumTerms(K, fill, n, add, 1), t = sumTerms(K, fill, n, add, 0);
+    assert.notDeepEqual([...c.subarray(0, n)], [...t.subarray(0, n)]);
+    const tr = adderAccumulate(buildUnit({ kind: 'add', width: 16, adder: 'trunc', k: 5 }));
+    assert.deepEqual([...sumTerms(K, fill, n, tr, 1).subarray(0, n)], [...sumTerms(K, fill, n, tr, 0).subarray(0, n)]);
 });

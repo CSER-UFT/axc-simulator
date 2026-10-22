@@ -50,7 +50,8 @@ function fillSelects() {
     };
     $('nnMul').innerHTML = (fromUnits ? `<option value="units">${esc(t('nn.fromUnits', { name: dn(unitName(fromUnits)) }))}</option>` : '')
         + `<option value="exact">${t('nn.mulExact')}</option>${group('mul', 8)}${group('mul', 16)}`;
-    $('nnAdder').innerHTML = `<option value="exact">${t('nn.adderExact')}</option>${group('add', 8)}${group('add', 16)}`;
+    $('nnAdder').innerHTML = `<option value="exact">${t('nn.adderExact')}</option>${group('add', 8)}${group('add', 16)}${group('add', 24)}${group('add', 32)}`;
+    $('nnAccum').value = store.get('nn.nnAccum') === 'tree' ? 'tree' : 'chain';
     const set = (id, v) => { $(id).value = [...$(id).options].some((o) => o.value === v) ? v : 'exact'; };
     set('nnMul', mulV);
     set('nnAdder', addV);
@@ -81,12 +82,15 @@ function tableOf(unit) {
     if (!tableCache.has(key)) tableCache.set(key, productTable(unit));
     return tableCache.get(key);
 }
-const nnKey = (mul, add, mask) => `${nnData.net.id}|${mul ? unitName(mul.cfg) : 'exata'}|${add ? unitName(add.cfg) : 'exato'}|${mask.join('')}`;
+// Estrutura da soma nas camadas com o somador aproximado: em cadeia (1) ou numa árvore com todos os termos (0).
+const accumTree = () => $('nnAccum').value === 'tree';
+const nnKey = (mul, add, mask) => `${nnData.net.id}|${mul ? unitName(mul.cfg) : 'exata'}|${add ? `${unitName(add.cfg)}|${accumTree() ? 'árvore' : 'cadeia'}` : 'exato'}|${mask.join('')}`;
 function nnSetup(mask) {
     const { mul, add } = nnUnits();
     const Tu = tableOf(mul), Tx = tableOf(null);
     const accum = add ? adderAccumulate(add) : null;
-    return { mul, add, tables: mask.map((m) => (m ? Tu : Tx)), adds: mask.map((m) => (m ? accum : null)), key: nnKey(mul, add, mask) };
+    const tree = accumTree() ? 0 : 1;
+    return { mul, add, tables: mask.map((m) => (m ? Tu : Tx)), adds: mask.map((m) => (m ? accum : null)), trees: mask.map(() => tree), key: nnKey(mul, add, mask) };
 }
 
 const getJson = (f) => fetch(f).then((r) => (r.ok ? r.json() : Promise.reject(new Error(f))));
@@ -106,7 +110,7 @@ async function loadNN(id) {
 }
 
 /** Classifica em lotes, sem travar a página; uma execução nova cancela as antigas. */
-function classifyAsync(tables, adds, key, onProgress) {
+function classifyAsync(tables, adds, key, onProgress, trees = []) {
     if (predCache.has(key)) return Promise.resolve(predCache.get(key));
     const { net, test } = nnData;
     const run = nnRun;
@@ -120,7 +124,7 @@ function classifyAsync(tables, adds, key, onProgress) {
         const step = () => {
             if (run !== nnRun) { reject(new Error('cancelada')); return; }
             const end = Math.min(test.n, k + chunk);
-            classifyRange(net, test, tables, adds, k, end, preds);
+            classifyRange(net, test, tables, adds, k, end, preds, trees);
             k = end;
             onProgress?.(k, test.n);
             if (k < test.n) setTimeout(step, 0);
@@ -192,7 +196,7 @@ async function render() {
     const progress = (k, n) => { $('nnStatus').textContent = t('nn.progress', { k, n }); };
     let preds, refUnitPreds = null, refUnit = null;
     try {
-        preds = await classifyAsync(setup.tables, setup.adds, setup.key, progress);
+        preds = await classifyAsync(setup.tables, setup.adds, setup.key, progress, setup.trees);
         // Booth de 8 bits: a unidade recebe a >> 1; a referência da técnica (Booth exato) também perde o bit baixo.
         if (setup.mul?.signed && setup.mul.cfg.width === 8) {
             refUnit = unitOf({ kind: 'mul', width: 8, method: 'booth' });
@@ -215,7 +219,7 @@ async function render() {
     h += `<tr><th>${t('nn.approxMacs')}</th><td class="mono">${nf(approxMacs)} ${t('nn.of')} ${nf(total)} (${pct(approxMacs / total)})</td></tr>`;
     h += '</table>';
     $('nnTable').innerHTML = h;
-    $('nnNote').innerHTML = modelNote(net) + (refUnitPreds ? ` ${t('nn.booth8')}` : '') + (setup.add ? ` ${t('nn.adderNote', { n: setup.add.cfg.width })}` : '');
+    $('nnNote').innerHTML = modelNote(net) + (refUnitPreds ? ` ${t('nn.booth8')}` : '') + (setup.add ? ` ${t(setup.add.cfg.width >= 32 ? 'nn.adderNote32' : 'nn.adderNote', { n: setup.add.cfg.width })} ${t(accumTree() ? 'nn.accumTreeNote' : 'nn.accumChainNote')}` : '');
     // Nomes curtos (dígitos) vão direto na matriz; nomes longos viram índices, com a legenda embaixo.
     const names = net.dataset.classes ?? Array.from({ length: classes }, (_, k) => String(k));
     const short = names.every((n) => n.length <= 2) ? names : names.map((_, k) => String(k));
@@ -233,7 +237,7 @@ async function render() {
     for (const cv of $('nnBroke').querySelectorAll('canvas')) drawImage(cv, test.images.subarray(+cv.dataset.k * test.size, (+cv.dataset.k + 1) * test.size), test.shape);
 }
 
-for (const id of ['nnMul', 'nnAdder', 'nnModel']) $(id).addEventListener('change', () => { store.set(`nn.${id}`, $(id).value); render(); });
+for (const id of ['nnMul', 'nnAdder', 'nnModel', 'nnAccum']) $(id).addEventListener('change', () => { store.set(`nn.${id}`, $(id).value); render(); });
 $('nnLayers').addEventListener('change', () => render());
 $('nnSensBtn').onclick = async () => {
     if (!nnData) return;
@@ -245,7 +249,7 @@ $('nnSensBtn').onclick = async () => {
         const setup = nnSetup(net.sites.map((_, j) => j === i));
         let preds;
         try {
-            preds = await classifyAsync(setup.tables, setup.adds, setup.key, (k, n) => { $('nnStatus').textContent = t('nn.sensProgress', { layer: net.sites[i].name, k, n }); });
+            preds = await classifyAsync(setup.tables, setup.adds, setup.key, (k, n) => { $('nnStatus').textContent = t('nn.sensProgress', { layer: net.sites[i].name, k, n }); }, setup.trees);
         } catch { return; }
         if (run !== nnRun) return;
         rows.push(`<tr><th>${esc(net.sites[i].name)}</th><td class="mono">${pct(macs[i] / total)}</td><td class="mono">${pct(summarize(test, preds, null, net.classes).accuracy)}</td></tr>`);

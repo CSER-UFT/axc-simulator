@@ -60,7 +60,11 @@ function readCfg() {
 
 /** Limites dos controles conforme o tipo e a largura. */
 function syncControls() {
-    const N = +$('width').value, mul = $('kind').value === 'mul';
+    const mul = $('kind').value === 'mul';
+    // 24 e 32 bits só para somadores (os acumuladores das redes); os multiplicadores vão até 16.
+    for (const o of $('width').options) o.disabled = mul && +o.value > 16;
+    if (mul && +$('width').value > 16) $('width').value = '16';
+    const N = +$('width').value;
     $('mulCfg').classList.toggle('hidden', !mul);
     $('addCfg').classList.toggle('hidden', mul);
     const method = $('mulMethod').value;

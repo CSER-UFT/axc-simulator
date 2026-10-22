@@ -5,6 +5,8 @@
  *   multiplicador por colunas: grade regular de passo 2 em colunas truncadas e aproximadas (vem um previsto
  *     ligado), cerca de 25% dos pares, mais a compensação nos que só truncam;
  *   somadores truncado e LOA: todos os k; segmentado: grade regular de passo 2 em L (menor que N) e P (cerca de 25%);
+ *   somadores de 24 e 32 bits (para as acumulações das redes neurais): exato, truncado e LOA em todos os k, segmentado
+ *     com L e P de 4 em 4;
  *   as unidades exatas de cada largura (referência de área, atraso e energia).
  *
  * As configurações pré-definidas (presets.js) estão todas aqui dentro, para a aba Síntese continuar com elas.
@@ -13,6 +15,8 @@ import { PRESETS } from './presets.js';
 import { unitName } from './units.js';
 
 const WIDTHS = [8, 16];
+/** Larguras só de somadores: os acumuladores das redes (somas de centenas de produtos de 16 bits). */
+const WIDE_ADDERS = [24, 32];
 
 function* multipliers(N) {
     yield { kind: 'mul', width: N, kTrunc: 0, kApprox: 0, approxCarry: true };
@@ -37,8 +41,9 @@ function* multipliers(N) {
 function* adders(N) {
     yield { kind: 'add', width: N, adder: 'exact' };
     for (const adder of ['trunc', 'loa']) for (let k = 1; k <= N; k++) yield { kind: 'add', width: N, adder, k };
-    // Com L = N há um bloco só: é o somador exato.
-    for (let L = 2; L < N; L += 2) for (let P = 0; P <= N; P += 2) yield { kind: 'add', width: N, adder: 'seg', L, P };
+    // Com L = N há um bloco só: é o somador exato. Nos largos, a grade do segmentado é de 4 em 4.
+    const step = N > 16 ? 4 : 2;
+    for (let L = step; L < N; L += step) for (let P = 0; P <= N; P += step) yield { kind: 'add', width: N, adder: 'seg', L, P };
 }
 
 /** Lista sem repetição (pelo nome da unidade), com as pré-definidas primeiro. */
@@ -53,5 +58,6 @@ export function designSpace() {
     };
     PRESETS.forEach(push);
     for (const N of WIDTHS) { for (const c of multipliers(N)) push(c); for (const c of adders(N)) push(c); }
+    for (const N of WIDE_ADDERS) for (const c of adders(N)) push(c);
     return out;
 }
