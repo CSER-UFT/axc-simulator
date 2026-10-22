@@ -1,0 +1,7 @@
+{
+ "format": "axc-nn/1",
+ "models": [
+  { "id": "minilenet-mnist", "file": "data/nn/minilenet-mnist.json", "name": "MiniLenet", "dataset": "MNIST" },
+  { "id": "lenet5-mnist", "file": "data/nn/lenet5-mnist.json", "name": "LeNet 5", "dataset": "MNIST" }
+ ]
+}

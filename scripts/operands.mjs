@@ -17,7 +17,6 @@
  * Uso: node scripts/operands.mjs [--n 32768]
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { decodeModel, decodeTestSet } from '../js/axc/lenet.js';
 import { testImage, KERNELS } from '../js/axc/image.js';
 import { rng } from '../js/axc/metrics.js';
 
@@ -57,6 +56,15 @@ function fromHistogram(H, A, n) {
 }
 
 // LeNet-5 -------------------------------------------------------------------------------------------------------
+// O formato de scripts/lenet5/train.py (pesos e viéses em base64, M em ponto flutuante por camada).
+const fromB64 = (s) => Uint8Array.from(Buffer.from(s, 'base64'));
+function decodeModel(json) {
+    return { layers: json.layers.map((L) => ({ name: L.name, shape: L.shape, w: new Int8Array(fromB64(L.w).buffer), b: new Int32Array(fromB64(L.b).buffer), M: L.M })) };
+}
+function decodeTestSet(buf, n = 1000) {
+    const u = new Uint8Array(buf);
+    return { n, labels: u.subarray(0, n), images: u.subarray(n, n + n * 784) };
+}
 const model = decodeModel(JSON.parse(readFileSync('data/lenet5.json', 'utf8')));
 const test = decodeTestSet(readFileSync('data/mnist1000.bin'));
 const H = new Float64Array(128 * 256);          // H[|w| * 256 + a]

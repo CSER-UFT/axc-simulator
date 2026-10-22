@@ -138,3 +138,18 @@ table.metrics td.note { text-align: left; }
 [data-theme="dark"] .fig-svg .t-exact { fill: #ddd; }
 #dsTable td { text-align: right; }
 #dsTable tr[data-name] { cursor: pointer; }
+
+/* Diagrama da arquitetura da rede (js/axc/nnsvg.js) */
+.nn-arch-box { overflow-x: auto; }
+.nn-arch { max-width: 100%; height: auto; display: block; font-family: var(--sans, 'IBM Plex Sans', sans-serif); }
+.nn-arch .nn-plane { fill: var(--panel-2); stroke: var(--line-strong); stroke-width: 0.8; }
+.nn-arch .nn-front { fill: var(--accent-soft); stroke: var(--ink); stroke-width: 1; }
+.nn-arch .nn-vec { fill: var(--accent-soft); stroke: var(--ink); stroke-width: 1; }
+.nn-arch .nn-band { fill: var(--line); fill-opacity: 0.22; stroke: var(--line-strong); stroke-width: 0.6; }
+.nn-arch .nn-kernel { fill: var(--focus-soft); stroke: var(--focus); stroke-width: 1.2; }
+.nn-arch .nn-link { stroke: var(--focus); stroke-width: 1; }
+.nn-arch .nn-tick { stroke: var(--line-strong); stroke-width: 0.8; }
+.nn-arch .nn-name { fill: var(--ink); font-size: 11px; font-weight: 600; }
+.nn-arch .nn-dims { fill: var(--muted); font-size: 10.5px; font-family: var(--mono, 'IBM Plex Mono', monospace); }
+.nn-arch .nn-op { fill: var(--muted); font-size: 10px; }
+.nn-arch .nn-note { fill: var(--faint); font-size: 9px; }

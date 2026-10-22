@@ -8,7 +8,7 @@
  *   node bin/axc.mjs sweep --group mul8 [--dist ...] [--format csv|json]
  *   node bin/axc.mjs synth <unidade>
  *   node bin/axc.mjs verilog <unidade> [--tb] [--out arquivo.v]
- *   node bin/axc.mjs lenet <multiplicador> [--add <somador>] [--layers conv1,conv2,fc1,fc2,fc3]
+ *   node bin/axc.mjs lenet <multiplicador> [--add <somador>] [--model lenet5-mnist|minilenet-mnist] [--layers conv1,conv2,...]
  *   node bin/axc.mjs hls <kernel.c | --example gauss|sobel|sharpen|fir|dot> [--clock ns] [--flow delay|area|iso] [--ports n]
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
@@ -32,7 +32,7 @@ import { testInputs, errorMetrics, loadOperands, APP_DISTRIBUTIONS, DISTRIBUTION
 import { toVerilog, testbench, moduleName } from '../js/axc/verilog.js';
 import { designSpace } from '../js/axc/designspace.js';
 import { PRESETS } from '../js/axc/presets.js';
-import { LAYERS, decodeModel, decodeTestSet, productTable, classifyBatch, adderAccumulate, summarize } from '../js/axc/lenet.js';
+import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize } from '../js/axc/nn.js';
 
 import { synthesize } from '../js/hls/index.js';
 import { KERNELS } from '../js/hls/kernels.js';
@@ -130,18 +130,22 @@ switch (cmd) {
         if (mul.kind !== 'mul') die('o primeiro argumento do lenet é um multiplicador');
         const add = opt('--add') ? cfgOf(opt('--add')) : null;
         if (add && add.kind !== 'add') die('--add espera um somador');
-        const layers = (opt('--layers') ?? LAYERS.join(',')).split(',');
-        const model = decodeModel(JSON.parse(readFileSync(join(ROOT, 'data/lenet5.json'), 'utf8')));
-        const test = decodeTestSet(readFileSync(join(ROOT, 'data/mnist1000.bin')));
+        const reg = JSON.parse(readFileSync(join(ROOT, 'data/nn/models.json'), 'utf8'));
+        const entry = reg.models.find((m) => m.id === opt('--model', 'lenet5-mnist')) ?? die(`modelo desconhecido: ${opt('--model')} (${reg.models.map((m) => m.id).join(', ')})`);
+        const net = decodeNet(JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8')));
+        const test = decodeTestSet(readFileSync(join(ROOT, net.dataset.file)), net.dataset);
+        const names = net.sites.map((l) => l.name);
+        const layers = (opt('--layers') ?? names.join(',')).split(',');
+        for (const l of layers) if (!names.includes(l)) die(`camada desconhecida: ${l} (${names.join(', ')})`);
         const T = productTable(buildUnit(mul)), Tx = productTable(null);
         const acc = add ? adderAccumulate(buildUnit(add)) : null;
-        const mask = LAYERS.map((l) => layers.includes(l));
-        const run = (tables, adds) => { const p = new Uint8Array(test.n); classifyBatch(model, test, tables, adds, 0, test.n, p); return p; };
-        const ref = run(LAYERS.map(() => Tx), LAYERS.map(() => null));
+        const mask = names.map((l) => layers.includes(l));
+        const run = (tables, adds) => classifyRange(net, test, tables, adds, 0, test.n, new Uint8Array(test.n));
+        const ref = run(names.map(() => Tx), []);
         const preds = run(mask.map((m) => (m ? T : Tx)), mask.map((m) => (m ? acc : null)));
-        const s = summarize(test, preds, ref), s0 = summarize(test, ref, null);
-        const r = { mul: unitName(mul), add: add ? unitName(add) : null, layers, accuracy: s.accuracy, exactAccuracy: s0.accuracy, broke: s.broke.length, fixed: s.fixed };
-        out(r, () => `${r.mul}${r.add ? ` + ${r.add}` : ''} em ${layers.join(', ')}: acurácia ${(100 * r.accuracy).toFixed(1)}% (exata ${(100 * r.exactAccuracy).toFixed(1)}%), ${r.broke} erradas a mais, ${r.fixed} corrigidas`);
+        const s = summarize(test, preds, ref, net.classes), s0 = summarize(test, ref, null, net.classes);
+        const r = { model: net.id, mul: unitName(mul), add: add ? unitName(add) : null, layers, accuracy: s.accuracy, exactAccuracy: s0.accuracy, broke: s.broke.length, fixed: s.fixed };
+        out(r, () => `${net.name}, ${r.mul}${r.add ? ` + ${r.add}` : ''} em ${layers.join(', ')}: acurácia ${(100 * r.accuracy).toFixed(1)}% (exata ${(100 * r.exactAccuracy).toFixed(1)}%), ${r.broke} erradas a mais, ${r.fixed} corrigidas`);
         break;
     }
     case 'hls': {

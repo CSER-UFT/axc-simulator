@@ -13,7 +13,7 @@ export const heads = {
     },
     lenet: {
         title: 'Rede neural aproximada',
-        lead: 'Uma LeNet-5 quantizada em 8 bits classifica 1000 dígitos do MNIST com os multiplicadores e somadores da biblioteca, camada por camada, e mostra o efeito na acurácia.',
+        lead: 'Redes convolucionais quantizadas em 8 bits (LeNet 5 e MiniLenet) classificam 1000 imagens do MNIST com os multiplicadores e somadores da biblioteca, camada por camada, e mostram o efeito na acurácia.',
     },
 };
 
@@ -145,12 +145,13 @@ npm run vivado:units         # caracterização das unidades no Vivado</pre>
         title: 'Primeiros passos',
         html: `
 <ol>
+    <li>Escolha o <strong>modelo</strong>: a MiniLenet (do código C para o Vitis) ou a LeNet 5. O diagrama da arquitetura, embaixo da matriz de confusão, mostra as camadas e as formas dos tensores.</li>
     <li>Escolha o <strong>multiplicador</strong> e, se quiser, o <strong>somador das acumulações</strong> entre as unidades da biblioteca. Da página de unidades, o botão <strong>Usar na LeNet-5</strong> abre esta página com a unidade de lá.</li>
     <li>Marque as <strong>camadas</strong> que usam as unidades aproximadas; as outras ficam exatas.</li>
-    <li>A cada mudança, a página classifica as imagens de novo e mostra a acurácia nas 1000 imagens, contra a da rede exata, a matriz de confusão e os dígitos que passaram a errar.</li>
+    <li>A cada mudança, a página classifica as imagens de novo e mostra a acurácia nas 1000 imagens, contra a da rede exata, a matriz de confusão e as imagens que passaram a errar.</li>
     <li>O botão de <strong>sensibilidade</strong> aproxima uma camada por vez e mostra quanto cada uma custa em acurácia e quantas multiplicações ela faz.</li>
 </ol>
-<p class="tip">Para começar: o MUL8 Mitchell em todas as camadas quase não muda a acurácia; com a compensação do viés, a acurácia cai uns 4 pontos, embora o erro médio da unidade seja menor.</p>`,
+<p class="tip">Para começar: o MUL8 Mitchell em todas as camadas quase não muda a acurácia das duas redes; com a compensação do viés, embora o erro médio da unidade seja menor, a LeNet 5 cai uns 4 pontos e a MiniLenet, menor e com pontos zero, cai para 49%.</p>`,
     },
 ];
 
@@ -169,7 +170,7 @@ export const common = [
         html: `
 <dl>
     <dt><a href="./index.html">Unidades</a></dt><dd>um somador ou multiplicador aproximado porta a porta: estrutura, mapa de erro, métricas, custo, Pareto, tensão e memória, computação estocástica.</dd>
-    <dt><a href="./lenet.html">Rede neural</a></dt><dd>a LeNet-5 no MNIST com as unidades da biblioteca, camada por camada.</dd>
+    <dt><a href="./lenet.html">Rede neural</a></dt><dd>a LeNet 5 e a MiniLenet no MNIST com as unidades da biblioteca, camada por camada, e o diagrama da arquitetura.</dd>
     <dt><a href="./hls.html">Síntese de alto nível</a></dt><dd>kernels inteiros em C com diretivas: escalonamento, custo, erro nas saídas, exploração e a biblioteca sintetizada.</dd>
 </dl>
 <p>Cada página tem a sua ajuda, no botão <strong>Ajuda</strong> do cabeçalho; as referências são as mesmas.</p>`,

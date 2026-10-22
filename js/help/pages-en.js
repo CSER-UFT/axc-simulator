@@ -12,7 +12,7 @@ export const heads = {
     },
     lenet: {
         title: 'Approximate neural network',
-        lead: 'An 8 bit quantized LeNet-5 classifies 1000 MNIST digits with the multipliers and adders of the library, layer by layer, and shows the effect on accuracy.',
+        lead: '8 bit quantized convolutional networks (LeNet 5 and MiniLenet) classify 1000 MNIST images with the multipliers and adders of the library, layer by layer, and show the effect on accuracy.',
     },
 };
 
@@ -144,12 +144,13 @@ npm run vivado:units         # characterization of the units in Vivado</pre>
         title: 'Getting started',
         html: `
 <ol>
+    <li>Choose the <strong>model</strong>: MiniLenet (from the C code for Vitis) or LeNet 5. The architecture diagram, below the confusion matrix, shows the layers and the tensor shapes.</li>
     <li>Choose the <strong>multiplier</strong> and, optionally, the <strong>accumulation adder</strong> among the library units. From the units page, the <strong>Use in LeNet-5</strong> button opens this page with the unit from there.</li>
     <li>Check the <strong>layers</strong> that use the approximate units; the others stay exact.</li>
-    <li>On every change, the page classifies the images again and shows the accuracy on the 1000 images, against that of the exact network, the confusion matrix and the digits that started to fail.</li>
+    <li>On every change, the page classifies the images again and shows the accuracy on the 1000 images, against that of the exact network, the confusion matrix and the images that started to fail.</li>
     <li>The <strong>sensitivity</strong> button approximates one layer at a time and shows how much accuracy each one costs and how many multiplications it does.</li>
 </ol>
-<p class="tip">To start: MUL8 Mitchell on every layer barely changes the accuracy; with bias compensation, accuracy drops about 4 points, although the mean error of the unit is smaller.</p>`,
+<p class="tip">To start: MUL8 Mitchell on every layer barely changes the accuracy of both networks; with bias compensation, although the mean error of the unit is smaller, LeNet 5 drops about 4 points and MiniLenet, smaller and with zero points, drops to 49%.</p>`,
     },
 ];
 
@@ -168,7 +169,7 @@ export const common = [
         html: `
 <dl>
     <dt><a href="./index.html">Units</a></dt><dd>an approximate adder or multiplier gate by gate: structure, error map, metrics, cost, Pareto, voltage and memory, stochastic computing.</dd>
-    <dt><a href="./lenet.html">Neural network</a></dt><dd>LeNet-5 on MNIST with the library units, layer by layer.</dd>
+    <dt><a href="./lenet.html">Neural network</a></dt><dd>LeNet 5 and MiniLenet on MNIST with the library units, layer by layer, and the architecture diagram.</dd>
     <dt><a href="./hls.html">High level synthesis</a></dt><dd>whole C kernels with directives: scheduling, cost, output error, exploration and the synthesized library.</dd>
 </dl>
 <p>Each page has its own help, under the <strong>Help</strong> button in the header; the references are the same.</p>`,

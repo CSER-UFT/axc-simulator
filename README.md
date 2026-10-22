@@ -28,7 +28,7 @@ Interface e ajuda em **português e inglês** (seletor no cabeçalho). O botão 
   * as netlists (o Verilog do simulador e as três mapeadas de cada configuração) vão para `build/axc-netlists.tar.gz`, para anexar a uma release; o `data/synth.json` guarda o SHA-256 de cada uma.
 * **Espaço de projeto e referência externa**: na aba Biblioteca, todas as configurações de um grupo com o custo (área, atraso, energia com entradas uniformes ou com os operandos reais, fuga, LUTs) e o erro (inclusive sob os operandos reais) à escolha, a fronteira de Pareto com o intervalo de confiança e a exportação em CSV, JSON e SVG. Como referência, os multiplicadores e somadores sem sinal de 8 e 16 bits da **EvoApproxLib** (licença MIT; Mrázek e colegas, DATE 2017), sintetizados com exatamente o mesmo fluxo e com o erro calculado sobre os mesmos pares (`scripts/evoapprox.mjs`, resultado em `data/evoapprox.json`). As métricas calculadas aqui conferem com as publicadas pela biblioteca.
 * **Comparação**: configurações guardadas, varredura do parâmetro principal, fronteira de Pareto com custo e métrica de erro à escolha, contagem de dominância, ponto de joelho, exportação em CSV e SVG.
-* **Rede neural** (página `lenet.html`): LeNet-5 treinada no MNIST e quantizada em 8 bits, com os produtos das camadas escolhidas feitos pelo multiplicador escolhido (o da página de unidades, pelo botão Usar na LeNet-5, ou qualquer um da biblioteca) e as somas pelo somador escolhido; acurácia contra a rede exata, sensibilidade por camada, matriz de confusão e os dígitos que passaram a errar. A rede é treinada uma vez com `scripts/lenet5/train.py` (só NumPy): `python3 scripts/lenet5/train.py <pasta com os 4 .gz do MNIST> --epochs 8`. O subconjunto de teste incluído (1000 imagens, `data/mnist1000.bin`) é do MNIST, sob a licença CC BY-SA 3.0.
+* **Rede neural** (página `lenet.html`): redes convolucionais quantizadas em 8 bits no MNIST, a LeNet 5 e a MiniLenet, com os produtos das camadas escolhidas feitos pelo multiplicador escolhido (o da página de unidades, pelo botão Usar na LeNet-5, ou qualquer um da biblioteca) e as somas pelo somador escolhido; acurácia contra a rede exata, sensibilidade por camada, matriz de confusão, as imagens que passaram a errar e o diagrama da arquitetura (no estilo do NN SVG, exportável em SVG e PNG). As redes ficam em `data/nn/` num formato JSON comum (camadas conv, maxpool, flatten e densa; pesos int8, ativações uint8 com ponto zero absorvido no viés; reescala em Q32 ou em ponto flutuante), listadas em `data/nn/models.json` e geradas por `scripts/nn/import.mjs`. A LeNet 5 é treinada uma vez com `scripts/lenet5/train.py` (só NumPy): `python3 scripts/lenet5/train.py <pasta com os 4 .gz do MNIST> --epochs 8`, e depois `node scripts/nn/import.mjs lenet5 data/lenet5.json`. A MiniLenet vem dos cabeçalhos C de um projeto para o Vitis (pesos do grupo DEFADAS/ITACA da Universitat Politècnica de València, licença MIT; treino em https://git.upv.es/defadas/MiniLenetPython): `node scripts/nn/import.mjs upv cnn_defines.h MiniLenetq_weights_and_bias_all_layers.h`; com as unidades exatas, as saídas são iguais às do C bit a bit (`test/fixtures/minilenet-c-fc2.bin`). O subconjunto de teste incluído (1000 imagens, `data/mnist1000.bin`) é do MNIST, sob a licença CC BY-SA 3.0.
 * **Aplicação**: kernels inteiros (filtros de imagem, FIR, produto escalar) com as unidades aproximadas, inclusive sobre uma imagem sua, ficam na página de síntese de alto nível (abaixo); a comparação mantém o MSE do filtro gaussiano 3 × 3 sobre a imagem de teste como métrica de aplicação.
 
 ## Síntese de alto nível (página hls.html)
@@ -131,7 +131,7 @@ node bin/axc.mjs metrics "MUL8 DRUM4" --dist lenet        # métricas de erro, c
 node bin/axc.mjs sweep --group add16 --dist image > a.csv # todas as configurações de um grupo, em CSV
 node bin/axc.mjs synth "ADD16 LOA8"                       # números da síntese (três fluxos, energia)
 node bin/axc.mjs verilog "MUL16 T8" --tb --out m.v        # Verilog e testbench
-node bin/axc.mjs lenet "MUL8 MITCHELL" --add "ADD16 LOA8" # acurácia da LeNet-5 com as unidades
+node bin/axc.mjs lenet "MUL8 MITCHELL" --add "ADD16 LOA8" # acurácia da LeNet 5 com as unidades (--model minilenet-mnist)
 ```
 
 A unidade é o nome mostrado na página ou uma configuração em JSON (`{"kind":"mul","width":8,"method":"drum","k":4}`); todos os comandos aceitam `--json`.
@@ -164,8 +164,9 @@ O arquivo `CITATION.cff` traz os mesmos metadados (o GitHub mostra "Cite this re
 | `js/axc/metrics.js` | entradas de teste, métricas de erro, histograma, mapa de erro, fronteira de Pareto |
 | `js/axc/image.js`, `js/axc/ssim.js` | imagem de teste, leitura de PPM, PGM e PBM, filtros, PSNR; SSIM padrão e a sua estimativa a partir dos momentos do erro |
 | `js/axc/vos.js` | escalonamento de tensão (atraso, tempo de chegada, captura) e memória aproximada |
-| `js/axc/lenet.js`, `js/lenet-app.js` | inferência inteira da LeNet-5 com a tabela de produtos da unidade; a página `lenet.html` |
-| `scripts/lenet5/train.py` | treino da LeNet-5 com NumPy e quantização em 8 bits (gera `data/lenet5.json` e `data/mnist1000.bin`) |
+| `js/axc/nn.js`, `js/axc/nnsvg.js`, `js/lenet-app.js` | inferência inteira das redes do formato `axc-nn/1` com a tabela de produtos e o somador das unidades; o diagrama da arquitetura em SVG; a página `lenet.html` |
+| `scripts/nn/import.mjs` | gera as redes de `data/nn/` a partir da saída de `train.py` ou dos cabeçalhos C da MiniLenet, com a acurácia e as classes da rede exata |
+| `scripts/lenet5/train.py` | treino da LeNet 5 com NumPy e quantização em 8 bits (gera `data/lenet5.json` e `data/mnist1000.bin`; `scripts/nn/import.mjs` converte para `data/nn/`) |
 | `scripts/sky130/voltage.py` | atraso e energia das células sky130 por canto de tensão e ajuste da lei de potência alfa |
 | `js/axc/stochastic.js` | computação estocástica: geradores (LFSR, Sobol), fluxos, operações, erro, custo, falhas e o filtro com MUX |
 | `js/axc/verilog.js` | exportação em Verilog, testbench e vetores de teste |
@@ -202,6 +203,15 @@ Ajustes pendentes da síntese de alto nível, para retomar:
 * estimativa do SSIM com erros correlacionados no espaço (otimista no Sobel com subtrações truncadas), ou o SSIM medido na decisão;
 * calibrar o custo dos multiplicadores aproximados com operando constante (causa da ordenação errada no FIR da quarta rodada);
 * sintetizar e caracterizar as unidades de 9 a 15 bits (sky130 e Vivado), para custos medidos nessas larguras.
+
+Redes neurais (a etapa 1, formato comum, avaliador genérico, MiniLenet e diagrama, está feita):
+
+* etapa 2: treino e quantização fora do navegador (PyTorch, na convenção da MiniLenet) para MNIST, Fashion MNIST e CIFAR 10, com conjunto de validação separado;
+* etapa 3: somadores de 24 e 32 bits nas acumulações (caracterização sky130 e Vivado) e acumulação em cadeia ou em árvore;
+* etapa 4: gerador de C a partir da descrição da rede, no estilo do template da MiniLenet, e custo pelo motor de HLS;
+* etapa 5: diretivas por camada (pipeline, II, paralelismo dos MACs, partição);
+* etapa 6: busca na página da rede, com restrição de queda de acurácia;
+* etapa 7: exportação do projeto para o Vitis e o Vivado.
 
 * Exploração: diretivas com valores numéricos (II, fatores de unroll e de partição) e exploração em lote de vários kernels; estimativa do SSIM com erros correlacionados no espaço.
 * Recorrências com somadores aproximados no modelo de erro (execuções consecutivas no perfil).
@@ -248,6 +258,7 @@ As técnicas e os modelos do simulador vêm destes trabalhos (a mesma lista est�
 * B. Jacob, S. Kligys, B. Chen, M. Zhu, M. Tang, A. Howard, H. Adam e D. Kalenichenko. "Quantization and training of neural networks for efficient integer-arithmetic-only inference". *IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)*, 2018. DOI: [10.1109/CVPR.2018.00286](https://doi.org/10.1109/CVPR.2018.00286).
 * S. Venkataramani, A. Ranjan, K. Roy e A. Raghunathan. "AxNN: energy-efficient neuromorphic systems using approximate computing". *International Symposium on Low Power Electronics and Design (ISLPED)*, 2014. DOI: [10.1145/2627369.2627613](https://doi.org/10.1145/2627369.2627613).
 * V. Mrázek, S. S. Sarwar, L. Sekanina, Z. Vašíček e K. Roy. "Design of power-efficient approximate multipliers for approximate artificial neural networks". *IEEE/ACM International Conference on Computer-Aided Design (ICCAD)*, 2016. DOI: [10.1145/2966986.2967021](https://doi.org/10.1145/2966986.2967021).
+* A. LeNail. "NN-SVG: publication-ready neural network architecture schematics". *Journal of Open Source Software, vol. 4, n. 33, 747*, 2019. DOI: [10.21105/joss.00747](https://doi.org/10.21105/joss.00747).
 
 ### Computação estocástica
 

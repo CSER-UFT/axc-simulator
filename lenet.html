@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Rede neural aproximada</title>
-        <meta name="description" content="LeNet-5 quantizada em 8 bits no MNIST com multiplicadores e somadores aproximados da biblioteca: acurácia, matriz de confusão, sensibilidade por camada." />
+        <meta name="description" content="Redes convolucionais quantizadas em 8 bits (LeNet 5, MiniLenet) com multiplicadores e somadores aproximados da biblioteca: acurácia, matriz de confusão, sensibilidade por camada e arquitetura." />
         <link rel="icon" href="./svg/cpu.svg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -33,7 +33,9 @@
         <main>
             <div>
                 <section>
-                    <h2 data-i18n="nn.units">Unidades</h2>
+                    <h2 data-i18n="nn.modelTitle">Rede</h2>
+                    <label><span data-i18n="nn.model">Modelo</span> <select id="nnModel"></select></label>
+                    <h2 style="margin-top:12px" data-i18n="nn.units">Unidades</h2>
                     <label><span data-i18n="nn.mul">Multiplicador</span> <select id="nnMul"></select></label>
                     <label><span data-i18n="nn.adder">Somador das acumulações</span> <select id="nnAdder"></select></label>
                     <div id="nnUnitInfo"></div>
@@ -52,10 +54,13 @@
             </div>
             <div>
                 <section>
-                    <p class="note" data-i18n="nn.introPage">Uma LeNet-5 treinada no MNIST e quantizada em 8 bits classifica 1000 dígitos de teste. Nas camadas marcadas, os produtos são feitos pelo multiplicador escolhido e as somas pelo somador escolhido. A referência é a mesma rede exata.</p>
+                    <p class="note" data-i18n="nn.introPage">Uma rede convolucional quantizada em 8 bits classifica as imagens de teste da sua base. Nas camadas marcadas, os produtos são feitos pelo multiplicador escolhido e as somas pelo somador escolhido. A referência é a mesma rede exata.</p>
                     <p class="note" id="nnNote"></p>
                     <h3 data-i18n="nn.conf">Matriz de confusão (linhas: dígito real; colunas: previsto)</h3>
                     <div class="scroll-box" id="nnConf"></div>
+                    <h3 style="margin-top:14px" data-i18n="nn.arch">Arquitetura</h3>
+                    <div class="nn-arch-box" id="nnArch"></div>
+                    <p class="note" data-i18n="nn.archNote">Formas dos tensores em canais@altura×largura. O quadrado destacado é o núcleo da convolução (ou a janela do pooling) e o ponto que ele produz na camada seguinte.</p>
                     <h3 style="margin-top:14px" data-i18n="nn.broke">Dígitos que a rede exata acerta e a aproximada erra</h3>
                     <div id="nnBroke" class="digit-grid"></div>
                 </section>

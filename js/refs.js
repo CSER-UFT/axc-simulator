@@ -37,6 +37,7 @@ export const REFS = {
     mrazek2017: { authors: ['V. Mrázek', 'R. Hrbáček', 'Z. Vašíček', 'L. Sekanina'], year: 2017, title: 'EvoApprox8b: library of approximate adders and multipliers for circuit design and benchmarking of approximation methods', venue: 'Design, Automation and Test in Europe (DATE)', doi: '10.23919/DATE.2017.7926993' },
     mrazek2016: { authors: ['V. Mrázek', 'S. S. Sarwar', 'L. Sekanina', 'Z. Vašíček', 'K. Roy'], year: 2016, title: 'Design of power-efficient approximate multipliers for approximate artificial neural networks', venue: 'IEEE/ACM International Conference on Computer-Aided Design (ICCAD)', doi: '10.1145/2966986.2967021' },
     jacob2018: { authors: ['B. Jacob', 'S. Kligys', 'B. Chen', 'M. Zhu', 'M. Tang', 'A. Howard', 'H. Adam', 'D. Kalenichenko'], year: 2018, title: 'Quantization and training of neural networks for efficient integer-arithmetic-only inference', venue: 'IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)', doi: '10.1109/CVPR.2018.00286' },
+    lenail2019: { authors: ['A. LeNail'], year: 2019, title: 'NN-SVG: publication-ready neural network architecture schematics', venue: 'Journal of Open Source Software, vol. 4, n. 33, 747', doi: '10.21105/joss.00747' },
     mnist: { authors: ['Y. LeCun', 'C. Cortes', 'C. J. C. Burges'], title: 'The MNIST database of handwritten digits (licença CC BY-SA 3.0)', venue: 'software', url: 'http://yann.lecun.com/exdb/mnist/' },
     yosys: { authors: ['C. Wolf'], title: 'Yosys Open SYnthesis Suite', venue: 'software', url: 'https://yosyshq.net/yosys/' },
     iverilog: { authors: ['S. Williams'], title: 'Icarus Verilog', venue: 'software', url: 'https://steveicarus.github.io/iverilog/' },
@@ -64,7 +65,7 @@ export const REF_GROUPS = [
     { key: 'arith', keys: ['booth1951', 'macsorley1961', 'mitchell1962', 'wallace1964', 'dadda1965', 'schulte1993', 'mahdiani2010', 'kulkarni2011', 'kahng2012', 'momeni2015', 'hashemi2015', 'shafique2015', 'venkatachalam2017', 'jiang2020'] },
     { key: 'eval', keys: ['liang2013', 'wang2004', 'satopaa2011', 'chandrakasan1992', 'mrazek2017'] },
     { key: 'vos', keys: ['sakurai1990', 'liu2011'] },
-    { key: 'nn', keys: ['lecun1998', 'mnist', 'jacob2018', 'venkataramani2014', 'mrazek2016'] },
+    { key: 'nn', keys: ['lecun1998', 'mnist', 'jacob2018', 'venkataramani2014', 'mrazek2016', 'lenail2019'] },
     { key: 'sc', keys: ['gaines1969', 'alaghi2013', 'alaghi2013corr', 'alaghi2014', 'sobol1967', 'joe2008'] },
     { key: 'tools', keys: ['iverilog', 'yosys', 'brayton2010', 'sky130', 'opensta'] },
 ];
