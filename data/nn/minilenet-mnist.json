@@ -31,7 +31,12 @@
    "8",
    "9"
   ],
-  "note": "1000 imagens do conjunto de teste do MNIST (100 de cada dígito), licença CC BY-SA 3.0"
+  "note": "1000 imagens do conjunto de teste do MNIST (100 de cada dígito), licença CC BY-SA 3.0",
+  "val": {
+   "file": "data/nn/mnist-val1000.bin",
+   "n": 1000,
+   "note": "imagens de treino do MNIST que a MiniLenet da UPV pode ter usado no treino"
+  }
  },
  "input": {
   "mean": 0.1307,

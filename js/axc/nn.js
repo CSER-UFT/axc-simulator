@@ -97,7 +97,9 @@ export function decodeNet(json) {
     if (!sites.length || !sites[sites.length - 1]) throw new Error('rede sem camadas com pesos');
     return {
         id: json.id, name: json.name, description: json.description ?? '', source: json.source ?? null,
-        dataset: ds, input: json.input ?? null, inputLut: inputTable(json.input),
+        dataset: ds, input: json.input ?? null,
+        // Uma tabela por canal de entrada (a normalização pode ser por canal, como na CIFAR 10).
+        inputLuts: Array.from({ length: ds.shape.length === 3 ? ds.shape[0] : 1 }, (_, c) => inputTable(json.input, c)),
         layers, sites, classes: shape[0],
         accuracy: json.accuracy ?? {}, expected: json.expected ? fromB64(json.expected) : null,
     };
@@ -286,7 +288,8 @@ function makeScratch() {
  */
 export function infer(net, img, tables, adds = [], scratch = makeScratch()) {
     let x = new Uint8Array(img.length);
-    for (let i = 0; i < img.length; i++) x[i] = net.inputLut[img[i]];
+    const luts = net.inputLuts, plane = img.length / luts.length;
+    for (let c = 0, i = 0; c < luts.length; c++) { const T = luts[c]; for (let e = i + plane; i < e; i++) x[i] = T[img[i]]; }
     let si = 0, out = null;
     for (const l of net.layers) {
         if (l.type === 'conv' || l.type === 'dense') {

@@ -2,6 +2,10 @@
  "format": "axc-nn/1",
  "models": [
   { "id": "minilenet-mnist", "file": "data/nn/minilenet-mnist.json", "name": "MiniLenet", "dataset": "MNIST" },
-  { "id": "lenet5-mnist", "file": "data/nn/lenet5-mnist.json", "name": "LeNet 5", "dataset": "MNIST" }
+  { "id": "lenet5-mnist", "file": "data/nn/lenet5-mnist.json", "name": "LeNet 5", "dataset": "MNIST" },
+  { "id": "minilenet-fashion", "file": "data/nn/minilenet-fashion.json", "name": "MiniLenet", "dataset": "Fashion MNIST" },
+  { "id": "lenet5-fashion", "file": "data/nn/lenet5-fashion.json", "name": "LeNet 5", "dataset": "Fashion MNIST" },
+  { "id": "minilenet-cifar10", "file": "data/nn/minilenet-cifar10.json", "name": "MiniLenet", "dataset": "CIFAR 10" },
+  { "id": "lenet5-cifar10", "file": "data/nn/lenet5-cifar10.json", "name": "LeNet 5", "dataset": "CIFAR 10" }
  ]
 }

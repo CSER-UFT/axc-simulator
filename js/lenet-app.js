@@ -169,7 +169,7 @@ function modelNote(net) {
     const macs = macsPerSite(net).reduce((a, b) => a + b, 0);
     const weights = net.sites.reduce((a, l) => a + l.w.length, 0);
     let h = t('nn.modelInfo', { name: net.name, dataset: net.dataset.name, n: net.dataset.n, weights: nf(weights), macs: nf(macs) });
-    if (net.id === 'lenet5-mnist') h += ` ${t('nn.noteLenet5', { float: pct(net.accuracy.float), int8: pct(net.accuracy.int8Full) })}`;
+    if (net.source?.script === 'scripts/nn/train.py') h += ` ${t('nn.noteTrained', { epochs: net.source.epochs, float: pct(net.accuracy.float), int8: pct(net.accuracy.int8Full) })}`;
     else if (net.id === 'minilenet-mnist') h += ` ${t('nn.noteMini')}`;
     return `${h} ${t('nn.noteUnits')}`;
 }
@@ -216,15 +216,18 @@ async function render() {
     h += '</table>';
     $('nnTable').innerHTML = h;
     $('nnNote').innerHTML = modelNote(net) + (refUnitPreds ? ` ${t('nn.booth8')}` : '') + (setup.add ? ` ${t('nn.adderNote', { n: setup.add.cfg.width })}` : '');
+    // Nomes curtos (dígitos) vão direto na matriz; nomes longos viram índices, com a legenda embaixo.
     const names = net.dataset.classes ?? Array.from({ length: classes }, (_, k) => String(k));
-    let c = `<table class="conf"><tr><th></th>${names.map((k) => `<th>${esc(k)}</th>`).join('')}</tr>`;
+    const short = names.every((n) => n.length <= 2) ? names : names.map((_, k) => String(k));
+    let c = `<table class="conf"><tr><th></th>${short.map((k, i) => `<th title="${esc(names[i])}">${esc(k)}</th>`).join('')}</tr>`;
     su.conf.forEach((row, y) => {
         const n = row.reduce((a, b) => a + b, 0) || 1;
-        c += `<tr><th>${esc(names[y])}</th>${row.map((v, p) => `<td class="${p === y ? 'diag' : v ? 'off' : ''}" style="--v:${p === y ? (0.15 + 0.6 * v / n).toFixed(2) : Math.min(1, 0.25 + v / 20).toFixed(2)}">${v || ''}</td>`).join('')}</tr>`;
+        c += `<tr><th title="${esc(names[y])}">${esc(short[y])}</th>${row.map((v, p) => `<td class="${p === y ? 'diag' : v ? 'off' : ''}" style="--v:${p === y ? (0.15 + 0.6 * v / n).toFixed(2) : Math.min(1, 0.25 + v / 20).toFixed(2)}">${v || ''}</td>`).join('')}</tr>`;
     });
-    $('nnConf').innerHTML = `${c}</table>`;
+    const legend = short === names ? '' : `<p class="note">${names.map((n, k) => `${k} ${esc(n)}`).join(', ')}</p>`;
+    $('nnConf').innerHTML = `${c}</table>${legend}`;
     const shown = su.broke.slice(0, 60);
-    $('nnBroke').innerHTML = shown.length ? shown.map((k) => `<figure><canvas data-k="${k}"></canvas><figcaption>${esc(names[test.labels[k]])} → ${esc(names[preds[k]])}</figcaption></figure>`).join('')
+    $('nnBroke').innerHTML = shown.length ? shown.map((k) => `<figure title="${esc(names[test.labels[k]])} → ${esc(names[preds[k]])}"><canvas data-k="${k}"></canvas><figcaption>${esc(short[test.labels[k]])} → ${esc(short[preds[k]])}</figcaption></figure>`).join('')
         + (su.broke.length > shown.length ? `<p class="note">${t('nn.more', { n: su.broke.length - shown.length })}</p>` : '')
         : `<p class="note">${t('nn.noneBroke')}</p>`;
     for (const cv of $('nnBroke').querySelectorAll('canvas')) drawImage(cv, test.images.subarray(+cv.dataset.k * test.size, (+cv.dataset.k + 1) * test.size), test.shape);

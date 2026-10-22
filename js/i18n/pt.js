@@ -119,7 +119,7 @@ export default {
     'nn.archFlatten': 'flatten',
     'nn.archDense': 'densa',
     'nn.modelInfo': '{name} na base {dataset} ({n} imagens de teste): {weights} pesos e {macs} multiplicações por imagem.',
-    'nn.noteLenet5': 'Treinada com scripts/lenet5/train.py (só NumPy) e quantizada depois do treino: pesos de −127 a 127, ativações de 0 a 255 e uma escala por camada, em ponto flutuante. No teste completo de 10 mil imagens, a acurácia é {float} em ponto flutuante e {int8} em 8 bits.',
+    'nn.noteTrained': 'Treinada com scripts/nn/train.py (PyTorch, {epochs} épocas, com 5000 imagens de treino separadas para validação) e quantizada depois do treino na convenção da MiniLenet: pesos int8 por canal, ativações uint8 com ponto zero e reescala em Q32. No teste completo de 10 mil imagens, a acurácia é {float} em ponto flutuante e {int8} em 8 bits.',
     'nn.noteMini': 'Pesos e escalas do código C para o Vitis (Universitat Politècnica de València, licença MIT): reescala em Q32 com pontos zero, como na função requantize do C, e o ponto zero da entrada de cada camada absorvido no viés, de modo que todo produto é uint8 × int8. Com as unidades exatas, as saídas são iguais às do C bit a bit, com o max pooling em uint8.',
     'nn.noteUnits': 'Nas unidades sem sinal, a unidade calcula |peso| × ativação e o sinal é aplicado de forma exata; nas de 16 bits, os operandos ocupam os bits baixos. O viés pesa mais que o erro médio: cada saída soma centenas de produtos, e um erro sempre do mesmo lado se acumula, enquanto erros dos dois lados se cancelam.',
     'tab.vos': 'Tensão e memória',

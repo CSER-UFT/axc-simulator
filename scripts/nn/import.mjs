@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 /**
- * Gera uma rede no formato axc-nn/1 (js/axc/nn.js) a partir de:
- *
- *   lenet5 <data/lenet5.json>
- *       a LeNet 5 de scripts/lenet5/train.py (reescala com M em ponto flutuante, entrada = pixel);
+ * Gera uma rede no formato axc-nn/1 (js/axc/nn.js) a partir dos cabeçalhos C de um projeto para o Vitis:
  *
  *   upv <cnn_defines.h> <pesos.h> [--mean 0.1307] [--std 0.3081] [--qmax 127]
  *       a MiniLenet do código C para o Vitis (cabeçalhos no formato do grupo DEFADAS/ITACA da Universitat
@@ -32,30 +29,9 @@ const MNIST = {
     classes: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
     note: '1000 imagens do conjunto de teste do MNIST (100 de cada dígito), licença CC BY-SA 3.0',
 };
-
-// LeNet 5 de train.py ------------------------------------------------------------------------------------------
-function fromLenet5(path) {
-    const j = JSON.parse(readFileSync(path, 'utf8'));
-    const [c1, c2, f1, f2, f3] = j.layers;
-    const rq = (L) => (L.M == null ? undefined : { mode: 'float', M: L.M, zero: 0 });
-    return {
-        format: FORMAT, id: 'lenet5-mnist', name: 'LeNet 5',
-        description: 'LeNet 5 (ReLU, max pooling) treinada com scripts/lenet5/train.py; pesos int8, ativações uint8, reescala com M em ponto flutuante',
-        source: { script: 'scripts/lenet5/train.py', from: 'data/lenet5.json' },
-        dataset: MNIST, input: null,
-        layers: [
-            { type: 'conv', name: 'conv1', out: c1.shape[0], k: 5, pad: 2, stride: 1, w: c1.w, b: c1.b, requant: rq(c1) },
-            { type: 'maxpool', size: 2 },
-            { type: 'conv', name: 'conv2', out: c2.shape[0], k: 5, pad: 0, stride: 1, w: c2.w, b: c2.b, requant: rq(c2) },
-            { type: 'maxpool', size: 2 },
-            { type: 'flatten' },
-            { type: 'dense', name: 'fc1', out: f1.shape[0], w: f1.w, b: f1.b, requant: rq(f1) },
-            { type: 'dense', name: 'fc2', out: f2.shape[0], w: f2.w, b: f2.b, requant: rq(f2) },
-            { type: 'dense', name: 'fc3', out: f3.shape[0], w: f3.w, b: f3.b },
-        ],
-        accuracy: { float: j.accuracy.float, int8Full: j.accuracy.int8 },
-    };
-}
+// Validação: 100 imagens de cada dígito das 5000 de treino que scripts/nn/train.py deixa de fora (semente 1). A
+// MiniLenet da UPV foi treinada em outro lugar e pode ter visto essas imagens; para ela, a validação não é separada.
+const MNIST_VAL = { file: 'data/nn/mnist-val1000.bin', n: 1000 };
 
 // Cabeçalhos C da MiniLenet -------------------------------------------------------------------------------------
 function parseDefines(text) {
@@ -126,7 +102,7 @@ function fromUpv(definesPath, weightsPath) {
             license: 'MIT',
             training: 'https://git.upv.es/defadas/MiniLenetPython',
         },
-        dataset: { ...MNIST, shape: [C, d('IMAGE_HEIGHT'), d('IMAGE_WIDTH')] },
+        dataset: { ...MNIST, shape: [C, d('IMAGE_HEIGHT'), d('IMAGE_WIDTH')], val: { ...MNIST_VAL, note: 'imagens de treino do MNIST que a MiniLenet da UPV pode ter usado no treino' } },
         input: { mean, std, scale, zero, qmin: 0, qmax, note: 'escala deduzida (mínimo e máximo do MNIST normalizado, faixa 0 a qmax); o ponto zero confere com ZERO_IMAGE' },
         layers: [
             layer('conv', 'conv1', K1, 'KERNELQ_CONV_1', 'BIAS_CONV1', 'M_CONV1', zImg, z1, { k: k1, pad, stride: 1 }),
@@ -145,9 +121,8 @@ function fromUpv(definesPath, weightsPath) {
 // --------------------------------------------------------------------------------------------------------------
 const kind = pos[0];
 let json;
-if (kind === 'lenet5') json = fromLenet5(pos[1] ?? 'data/lenet5.json');
-else if (kind === 'upv') json = fromUpv(pos[1] ?? die('falta cnn_defines.h'), pos[2] ?? die('falta o .h dos pesos'));
-else die('uso: import.mjs lenet5 <lenet5.json> | upv <cnn_defines.h> <pesos.h> [--out arquivo]');
+if (kind === 'upv') json = fromUpv(pos[1] ?? die('falta cnn_defines.h'), pos[2] ?? die('falta o .h dos pesos'));
+else die('uso: import.mjs upv <cnn_defines.h> <pesos.h> [--out arquivo]  (as redes treinadas aqui saem de scripts/nn/train.py)');
 if (opt('--id')) json.id = opt('--id');
 if (opt('--name')) json.name = opt('--name');
 const inputs = json.expectedInputs;

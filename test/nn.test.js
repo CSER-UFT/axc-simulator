@@ -13,18 +13,25 @@ const load = (id) => {
 const lenet = load('lenet5-mnist'), mini = load('minilenet-mnist');
 const run = ({ net, test }, T, adds = [], n = test.n) => classifyRange(net, test, net.sites.map(() => T), adds, 0, n, new Uint8Array(n));
 
-test('registro de modelos: cada arquivo existe e tem o mesmo id', () => {
-    const reg = JSON.parse(readFileSync(new URL('../data/nn/models.json', import.meta.url), 'utf8'));
-    for (const m of reg.models) assert.equal(JSON.parse(readFileSync(new URL(`../${m.file}`, import.meta.url), 'utf8')).id, m.id);
+const registry = JSON.parse(readFileSync(new URL('../data/nn/models.json', import.meta.url), 'utf8'));
+
+test('registro de modelos: cada arquivo existe, tem o mesmo id e a base tem teste e validação', () => {
+    for (const m of registry.models) {
+        const j = JSON.parse(readFileSync(new URL(`../${m.file}`, import.meta.url), 'utf8'));
+        assert.equal(j.id, m.id);
+        const size = j.dataset.shape.reduce((a, b) => a * b, 1);
+        assert.equal(readFileSync(new URL(`../${j.dataset.file}`, import.meta.url)).length, j.dataset.n * (1 + size), m.id);
+        if (j.dataset.val) assert.equal(readFileSync(new URL(`../${j.dataset.val.file}`, import.meta.url)).length, j.dataset.val.n * (1 + size), m.id);
+    }
 });
 
-test('LeNet 5: a inferência genérica dá as mesmas classes do script em Python', () => {
-    const p = run(lenet, productTable(null));
-    assert.deepEqual([...p], [...lenet.net.expected]);
-    // As classes do script de treino (formato antigo) são as mesmas.
-    const old = JSON.parse(readFileSync(new URL('../data/lenet5.json', import.meta.url), 'utf8'));
-    assert.equal(lenet.json.expected, old.expected);
-    assert.ok(Math.abs(summarize(lenet.test, p).accuracy - 0.984) < 1e-9);
+test('todas as redes: a inferência no navegador dá as mesmas classes da inferência inteira do script que as gerou', () => {
+    for (const m of registry.models) {
+        const r = load(m.id);
+        const p = run(r, productTable(null));
+        assert.deepEqual([...p], [...r.net.expected], m.id);
+        assert.ok(Math.abs(summarize(r.test, p, null, r.net.classes).accuracy - r.json.accuracy.int8Subset) < 1e-9, m.id);
+    }
     assert.deepEqual(macsPerSite(lenet.net), [117600, 240000, 48000, 10080, 840]);
 });
 

@@ -13,7 +13,7 @@ export const heads = {
     },
     lenet: {
         title: 'Rede neural aproximada',
-        lead: 'Redes convolucionais quantizadas em 8 bits (LeNet 5 e MiniLenet) classificam 1000 imagens do MNIST com os multiplicadores e somadores da biblioteca, camada por camada, e mostram o efeito na acurácia.',
+        lead: 'Redes convolucionais quantizadas em 8 bits (LeNet 5 e MiniLenet) classificam 1000 imagens do MNIST, do Fashion MNIST ou da CIFAR 10 com os multiplicadores e somadores da biblioteca, camada por camada, e mostram o efeito na acurácia.',
     },
 };
 
@@ -145,13 +145,13 @@ npm run vivado:units         # caracterização das unidades no Vivado</pre>
         title: 'Primeiros passos',
         html: `
 <ol>
-    <li>Escolha o <strong>modelo</strong>: a MiniLenet (do código C para o Vitis) ou a LeNet 5. O diagrama da arquitetura, embaixo da matriz de confusão, mostra as camadas e as formas dos tensores.</li>
+    <li>Escolha o <strong>modelo</strong>: a MiniLenet ou a LeNet 5, no MNIST, no Fashion MNIST ou na CIFAR 10 (a MiniLenet do MNIST vem do código C para o Vitis). O diagrama da arquitetura, embaixo da matriz de confusão, mostra as camadas e as formas dos tensores.</li>
     <li>Escolha o <strong>multiplicador</strong> e, se quiser, o <strong>somador das acumulações</strong> entre as unidades da biblioteca. Da página de unidades, o botão <strong>Usar na LeNet-5</strong> abre esta página com a unidade de lá.</li>
     <li>Marque as <strong>camadas</strong> que usam as unidades aproximadas; as outras ficam exatas.</li>
     <li>A cada mudança, a página classifica as imagens de novo e mostra a acurácia nas 1000 imagens, contra a da rede exata, a matriz de confusão e as imagens que passaram a errar.</li>
     <li>O botão de <strong>sensibilidade</strong> aproxima uma camada por vez e mostra quanto cada uma custa em acurácia e quantas multiplicações ela faz.</li>
 </ol>
-<p class="tip">Para começar: o MUL8 Mitchell em todas as camadas quase não muda a acurácia das duas redes; com a compensação do viés, embora o erro médio da unidade seja menor, a LeNet 5 cai uns 4 pontos e a MiniLenet, menor e com pontos zero, cai para 49%.</p>`,
+<p class="tip">Para começar: o MUL8 Mitchell em todas as camadas quase não muda a acurácia das duas redes; com a compensação do viés, embora o erro médio da unidade seja menor, a LeNet 5 cai para 82% e a MiniLenet, menor, para 49%.</p>`,
     },
 ];
 

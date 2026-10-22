@@ -119,7 +119,7 @@ export default {
     'nn.archFlatten': 'flatten',
     'nn.archDense': 'dense',
     'nn.modelInfo': '{name} on {dataset} ({n} test images): {weights} weights and {macs} multiplications per image.',
-    'nn.noteLenet5': 'Trained with scripts/lenet5/train.py (NumPy only) and quantized after training: weights from −127 to 127, activations from 0 to 255 and one floating point scale per layer. On the full test set of 10 thousand images, the accuracy is {float} in floating point and {int8} in 8 bits.',
+    'nn.noteTrained': 'Trained with scripts/nn/train.py (PyTorch, {epochs} epochs, with 5000 training images held out for validation) and quantized after training in the MiniLenet convention: per channel int8 weights, uint8 activations with a zero point and Q32 requantization. On the full test set of 10 thousand images, the accuracy is {float} in floating point and {int8} in 8 bits.',
     'nn.noteMini': 'Weights and scales from the C code for Vitis (Universitat Politècnica de València, MIT license): Q32 requantization with zero points, as in the requantize function of the C code, and the input zero point of each layer folded into the bias, so every product is uint8 × int8. With the exact units, the outputs match the C code bit for bit, with max pooling in uint8.',
     'nn.noteUnits': 'In unsigned units, the unit computes |weight| × activation and the sign is applied exactly; in 16 bit units, the operands take the low bits. Bias matters more than mean error: each output adds hundreds of products, and an error always on the same side accumulates, while errors on both sides cancel out.',
     'tab.vos': 'Voltage and memory',

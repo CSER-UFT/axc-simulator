@@ -12,7 +12,7 @@ export const heads = {
     },
     lenet: {
         title: 'Approximate neural network',
-        lead: '8 bit quantized convolutional networks (LeNet 5 and MiniLenet) classify 1000 MNIST images with the multipliers and adders of the library, layer by layer, and show the effect on accuracy.',
+        lead: '8 bit quantized convolutional networks (LeNet 5 and MiniLenet) classify 1000 MNIST, Fashion MNIST or CIFAR 10 images with the multipliers and adders of the library, layer by layer, and show the effect on accuracy.',
     },
 };
 
@@ -144,13 +144,13 @@ npm run vivado:units         # characterization of the units in Vivado</pre>
         title: 'Getting started',
         html: `
 <ol>
-    <li>Choose the <strong>model</strong>: MiniLenet (from the C code for Vitis) or LeNet 5. The architecture diagram, below the confusion matrix, shows the layers and the tensor shapes.</li>
+    <li>Choose the <strong>model</strong>: MiniLenet or LeNet 5, on MNIST, Fashion MNIST or CIFAR 10 (MiniLenet on MNIST comes from the C code for Vitis). The architecture diagram, below the confusion matrix, shows the layers and the tensor shapes.</li>
     <li>Choose the <strong>multiplier</strong> and, optionally, the <strong>accumulation adder</strong> among the library units. From the units page, the <strong>Use in LeNet-5</strong> button opens this page with the unit from there.</li>
     <li>Check the <strong>layers</strong> that use the approximate units; the others stay exact.</li>
     <li>On every change, the page classifies the images again and shows the accuracy on the 1000 images, against that of the exact network, the confusion matrix and the images that started to fail.</li>
     <li>The <strong>sensitivity</strong> button approximates one layer at a time and shows how much accuracy each one costs and how many multiplications it does.</li>
 </ol>
-<p class="tip">To start: MUL8 Mitchell on every layer barely changes the accuracy of both networks; with bias compensation, although the mean error of the unit is smaller, LeNet 5 drops about 4 points and MiniLenet, smaller and with zero points, drops to 49%.</p>`,
+<p class="tip">To start: MUL8 Mitchell on every layer barely changes the accuracy of both networks; with bias compensation, although the mean error of the unit is smaller, LeNet 5 drops to 82% and MiniLenet, smaller, to 49%.</p>`,
     },
 ];
 
