@@ -16,6 +16,10 @@
  *              anterior entra no DFG como 'carry' e o novo sai como 'carryout', com a aresta de distância 1.
  */
 import { HlsError, parsePragma, typeOf } from './lang.js';
+import { mulQ32 } from '../axc/nn.js';
+
+/** Reescala das redes (a função requantize do C): (acc × m + 2^31) >> 32, mais z, saturada entre 0 e 255. */
+export const requantValue = (acc, m, z) => Math.min(255, Math.max(0, mulQ32(acc, m) + z));
 
 const MAX_UNROLL = 4096;
 
@@ -149,7 +153,7 @@ export function elaborate(ast, { ports = 2 } = {}) {
         return seg;
     };
     const closeSeg = () => { seg = null; };
-    const PURE = new Set(['add', 'sub', 'mul', 'shl', 'shr', 'and', 'or', 'xor', 'not', 'cmp', 'sel', 'trunc']);
+    const PURE = new Set(['add', 'sub', 'mul', 'shl', 'shr', 'and', 'or', 'xor', 'not', 'cmp', 'sel', 'trunc', 'rq']);
     const COMM = new Set(['add', 'mul', 'and', 'or', 'xor']);
     // Origem de cada operação: a expressão do código e as iterações dos laços desenrolados por estarem dentro de um
     // pipeline (cópias diferentes, como os pesos de uma janela). As cópias pedidas com a diretiva unroll (com ou sem
@@ -323,7 +327,14 @@ export function elaborate(ast, { ports = 2 } = {}) {
                     r.node.range = r.range = [a.range[1] < 0 ? -a.range[1] : 0, m];
                     return r;
                 }
-                throw new HlsError(`função ${e.name} não suportada (só min, max e abs)`, e.line);
+                if (e.name === 'requant') {
+                    // Reescala das redes quantizadas: min(255, max(0, ((acc × m + 2^31) >> 32) + z)), uma peça exata.
+                    if (args.length !== 3) throw new HlsError('requant recebe 3 argumentos (acc, m, z)', e.line);
+                    if (args.every((a) => a.k === 'const')) return cval(requantValue(args[0].v, args[1].v, args[2].v));
+                    const [A, M, Z] = args.map((a) => use(a, e.line));
+                    return emit('rq', [asArg(A), asArg(M), asArg(Z)], [0, 255], e.line);
+                }
+                throw new HlsError(`função ${e.name} não suportada (só min, max, abs e requant)`, e.line);
             }
             default: throw new HlsError('expressão não suportada', e.line);
         }

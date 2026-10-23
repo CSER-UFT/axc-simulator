@@ -166,6 +166,7 @@ O arquivo `CITATION.cff` traz os mesmos metadados (o GitHub mostra "Cite this re
 | `js/axc/image.js`, `js/axc/ssim.js` | imagem de teste, leitura de PPM, PGM e PBM, filtros, PSNR; SSIM padrão e a sua estimativa a partir dos momentos do erro |
 | `js/axc/vos.js` | escalonamento de tensão (atraso, tempo de chegada, captura) e memória aproximada |
 | `js/axc/nn.js`, `js/axc/nnsvg.js`, `js/lenet-app.js` | inferência inteira das redes do formato `axc-nn/1` com a tabela de produtos e o somador das unidades; o diagrama da arquitetura em SVG; a página `lenet.html` |
+| `js/axc/nngen.js` | gerador do código de cada camada (na linguagem da página de síntese de alto nível) e custo da rede pelo modelo de HLS (`node bin/axc.mjs nncost`) |
 | `scripts/nn/train.py` | treino em PyTorch e quantização das redes de `data/nn/` (MiniLenet e LeNet 5 em MNIST, Fashion MNIST e CIFAR 10), com os subconjuntos de teste e de validação |
 | `scripts/nn/import.mjs` | gera a MiniLenet do MNIST a partir dos cabeçalhos C do projeto para o Vitis, com a acurácia e as classes da rede exata |
 | `scripts/lenet5/train.py` | a LeNet 5 original, treinada com NumPy (gera `data/lenet5.json`, a fonte dos operandos reais de `scripts/operands.mjs`) |
@@ -206,10 +207,10 @@ Ajustes pendentes da síntese de alto nível, para retomar:
 * calibrar o custo dos multiplicadores aproximados com operando constante (causa da ordenação errada no FIR da quarta rodada);
 * sintetizar e caracterizar as unidades de 9 a 15 bits (sky130 e Vivado), para custos medidos nessas larguras.
 
-Redes neurais (feitas: etapa 1, formato comum, avaliador genérico, MiniLenet e diagrama; etapa 2, treino e quantização em PyTorch para MNIST, Fashion MNIST e CIFAR 10, com validação separada; etapa 3, somadores de 24 e 32 bits nas acumulações, sintetizados em sky130 e caracterizados no Vivado, e soma em cadeia ou em árvore):
+Redes neurais (feitas: etapa 1, formato comum, avaliador genérico, MiniLenet e diagrama; etapa 2, treino e quantização em PyTorch para MNIST, Fashion MNIST e CIFAR 10, com validação separada; etapa 3, somadores de 24 e 32 bits nas acumulações, sintetizados em sky130 e caracterizados no Vivado, e soma em cadeia ou em árvore; etapa 4, gerador de código das camadas e custo do hardware pelo modelo de HLS, com a reescala como peça exata):
 
+* validar o custo da etapa 4 com os relatórios do Vitis da MiniLenet (latência e II de cada função, LUT, FF, DSP);
 * a síntese de alto nível ainda faz o somador de 32 bits como dois de 16 em cascata; pode passar a usar os de 24 e 32 bits da biblioteca;
-* etapa 4: gerador de C a partir da descrição da rede, no estilo do template da MiniLenet, e custo pelo motor de HLS;
 * etapa 5: diretivas por camada (pipeline, II, paralelismo dos MACs, partição);
 * etapa 6: busca na página da rede, com restrição de queda de acurácia;
 * etapa 7: exportação do projeto para o Vitis e o Vivado.

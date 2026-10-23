@@ -8,6 +8,7 @@ import { buildUnit, unitName } from './axc/units.js';
 import { testInputs, errorMetrics } from './axc/metrics.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize, macsPerSite } from './axc/nn.js';
 import { archSvg } from './axc/nnsvg.js';
+import { networkCost } from './axc/nngen.js';
 import { esc } from './ui/plots.js';
 import { Help } from './ui/help.js';
 import { initFigureExport } from './ui/figexport.js';
@@ -51,7 +52,7 @@ function fillSelects() {
     $('nnMul').innerHTML = (fromUnits ? `<option value="units">${esc(t('nn.fromUnits', { name: dn(unitName(fromUnits)) }))}</option>` : '')
         + `<option value="exact">${t('nn.mulExact')}</option>${group('mul', 8)}${group('mul', 16)}`;
     $('nnAdder').innerHTML = `<option value="exact">${t('nn.adderExact')}</option>${group('add', 8)}${group('add', 16)}${group('add', 24)}${group('add', 32)}`;
-    $('nnAccum').value = store.get('nn.nnAccum') === 'tree' ? 'tree' : 'chain';
+    $('nnAccum').value = ['chain', 'tree', 'arch'].includes(store.get('nn.nnAccum')) ? store.get('nn.nnAccum') : 'arch';
     const set = (id, v) => { $(id).value = [...$(id).options].some((o) => o.value === v) ? v : 'exact'; };
     set('nnMul', mulV);
     set('nnAdder', addV);
@@ -82,15 +83,16 @@ function tableOf(unit) {
     if (!tableCache.has(key)) tableCache.set(key, productTable(unit));
     return tableCache.get(key);
 }
-// Estrutura da soma nas camadas com o somador aproximado: em cadeia (1) ou numa árvore com todos os termos (0).
-const accumTree = () => $('nnAccum').value === 'tree';
-const nnKey = (mul, add, mask) => `${nnData.net.id}|${mul ? unitName(mul.cfg) : 'exata'}|${add ? `${unitName(add.cfg)}|${accumTree() ? 'árvore' : 'cadeia'}` : 'exato'}|${mask.join('')}`;
+// Estrutura da soma nas camadas com o somador aproximado: em cadeia (1) ou numa árvore com todos os termos (0); como
+// na arquitetura do código gerado (js/axc/nngen.js): convoluções em árvore (a janela desenrolada) e densas em cadeia.
+const accumMode = () => $('nnAccum').value;
+const treeOf = (l) => (accumMode() === 'tree' || (accumMode() === 'arch' && l.type === 'conv') ? 0 : 1);
+const nnKey = (mul, add, mask) => `${nnData.net.id}|${mul ? unitName(mul.cfg) : 'exata'}|${add ? `${unitName(add.cfg)}|${accumMode()}` : 'exato'}|${mask.join('')}`;
 function nnSetup(mask) {
     const { mul, add } = nnUnits();
     const Tu = tableOf(mul), Tx = tableOf(null);
     const accum = add ? adderAccumulate(add) : null;
-    const tree = accumTree() ? 0 : 1;
-    return { mul, add, tables: mask.map((m) => (m ? Tu : Tx)), adds: mask.map((m) => (m ? accum : null)), trees: mask.map(() => tree), key: nnKey(mul, add, mask) };
+    return { mul, add, tables: mask.map((m) => (m ? Tu : Tx)), adds: mask.map((m) => (m ? accum : null)), trees: nnData.net.sites.map(treeOf), key: nnKey(mul, add, mask) };
 }
 
 const getJson = (f) => fetch(f).then((r) => (r.ok ? r.json() : Promise.reject(new Error(f))));
@@ -219,7 +221,7 @@ async function render() {
     h += `<tr><th>${t('nn.approxMacs')}</th><td class="mono">${nf(approxMacs)} ${t('nn.of')} ${nf(total)} (${pct(approxMacs / total)})</td></tr>`;
     h += '</table>';
     $('nnTable').innerHTML = h;
-    $('nnNote').innerHTML = modelNote(net) + (refUnitPreds ? ` ${t('nn.booth8')}` : '') + (setup.add ? ` ${t(setup.add.cfg.width >= 32 ? 'nn.adderNote32' : 'nn.adderNote', { n: setup.add.cfg.width })} ${t(accumTree() ? 'nn.accumTreeNote' : 'nn.accumChainNote')}` : '');
+    $('nnNote').innerHTML = modelNote(net) + (refUnitPreds ? ` ${t('nn.booth8')}` : '') + (setup.add ? ` ${t(setup.add.cfg.width >= 32 ? 'nn.adderNote32' : 'nn.adderNote', { n: setup.add.cfg.width })} ${t({ tree: 'nn.accumTreeNote', chain: 'nn.accumChainNote', arch: 'nn.accumArchNote' }[accumMode()])}` : '');
     // Nomes curtos (dígitos) vão direto na matriz; nomes longos viram índices, com a legenda embaixo.
     const names = net.dataset.classes ?? Array.from({ length: classes }, (_, k) => String(k));
     const short = names.every((n) => n.length <= 2) ? names : names.map((_, k) => String(k));
@@ -235,7 +237,54 @@ async function render() {
         + (su.broke.length > shown.length ? `<p class="note">${t('nn.more', { n: su.broke.length - shown.length })}</p>` : '')
         : `<p class="note">${t('nn.noneBroke')}</p>`;
     for (const cv of $('nnBroke').querySelectorAll('canvas')) drawImage(cv, test.images.subarray(+cv.dataset.k * test.size, (+cv.dataset.k + 1) * test.size), test.shape);
+    renderCost();
 }
+
+// Custo do hardware ---------------------------------------------------------------------------------------------
+let hlsData = null, costRun = 0;
+const costCache = new Map();
+const loadHls = () => (hlsData ??= Promise.all([getJson('data/hls-cells.json'), getJson('data/vivado-units.json').catch(() => null)]).then(([cells, fpga]) => ({ cells, fpga })));
+/** Custo da configuração e o da rede exata, por camada, pelo modelo de síntese de alto nível (depois da acurácia). */
+async function renderCost() {
+    if (!nnData || !synth) return;
+    const run = ++costRun;
+    const { net } = nnData;
+    const { mul, add, mulName } = nnUnits();
+    const inLib = (u, v) => !u || v !== 'units' || synth.designs.some((d) => d.name === unitName(u.cfg));
+    $('nnCostNote').innerHTML = '';
+    if (!inLib(mul, mulName)) { $('nnCost').innerHTML = `<p class="note">${t('nn.costNoUnit')}</p>`; return; }
+    $('nnCost').innerHTML = `<p class="note">${t('nn.costRunning')}</p>`;
+    let hd;
+    try { hd = await loadHls(); } catch (e) { $('nnCost').innerHTML = `<p class="note">${t('nn.loadError', { file: 'data/hls-cells.json' })}</p>`; return; }
+    await new Promise((r) => setTimeout(r, 0));
+    if (run !== costRun) return;
+    const o = { synth, cells: hd.cells, fpga: hd.fpga, target: $('nnTarget').value, clockNs: +$('nnClock').value || 10 };
+    const mask = nnMask();
+    const cost = (m, a, k) => {
+        const key = `${net.id}|${o.target}|${o.clockNs}|${m ?? '-'}|${a ?? '-'}|${k.join('')}`;
+        if (!costCache.has(key)) costCache.set(key, networkCost(net, { ...o, mul: m, add: a, mask: k }));
+        return costCache.get(key);
+    };
+    let ex, c;
+    try {
+        ex = cost(null, null, mask);
+        c = cost(mul ? unitName(mul.cfg) : null, add ? unitName(add.cfg) : null, mask);
+    } catch (e) { $('nnCost').innerHTML = `<p class="note">${esc(e.message)}</p>`; return; }
+    if (run !== costRun) return;
+    const d = (a, b) => (b ? `${a <= b ? '−' : '+'}${nf(Math.abs(100 * (1 - a / b)), 1)}%` : '');
+    const asic = o.target === 'asic';
+    let h = `<table class="kv"><tr><th></th><td class="note">${t('nn.costCycles')}</td><td class="note">II</td><td class="note">${asic ? 'µm²' : 'LUT'}</td><td class="note">${asic ? 'FF' : 'FF'}</td><td class="note">DSP</td><td class="note">nJ</td></tr>`;
+    for (const l of c.layers) {
+        const e = ex.layers.find((x) => x.name === l.name);
+        const main = asic ? l.area : l.luts, mainEx = asic ? e.area : e.luts;
+        h += `<tr><th class="mono">${esc(l.name)}${l.approx ? ' *' : ''}</th><td class="mono">${nf(l.cycles)}</td><td class="mono">${l.II ?? '-'}</td><td class="mono">${nf(main, 0)}${main !== mainEx ? ` <span class="note">(${d(main, mainEx)})</span>` : ''}</td><td class="mono">${nf(l.ff)}</td><td class="mono">${l.dsp}</td><td class="mono">${nf(l.energy / 1e6, 2)}</td></tr>`;
+    }
+    const T = c.totals, X = ex.totals, main = asic ? T.area : T.luts, mainEx = asic ? X.area : X.luts;
+    h += `<tr><th><b>${t('nn.costTotal')}</b></th><td class="mono"><b>${nf(T.cycles)}</b></td><td></td><td class="mono"><b>${nf(main, 0)}</b> (${d(main, mainEx)})</td><td class="mono">${nf(T.ff)}</td><td class="mono">${T.dsp}</td><td class="mono"><b>${nf(T.energy / 1e6, 1)}</b> (${d(T.energy, X.energy)})</td></tr></table>`;
+    $('nnCost').innerHTML = h;
+    $('nnCostNote').innerHTML = t('nn.costNote', { us: nf(T.timeUs, 1), clock: nf(o.clockNs, 1) }) + (c.warnings.length ? ` ${esc(c.warnings.join('; '))}` : '');
+}
+for (const id of ['nnClock', 'nnTarget']) $(id).addEventListener('change', () => renderCost());
 
 for (const id of ['nnMul', 'nnAdder', 'nnModel', 'nnAccum']) $(id).addEventListener('change', () => { store.set(`nn.${id}`, $(id).value); render(); });
 $('nnLayers').addEventListener('change', () => render());

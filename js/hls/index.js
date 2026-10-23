@@ -85,15 +85,16 @@ export function partitionLogic(design, model = MODEL) {
 /**
  * @param {string} src código do kernel
  * @param {{synth: object, cells: object, flow?: string, target?: string, clockNs?: number, ports?: number, model?: object,
- *          assign?: Map<string, string>|object, design?: object, fpga?: object}} o fpga: data/vivado-units.json (alvo FPGA); assign: unidade aproximada de cada operação (id do
- *          nó -> nome); design: projeto já elaborado do mesmo código, reaproveitado
+ *          assign?: Map<string, string>|object, design?: object, fpga?: object, wide?: boolean}} o fpga: data/vivado-units.json (alvo FPGA); assign: unidade aproximada de cada operação (id do
+ *          nó -> nome); design: projeto já elaborado do mesmo código, reaproveitado; wide: somadores de 24 e 32 bits
+ *          da biblioteca (o fluxo das redes neurais)
  */
-export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic', clockNs = 5, ports = 2, model = MODEL, assign = null, design: given = null, fpga = null } = {}) {
+export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic', clockNs = 5, ports = 2, model = MODEL, assign = null, design: given = null, fpga = null, wide = false } = {}) {
     const clockPs = Math.round(clockNs * 1000);
     // A elaboração é a parte cara; a exploração passa o projeto já elaborado (o mesmo código e as mesmas portas).
     const design = given ?? elaborate(parse(src), { ports });
     const warnings = [...design.warnings];
-    const lib = makeLibrary(synth, cells, { flow, target, fpga });
+    const lib = makeLibrary(synth, cells, { flow, target, fpga, wide });
     const arrays = new Map(design.arrays.map((a) => [a.name, a]));
     // Operações que aceitam unidade aproximada e a atribuição pedida (os ids que não existem mais são ignorados).
     const ops = approxOps(design, lib);
@@ -101,7 +102,9 @@ export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic',
     for (const [id, name] of assign instanceof Map ? assign : Object.entries(assign ?? {})) {
         const op = ops.byId.get(id);
         if (!op) continue;
-        if (!op.candidates.includes(name)) { warnings.push({ msg: `${id}: ${name} não serve para ${op.label} (ignorada)`, line: op.node.line }); continue; }
+        // Com a opção wide (redes), também as cascatas da largura da soma (ADD24 (ADD16 LOA8 + ADD8 exato)).
+        const wideOk = () => { try { const u = lib.unitByName(name); return u.cfg.kind === 'add' && u.cfg.width === op.W; } catch { return false; } };
+        if (!op.candidates.includes(name) && !(lib.wide && op.cls === 'add' && op.candidates.length > 1 && wideOk())) { warnings.push({ msg: `${id}: ${name} não serve para ${op.label} (ignorada)`, line: op.node.line }); continue; }
         if (name !== op.candidates[0]) asg.set(id, name);
     }
     const schedOf = new Map();
@@ -195,7 +198,7 @@ export function synthesize(src, { synth, cells, flow = 'delay', target = 'asic',
         design, lib, segs, cost, warnings, model, ops, assign: asg,
         totals: {
             cycles: totalCycles, clockPs, timeNs: (totalCycles * clockPs) / 1000, critPs,
-            area: cost.area.total, luts: cost.fpga.luts, carry4: cost.fpga.carry4, ff: cost.fpga.ff, energy: cost.energy.total,
+            area: cost.area.total, luts: cost.fpga.luts, carry4: cost.fpga.carry4, ff: cost.fpga.ff, dsp: cost.fpga.dsp, energy: cost.energy.total,
             intervalNs: inner.length === 1 ? (inner[0].IIachieved * clockPs) / 1000 : null,
         },
     };

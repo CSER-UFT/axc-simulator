@@ -38,7 +38,7 @@
                     <h2 style="margin-top:12px" data-i18n="nn.units">Unidades</h2>
                     <label><span data-i18n="nn.mul">Multiplicador</span> <select id="nnMul"></select></label>
                     <label><span data-i18n="nn.adder">Somador das acumulações</span> <select id="nnAdder"></select></label>
-                    <label><span data-i18n="nn.accum">Estrutura da soma</span> <select id="nnAccum"><option value="chain" data-i18n="nn.accumChain">em cadeia (laço)</option><option value="tree" data-i18n="nn.accumTree">em árvore (laço desenrolado)</option></select></label>
+                    <label><span data-i18n="nn.accum">Estrutura da soma</span> <select id="nnAccum"><option value="arch" data-i18n="nn.accumArch">como na arquitetura</option><option value="chain" data-i18n="nn.accumChain">em cadeia (laço)</option><option value="tree" data-i18n="nn.accumTree">em árvore (laço desenrolado)</option></select></label>
                     <div id="nnUnitInfo"></div>
                     <h3 style="margin-top:10px" data-i18n="nn.layers">Camadas com a unidade aproximada:</h3>
                     <div class="row" id="nnLayers"></div>
@@ -51,6 +51,15 @@
                     <h2 data-i18n="nn.result">Resultado</h2>
                     <div id="nnTable"></div>
                     <div id="nnSens"></div>
+                </section>
+                <section style="margin-top:16px">
+                    <h2 data-i18n="nn.costTitle">Custo do hardware (estimativa)</h2>
+                    <div class="row">
+                        <label><span data-i18n="nn.costClock">Período (ns)</span> <input type="number" id="nnClock" min="2" max="50" step="0.5" value="10" style="width:5em" /></label>
+                        <label><span data-i18n="nn.costTarget">Alvo</span> <select id="nnTarget"><option value="asic" data-i18n="nn.costAsic">ASIC sky130</option><option value="fpga" data-i18n="nn.costFpga">FPGA xc7a100t</option></select></label>
+                    </div>
+                    <div id="nnCost"></div>
+                    <p class="note" id="nnCostNote"></p>
                 </section>
             </div>
             <div>

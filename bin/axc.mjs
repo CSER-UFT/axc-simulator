@@ -9,6 +9,10 @@
  *   node bin/axc.mjs synth <unidade>
  *   node bin/axc.mjs verilog <unidade> [--tb] [--out arquivo.v]
  *   node bin/axc.mjs lenet <multiplicador> [--add <somador>] [--tree] [--model lenet5-mnist|minilenet-mnist|...] [--layers conv1,conv2,...]
+ *   node bin/axc.mjs nncost [--model minilenet-mnist|...] [--mul <multiplicador>] [--add <somador>] [--layers conv1,...]
+ *                           [--clock 10] [--target asic|fpga] [--flow delay|area|iso] [--kernels pasta]
+ *       custo da rede pelo modelo de síntese de alto nível (código gerado por js/axc/nngen.js), por camada e no total;
+ *       --kernels grava o código de cada camada (na linguagem da página de síntese de alto nível)
  *   node bin/axc.mjs hls <kernel.c | --example gauss|sobel|sharpen|fir|dot> [--clock ns] [--flow delay|area|iso] [--ports n]
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
@@ -33,6 +37,7 @@ import { toVerilog, testbench, moduleName } from '../js/axc/verilog.js';
 import { designSpace } from '../js/axc/designspace.js';
 import { PRESETS } from '../js/axc/presets.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize } from '../js/axc/nn.js';
+import { networkKernels, networkCost } from '../js/axc/nngen.js';
 
 import { synthesize } from '../js/hls/index.js';
 import { KERNELS } from '../js/hls/kernels.js';
@@ -148,6 +153,37 @@ switch (cmd) {
         const s = summarize(test, preds, ref, net.classes), s0 = summarize(test, ref, null, net.classes);
         const r = { model: net.id, mul: unitName(mul), add: add ? unitName(add) : null, sum: add ? (flag('--tree') ? 'tree' : 'chain') : null, layers, accuracy: s.accuracy, exactAccuracy: s0.accuracy, broke: s.broke.length, fixed: s.fixed };
         out(r, () => `${net.name}, ${r.mul}${r.add ? ` + ${r.add} (${r.sum === 'tree' ? 'árvore' : 'cadeia'})` : ''} em ${layers.join(', ')}: acurácia ${(100 * r.accuracy).toFixed(1)}% (exata ${(100 * r.exactAccuracy).toFixed(1)}%), ${r.broke} erradas a mais, ${r.fixed} corrigidas`);
+        break;
+    }
+    case 'nncost': {
+        const reg = JSON.parse(readFileSync(join(ROOT, 'data/nn/models.json'), 'utf8'));
+        const entry = reg.models.find((m) => m.id === opt('--model', 'minilenet-mnist')) ?? die(`modelo desconhecido: ${opt('--model')} (${reg.models.map((m) => m.id).join(', ')})`);
+        const net = decodeNet(JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8')));
+        const names = net.sites.map((l) => l.name);
+        const layers = (opt('--layers') ?? names.join(',')).split(',');
+        for (const l of layers) if (!names.includes(l)) die(`camada desconhecida: ${l} (${names.join(', ')})`);
+        const unitArg = (k, kind) => { const v = opt(k); if (!v) return null; const c = cfgOf(v); if (c.kind !== kind) die(`${k} espera um ${kind === 'mul' ? 'multiplicador' : 'somador'}`); return unitName(c); };
+        if (opt('--kernels')) {
+            const dir = opt('--kernels');
+            for (const k of networkKernels(net)) writeFileSync(join(dir, `${k.name}.c`), k.src);
+        }
+        let c;
+        try {
+            c = networkCost(net, {
+                synth: synthData(), cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')),
+                fpga: existsSync(join(ROOT, 'data/vivado-units.json')) ? JSON.parse(readFileSync(join(ROOT, 'data/vivado-units.json'), 'utf8')) : null,
+                target: opt('--target', 'asic'), flow: opt('--flow', 'delay'), clockNs: +opt('--clock', 10),
+                mul: unitArg('--mul', 'mul'), add: unitArg('--add', 'add'), mask: names.map((l) => layers.includes(l)),
+            });
+        } catch (e) { die(e.message); }
+        const r = { model: net.id, ...c };
+        out(r, () => [
+            `${net.name} (${net.dataset.name}), ${c.totals.clockNs} ns${opt('--mul') || opt('--add') ? `, ${[opt('--mul'), opt('--add')].filter(Boolean).join(' + ')} em ${layers.join(', ')}` : ', unidades exatas'}`,
+            'camada       ciclos    II   área (µm²)    LUT     FF  DSP  energia (nJ)  unidades',
+            ...c.layers.map((l) => `${l.name.padEnd(9)} ${String(l.cycles).padStart(9)} ${String(l.II ?? '-').padStart(5)} ${l.area.toFixed(0).padStart(12)} ${String(l.luts).padStart(6)} ${String(l.ff).padStart(6)} ${String(l.dsp).padStart(4)} ${(l.energy / 1e6).toFixed(2).padStart(13)}  ${l.units.map((u) => `${u.count} × ${u.name}`).join(', ')}`),
+            `total     ${String(c.totals.cycles).padStart(9)} ${''.padStart(5)} ${c.totals.area.toFixed(0).padStart(12)} ${String(c.totals.luts).padStart(6)} ${String(c.totals.ff).padStart(6)} ${String(c.totals.dsp).padStart(4)} ${(c.totals.energy / 1e6).toFixed(2).padStart(13)}  (${c.totals.timeUs.toFixed(1)} µs por imagem)`,
+            ...c.warnings.map((w) => `aviso: ${w}`),
+        ].join('\n'));
         break;
     }
     case 'hls': {

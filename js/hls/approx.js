@@ -52,7 +52,7 @@ export function approxOps(design, lib) {
         for (const n of seg.nodes) {
             const cls = opClass(n);
             if (cls !== 'mul' && cls !== 'add') continue;
-            const W = opWidth(n, rangeOf);
+            const W = (lib.opWidth ?? opWidth)(n, rangeOf);
             const ranges = n.args.map((a) => (a.c !== undefined ? [a.c, a.c] : rangeOf(a.n)));
             let candidates = lib.candidates(cls, W);
             let reason = null;
@@ -88,9 +88,10 @@ export function unitFunction(lib, name) {
     const cfg = u.cfg;
     let f, signed = false;
     if (cfg.kind === 'add') {
-        if (cfg.width === 32) {
+        if (cfg.low) {
+            // Cascata: a parte de baixo pela unidade, a de cima exata com o vai um dela.
             const lo = adderFunction(cfg.low);
-            const M = 65536;
+            const M = 2 ** cfg.low.width;
             f = (a, b) => {
                 const l = lo(a % M, b % M);
                 return (Math.floor(a / M) + Math.floor(b / M) + Math.floor(l / M)) * M + (l % M);
@@ -157,7 +158,7 @@ export function opFunction(lib, op, name) {
 /** Técnica de uma unidade, para agrupar as opções (array, booth, kulkarni, drum, mitchell; trunc, loa, seg). */
 export function technique(lib, name) {
     const cfg = lib.unitByName(name).cfg;
-    if (cfg.kind === 'add') return cfg.width === 32 ? `${technique(lib, `ADD16 ${name.match(/\(ADD16 (.+?) \+/)?.[1] ?? 'exato'}`)}` : cfg.adder ?? 'exact';
+    if (cfg.kind === 'add') return cfg.low ? (cfg.low.adder ?? 'exact') : cfg.adder ?? 'exact';
     const m = cfg.method ?? 'array';
     if (m === 'array' && !cfg.kTrunc && !cfg.kApprox) return cfg.comp ? 'array' : 'exact';
     return m;

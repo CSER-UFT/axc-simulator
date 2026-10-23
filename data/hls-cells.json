@@ -167,6 +167,26 @@
      "carry4": 3
     }
    }
+  },
+  "requant": {
+   "32": {
+    "delay": {
+     "area": 57338.74,
+     "delay": 6175,
+     "energy": 52464.42,
+     "luts": 74,
+     "carry4": 32,
+     "dsp": 4
+    },
+    "area": {
+     "area": 35940.72,
+     "delay": 8499,
+     "energy": 35636.51,
+     "luts": 74,
+     "carry4": 32,
+     "dsp": 4
+    }
+   }
   }
  },
  "register": {
@@ -176,5 +196,6 @@
   "setup": 111,
   "energy": 55.749,
   "leakage": 0.0084
- }
+ },
+ "requantGenerated": "2026-10-23"
 }

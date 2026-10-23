@@ -198,6 +198,15 @@ const base = {
     <li><strong>o segmentado também depende da estrutura, e a árvore é pior</strong>: com blocos e previsão de 4 bits em 16 bits, a LeNet 5 no MNIST fica com 67% em cadeia e 12% em árvore.</li>
 </ul>
 <p>A mesma unidade que vai bem com entradas uniformes pode falhar com os dados reais, e o mesmo somador pode servir ou não conforme a largura e a ordem das somas, que são decisões de arquitetura.</p>
+<h3>Custo do hardware</h3>
+<p>A seção <strong>Custo do hardware</strong> estima o circuito da rede com o modelo da página de síntese de alto nível. O gerador <code>js/axc/nngen.js</code> escreve um kernel por camada, na linguagem daquela página e na organização do código C da MiniLenet para o Vitis: borda, convolução, max pooling, flatten e densa, chamadas em sequência. Nas convoluções, o pipeline fica no laço da coluna de saída, com a janela desenrolada; nas densas, no laço das entradas, com a acumulação em cadeia; as memórias têm 2 portas e nenhuma partição. A reescala em Q32 é uma peça exata, <code>requant(acc, m, z)</code>, sintetizada com o mesmo fluxo das unidades (57 mil µm² e 6,2 ns na sky130; 4 DSP48 e 74 LUTs no FPGA). Os kernels, executados em sequência pelo modelo, dão as mesmas saídas do avaliador da página em todas as redes (um teste confere), então o custo é o do mesmo cálculo que a acurácia mede.</p>
+<p>As multiplicações das camadas marcadas usam o multiplicador escolhido. Cada soma da acumulação tem a largura que a faixa de valores pede (16, 24 ou 32 bits), e o somador escolhido entra nela pela mesma regra do avaliador: com um somador de N bits e uma soma de W bits, a mesma técnica em W bits quando N ≥ W, e uma cascata (o somador nos N bits de baixo, um exato em cima) quando N &lt; W. A linha de comando dá a mesma tabela: <code>node bin/axc.mjs nncost --model minilenet-mnist --mul "MUL8 T4" --add "ADD32 LOA10"</code>, e <code>--kernels pasta</code> grava o código de cada camada, que dá para abrir na página de síntese de alto nível.</p>
+<p>O que a estimativa mostra na MiniLenet, a 10 ns:</p>
+<ul>
+    <li><strong>as memórias limitam as convoluções</strong>: sem partição, as 25 leituras da janela por iteração em 2 portas dão II 13 na conv1, e as 75 da conv2 dão II 38 (o código C pede II 13 para ela). Com esses II, as 25 ou 75 multiplicações da janela dividem só 2 multiplicadores;</li>
+    <li><strong>a reescala domina as camadas densas</strong>: uma peça de 32 × 32 bits por camada é quase toda a área delas;</li>
+    <li><strong>a energia vai quase toda para os registradores</strong> (89%): cada bit é contado em todo ciclo, e a conv2 leva 44 mil ciclos para 1176 saídas. Com o MUL8 T4 e o ADD32 LOA10 em todas as camadas, a área cai 12,5% e a energia só 1,4%, com a acurácia 0,9 ponto abaixo. Para a aproximação dos operadores aparecer na energia, a arquitetura precisa primeiro tirar o gargalo da memória (partição e paralelismo por camada).</li>
+</ul>
 <p>A matriz de confusão mostra para onde vão os erros, e a grade mostra as imagens que a rede exata acerta e a aproximada erra. As imagens do MNIST são distribuídas sob a licença CC BY-SA 3.0.</p>`,
         },
         {

@@ -44,7 +44,7 @@ export function scheduleSegment(seg, ctx) {
     const info = new Map();
     for (const n of seg.nodes) {
         const cls = opClass(n);
-        const W = opWidth(n, rangeOf);
+        const W = (lib.opWidth ?? opWidth)(n, rangeOf);
         let delay = 0, unit = null, noShare = false;
         if (SHARED.has(cls)) {
             const name = ctx.assign?.get(n.id);
@@ -60,7 +60,7 @@ export function scheduleSegment(seg, ctx) {
             // são compartilhadas quando isso economiza (decidido na ligação, com o custo de cada instância e dos
             // multiplexadores).
             noShare = !ctx.allocation?.[cls] && (cls === 'add' || !!unit.constMul);
-        } else if (['cmp', 'mux', 'logic'].includes(cls)) { unit = lib.cell(cls, W); delay = unit.delay; }
+        } else if (['cmp', 'mux', 'logic', 'requant'].includes(cls)) { unit = lib.cell(cls, W); delay = unit.delay; }
         const k = delay > Tc ? Math.ceil((delay + overhead) / clockPs) : 1;
         // Recurso: o banco de memória, ou o tipo de unidade (exatas e aproximadas da mesma largura não se misturam).
         const key = cls === 'mem' ? n.bank?.key ?? n.array : SHARED.has(cls) && !noShare ? unit.name : null;

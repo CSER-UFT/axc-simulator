@@ -8,7 +8,7 @@ const span = (cls, s) => `<span class="tk-${cls}">${escHtml(s)}</span>`;
 
 const KEYWORDS = new Set(['for', 'const', 'void', 'return', 'if', 'else', 'while', 'static', 'unsigned', 'signed']);
 const TYPES = /^(u8|u16|u32|i8|i16|i32|int|char|short|long|bool|u?int(8|16|32)_t)$/;
-const FUNCS = new Set(['min', 'max', 'abs']);
+const FUNCS = new Set(['min', 'max', 'abs', 'requant']);
 const PRAGMA_WORDS = /\b(pipeline|unroll|array_partition|allocation|interface|inline|loop_tripcount|loop_flatten|dependence)\b/;
 
 /** Uma linha de diretiva (#pragma, #define): a palavra da diretiva, as opções e os valores. */

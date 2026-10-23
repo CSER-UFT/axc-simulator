@@ -99,7 +99,7 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
             } else if (SHARED.has(me.cls)) {
                 if (!byKey.has(me.key)) byKey.set(me.key, []);
                 byKey.get(me.key).push({ id, s: s.cycle, e: s.cycle + me.k - 1, me, slots: Array.from({ length: me.k }, (_, j) => (pipelined ? (s.cycle + j) % sch.II : s.cycle + j)) });
-            } else if (['cmp', 'mux', 'logic'].includes(me.cls)) opsCells.push({ me, execs });
+            } else if (['cmp', 'mux', 'logic', 'requant'].includes(me.cls)) opsCells.push({ me, execs });
             if (me.unit) energyOps += (opKnown ? lib.effective(me.unit, { a: opKnown[0], b: opKnown[1] }) : me.unit).energy * execs;
         }
         for (const [key, list] of byKey) {
@@ -226,7 +226,7 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
         if (!cellGroups.has(k)) cellGroups.set(k, { key: k, cls: me.cls, W: me.W, count: 0, cell: me.unit });
         cellGroups.get(k).count++;
     }
-    const cellList = [...cellGroups.values()].map((g) => ({ ...g, area: g.count * g.cell.area, luts: g.count * g.cell.luts, carry4: g.count * g.cell.carry4 }));
+    const cellList = [...cellGroups.values()].map((g) => ({ ...g, area: g.count * g.cell.area, luts: g.count * g.cell.luts, carry4: g.count * g.cell.carry4, dsp: g.count * (g.cell.dsp ?? 0) }));
     const timeNs = (totalCycles * clockPs) / 1000;
     const energy = {
         ops: energyOps,
@@ -247,6 +247,7 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
         ff: regBits - srlFf + (addr?.ff ?? 0),
         srlLuts,
         addrLuts: addr?.luts ?? 0,
+        dsp: sum(cellList, (c) => c.dsp ?? 0),
     };
     return { units: unitList, cells: cellList, muxes, regs, regBits, control, area, fpga, energy, addr };
 }
