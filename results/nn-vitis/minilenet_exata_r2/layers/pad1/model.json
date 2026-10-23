@@ -1,0 +1,68 @@
+{
+ "id": "minilenet-mnist_exata_10ns_pad1",
+ "note": "MiniLenet, camada pad1",
+ "clockNs": 10,
+ "part": "xc7a100tcsg324-1",
+ "top": "pad1",
+ "delays": "fpga",
+ "assign": {},
+ "prediction": {
+  "cycles": 915,
+  "timeNs": 9150,
+  "intervalNs": null,
+  "critPs": 812,
+  "luts": 262,
+  "carry4": 14,
+  "ff": 45,
+  "areaUm2": 3833.7327999999998,
+  "energyFj": 6080274.60324,
+  "loops": [
+   {
+    "label": "pad1_c",
+    "mode": "sequential",
+    "trip": 1,
+    "II": null,
+    "iterLatency": 915,
+    "latency": 915
+   },
+   {
+    "label": "pad1_top_L3",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 64,
+    "II": 1,
+    "iterLatency": 1,
+    "latency": 65
+   },
+   {
+    "label": "pad1_side_L5",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 56,
+    "II": 1,
+    "iterLatency": 1,
+    "latency": 57
+   },
+   {
+    "label": "pad1_in_L7",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 784,
+    "II": 1,
+    "iterLatency": 2,
+    "latency": 786
+   }
+  ],
+  "addrLuts": 150,
+  "units": [],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}

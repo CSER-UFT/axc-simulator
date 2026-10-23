@@ -1,0 +1,498 @@
+<profile>
+  <RunData>
+    <RUN_TYPE>impl</RUN_TYPE>
+    <VIVADO_VERSION>v.2022.2</VIVADO_VERSION>
+    <ROOT_MODULE_CELL>bd_0_i/hls_inst</ROOT_MODULE_CELL>
+  </RunData>
+  <TimingReport>
+    <TargetClockPeriod>10.000</TargetClockPeriod>
+    <AchievedClockPeriod>9.783</AchievedClockPeriod>
+    <CLOCK_NAME>ap_clk</CLOCK_NAME>
+    <CP_FINAL>9.783</CP_FINAL>
+    <CP_ROUTE>9.783</CP_ROUTE>
+    <CP_SYNTH>9.163</CP_SYNTH>
+    <CP_TARGET>10.000</CP_TARGET>
+    <SLACK_FINAL>0.217</SLACK_FINAL>
+    <SLACK_ROUTE>0.217</SLACK_ROUTE>
+    <SLACK_SYNTH>0.837</SLACK_SYNTH>
+    <TIMING_MET>TRUE</TIMING_MET>
+    <TNS_FINAL>0.000</TNS_FINAL>
+    <TNS_ROUTE>0.000</TNS_ROUTE>
+    <TNS_SYNTH>0.000</TNS_SYNTH>
+    <WNS_FINAL>0.217</WNS_FINAL>
+    <WNS_ROUTE>0.217</WNS_ROUTE>
+    <WNS_SYNTH>0.837</WNS_SYNTH>
+  </TimingReport>
+  <AreaReport>
+    <Resources>
+      <BRAM>51</BRAM>
+      <CLB>0</CLB>
+      <DSP>2</DSP>
+      <FF>4121</FF>
+      <LATCH>0</LATCH>
+      <LUT>5397</LUT>
+      <SLICE>1876</SLICE>
+      <SRL>10</SRL>
+      <URAM>0</URAM>
+    </Resources>
+    <AvailableResources>
+      <BRAM>270</BRAM>
+      <CLB>0</CLB>
+      <DSP>240</DSP>
+      <FF>126800</FF>
+      <LUT>63400</LUT>
+      <SLICE>15850</SLICE>
+      <URAM>0</URAM>
+    </AvailableResources>
+  </AreaReport>
+  <RtlModules>
+    <RtlModule CELL="inst" DEPTH="0" IS_TOP="1" TYPE="function" MODULENAME="network" DISPNAME="inst" RTLNAME="network">
+      <SubModules count="18">grp_axc_requant_fu_273 grp_conv1_fu_156 grp_conv2_fu_224 grp_fc1_fu_248 grp_fc2_fu_260 grp_flatten_fu_242 grp_pad1_fu_148 grp_pad2_fu_218 grp_pool1_fu_212 grp_pool2_fu_236 t1_V_U t2_V_U t3_V_U t4_V_U t5_V_U t6_V_U t7_V_U t8_V_U</SubModules>
+      <Resources BRAM="51" DSP="2" FF="4121" LUT="5397"/>
+      <LocalResources FF="27" LUT="1"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_axc_requant_fu_273" DEPTH="1" TYPE="rtl" MODULENAME="axc_requant" DISPNAME="grp_axc_requant_fu_273" RTLNAME="network_axc_requant">
+      <SubModules count="1">mul_25ns_25s_50_1_1_U7</SubModules>
+      <Resources DSP="2" FF="14" LUT="15"/>
+      <LocalResources FF="14" LUT="14"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_axc_requant_fu_273/mul_25ns_25s_50_1_1_U7" BINDMODULE="network_mul_25ns_25s_50_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_25ns_25s_50_1_1" DISPNAME="mul_25ns_25s_50_1_1_U7" RTLNAME="network_mul_25ns_25s_50_1_1">
+      <Resources DSP="2" LUT="1"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="1" ID="" IMPL="dsp" LATENCY="0" LOOP="" OPTYPE="mul" PRAGMA="yes" RTLNAME="mul_25ns_25s_50_1_1_U7" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_196"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="1" ID="" IMPL="dsp" LATENCY="0" LOOP="" OPTYPE="mul" PRAGMA="yes" RTLNAME="mul_25ns_25s_50_1_1_U7" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_196"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="1" ID="" IMPL="dsp" LATENCY="0" LOOP="" OPTYPE="mul" PRAGMA="yes" RTLNAME="mul_25ns_25s_50_1_1_U7" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_196"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="1" ID="" IMPL="dsp" LATENCY="0" LOOP="" OPTYPE="mul" PRAGMA="yes" RTLNAME="mul_25ns_25s_50_1_1_U7" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_196"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156" DEPTH="1" TYPE="function" MODULENAME="conv1" DISPNAME="grp_conv1_fu_156" RTLNAME="network_conv1">
+      <SubModules count="30">flow_control_loop_pipe_sequential_init_U mul_8ns_6ns_14_1_1_U14 mul_8ns_6ns_14_1_1_U18 mul_8ns_7ns_15_1_1_U16 mul_8ns_7ns_15_1_1_U17 mul_8ns_7ns_15_1_1_U21 mul_8ns_7ns_15_1_1_U34 mul_8ns_7s_15_1_1_U12 mul_8ns_7s_15_1_1_U19 mul_8ns_7s_15_1_1_U29 mul_8ns_8s_16_1_1_U13 mul_8ns_8s_16_1_1_U15 mul_8ns_8s_16_1_1_U20 mul_8ns_8s_16_1_1_U22 mul_8ns_8s_16_1_1_U23 mul_8ns_8s_16_1_1_U24 mul_8ns_8s_16_1_1_U25 mul_8ns_8s_16_1_1_U26 mul_8ns_8s_16_1_1_U27 mul_8ns_8s_16_1_1_U28 mul_8ns_8s_16_1_1_U30 mul_8ns_8s_16_1_1_U31 mul_8ns_8s_16_1_1_U32 mul_8ns_8s_16_1_1_U33 mul_8ns_8s_16_1_1_U35 mul_8ns_8s_16_1_1_U38 w_V_3_14_U w_V_3_15_U w_V_3_24_U w_V_3_6_U</SubModules>
+      <Resources FF="845" LUT="1864"/>
+      <LocalResources FF="831" LUT="622"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="2" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="4"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_6ns_14_1_1_U14" BINDMODULE="network_mul_8ns_6ns_14_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_6ns_14_1_1" DISPNAME="mul_8ns_6ns_14_1_1_U14" RTLNAME="network_mul_8ns_6ns_14_1_1">
+      <Resources LUT="42"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_6ns_14_1_1_U14" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_181"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_6ns_14_1_1_U18" BINDMODULE="network_mul_8ns_6ns_14_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_6ns_14_1_1" DISPNAME="mul_8ns_6ns_14_1_1_U18" RTLNAME="network_mul_8ns_6ns_14_1_1">
+      <Resources LUT="43"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_6ns_14_1_1_U18" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_188"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_7ns_15_1_1_U16" BINDMODULE="network_mul_8ns_7ns_15_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_7ns_15_1_1" DISPNAME="mul_8ns_7ns_15_1_1_U16" RTLNAME="network_mul_8ns_7ns_15_1_1">
+      <Resources LUT="49"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7ns_15_1_1_U16" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_185"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_7ns_15_1_1_U17" BINDMODULE="network_mul_8ns_7ns_15_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_7ns_15_1_1" DISPNAME="mul_8ns_7ns_15_1_1_U17" RTLNAME="network_mul_8ns_7ns_15_1_1">
+      <Resources LUT="48"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7ns_15_1_1_U17" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_186"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_7ns_15_1_1_U21" BINDMODULE="network_mul_8ns_7ns_15_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_7ns_15_1_1" DISPNAME="mul_8ns_7ns_15_1_1_U21" RTLNAME="network_mul_8ns_7ns_15_1_1">
+      <Resources LUT="37"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7ns_15_1_1_U21" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_148"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_7ns_15_1_1_U34" BINDMODULE="network_mul_8ns_7ns_15_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_7ns_15_1_1" DISPNAME="mul_8ns_7ns_15_1_1_U34" RTLNAME="network_mul_8ns_7ns_15_1_1">
+      <Resources LUT="50"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7ns_15_1_1_U34" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_172"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_7s_15_1_1_U12" BINDMODULE="network_mul_8ns_7s_15_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_7s_15_1_1" DISPNAME="mul_8ns_7s_15_1_1_U12" RTLNAME="network_mul_8ns_7s_15_1_1">
+      <Resources LUT="50"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7s_15_1_1_U12" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_178"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_7s_15_1_1_U19" BINDMODULE="network_mul_8ns_7s_15_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_7s_15_1_1" DISPNAME="mul_8ns_7s_15_1_1_U19" RTLNAME="network_mul_8ns_7s_15_1_1">
+      <Resources LUT="60"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7s_15_1_1_U19" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_189"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_7s_15_1_1_U29" BINDMODULE="network_mul_8ns_7s_15_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_7s_15_1_1" DISPNAME="mul_8ns_7s_15_1_1_U29" RTLNAME="network_mul_8ns_7s_15_1_1">
+      <Resources LUT="52"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7s_15_1_1_U29" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_163"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U13" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U13" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="51"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U13" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_179"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U15" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U15" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="34"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U15" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_182"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U20" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U20" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="47"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U20" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U22" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U22" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="48"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U22" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_150"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U23" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U23" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="47"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U23" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_151"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U24" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U24" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="51"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U24" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_154"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U25" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U25" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="59"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U25" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_155"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U26" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U26" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="55"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U26" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_157"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U27" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U27" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="43"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U27" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_158"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U28" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U28" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="42"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U28" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_162"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U30" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U30" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="59"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U30" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_165"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U31" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U31" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="46"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U31" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_166"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U32" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U32" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="61"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U32" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_169"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U33" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U33" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="45"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U33" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_170"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U35" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U35" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="68"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U35" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_173"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/mul_8ns_8s_16_1_1_U38" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U38" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="58"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U38" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_193"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/w_V_3_14_U" BINDMODULE="network_conv1_w_V_3_14_ROM_AUTO_1R" DEPTH="2" TYPE="resource" MODULENAME="conv1_w_V_3_14_ROM_AUTO_1R" DISPNAME="w_V_3_14_U" RTLNAME="network_conv1_w_V_3_14_ROM_AUTO_1R">
+      <Resources FF="4" LUT="6"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="w_V_3_14_U" SOURCE="" URAM="0" VARIABLE="w_V_3_14"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/w_V_3_15_U" BINDMODULE="network_conv1_w_V_3_15_ROM_AUTO_1R" DEPTH="2" TYPE="resource" MODULENAME="conv1_w_V_3_15_ROM_AUTO_1R" DISPNAME="w_V_3_15_U" RTLNAME="network_conv1_w_V_3_15_ROM_AUTO_1R">
+      <Resources FF="3" LUT="2"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="w_V_3_15_U" SOURCE="" URAM="0" VARIABLE="w_V_3_15"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/w_V_3_24_U" BINDMODULE="network_conv1_w_V_3_24_ROM_AUTO_1R" DEPTH="2" TYPE="resource" MODULENAME="conv1_w_V_3_24_ROM_AUTO_1R" DISPNAME="w_V_3_24_U" RTLNAME="network_conv1_w_V_3_24_ROM_AUTO_1R">
+      <Resources FF="4" LUT="2"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="w_V_3_24_U" SOURCE="" URAM="0" VARIABLE="w_V_3_24"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv1_fu_156/w_V_3_6_U" BINDMODULE="network_conv1_w_V_3_6_ROM_AUTO_1R" DEPTH="2" TYPE="resource" MODULENAME="conv1_w_V_3_6_ROM_AUTO_1R" DISPNAME="w_V_3_6_U" RTLNAME="network_conv1_w_V_3_6_ROM_AUTO_1R">
+      <Resources FF="1"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="w_V_3_6_U" SOURCE="" URAM="0" VARIABLE="w_V_3_6"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv2_fu_224" DEPTH="1" TYPE="function" MODULENAME="conv2" DISPNAME="grp_conv2_fu_224" RTLNAME="network_conv2">
+      <SubModules count="8">b_V_2_U flow_control_loop_pipe_sequential_init_U m_V_2_U mul_3ns_8ns_10_1_1_U86 mul_8ns_8s_16_1_1_U160 mul_8ns_8s_16_1_1_U87 mul_8ns_8s_16_1_1_U88 w_V_2_U</SubModules>
+      <Resources BRAM="1" FF="2398" LUT="2471"/>
+      <LocalResources FF="2372" LUT="2123"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv2_fu_224/b_V_2_U" BINDMODULE="network_conv2_b_V_2_ROM_AUTO_1R" DEPTH="2" TYPE="resource" MODULENAME="conv2_b_V_2_ROM_AUTO_1R" DISPNAME="b_V_2_U" RTLNAME="network_conv2_b_V_2_ROM_AUTO_1R">
+      <Resources FF="4" LUT="2"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="b_V_2_U" SOURCE="" URAM="0" VARIABLE="b_V_2"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv2_fu_224/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="2" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="38"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv2_fu_224/m_V_2_U" BINDMODULE="network_conv2_m_V_2_ROM_AUTO_1R" DEPTH="2" TYPE="resource" MODULENAME="conv2_m_V_2_ROM_AUTO_1R" DISPNAME="m_V_2_U" RTLNAME="network_conv2_m_V_2_ROM_AUTO_1R">
+      <Resources FF="20" LUT="12"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="m_V_2_U" SOURCE="" URAM="0" VARIABLE="m_V_2"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv2_fu_224/mul_3ns_8ns_10_1_1_U86" BINDMODULE="network_mul_3ns_8ns_10_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_3ns_8ns_10_1_1" DISPNAME="mul_3ns_8ns_10_1_1_U86" RTLNAME="network_mul_3ns_8ns_10_1_1">
+      <Resources LUT="6"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv2_f_conv2_h_conv2_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_3ns_8ns_10_1_1_U86" SOURCE="kernel.cpp:233" URAM="0" VARIABLE="mul_ln233"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv2_fu_224/mul_8ns_8s_16_1_1_U160" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U160" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="64"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv2_f_conv2_h_conv2_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U160" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_143"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv2_fu_224/mul_8ns_8s_16_1_1_U87" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U87" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="64"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv2_f_conv2_h_conv2_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U87" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv2_fu_224/mul_8ns_8s_16_1_1_U88" BINDMODULE="network_mul_8ns_8s_16_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U88" RTLNAME="network_mul_8ns_8s_16_1_1">
+      <Resources LUT="63"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv2_f_conv2_h_conv2_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U88" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_1"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_conv2_fu_224/w_V_2_U" BINDMODULE="network_conv2_w_V_2_ROM_AUTO_1R" DEPTH="2" TYPE="resource" MODULENAME="conv2_w_V_2_ROM_AUTO_1R" DISPNAME="w_V_2_U" RTLNAME="network_conv2_w_V_2_ROM_AUTO_1R">
+      <Resources BRAM="1" LUT="103"/>
+      <BindNode BINDTYPE="storage" BRAM="1" BUNDLEDNAME="" DISPNAME="bind_storage rom_2p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_2p" PRAGMA="" RTLNAME="w_V_2_U" SOURCE="" URAM="0" VARIABLE="w_V_2"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc1_fu_248" DEPTH="1" TYPE="function" MODULENAME="fc1" DISPNAME="grp_fc1_fu_248" RTLNAME="network_fc1">
+      <SubModules count="1">grp_fc1_Pipeline_fc1_i_fu_91</SubModules>
+      <Resources BRAM="34" FF="173" LUT="208"/>
+      <LocalResources BRAM="2" FF="115" LUT="63"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc1_fu_248/grp_fc1_Pipeline_fc1_i_fu_91" DEPTH="2" TYPE="function" MODULENAME="fc1_Pipeline_fc1_i" DISPNAME="grp_fc1_Pipeline_fc1_i_fu_91" RTLNAME="network_fc1_Pipeline_fc1_i">
+      <SubModules count="3">flow_control_loop_pipe_sequential_init_U mul_8s_8ns_16_1_1_U172 w_V_1_U</SubModules>
+      <Resources BRAM="32" FF="58" LUT="146"/>
+      <LocalResources FF="55" LUT="58"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc1_fu_248/grp_fc1_Pipeline_fc1_i_fu_91/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="3" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="24"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc1_fu_248/grp_fc1_Pipeline_fc1_i_fu_91/mul_8s_8ns_16_1_1_U172" BINDMODULE="network_mul_8s_8ns_16_1_1" DEPTH="3" TYPE="resource" MODULENAME="mul_8s_8ns_16_1_1" DISPNAME="mul_8s_8ns_16_1_1_U172" RTLNAME="network_mul_8s_8ns_16_1_1">
+      <Resources LUT="52"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="fc1_i" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8s_8ns_16_1_1_U172" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc1_fu_248/grp_fc1_Pipeline_fc1_i_fu_91/w_V_1_U" BINDMODULE="network_fc1_Pipeline_fc1_i_w_V_1_ROM_AUTO_1R" DEPTH="3" TYPE="resource" MODULENAME="fc1_Pipeline_fc1_i_w_V_1_ROM_AUTO_1R" DISPNAME="w_V_1_U" RTLNAME="network_fc1_Pipeline_fc1_i_w_V_1_ROM_AUTO_1R">
+      <Resources BRAM="32" FF="1" LUT="16"/>
+      <BindNode BINDTYPE="storage" BRAM="32" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="w_V_1_U" SOURCE="" URAM="0" VARIABLE="w_V_1"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc2_fu_260" DEPTH="1" TYPE="function" MODULENAME="fc2" DISPNAME="grp_fc2_fu_260" RTLNAME="network_fc2">
+      <SubModules count="3">b_V_U grp_fc2_Pipeline_fc2_i_fu_109 m_V_U</SubModules>
+      <Resources BRAM="1" FF="184" LUT="205"/>
+      <LocalResources FF="90" LUT="46"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc2_fu_260/b_V_U" BINDMODULE="network_fc2_b_V_ROM_AUTO_1R" DEPTH="2" TYPE="resource" MODULENAME="fc2_b_V_ROM_AUTO_1R" DISPNAME="b_V_U" RTLNAME="network_fc2_b_V_ROM_AUTO_1R">
+      <Resources FF="16" LUT="10"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="b_V_U" SOURCE="" URAM="0" VARIABLE="b_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc2_fu_260/grp_fc2_Pipeline_fc2_i_fu_109" DEPTH="2" TYPE="function" MODULENAME="fc2_Pipeline_fc2_i" DISPNAME="grp_fc2_Pipeline_fc2_i_fu_109" RTLNAME="network_fc2_Pipeline_fc2_i">
+      <SubModules count="3">flow_control_loop_pipe_sequential_init_U mul_8s_8ns_16_1_1_U182 w_V_U</SubModules>
+      <Resources BRAM="1" FF="55" LUT="138"/>
+      <LocalResources FF="53" LUT="54"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc2_fu_260/grp_fc2_Pipeline_fc2_i_fu_109/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="3" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="24"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc2_fu_260/grp_fc2_Pipeline_fc2_i_fu_109/mul_8s_8ns_16_1_1_U182" BINDMODULE="network_mul_8s_8ns_16_1_1" DEPTH="3" TYPE="resource" MODULENAME="mul_8s_8ns_16_1_1" DISPNAME="mul_8s_8ns_16_1_1_U182" RTLNAME="network_mul_8s_8ns_16_1_1">
+      <Resources LUT="52"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="fc2_i" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8s_8ns_16_1_1_U182" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc2_fu_260/grp_fc2_Pipeline_fc2_i_fu_109/w_V_U" BINDMODULE="network_fc2_Pipeline_fc2_i_w_V_ROM_AUTO_1R" DEPTH="3" TYPE="resource" MODULENAME="fc2_Pipeline_fc2_i_w_V_ROM_AUTO_1R" DISPNAME="w_V_U" RTLNAME="network_fc2_Pipeline_fc2_i_w_V_ROM_AUTO_1R">
+      <Resources BRAM="1" LUT="12"/>
+      <BindNode BINDTYPE="storage" BRAM="1" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="w_V_U" SOURCE="" URAM="0" VARIABLE="w_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_fc2_fu_260/m_V_U" BINDMODULE="network_fc2_m_V_ROM_AUTO_1R" DEPTH="2" TYPE="resource" MODULENAME="fc2_m_V_ROM_AUTO_1R" DISPNAME="m_V_U" RTLNAME="network_fc2_m_V_ROM_AUTO_1R">
+      <Resources FF="23" LUT="11"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="m_V_U" SOURCE="" URAM="0" VARIABLE="m_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_flatten_fu_242" DEPTH="1" TYPE="function" MODULENAME="flatten" DISPNAME="grp_flatten_fu_242" RTLNAME="network_flatten">
+      <SubModules count="1">flow_control_loop_pipe_sequential_init_U</SubModules>
+      <Resources FF="50" LUT="54"/>
+      <LocalResources FF="48" LUT="7"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_flatten_fu_242/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="2" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="47"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad1_fu_148" DEPTH="1" TYPE="function" MODULENAME="pad1" DISPNAME="grp_pad1_fu_148" RTLNAME="network_pad1">
+      <SubModules count="3">grp_pad1_Pipeline_pad1_in_L7_fu_40 grp_pad1_Pipeline_pad1_side_L5_fu_34 grp_pad1_Pipeline_pad1_top_L3_fu_28</SubModules>
+      <Resources FF="102" LUT="120"/>
+      <LocalResources FF="9" LUT="4"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad1_fu_148/grp_pad1_Pipeline_pad1_in_L7_fu_40" DEPTH="2" TYPE="function" MODULENAME="pad1_Pipeline_pad1_in_L7" DISPNAME="grp_pad1_Pipeline_pad1_in_L7_fu_40" RTLNAME="network_pad1_Pipeline_pad1_in_L7">
+      <SubModules count="1">flow_control_loop_pipe_sequential_init_U</SubModules>
+      <Resources FF="49" LUT="53"/>
+      <LocalResources FF="47" LUT="16"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad1_fu_148/grp_pad1_Pipeline_pad1_in_L7_fu_40/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="3" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="37"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad1_fu_148/grp_pad1_Pipeline_pad1_side_L5_fu_34" DEPTH="2" TYPE="function" MODULENAME="pad1_Pipeline_pad1_side_L5" DISPNAME="grp_pad1_Pipeline_pad1_side_L5_fu_34" RTLNAME="network_pad1_Pipeline_pad1_side_L5">
+      <SubModules count="1">flow_control_loop_pipe_sequential_init_U</SubModules>
+      <Resources FF="15" LUT="27"/>
+      <LocalResources FF="13"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad1_fu_148/grp_pad1_Pipeline_pad1_side_L5_fu_34/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="3" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="27"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad1_fu_148/grp_pad1_Pipeline_pad1_top_L3_fu_28" DEPTH="2" TYPE="function" MODULENAME="pad1_Pipeline_pad1_top_L3" DISPNAME="grp_pad1_Pipeline_pad1_top_L3_fu_28" RTLNAME="network_pad1_Pipeline_pad1_top_L3">
+      <SubModules count="1">flow_control_loop_pipe_sequential_init_U</SubModules>
+      <Resources FF="29" LUT="36"/>
+      <LocalResources FF="27" LUT="11"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad1_fu_148/grp_pad1_Pipeline_pad1_top_L3_fu_28/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="3" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="25"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad2_fu_218" DEPTH="1" TYPE="function" MODULENAME="pad2" DISPNAME="grp_pad2_fu_218" RTLNAME="network_pad2">
+      <SubModules count="3">grp_pad2_Pipeline_pad2_in_L7_fu_56 grp_pad2_Pipeline_pad2_side_L5_fu_49 grp_pad2_Pipeline_pad2_top_L3_fu_42</SubModules>
+      <Resources FF="138" LUT="162"/>
+      <LocalResources FF="26" LUT="14"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad2_fu_218/grp_pad2_Pipeline_pad2_in_L7_fu_56" DEPTH="2" TYPE="function" MODULENAME="pad2_Pipeline_pad2_in_L7" DISPNAME="grp_pad2_Pipeline_pad2_in_L7_fu_56" RTLNAME="network_pad2_Pipeline_pad2_in_L7">
+      <SubModules count="1">flow_control_loop_pipe_sequential_init_U</SubModules>
+      <Resources FF="46" LUT="58"/>
+      <LocalResources FF="44" LUT="24"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad2_fu_218/grp_pad2_Pipeline_pad2_in_L7_fu_56/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="3" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="34"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad2_fu_218/grp_pad2_Pipeline_pad2_side_L5_fu_49" DEPTH="2" TYPE="function" MODULENAME="pad2_Pipeline_pad2_side_L5" DISPNAME="grp_pad2_Pipeline_pad2_side_L5_fu_49" RTLNAME="network_pad2_Pipeline_pad2_side_L5">
+      <SubModules count="1">flow_control_loop_pipe_sequential_init_U</SubModules>
+      <Resources FF="37" LUT="52"/>
+      <LocalResources FF="35" LUT="28"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad2_fu_218/grp_pad2_Pipeline_pad2_side_L5_fu_49/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="3" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="24"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad2_fu_218/grp_pad2_Pipeline_pad2_top_L3_fu_42" DEPTH="2" TYPE="function" MODULENAME="pad2_Pipeline_pad2_top_L3" DISPNAME="grp_pad2_Pipeline_pad2_top_L3_fu_42" RTLNAME="network_pad2_Pipeline_pad2_top_L3">
+      <SubModules count="1">flow_control_loop_pipe_sequential_init_U</SubModules>
+      <Resources FF="29" LUT="38"/>
+      <LocalResources FF="27" LUT="16"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pad2_fu_218/grp_pad2_Pipeline_pad2_top_L3_fu_42/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="3" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="22"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pool1_fu_212" DEPTH="1" TYPE="function" MODULENAME="pool1" DISPNAME="grp_pool1_fu_212" RTLNAME="network_pool1">
+      <SubModules count="1">flow_control_loop_pipe_sequential_init_U</SubModules>
+      <Resources FF="99" LUT="122"/>
+      <LocalResources FF="97" LUT="69"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pool1_fu_212/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="2" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="53"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pool2_fu_236" DEPTH="1" TYPE="function" MODULENAME="pool2" DISPNAME="grp_pool2_fu_236" RTLNAME="network_pool2">
+      <SubModules count="1">flow_control_loop_pipe_sequential_init_U</SubModules>
+      <Resources FF="91" LUT="121"/>
+      <LocalResources FF="89" LUT="66"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_pool2_fu_236/flow_control_loop_pipe_sequential_init_U" BINDMODULE="network_flow_control_loop_pipe_sequential_init" DEPTH="2" TYPE="rtl" MODULENAME="flow_control_loop_pipe_sequential_init" DISPNAME="flow_control_loop_pipe_sequential_init_U" RTLNAME="network_flow_control_loop_pipe_sequential_init">
+      <Resources FF="2" LUT="55"/>
+    </RtlModule>
+    <RtlModule CELL="inst/t1_V_U" BINDMODULE="network_t1_V_RAM_AUTO_1R1W" DEPTH="1" TYPE="resource" MODULENAME="t1_V_RAM_AUTO_1R1W" DISPNAME="t1_V_U" RTLNAME="network_t1_V_RAM_AUTO_1R1W">
+      <Resources BRAM="1" LUT="12"/>
+      <BindNode BINDTYPE="storage" BRAM="1" BUNDLEDNAME="" DISPNAME="bind_storage ram_t2p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="ram_t2p" PRAGMA="" RTLNAME="t1_V_U" SOURCE="kernel.cpp:644" URAM="0" VARIABLE="t1_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/t2_V_U" BINDMODULE="network_t2_V_RAM_1WNR_AUTO_1R1W" DEPTH="1" TYPE="resource" MODULENAME="t2_V_RAM_1WNR_AUTO_1R1W" DISPNAME="t2_V_U" RTLNAME="network_t2_V_RAM_1WNR_AUTO_1R1W">
+      <Resources BRAM="6" LUT="17"/>
+      <BindNode BINDTYPE="storage" BRAM="2" BUNDLEDNAME="" DISPNAME="bind_storage rom_np" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_np" PRAGMA="" RTLNAME="t2_V_U" SOURCE="kernel.cpp:645" URAM="0" VARIABLE="t2_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/t3_V_U" BINDMODULE="network_t3_V_RAM_AUTO_1R1W" DEPTH="1" TYPE="resource" MODULENAME="t3_V_RAM_AUTO_1R1W" DISPNAME="t3_V_U" RTLNAME="network_t3_V_RAM_AUTO_1R1W">
+      <Resources BRAM="1"/>
+      <BindNode BINDTYPE="storage" BRAM="1" BUNDLEDNAME="" DISPNAME="bind_storage ram_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="ram_1p" PRAGMA="" RTLNAME="t3_V_U" SOURCE="kernel.cpp:646" URAM="0" VARIABLE="t3_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/t4_V_U" BINDMODULE="network_t4_V_RAM_AUTO_1R1W" DEPTH="1" TYPE="resource" MODULENAME="t4_V_RAM_AUTO_1R1W" DISPNAME="t4_V_U" RTLNAME="network_t4_V_RAM_AUTO_1R1W">
+      <Resources BRAM="1" LUT="8"/>
+      <BindNode BINDTYPE="storage" BRAM="1" BUNDLEDNAME="" DISPNAME="bind_storage ram_t2p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="ram_t2p" PRAGMA="" RTLNAME="t4_V_U" SOURCE="kernel.cpp:647" URAM="0" VARIABLE="t4_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/t5_V_U" BINDMODULE="network_t5_V_RAM_1WNR_AUTO_1R1W" DEPTH="1" TYPE="resource" MODULENAME="t5_V_RAM_1WNR_AUTO_1R1W" DISPNAME="t5_V_U" RTLNAME="network_t5_V_RAM_1WNR_AUTO_1R1W">
+      <Resources BRAM="3" LUT="17"/>
+      <BindNode BINDTYPE="storage" BRAM="1" BUNDLEDNAME="" DISPNAME="bind_storage rom_np" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_np" PRAGMA="" RTLNAME="t5_V_U" SOURCE="kernel.cpp:648" URAM="0" VARIABLE="t5_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/t6_V_U" BINDMODULE="network_t6_V_RAM_AUTO_1R1W" DEPTH="1" TYPE="resource" MODULENAME="t6_V_RAM_AUTO_1R1W" DISPNAME="t6_V_U" RTLNAME="network_t6_V_RAM_AUTO_1R1W">
+      <Resources BRAM="1"/>
+      <BindNode BINDTYPE="storage" BRAM="1" BUNDLEDNAME="" DISPNAME="bind_storage ram_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="ram_1p" PRAGMA="" RTLNAME="t6_V_U" SOURCE="kernel.cpp:649" URAM="0" VARIABLE="t6_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/t7_V_U" BINDMODULE="network_t6_V_RAM_AUTO_1R1W" DEPTH="1" TYPE="resource" MODULENAME="t6_V_RAM_AUTO_1R1W" DISPNAME="t7_V_U" RTLNAME="network_t6_V_RAM_AUTO_1R1W">
+      <Resources BRAM="1" LUT="15"/>
+      <BindNode BINDTYPE="storage" BRAM="1" BUNDLEDNAME="" DISPNAME="bind_storage ram_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="ram_1p" PRAGMA="" RTLNAME="t7_V_U" SOURCE="kernel.cpp:650" URAM="0" VARIABLE="t7_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/t8_V_U" BINDMODULE="network_t8_V_RAM_AUTO_1R1W" DEPTH="1" TYPE="resource" MODULENAME="t8_V_RAM_AUTO_1R1W" DISPNAME="t8_V_U" RTLNAME="network_t8_V_RAM_AUTO_1R1W">
+      <Resources BRAM="1" LUT="15"/>
+      <BindNode BINDTYPE="storage" BRAM="1" BUNDLEDNAME="" DISPNAME="bind_storage ram_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="ram_1p" PRAGMA="" RTLNAME="t8_V_U" SOURCE="kernel.cpp:651" URAM="0" VARIABLE="t8_V"/>
+    </RtlModule>
+  </RtlModules>
+  <TimingPaths>
+    <TPATH DATAPATH_DELAY="8.960" DATAPATH_LOGIC_DELAY="2.711" DATAPATH_NET_DELAY="6.249" ENDPOINT_PIN="t4_V_U/ram_reg/ADDRBWRADDR[13]" LOGIC_LEVELS="9" MAX_FANOUT="288" SLACK="0.217" STARTPOINT_PIN="grp_conv2_fu_224_ap_start_reg_reg/C">
+      <CELL NAME="grp_conv2_fu_224_ap_start_reg_reg" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="673"/>
+      <CELL NAME="grp_conv2_fu_224/w_V_2_U/reg_1555[7]_i_4" PRIMITIVE_TYPE="LUT.others.LUT3" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_439" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_262" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_112__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_116__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="3976"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_74__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="2436"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_72__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="2436"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_47" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_pad2_fu_218/grp_pad2_Pipeline_pad2_side_L5_fu_49/ram_reg_i_13__0" PRIMITIVE_TYPE="MUXFX.others.MUXF7" LINE_NUMBER="239"/>
+      <CELL NAME="t4_V_U/ram_reg" PRIMITIVE_TYPE="BMEM.bram.RAMB18E1" LINE_NUMBER="38"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="8.844" DATAPATH_LOGIC_DELAY="2.598" DATAPATH_NET_DELAY="6.246" ENDPOINT_PIN="t4_V_U/ram_reg/ADDRBWRADDR[12]" LOGIC_LEVELS="9" MAX_FANOUT="288" SLACK="0.331" STARTPOINT_PIN="grp_conv2_fu_224_ap_start_reg_reg/C">
+      <CELL NAME="grp_conv2_fu_224_ap_start_reg_reg" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="673"/>
+      <CELL NAME="grp_conv2_fu_224/w_V_2_U/reg_1555[7]_i_4" PRIMITIVE_TYPE="LUT.others.LUT3" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_439" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_262" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_112__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_116__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="3976"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_74__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="2436"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_72__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="2436"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_49" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_pad2_fu_218/grp_pad2_Pipeline_pad2_side_L5_fu_49/ram_reg_i_14__0" PRIMITIVE_TYPE="MUXFX.others.MUXF7" LINE_NUMBER="239"/>
+      <CELL NAME="t4_V_U/ram_reg" PRIMITIVE_TYPE="BMEM.bram.RAMB18E1" LINE_NUMBER="38"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="8.838" DATAPATH_LOGIC_DELAY="2.561" DATAPATH_NET_DELAY="6.277" ENDPOINT_PIN="t4_V_U/ram_reg/ADDRBWRADDR[10]" LOGIC_LEVELS="9" MAX_FANOUT="120" SLACK="0.338" STARTPOINT_PIN="grp_conv2_fu_224/ap_enable_reg_pp0_iter0_reg_reg/C">
+      <CELL NAME="grp_conv2_fu_224/ap_enable_reg_pp0_iter0_reg_reg" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="2437"/>
+      <CELL NAME="grp_conv2_fu_224/w_V_2_U/q1_reg_i_86" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_292" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_123__0" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_76" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_80" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="3976"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_64__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="2436"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_74__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="2436"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_53" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_pad2_fu_218/grp_pad2_Pipeline_pad2_side_L5_fu_49/ram_reg_i_16__0" PRIMITIVE_TYPE="MUXFX.others.MUXF7" LINE_NUMBER="239"/>
+      <CELL NAME="t4_V_U/ram_reg" PRIMITIVE_TYPE="BMEM.bram.RAMB18E1" LINE_NUMBER="38"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="8.810" DATAPATH_LOGIC_DELAY="2.611" DATAPATH_NET_DELAY="6.199" ENDPOINT_PIN="t4_V_U/ram_reg/ADDRBWRADDR[11]" LOGIC_LEVELS="9" MAX_FANOUT="120" SLACK="0.365" STARTPOINT_PIN="grp_conv2_fu_224/ap_enable_reg_pp0_iter0_reg_reg/C">
+      <CELL NAME="grp_conv2_fu_224/ap_enable_reg_pp0_iter0_reg_reg" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="2437"/>
+      <CELL NAME="grp_conv2_fu_224/w_V_2_U/q1_reg_i_86" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_292" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_123__0" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_76" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_80" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="3976"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_64__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="2436"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_74__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="2436"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_51__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_pad2_fu_218/grp_pad2_Pipeline_pad2_side_L5_fu_49/ram_reg_i_15__0" PRIMITIVE_TYPE="MUXFX.others.MUXF7" LINE_NUMBER="239"/>
+      <CELL NAME="t4_V_U/ram_reg" PRIMITIVE_TYPE="BMEM.bram.RAMB18E1" LINE_NUMBER="38"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="8.969" DATAPATH_LOGIC_DELAY="2.677" DATAPATH_NET_DELAY="6.292" ENDPOINT_PIN="t4_V_U/ram_reg/ADDRARDADDR[9]" LOGIC_LEVELS="9" MAX_FANOUT="120" SLACK="0.381" STARTPOINT_PIN="grp_conv2_fu_224/ap_enable_reg_pp0_iter0_reg_reg/C">
+      <CELL NAME="grp_conv2_fu_224/ap_enable_reg_pp0_iter0_reg_reg" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="2437"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_645" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_515" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_213" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_97__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_101__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="3984"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_70" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="2436"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_68__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="2436"/>
+      <CELL NAME="grp_conv2_fu_224/ram_reg_i_39" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="2429"/>
+      <CELL NAME="grp_pad2_fu_218/grp_pad2_Pipeline_pad2_side_L5_fu_49/ram_reg_i_7__0" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="239"/>
+      <CELL NAME="t4_V_U/ram_reg" PRIMITIVE_TYPE="BMEM.bram.RAMB18E1" LINE_NUMBER="38"/>
+    </TPATH>
+  </TimingPaths>
+  <VivadoReportFiles>
+    <ReportFile TYPE="design_analysis" PATH="verilog/report/network_design_analysis_routed.rpt"/>
+    <ReportFile TYPE="failfast" PATH="verilog/report/network_failfast_routed.rpt"/>
+    <ReportFile TYPE="status" PATH="verilog/report/network_status_routed.rpt"/>
+    <ReportFile TYPE="timing" PATH="verilog/report/network_timing_routed.rpt"/>
+    <ReportFile TYPE="timing_paths" PATH="verilog/report/network_timing_paths_routed.rpt"/>
+    <ReportFile TYPE="utilization" PATH="verilog/report/network_utilization_routed.rpt"/>
+    <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/network_utilization_hierarchical_routed.rpt"/>
+  </VivadoReportFiles>
+  <GeneralInfo NAME="General Information">
+    <item NAME="Date" VALUE="Fri Oct 23 15:31:46 -03 2026"/>
+    <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
+    <item NAME="Project" VALUE="proj"/>
+    <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>
+    <item NAME="Product family" VALUE="artix7"/>
+    <item NAME="Target device" VALUE="xc7a100t-csg324-1"/>
+  </GeneralInfo>
+  <RunOptions NAME="Run Constraints &amp; Options">
+    <General NAME="Design Constraints &amp; Options">
+      <item NAME="Place &amp; Route target clock" VALUE="10 ns"/>
+      <item NAME="C-Synthesis target clock" VALUE="10 ns"/>
+      <item NAME="C-Synthesis uncertainty" VALUE="27%"/>
+      <item NAME="config_export -ip_xdc_file" VALUE=""/>
+      <item NAME="config_export -ip_xdc_ooc_file" VALUE=""/>
+    </General>
+    <Syn NAME="RTL Synthesis Options">
+      <item NAME="config_export -vivado_synth_strategy" VALUE="default"/>
+      <item NAME="config_export -vivado_synth_design_args" VALUE="-directive sdx_optimization_effort_high"/>
+    </Syn>
+    <Impl NAME="Place &amp; Route Options">
+      <item NAME="config_export -vivado_impl_strategy" VALUE="default"/>
+      <item NAME="config_export -vivado_phys_opt" VALUE="none"/>
+      <item NAME="config_export -vivado_pblock" VALUE=""/>
+    </Impl>
+    <Reporting NAME="Reporting Options">
+      <item NAME="config_export -vivado_report_level" VALUE="2"/>
+      <item NAME="config_export -vivado_max_timing_paths" VALUE="10"/>
+    </Reporting>
+  </RunOptions>
+</profile>
+

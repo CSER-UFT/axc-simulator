@@ -10,6 +10,7 @@ import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate,
 import { archSvg } from './axc/nnsvg.js';
 import { networkCost, normalizeDirectives, directiveTrees, parOptions, CONV_PIPES, DENSE_PIPES } from './axc/nngen.js';
 import { esc, accuracyCostSvg } from './ui/plots.js';
+import { highlightC } from './hls/highlight.js';
 import { Help } from './ui/help.js';
 import { initFigureExport } from './ui/figexport.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale, dec } from './i18n/index.js';
@@ -230,14 +231,16 @@ async function render() {
     const approxOn = setup.override ? nnOverride.map((a) => !!(a.mul || a.add)) : mask;
     const approxMacs = macs.reduce((a, m, i) => a + (approxOn[i] ? m : 0), 0);
     const label = setup.override ? t('nn.searchLabel') : `${setup.mul ? dn(unitName(setup.mul.cfg)) : t('nn.mulExact')} + ${setup.add ? dn(unitName(setup.add.cfg)) : t('nn.addExact')}`;
-    let h = '<table class="kv">';
-    h += `<tr><th>${t('nn.accExact')}</th><td class="mono">${pct(sx.accuracy)}</td></tr>`;
-    if (refUnitPreds) h += `<tr><th>${t('nn.accRefUnit', { name: dn(unitName(refUnit.cfg)) })}</th><td class="mono">${pct(summarize(test, refUnitPreds, null, classes).accuracy)}</td></tr>`;
-    h += `<tr><th><b>${esc(t('nn.accUnit', { name: label }))}</b></th><td class="mono"><b>${pct(su.accuracy)}</b> (${su.accuracy >= sx.accuracy ? '+' : '−'}${nf(Math.abs(su.accuracy - sx.accuracy) * 100, 1)} ${t('nn.pp')})</td></tr>`;
-    h += `<tr><th>${t('nn.changed')}</th><td class="mono">${t('nn.changedV', { broke: su.broke.length, fixed: su.fixed })}</td></tr>`;
-    h += `<tr><th>${t('nn.approxMacs')}</th><td class="mono">${nf(approxMacs)} ${t('nn.of')} ${nf(total)} (${pct(approxMacs / total)})</td></tr>`;
-    h += '</table>';
-    $('nnTable').innerHTML = h;
+    // Cartões, como o resumo da página de síntese de alto nível.
+    const card = (k, v, u = '') => `<div class="metric"><div class="k">${esc(k)}</div><div class="v">${v}</div><div class="u">${esc(u)}</div></div>`;
+    const diff = `${su.accuracy >= sx.accuracy ? '+' : '−'}${nf(Math.abs(su.accuracy - sx.accuracy) * 100, 1)} ${t('nn.pp')}`;
+    $('nnTable').innerHTML = `<div class="metrics-grid">${[
+        card(t('nn.accExact'), pct(sx.accuracy), `${nf(test.n)} ${t('nn.images')}`),
+        refUnitPreds ? card(t('nn.accRefUnit', { name: dn(unitName(refUnit.cfg)) }), pct(summarize(test, refUnitPreds, null, classes).accuracy)) : '',
+        card(t('nn.accUnit', { name: label }), pct(su.accuracy), diff),
+        card(t('nn.changed'), `${su.broke.length} / ${su.fixed}`, t('nn.changedU')),
+        card(t('nn.approxMacsShort'), pct(approxMacs / total), `${nf(approxMacs)} ${t('nn.of')} ${nf(total)}`),
+    ].join('')}</div>`;
     $('nnNote').innerHTML = modelNote(net) + (refUnitPreds ? ` ${t('nn.booth8')}` : '') + (setup.override ? ` ${t('nn.accumArchNote')}` : '') + (setup.add ? ` ${t(setup.add.cfg.width >= 32 ? 'nn.adderNote32' : 'nn.adderNote', { n: setup.add.cfg.width })} ${t({ tree: 'nn.accumTreeNote', chain: 'nn.accumChainNote', arch: 'nn.accumArchNote' }[accumMode()])}` : '');
     // Nomes curtos (dígitos) vão direto na matriz; nomes longos viram índices, com a legenda embaixo.
     const names = net.dataset.classes ?? Array.from({ length: classes }, (_, k) => String(k));
@@ -256,6 +259,17 @@ async function render() {
     for (const cv of $('nnBroke').querySelectorAll('canvas')) drawImage(cv, test.images.subarray(+cv.dataset.k * test.size, (+cv.dataset.k + 1) * test.size), test.shape);
     renderCost();
 }
+
+// Abas (como na página de síntese de alto nível) ------------------------------------------------------------------
+let tab = ['result', 'cost', 'code', 'search', 'arch'].includes(store.get('nn.tab')) ? store.get('nn.tab') : 'result';
+function setTab(t2) {
+    tab = t2;
+    store.set('nn.tab', tab);
+    for (const b of $('nnTabs').querySelectorAll('[data-tab]')) b.classList.toggle('sel', b.dataset.tab === tab);
+    for (const p of document.querySelectorAll('.nn-main .pane')) p.classList.toggle('hidden', p.id !== `pane-${tab}`);
+}
+$('nnTabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) setTab(b.dataset.tab); });
+setTab(tab);
 
 // Diretivas por camada -------------------------------------------------------------------------------------------
 function loadDirs(net) {
@@ -306,7 +320,7 @@ function renderCode() {
     sel.value = lastKernels.some((k) => k.name === cur) ? cur : (lastKernels.find((k) => k.site !== null)?.name ?? '');
     const k = lastKernels.find((x) => x.name === sel.value);
     // Os pesos ficam numa linha só, que pode ser longa: o código vai como está.
-    $('nnCode').textContent = k ? k.src : '';
+    $('nnCode').innerHTML = k ? highlightC(k.src) : '';
 }
 $('nnCodeLayer').addEventListener('change', renderCode);
 
@@ -354,15 +368,25 @@ async function renderCost() {
     if (run !== costRun) return;
     const d = (a, b) => (b ? `${a <= b ? '−' : '+'}${nf(Math.abs(100 * (1 - a / b)), 1)}%` : '');
     const asic = o.target === 'asic';
-    let h = `<table class="kv"><tr><th></th><td class="note">${t('nn.costCycles')}</td><td class="note">II</td><td class="note">${asic ? 'µm²' : 'LUT'}</td><td class="note">${asic ? 'FF' : 'FF'}</td><td class="note">DSP</td><td class="note">nJ</td></tr>`;
+    let h = `<table class="hls-table"><tr><th></th><th>${t('nn.costCycles')}</th><th>II</th><th>${asic ? 'µm²' : 'LUT'}</th><th>FF</th><th>DSP</th><th>nJ</th><th class="left">${t('nn.costUnits')}</th></tr>`;
     for (const l of c.layers) {
         const e = ex.layers.find((x) => x.name === l.name);
         const main = asic ? l.area : l.luts, mainEx = asic ? e.area : e.luts;
-        h += `<tr><th class="mono">${esc(l.name)}${l.approx ? ' *' : ''}</th><td class="mono">${nf(l.cycles)}</td><td class="mono"${whyText(l.IIwhy) ? ` title="${esc(whyText(l.IIwhy))}"` : ''}>${l.II ?? '-'}${whyText(l.IIwhy) ? '<sup>†</sup>' : ''}</td><td class="mono">${nf(main, 0)}${main !== mainEx ? ` <span class="note">(${d(main, mainEx)})</span>` : ''}</td><td class="mono">${nf(l.ff)}</td><td class="mono">${l.dsp}</td><td class="mono">${nf(l.energy / 1e6, 2)}</td></tr>`;
+        const us = l.units.filter((u) => !/ exato$/.test(u.name) || l.site !== null).map((u) => `${u.count} × ${esc(dn(u.name))}`).join(', ');
+        h += `<tr><td class="mono">${esc(l.name)}${l.approx ? ' *' : ''}</td><td class="mono">${nf(l.cycles)}</td><td class="mono"${whyText(l.IIwhy) ? ` title="${esc(whyText(l.IIwhy))}"` : ''}>${l.II ?? '-'}${whyText(l.IIwhy) ? '<sup>†</sup>' : ''}</td><td class="mono">${nf(main, 0)}${main !== mainEx ? ` <span class="note">(${d(main, mainEx)})</span>` : ''}</td><td class="mono">${nf(l.ff)}</td><td class="mono">${l.dsp}</td><td class="mono">${nf(l.energy / 1e6, 2)}</td><td class="units">${us}</td></tr>`;
     }
     const T = c.totals, X = ex.totals, main = asic ? T.area : T.luts, mainEx = asic ? X.area : X.luts;
-    h += `<tr><th><b>${t('nn.costTotal')}</b></th><td class="mono"><b>${nf(T.cycles)}</b></td><td></td><td class="mono"><b>${nf(main, 0)}</b> (${d(main, mainEx)})</td><td class="mono">${nf(T.ff)}</td><td class="mono">${T.dsp}</td><td class="mono"><b>${nf(T.energy / 1e6, 1)}</b> (${d(T.energy, X.energy)})</td></tr></table>`;
+    h += `<tr class="best"><td>${t('nn.costTotal')}</td><td class="mono">${nf(T.cycles)}</td><td></td><td class="mono">${nf(main, 0)} (${d(main, mainEx)})</td><td class="mono">${nf(T.ff)}</td><td class="mono">${T.dsp}</td><td class="mono">${nf(T.energy / 1e6, 1)} (${d(T.energy, X.energy)})</td><td class="units">${T.requantShared ? esc(t('nn.costShared')) : ''}</td></tr></table>`;
     $('nnCost').innerHTML = h;
+    const card = (k, v, u = '') => `<div class="metric"><div class="k">${esc(k)}</div><div class="v">${v}</div><div class="u">${esc(u)}</div></div>`;
+    $('nnCostSummary').innerHTML = `<div class="metrics-grid">${[
+        card(t('nn.m.cycles'), nf(T.cycles), t('nn.m.cyclesU', { ns: nf(o.clockNs, 1) })),
+        card(t('nn.m.time'), nf(T.timeUs, 1), 'µs'),
+        asic ? card(t('nn.m.area'), nf(T.area, 0), `µm² (sky130) ${mainEx !== main ? d(main, mainEx) : ''}`) : card(t('nn.m.luts'), nf(T.luts), `LUT, ${nf(T.carry4)} CARRY4 ${mainEx !== main ? d(main, mainEx) : ''}`),
+        card('FF', nf(T.ff), t('nn.m.ffU')),
+        card('DSP48', nf(T.dsp), t('nn.m.dspU')),
+        card(t('nn.m.energy'), nf(T.energy / 1e6, 1), `nJ ${T.energy !== X.energy ? d(T.energy, X.energy) : ''}`),
+    ].join('')}</div>`;
     lastKernels = c.layers.map((l) => ({ name: l.name, site: l.site, src: l.src }));
     renderCode();
     const limited = c.layers.filter((l) => whyText(l.IIwhy)).map((l) => `${esc(l.name)} (${esc(whyText(l.IIwhy))})`);
@@ -467,11 +491,11 @@ function renderSearch() {
     const unit = { area: 'µm²', luts: 'LUT', energy: 'nJ' }[obj];
     const val = (x) => (obj === 'energy' ? x / 1e6 : x);
     const pp = (a, b) => `${a >= b ? '+' : '−'}${nf(Math.abs(a - b) * 100, 1)} ${t('nn.pp')}`;
-    let h = `<table class="kv"><tr><th></th><td class="note">${t('nn.searchExact')}</td><td class="note">${t('nn.searchBest')}</td></tr>`;
+    let h = `<table class="hls-table"><tr><th></th><td class="note">${t('nn.searchExact')}</td><td class="note">${t('nn.searchBest')}</td></tr>`;
     h += `<tr><th>${t(`nn.searchObj_${obj}`)}</th><td class="mono">${nf(val(r.exact.cost), 0)} ${unit}</td><td class="mono"><b>${nf(val(r.best.cost), 0)} ${unit}</b> (−${nf(100 * r.best.saving, 1)}%)</td></tr>`;
     h += `<tr><th>${t('nn.searchAccVal', { n: r.n })}</th><td class="mono">${pct(r.exact.accVal)}</td><td class="mono">${pct(r.best.accVal)} (${pp(r.best.accVal, r.exact.accVal)})</td></tr>`;
     h += `<tr><th>${t('nn.searchAccTest', { n: r.testN })}</th><td class="mono">${pct(r.exact.accTest)}</td><td class="mono"><b>${pct(r.best.accTest)}</b> (${pp(r.best.accTest, r.exact.accTest)})</td></tr></table>`;
-    h += `<table class="kv" style="margin-top:8px"><tr><th></th><td class="note">${t('nn.mul')}</td><td class="note">${t('nn.adder')}</td><td class="note">${unit}</td></tr>`;
+    h += `<table class="hls-table" style="margin-top:8px"><tr><th></th><td class="note">${t('nn.mul')}</td><td class="note">${t('nn.adder')}</td><td class="note">${unit}</td></tr>`;
     net.sites.forEach((l, i) => {
         const a = r.best.assign[i], lb = r.layersBest.find((x) => x.site === i), le = r.layersExact.find((x) => x.site === i);
         const v = val(lb[obj]), ve = val(le[obj]);
@@ -479,18 +503,22 @@ function renderSearch() {
     });
     h += '</table>';
     h += `<div class="row" style="margin-top:6px"><button type="button" class="btn primary" id="nnSearchApply">${t('nn.searchApply')}</button></div>`;
+    const left = h;
+    h = '';
     // Pontos avaliados por inteiro (os inviáveis abandonados no meio não têm acurácia).
     const pts = r.points.filter((p) => p.full).map((p) => ({ x: (100 * p.cost) / r.exact.cost, y: 100 * (1 - p.wrong / r.n), infeasible: !p.feasible, label: p.assign.map((a, i) => (a.mul || a.add ? `${net.sites[i].name}: ${[a.mul, a.add].filter(Boolean).join(' + ')}` : '')).filter(Boolean).join('; ') || t('nn.searchExact') }));
     const front = new Set(r.front.map((f) => JSON.stringify(f.assign)));
     for (const [k, p] of r.points.filter((q) => q.full).entries()) { if (front.has(JSON.stringify(p.assign))) pts[k].front = true; }
     pts.push({ x: 100, y: 100 * r.exact.accVal, label: t('nn.searchExact') });
     pts.push({ x: (100 * r.best.cost) / r.exact.cost, y: 100 * r.best.accVal, label: t('nn.searchBest'), current: true, front: true });
-    h += `<figure style="margin-top:8px">${accuracyCostSvg(pts, { xLabel: t('nn.searchPlotX', { obj: t(`nn.searchObj_${obj}`) }), yLabel: t('nn.searchPlotY'), limit: 100 * (r.exact.accVal - r.maxDrop / 100), width: 520, height: 300 })}</figure>`;
+    h += `<figure style="margin:0">${accuracyCostSvg(pts, { xLabel: t('nn.searchPlotX', { obj: t(`nn.searchObj_${obj}`) }), yLabel: t('nn.searchPlotY'), limit: 100 * (r.exact.accVal - r.maxDrop / 100), width: 520, height: 300 })}</figure>`;
     const se = (a, n) => 100 * Math.sqrt((a * (1 - a)) / n);
+    const plot = h;
+    h = '';
     h += `<p class="note">${t('nn.searchNoise', { n: r.n, se: nf(se(r.exact.accVal, r.n), 1), seT: nf(se(r.exact.accTest, r.testN), 1), dv: nf(100 * (r.exact.accVal - r.best.accVal), 1), dt: nf(100 * (r.exact.accTest - r.best.accTest), 1) })}</p>`;
     h += `<p class="note">${t('nn.searchNote', { cands: r.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} × ${c.add.length}`).join(', '), maxWrong: r.maxWrong, n: r.n })}</p>`;
-    $('nnSearchResult').innerHTML = h;
-    $('nnSearchApply').onclick = () => { setOverride(r.best.assign); render(); $('nnTable').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+    $('nnSearchResult').innerHTML = `<div class="nn-search-out"><div>${left}</div><div>${plot}</div></div>${h}`;
+    $('nnSearchApply').onclick = () => { setOverride(r.best.assign); setTab('result'); render(); };
 }
 $('nnSensBtn').onclick = async () => {
     if (!nnData) return;
@@ -508,7 +536,7 @@ $('nnSensBtn').onclick = async () => {
         rows.push(`<tr><th>${esc(net.sites[i].name)}</th><td class="mono">${pct(macs[i] / total)}</td><td class="mono">${pct(summarize(test, preds, null, net.classes).accuracy)}</td></tr>`);
     }
     $('nnStatus').textContent = '';
-    $('nnSens').innerHTML = `<h3 style="margin-top:10px">${t('nn.sensTitle')}</h3><table class="kv"><tr><th></th><td class="note">${t('nn.sensMacs')}</td><td class="note">${t('nn.sensAcc')}</td></tr>${rows.join('')}</table><p class="note">${t('nn.sensNote')}</p>`;
+    $('nnSens').innerHTML = `<h3 style="margin-top:10px">${t('nn.sensTitle')}</h3><table class="hls-table"><tr><th></th><td class="note">${t('nn.sensMacs')}</td><td class="note">${t('nn.sensAcc')}</td></tr>${rows.join('')}</table><p class="note">${t('nn.sensNote')}</p>`;
 };
 
 // Idioma e tema ------------------------------------------------------------------------------------------------

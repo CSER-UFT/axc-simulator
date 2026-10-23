@@ -235,7 +235,7 @@ const base = {
 </ul>
 <p>A busca leva cerca de 1 minuto na MiniLenet e 2 minutos na LeNet 5 do CIFAR 10 com 2 workers; com mais núcleos, a fase de sensibilidade fica proporcionalmente mais rápida, e a de combinação (uma avaliação depois da outra) não muda.</p>
 <h3>Exportação para o Vitis HLS e o Vivado</h3>
-<p>O botão <strong>Exportar projeto (Vitis HLS e Vivado)</strong>, na seção de custo, gera um .zip com a configuração da página (as diretivas, o período e as unidades dos seletores ou as da busca aplicada):</p>
+<p>O botão <strong>Exportar projeto (Vitis HLS e Vivado)</strong>, na aba Custo, gera um .zip com a configuração da página (as diretivas, o período e as unidades dos seletores ou as da busca aplicada):</p>
 <ul>
     <li><strong>network/</strong>: a rede inteira, para o Vitis HLS 2022.2. O kernel.cpp tem uma função por camada (o mesmo projeto elaborado que o modelo de custo avalia, com INLINE off para cada função ter o seu relatório) e o topo <code>network()</code>, que chama as camadas em sequência com vetores locais entre elas, como o código C da MiniLenet. As unidades aproximadas entram como caixa preta de RTL (o Verilog da netlist com o invólucro que o Vitis exige, e o modelo C da mesma netlist para a csim), e a reescala como uma função com a multiplicação de 32 × 32 bits em DSP. O testbench passa as imagens de teste pedidas e confere todas as saídas com a execução bit a bit do simulador (<code>AXC_MISMATCHES</code>) e conta os acertos (<code>AXC_ACCURACY</code>);</li>
     <li><strong>layers/&lt;camada&gt;/</strong>: cada camada sozinha, com as suas partições, que é o que o modelo de custo supõe; servem para comparar latência, II e recursos camada a camada;</li>

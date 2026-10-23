@@ -23,6 +23,12 @@ import { bitsFor, typeRange } from './elab.js';
 import { outputArrays, inputArrays } from './exec.js';
 
 export const cName = (unitName) => `u_${unitName.replace(/[^A-Za-z0-9]+/g, '_').replace(/_$/, '')}`;
+/** Nome da versão em C++ de uma unidade para as regiões sem pipeline (fora da caixa preta). */
+const seqName = (unitName) => `uc_${cName(unitName).slice(2)}`;
+/** Funções C++ (netlist) das unidades usadas fora dos laços com pipeline, com os nomes uc_*. */
+export function seqUnitsCode(lib, names) {
+    return names.length ? unitFunctions(lib, names, true).replace(/\bu_(?=[A-Za-z0-9])/g, 'uc_') : '';
+}
 const vName = (id) => `v${id.slice(1).replace('.', '_')}`;
 const cType = (range) => (range[0] < 0 ? `ap_int<${bitsFor(range)}>` : `ap_uint<${bitsFor(range)}>`);
 const arrType = (t) => (t.signed ? `ap_int<${t.bits}>` : `ap_uint<${t.bits}>`);
@@ -260,6 +266,8 @@ export function exportIR(result, { inline = false } = {}) {
         '',
         unitFunctions(result.lib, f.units, inline),
         '',
+        seqUnitsCode(result.lib, f.seqUnits),
+        '',
         ...(f.requant ? [REQUANT_CPP, ''] : []),
         f.code,
     ];
@@ -298,7 +306,11 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
     const lines = [];
     const ind = (d) => '    '.repeat(d);
     const decl = (n) => (hoist.has(n.id) ? '' : `${n.op === 'cmp' ? 'bool' : cType(n.range)} `);
-    const unitsUsed = new Set(asg.values());
+    // Unidades chamadas dentro de laços com pipeline (caixa preta ou C++, conforme a exportação) e fora deles: o
+    // Vitis 2022.2 não aceita a caixa preta de RTL (ap_ctrl_none) numa região sequencial (HLS 200-1918), e ali vai
+    // a mesma netlist em C++ (uc_*).
+    const unitsUsed = new Set(), seqUnits = new Set();
+    let piped = false;
     function emitNode(n, d) {
         const a = n.args;
         const T = n.op === 'cmp' ? 'bool' : cType(n.range);
@@ -317,7 +329,8 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
                 const name = asg.get(n.id);
                 if (!name) { set(`${T}(${val(a[0])} ${n.op === 'add' ? '+' : n.op === 'sub' ? '-' : '*'} ${val(a[1])})`); return; }
                 const u = result.lib.unitByName(name), N = u.cfg.width, W = u.cfg.kind === 'mul' ? 2 * N : N + 1;
-                const f = cName(name);
+                const f = piped ? cName(name) : seqName(name);
+                (piped ? unitsUsed : seqUnits).add(name);
                 if (u.cfg.kind === 'add' && n.op === 'sub') { set(`${T}(ap_uint<${N}>(~ap_uint<${N}>(${f}(ap_uint<${N}>(~ap_uint<${N}>(${val(a[0])})), ap_uint<${N}>(${val(a[1])})))))`); return; }
                 if (u.cfg.kind === 'add') {
                     // Soma com sinal: módulo 2^N (sem o vai um); sem sinal, o vai um faz parte do resultado.
@@ -360,7 +373,10 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
             lines.push(`${ind(d)}${L.label ?? L.id}: for (int ${t} = 0; ${t} < ${L.tripHw}; ${t}++) {`);
             lines.push(L.mode === 'pipelined' ? `#pragma HLS PIPELINE II=${L.II ?? 1}` : '#pragma HLS PIPELINE off');
             for (const t of L.pragmas ?? []) lines.push(`#pragma HLS ${t}`);
+            const was = piped;
+            piped = piped || L.mode === 'pipelined';
             emitRegion(it.region, d + 1);
+            piped = was;
             lines.push(`${ind(d)}}`);
         }
     }
@@ -371,16 +387,18 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
     const code = [
         `${prototype(design)} {`,
         ...(interfaces ? interfacePragmas(design) : []),
-        ...partitionPragmas({ arrays: design.arrays.filter(keep) }),
+        // As tabelas e os vetores locais antes das partições: a diretiva só enxerga um vetor já declarado.
         ...roms.map((a) => `    static const ${arrType(a.type)} ${a.name}[${a.dims.join('][')}] = {${a.init.join(', ')}};`),
         ...rams.map((a) => `    ${arrType(a.type)} ${a.name}[${a.dims.join('][')}];`),
+        // Só os vetores declarados (uma tabela sem acesso, com os índices todos constantes, não existe no C++).
+        ...partitionPragmas({ arrays: design.arrays.filter((a) => keep(a) && (a.kind !== 'rom' || a.accesses > 0)) }),
         ...[...hoist].filter((id) => byId.has(id)).map((id) => `    ${byId.get(id).op === 'cmp' ? 'bool' : cType(byId.get(id).range)} ${vName(id)} = 0;`),
         ...carries.map((n) => `    ${cType(n.range)} c${vName(n.id)} = 0;`),
         ...lines,
         '}',
         '',
     ];
-    return { code: code.join('\n'), units: [...unitsUsed], requant: usesRequant(design) };
+    return { code: code.join('\n'), units: [...unitsUsed], seqUnits: [...seqUnits], requant: usesRequant(design) };
 }
 
 /** Cabeçalho comum: tipos e a declaração do kernel. */

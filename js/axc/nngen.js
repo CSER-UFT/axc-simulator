@@ -193,10 +193,11 @@ export function networkKernels(net, dirs = null) {
 }
 
 function padKernel(name, C, H, W, p, z, Hs = H, HPs = H + 2 * p) {
-    // Cinco laços retangulares (linhas de cima e de baixo, colunas da esquerda e da direita, miolo): os índices
-    // ficam afins, e o total de escritas é o mesmo da função do C, (H + 2P) x (W + 2P). As duas escritas de cada
-    // laço da borda nunca caem na mesma posição; sem a diretiva dependence, o Vitis 2022.2 não prova isso com o canal
-    // no laço de fora e põe II 2 no laço das colunas (relatório da MiniLenet, pad2).
+    // Laços retangulares (linhas de cima e de baixo, colunas da esquerda, colunas da direita, miolo): os índices
+    // ficam afins, e o total de escritas é o mesmo da função do C, (H + 2P) x (W + 2P). As colunas da esquerda e as
+    // da direita ficam em laços separados: com as duas escritas na mesma linha, o Vitis 2022.2 via uma dependência
+    // entre iterações e punha II 2 (relatório da MiniLenet, pad2), e a diretiva dependence na porta do kernel não
+    // passa na verificação de síntese (SYNCHK 200-43).
     return `// ${name}: borda de ${p} pixels com o ponto zero da entrada (${z}), como a função de padding do C.
 #define C ${C}
 #define H ${H}
@@ -213,16 +214,19 @@ ${name}_top:
         for (int h = 0; h < P; h++)
             for (int w = 0; w < WP; w++) {
 #pragma HLS pipeline II=1
-#pragma HLS dependence variable=y type=inter false
                 y[c * ${HPs !== H + 2 * p ? 'HPS' : 'HP'} + h][w] = Z;
                 y[c * ${HPs !== H + 2 * p ? 'HPS' : 'HP'} + H + P + h][w] = Z;
             }
-${name}_side:
+${name}_left:
         for (int h = 0; h < H; h++)
             for (int w = 0; w < P; w++) {
 #pragma HLS pipeline II=1
-#pragma HLS dependence variable=y type=inter false
                 y[c * ${HPs !== H + 2 * p ? 'HPS' : 'HP'} + P + h][w] = Z;
+            }
+${name}_right:
+        for (int h = 0; h < H; h++)
+            for (int w = 0; w < P; w++) {
+#pragma HLS pipeline II=1
                 y[c * ${HPs !== H + 2 * p ? 'HPS' : 'HP'} + P + h][W + P + w] = Z;
             }
 ${name}_in:
@@ -505,6 +509,8 @@ export function costModel(net, o) {
             src: k.src,
             units: r.cost.units.map((u) => ({ name: u.unit.name, count: u.count })),
             warnings,
+            // Peças de reescala da camada (a rede compartilha uma só entre as camadas, veja network).
+            rq: (() => { const c = r.cost.cells.filter((x) => x.cls === 'requant'); const t = (f) => c.reduce((a, x) => a + (x[f] ?? 0), 0); return { count: t('count'), dsp: t('dsp'), luts: t('luts'), carry4: t('carry4'), area: t('area') }; })(),
         };
         // A síntese (projeto, atribuição, biblioteca) fica junto, fora do JSON: é dela que sai o C++ (nnexport.js).
         Object.defineProperty(row, 'result', { value: r, enumerable: false });
@@ -519,9 +525,15 @@ export function costModel(net, o) {
         const layers = kernels.map((k) => (k.site === null ? kernel(k) : kernel(k, units[k.site]?.mul ?? null, units[k.site]?.add ?? null)));
         const sum = (f) => layers.reduce((a, x) => a + x[f], 0);
         const cycles = sum('cycles');
+        // Reescala compartilhada: as camadas rodam uma depois da outra, e o Vitis 2022.2 instancia o módulo da reescala
+        // uma vez só no topo da rede (MiniLenet: 2 DSP48 na rede, 2 em cada camada sozinha). Na soma, ficam as peças
+        // da camada que mais usa, no lugar das de todas.
+        const rqAll = (f) => layers.reduce((a, x) => a + (x.rq?.[f] ?? 0), 0);
+        const big = layers.reduce((b, x) => ((x.rq?.dsp ?? 0) > (b?.rq?.dsp ?? -1) ? x : b), null)?.rq ?? { dsp: 0, luts: 0, carry4: 0, area: 0 };
+        const shared = (f) => rqAll(f) - (big[f] ?? 0);
         return {
             layers, warnings: [...new Set(layers.flatMap((l) => l.warnings))],
-            totals: { cycles, timeUs: (cycles * clockNs) / 1000, area: sum('area'), luts: sum('luts'), carry4: sum('carry4'), ff: sum('ff'), dsp: sum('dsp'), energy: sum('energy'), clockNs },
+            totals: { cycles, timeUs: (cycles * clockNs) / 1000, area: sum('area') - shared('area'), luts: sum('luts') - shared('luts'), carry4: sum('carry4') - shared('carry4'), ff: sum('ff'), dsp: sum('dsp') - shared('dsp'), energy: sum('energy'), clockNs, requantShared: shared('dsp') > 0 || shared('luts') > 0 },
         };
     };
     return { kernels, kernel, site, network, clockNs };

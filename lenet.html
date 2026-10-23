@@ -30,7 +30,7 @@
             </div>
         </header>
         <div id="readme" class="readme"></div>
-        <main>
+        <main class="hls-main nn-main">
             <div>
                 <section>
                     <h2 data-i18n="nn.modelTitle">Rede</h2>
@@ -49,12 +49,7 @@
                     <p class="note" id="nnStatus"></p>
                 </section>
                 <section style="margin-top:16px">
-                    <h2 data-i18n="nn.result">Resultado</h2>
-                    <div id="nnTable"></div>
-                    <div id="nnSens"></div>
-                </section>
-                <section style="margin-top:16px">
-                    <h2 data-i18n="nn.costTitle">Custo do hardware (estimativa)</h2>
+                    <h2 data-i18n="nn.hwTitle">Arquitetura do hardware</h2>
                     <div class="row">
                         <label><span data-i18n="nn.costClock">Período (ns)</span> <input type="number" id="nnClock" min="2" max="50" step="0.5" value="10" style="width:5em" /></label>
                         <label><span data-i18n="nn.costTarget">Alvo</span> <select id="nnTarget"><option value="asic" data-i18n="nn.costAsic">ASIC sky130</option><option value="fpga" data-i18n="nn.costFpga">FPGA xc7a100t</option></select></label>
@@ -64,47 +59,68 @@
                     <div class="row" style="margin-top:6px">
                         <button type="button" class="btn outline" id="nnDirReset" data-i18n="nn.dirReset">Diretivas padrão</button>
                     </div>
-                    <div id="nnCost" style="margin-top:10px"></div>
-                    <p class="note" id="nnCostNote"></p>
-                    <div class="row" style="margin-top:8px">
-                        <label><span data-i18n="nn.exportImages">Imagens no testbench</span> <input type="number" id="nnExportImages" min="1" max="1000" step="1" value="50" style="width:5em" /></label>
-                        <label class="check"><input type="checkbox" id="nnExportLayers" checked /> <span data-i18n="nn.exportLayers">projetos por camada</span></label>
-                        <button type="button" class="btn outline" id="nnExportBtn" data-i18n="nn.exportBtn">Exportar projeto (Vitis HLS e Vivado)</button>
-                    </div>
-                    <p class="note" id="nnExportStatus"></p>
-                    <details style="margin-top:8px">
-                        <summary data-i18n="nn.codeTitle">Código gerado</summary>
-                        <label><span data-i18n="nn.codeLayer">Camada</span> <select id="nnCodeLayer"></select></label>
-                        <pre class="scroll-box mono" id="nnCode" style="max-height:360px;white-space:pre;font-size:12px"></pre>
-                    </details>
-                </section>
-                <section style="margin-top:16px">
-                    <h2 data-i18n="nn.searchTitle">Busca das unidades por camada</h2>
-                    <p class="note" data-i18n="nn.searchIntro">Procura o multiplicador e o somador de cada camada com pesos que gastam menos, com a queda de acurácia no conjunto de validação dentro do limite. As diretivas e o período são os da seção de custo; a acurácia de teste do ponto escolhido só é medida no fim.</p>
-                    <div class="row">
-                        <label><span data-i18n="nn.searchObj">Objetivo</span> <select id="nnSearchObj"><option value="area" data-i18n="nn.searchObjArea">área (ASIC)</option><option value="luts" data-i18n="nn.searchObjLuts">LUTs (FPGA)</option><option value="energy" data-i18n="nn.searchObjEnergy">energia</option></select></label>
-                        <label><span data-i18n="nn.searchDrop">Queda máxima (pontos)</span> <input type="number" id="nnSearchDrop" min="0" max="50" step="0.1" value="1" style="width:5em" /></label>
-                        <label><span data-i18n="nn.searchHeur">Heurística</span> <select id="nnSearchHeur"><option value="sensitivity" data-i18n="nn.searchSens">sensibilidade</option><option value="sequential" data-i18n="nn.searchSeq">sequencial</option></select></label>
-                    </div>
-                    <div class="row" style="margin-top:6px">
-                        <button type="button" class="btn primary" id="nnSearchBtn" data-i18n="nn.searchBtn">Buscar</button>
-                        <button type="button" class="btn outline" id="nnSearchStop" data-i18n="nn.searchStop" disabled>Parar</button>
-                    </div>
-                    <p class="note" id="nnSearchStatus"></p>
-                    <div id="nnSearchResult"></div>
+                    <p class="note" data-i18n="nn.hwNote">As diretivas mudam o código gerado (aba Código), o custo (aba Custo) e a ordem das somas da acurácia.</p>
                 </section>
             </div>
             <div>
                 <section>
-                    <p class="note" data-i18n="nn.introPage">Uma rede convolucional quantizada em 8 bits classifica as imagens de teste da sua base. Nas camadas marcadas, os produtos são feitos pelo multiplicador escolhido e as somas pelo somador escolhido. A referência é a mesma rede exata.</p>
-                    <p class="note" id="nnNote"></p>
-                    <h3 data-i18n="nn.conf">Matriz de confusão (linhas: dígito real; colunas: previsto)</h3>
-                    <div class="scroll-box" id="nnConf"></div>
-                    <h3 style="margin-top:14px" data-i18n="nn.arch">Arquitetura</h3>
-                    <div class="nn-arch-box" id="nnArch"></div>
-                    <p class="note" data-i18n="nn.archNote">Formas dos tensores em canais@altura×largura. O quadrado destacado é o núcleo da convolução (ou a janela do pooling) e o ponto que ele produz na camada seguinte.</p>
-                    <h3 style="margin-top:14px" data-i18n="nn.broke">Dígitos que a rede exata acerta e a aproximada erra</h3>
-                    <div id="nnBroke" class="digit-grid"></div>
+                    <div class="tabs" id="nnTabs">
+                        <button type="button" class="btn sel" data-tab="result" data-i18n="nn.tab.result">Resultado</button>
+                        <button type="button" class="btn" data-tab="cost" data-i18n="nn.tab.cost">Custo</button>
+                        <button type="button" class="btn" data-tab="code" data-i18n="nn.tab.code">Código</button>
+                        <button type="button" class="btn" data-tab="search" data-i18n="nn.tab.search">Busca</button>
+                        <button type="button" class="btn" data-tab="arch" data-i18n="nn.tab.arch">Arquitetura</button>
+                    </div>
+                    <div class="pane" id="pane-result">
+                        <p class="note" data-i18n="nn.introPage">Uma rede convolucional quantizada em 8 bits classifica as imagens de teste da sua base. Nas camadas marcadas, os produtos são feitos pelo multiplicador escolhido e as somas pelo somador escolhido. A referência é a mesma rede exata.</p>
+                        <div id="nnTable"></div>
+                        <p class="note" id="nnNote"></p>
+                        <div id="nnSens"></div>
+                        <div class="nn-split">
+                            <div>
+                                <h3 data-i18n="nn.conf">Matriz de confusão (linhas: dígito real; colunas: previsto)</h3>
+                                <div class="scroll-box" id="nnConf"></div>
+                            </div>
+                            <div>
+                                <h3 data-i18n="nn.broke">Dígitos que a rede exata acerta e a aproximada erra</h3>
+                                <div id="nnBroke" class="digit-grid"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pane hidden" id="pane-cost">
+                        <h2 data-i18n="nn.costTitle">Custo do hardware (estimativa)</h2>
+                        <div id="nnCostSummary"></div>
+                        <div class="scroll-box" id="nnCost"></div>
+                        <p class="note" id="nnCostNote"></p>
+                        <h3 style="margin-top:12px" data-i18n="nn.exportTitle">Projeto para o Vitis HLS e o Vivado</h3>
+                        <div class="row">
+                            <label><span data-i18n="nn.exportImages">Imagens no testbench</span> <input type="number" id="nnExportImages" min="1" max="1000" step="1" value="50" style="width:5em" /></label>
+                            <label class="check"><input type="checkbox" id="nnExportLayers" checked /> <span data-i18n="nn.exportLayers">projetos por camada</span></label>
+                            <button type="button" class="btn outline" id="nnExportBtn" data-i18n="nn.exportBtn">Exportar projeto (Vitis HLS e Vivado)</button>
+                        </div>
+                        <p class="note" id="nnExportStatus"></p>
+                    </div>
+                    <div class="pane hidden" id="pane-code">
+                        <div class="row"><label style="margin:0"><span data-i18n="nn.codeLayer">Camada</span> <select id="nnCodeLayer"></select></label><span class="note" data-i18n="nn.codeNote">O código que o custo avalia, na linguagem da página de síntese de alto nível (dá para colar lá).</span></div>
+                        <pre class="hls-ir code-view" id="nnCode"></pre>
+                    </div>
+                    <div class="pane hidden" id="pane-search">
+                        <h2 data-i18n="nn.searchTitle">Busca das unidades por camada</h2>
+                        <p class="note" data-i18n="nn.searchIntro">Procura o multiplicador e o somador de cada camada com pesos que gastam menos, com a queda de acurácia no conjunto de validação dentro do limite. As diretivas e o período são os da arquitetura do hardware (coluna da esquerda); a acurácia de teste do ponto escolhido só é medida no fim.</p>
+                        <div class="row">
+                            <label><span data-i18n="nn.searchObj">Objetivo</span> <select id="nnSearchObj"><option value="area" data-i18n="nn.searchObjArea">área (ASIC)</option><option value="luts" data-i18n="nn.searchObjLuts">LUTs (FPGA)</option><option value="energy" data-i18n="nn.searchObjEnergy">energia</option></select></label>
+                            <label><span data-i18n="nn.searchDrop">Queda máxima (pontos)</span> <input type="number" id="nnSearchDrop" min="0" max="50" step="0.1" value="1" style="width:5em" /></label>
+                            <label><span data-i18n="nn.searchHeur">Heurística</span> <select id="nnSearchHeur"><option value="sensitivity" data-i18n="nn.searchSens">sensibilidade</option><option value="sequential" data-i18n="nn.searchSeq">sequencial</option></select></label>
+                            <button type="button" class="btn primary" id="nnSearchBtn" data-i18n="nn.searchBtn">Buscar</button>
+                            <button type="button" class="btn outline" id="nnSearchStop" data-i18n="nn.searchStop" disabled>Parar</button>
+                        </div>
+                        <p class="note" id="nnSearchStatus"></p>
+                        <div id="nnSearchResult"></div>
+                    </div>
+                    <div class="pane hidden" id="pane-arch">
+                        <div class="nn-arch-box" id="nnArch"></div>
+                        <p class="note" data-i18n="nn.archNote">Formas dos tensores em canais@altura×largura. O quadrado destacado é o núcleo da convolução (ou a janela do pooling) e o ponto que ele produz na camada seguinte.</p>
+                    </div>
                 </section>
             </div>
         </main>

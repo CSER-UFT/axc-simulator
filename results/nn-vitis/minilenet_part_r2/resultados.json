@@ -1,0 +1,579 @@
+{
+ "dir": "results/nn-vitis/minilenet_part_r2",
+ "model": "minilenet-mnist",
+ "clockNs": 10,
+ "network": {
+  "model": {
+   "cycles": 53115,
+   "timeUs": 531.15,
+   "area": 713961.1616000002,
+   "luts": 35555,
+   "carry4": 1854,
+   "ff": 2787,
+   "dsp": 8,
+   "energy": 1647068163.105261,
+   "clockNs": 10
+  },
+  "csim": {
+   "mismatches": 0,
+   "total": 1000,
+   "right": 99,
+   "images": 100
+  },
+  "hls": null,
+  "impl": null
+ },
+ "layers": [
+  {
+   "name": "pad1",
+   "model": {
+    "cycles": 915,
+    "II": 1,
+    "luts": 262,
+    "ff": 45,
+    "dsp": 0
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 1024
+    },
+    "hls": {
+     "estClockNs": 7.025,
+     "latencyBest": 916,
+     "latencyWorst": 916,
+     "intervalMin": 917,
+     "lut": 673,
+     "ff": 103,
+     "dsp": 0,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "pad1_in_L7",
+       "trip": 784,
+       "latency": 785,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 3
+      },
+      {
+       "name": "pad1_side_L5",
+       "trip": 56,
+       "latency": 56,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 1
+      },
+      {
+       "name": "pad1_top_L3",
+       "trip": 64,
+       "latency": 64,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 2
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "pad1_Pipeline_pad1_in_L7",
+       "count": 1,
+       "lut": 49,
+       "ff": 49,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "flow_control_loop_pipe_sequential_init",
+       "count": 3,
+       "lut": 81,
+       "ff": 6,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "pad1_Pipeline_pad1_side_L5",
+       "count": 1,
+       "lut": 31,
+       "ff": 15,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "pad1_Pipeline_pad1_top_L3",
+       "count": 1,
+       "lut": 32,
+       "ff": 29,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 116,
+     "ff": 102,
+     "dsp": 0,
+     "slice": 37,
+     "bram": 0,
+     "achievedNs": 4.139,
+     "timingMet": "TRUE",
+     "carry4": null
+    }
+   },
+   "inNet": null
+  },
+  {
+   "name": "conv1",
+   "model": {
+    "cycles": 2356,
+    "II": 1,
+    "luts": 6135,
+    "ff": 645,
+    "dsp": 2
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 2352
+    },
+    "hls": null,
+    "impl": null
+   },
+   "inNet": null
+  },
+  {
+   "name": "pool1",
+   "model": {
+    "cycles": 1178,
+    "II": 2,
+    "luts": 242,
+    "ff": 70,
+    "dsp": 0
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 588
+    },
+    "hls": {
+     "estClockNs": 7.181,
+     "latencyBest": 1181,
+     "latencyWorst": 1181,
+     "intervalMin": 1182,
+     "lut": 636,
+     "ff": 130,
+     "dsp": 0,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "pool1_c_pool1_h_pool1_w",
+       "trip": 588,
+       "latency": 1179,
+       "iterLatency": null,
+       "II": 2,
+       "depth": 6
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "flow_control_loop_pipe",
+       "count": 1,
+       "lut": 36,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 150,
+     "ff": 124,
+     "dsp": 0,
+     "slice": 60,
+     "bram": 0,
+     "achievedNs": 5.229,
+     "timingMet": "TRUE",
+     "carry4": null
+    }
+   },
+   "inNet": null
+  },
+  {
+   "name": "pad2",
+   "model": {
+    "cycles": 813,
+    "II": 1,
+    "luts": 404,
+    "ff": 41,
+    "dsp": 0
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 972
+    },
+    "hls": null,
+    "impl": null
+   },
+   "inNet": null
+  },
+  {
+   "name": "conv2",
+   "model": {
+    "cycles": 1180,
+    "II": 1,
+    "luts": 27589,
+    "ff": 1658,
+    "dsp": 2
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 1176
+    },
+    "hls": null,
+    "impl": null
+   },
+   "inNet": null
+  },
+  {
+   "name": "pool2",
+   "model": {
+    "cycles": 590,
+    "II": 2,
+    "luts": 229,
+    "ff": 67,
+    "dsp": 0
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 294
+    },
+    "hls": {
+     "estClockNs": 7.178,
+     "latencyBest": 593,
+     "latencyWorst": 593,
+     "intervalMin": 594,
+     "lut": 616,
+     "ff": 122,
+     "dsp": 0,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "pool2_c_pool2_h_pool2_w",
+       "trip": 294,
+       "latency": 591,
+       "iterLatency": null,
+       "II": 2,
+       "depth": 6
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "flow_control_loop_pipe",
+       "count": 1,
+       "lut": 30,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 147,
+     "ff": 116,
+     "dsp": 0,
+     "slice": 57,
+     "bram": 0,
+     "achievedNs": 5.406,
+     "timingMet": "TRUE",
+     "carry4": null
+    }
+   },
+   "inNet": null
+  },
+  {
+   "name": "flatten",
+   "model": {
+    "cycles": 296,
+    "II": 1,
+    "luts": 68,
+    "ff": 26,
+    "dsp": 0
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 294
+    },
+    "hls": {
+     "estClockNs": 6.514,
+     "latencyBest": 297,
+     "latencyWorst": 297,
+     "intervalMin": 298,
+     "lut": 220,
+     "ff": 50,
+     "dsp": 0,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "flatten_r_flatten_w",
+       "trip": 294,
+       "latency": 295,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 3
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "flow_control_loop_pipe",
+       "count": 1,
+       "lut": 51,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 52,
+     "ff": 49,
+     "dsp": 0,
+     "slice": 20,
+     "bram": 0,
+     "achievedNs": 4.978,
+     "timingMet": "TRUE",
+     "carry4": null
+    }
+   },
+   "inNet": null
+  },
+  {
+   "name": "fc1",
+   "model": {
+    "cycles": 44247,
+    "II": 1,
+    "luts": 339,
+    "ff": 119,
+    "dsp": 2
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 147
+    },
+    "hls": {
+     "estClockNs": 7.045,
+     "latencyBest": 44836,
+     "latencyWorst": 44836,
+     "intervalMin": 44837,
+     "lut": 483,
+     "ff": 250,
+     "dsp": 1,
+     "bram": 34,
+     "loops": [
+      {
+       "name": "fc1_o",
+       "trip": 147,
+       "latency": 44835,
+       "iterLatency": 305,
+       "II": null,
+       "depth": null
+      },
+      {
+       "name": "fc1_i",
+       "trip": 294,
+       "latency": 296,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 4
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "axc_requant",
+       "count": 1,
+       "lut": 12,
+       "ff": 13,
+       "dsp": 2,
+       "depth": 1
+      },
+      {
+       "module": "mul_24ns_25s_49_1_1",
+       "count": 1,
+       "lut": 1,
+       "ff": 0,
+       "dsp": 2,
+       "depth": 2
+      },
+      {
+       "module": "fc1_Pipeline_fc1_i",
+       "count": 1,
+       "lut": 151,
+       "ff": 66,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "flow_control_loop_pipe_sequential_init",
+       "count": 1,
+       "lut": 18,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "mul_8s_8ns_16_1_1",
+       "count": 1,
+       "lut": 52,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "fc1_Pipeline_fc1_i_w_V_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 30,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 2
+      }
+     ],
+     "lut": 178,
+     "ff": 144,
+     "dsp": 2,
+     "slice": 74,
+     "bram": 34,
+     "achievedNs": 8.175,
+     "timingMet": "TRUE",
+     "carry4": null
+    }
+   },
+   "inNet": null
+  },
+  {
+   "name": "fc2",
+   "model": {
+    "cycles": 1540,
+    "II": 1,
+    "luts": 287,
+    "ff": 116,
+    "dsp": 2
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 10
+    },
+    "hls": {
+     "estClockNs": 6.824,
+     "latencyBest": 1581,
+     "latencyWorst": 1581,
+     "intervalMin": 1582,
+     "lut": 466,
+     "ff": 262,
+     "dsp": 1,
+     "bram": 1,
+     "loops": [
+      {
+       "name": "fc2_o",
+       "trip": 10,
+       "latency": 1580,
+       "iterLatency": 158,
+       "II": null,
+       "depth": null
+      },
+      {
+       "name": "fc2_i",
+       "trip": 147,
+       "latency": 149,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 4
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "b_V_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 12,
+       "ff": 16,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "axc_requant",
+       "count": 1,
+       "lut": 29,
+       "ff": 13,
+       "dsp": 2,
+       "depth": 1
+      },
+      {
+       "module": "mul_23ns_24s_47_1_1",
+       "count": 1,
+       "lut": 13,
+       "ff": 0,
+       "dsp": 2,
+       "depth": 2
+      },
+      {
+       "module": "fc2_Pipeline_fc2_i",
+       "count": 1,
+       "lut": 143,
+       "ff": 63,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "flow_control_loop_pipe_sequential_init",
+       "count": 1,
+       "lut": 21,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "mul_8s_8ns_16_1_1",
+       "count": 1,
+       "lut": 52,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "fc2_Pipeline_fc2_i_w_V_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 26,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "m_V_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 0,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 197,
+     "ff": 135,
+     "dsp": 2,
+     "slice": 73,
+     "bram": 1,
+     "achievedNs": 7.205,
+     "timingMet": "TRUE",
+     "carry4": null
+    }
+   },
+   "inNet": null
+  }
+ ]
+}

@@ -19,6 +19,23 @@ relatórios ficam guardados (csynth.xml, export_impl.xml, utilização hierárqu
   do laço com pipeline (SYN 201-303) e a multiplicação foi para LUTs (664 LUTs na fc1); a reescala passou a ser um
   módulo próprio (INLINE off).
 * pad2: o Vitis viu uma dependência falsa entre as duas escritas do laço das colunas da borda (II 2); os laços da
-  borda passaram a ter `dependence variable=y type=inter false`.
+  borda passaram a ter `dependence variable=y type=inter false` (na rodada 2, trocada por laços separados).
 * A diferença de 4 ciclos por saída nas densas (305 contra 301 por iteração do laço de fora) vem da chamada da função
   em que o Vitis põe o laço com pipeline que não é achatado; fica para calibrar com mais casos.
+
+## Rodada 2: MiniLenet exata, com partição e aproximada (minilenet_*_r2)
+
+* Execução: as 30 csims sem nenhuma diferença (a rede: 99 acertos em 100 imagens nas três).
+* Exata (tudo sintetizado, menos a pad2 sozinha): a rede, agora sem a partição automática do Vitis, leva 124671
+  ciclos, contra 124849 do modelo (0,1%); LUT 5397 contra 7441 (o modelo superestima, principalmente a lógica de
+  endereço da conv2), FF 4121 contra 3897. As densas usam 2 DSP48 cada sozinhas, e a rede inteira 2: o Vitis
+  instancia um módulo de reescala só, no topo, compartilhado pelas camadas (o modelo da rede passou a contar assim).
+* Falhas, todas da exportação, corrigidas e com teste:
+  * pad2 sozinha: a diretiva dependence numa porta do kernel não passa na verificação de síntese (SYNCHK 200-43); as
+    colunas da esquerda e da direita da borda passaram a ser laços separados, sem a diretiva;
+  * partição (conv1, conv2 e a rede): a diretiva de partição dos pesos saía antes da declaração da tabela (HLS
+    207-3776); as tabelas passaram a ser declaradas antes, e uma tabela que some (pesos constantes) não recebe
+    diretiva;
+  * aproximada (fc1, fc2 e a rede): a caixa preta de RTL (ap_ctrl_none) não pode ficar fora de um laço com pipeline
+    (HLS 200-1918), e a soma do viés das densas fica; fora dos laços com pipeline, a unidade vai como a netlist em C++
+    (uc_*).

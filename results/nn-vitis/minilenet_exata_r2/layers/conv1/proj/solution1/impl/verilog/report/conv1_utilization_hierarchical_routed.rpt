@@ -1,0 +1,66 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Fri Oct 23 15:26:56 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 6 -file ./report/conv1_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++------------------------------------+----------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|              Instance              |                    Module                    | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++------------------------------------+----------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| bd_0_wrapper                       |                                        (top) |       1906 |       1906 |       0 |    0 | 819 |      0 |      0 |          2 |
+|   bd_0_i                           |                                         bd_0 |       1906 |       1906 |       0 |    0 | 819 |      0 |      0 |          2 |
+|     hls_inst                       |                              bd_0_hls_inst_0 |       1906 |       1906 |       0 |    0 | 819 |      0 |      0 |          2 |
+|       inst                         |                        bd_0_hls_inst_0_conv1 |       1906 |       1906 |       0 |    0 | 819 |      0 |      0 |          2 |
+|         (inst)                     |                        bd_0_hls_inst_0_conv1 |        559 |        559 |       0 |    0 | 806 |      0 |      0 |          0 |
+|         flow_control_loop_pipe_U   | bd_0_hls_inst_0_conv1_flow_control_loop_pipe |         46 |         46 |       0 |    0 |   1 |      0 |      0 |          0 |
+|         grp_axc_requant_fu_721     |            bd_0_hls_inst_0_conv1_axc_requant |         34 |         34 |       0 |    0 |   0 |      0 |      0 |          2 |
+|           (grp_axc_requant_fu_721) |            bd_0_hls_inst_0_conv1_axc_requant |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|           mul_24ns_20s_44_1_1_U1   |    bd_0_hls_inst_0_conv1_mul_24ns_20s_44_1_1 |         26 |         26 |       0 |    0 |   0 |      0 |      0 |          2 |
+|         mul_8ns_6ns_14_1_1_U11     |     bd_0_hls_inst_0_conv1_mul_8ns_6ns_14_1_1 |         44 |         44 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_6ns_14_1_1_U7      |   bd_0_hls_inst_0_conv1_mul_8ns_6ns_14_1_1_0 |         43 |         43 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7ns_15_1_1_U10     |     bd_0_hls_inst_0_conv1_mul_8ns_7ns_15_1_1 |         57 |         57 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7ns_15_1_1_U14     |   bd_0_hls_inst_0_conv1_mul_8ns_7ns_15_1_1_1 |         40 |         40 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7ns_15_1_1_U27     |   bd_0_hls_inst_0_conv1_mul_8ns_7ns_15_1_1_2 |         51 |         51 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7ns_15_1_1_U9      |   bd_0_hls_inst_0_conv1_mul_8ns_7ns_15_1_1_3 |         49 |         49 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7s_15_1_1_U12      |      bd_0_hls_inst_0_conv1_mul_8ns_7s_15_1_1 |         59 |         59 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7s_15_1_1_U22      |    bd_0_hls_inst_0_conv1_mul_8ns_7s_15_1_1_4 |         54 |         54 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7s_15_1_1_U5       |    bd_0_hls_inst_0_conv1_mul_8ns_7s_15_1_1_5 |         52 |         52 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U13      |      bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1 |         48 |         48 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U15      |    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_6 |         49 |         49 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U16      |    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_7 |         48 |         48 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U17      |    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_8 |         52 |         52 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U18      |    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_9 |         61 |         61 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U19      |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_10 |         57 |         57 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U20      |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_11 |         44 |         44 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U21      |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_12 |         42 |         42 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U23      |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_13 |         60 |         60 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U24      |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_14 |         47 |         47 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U25      |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_15 |         62 |         62 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U26      |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_16 |         46 |         46 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U28      |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_17 |         67 |         67 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U31      |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_18 |         58 |         58 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U6       |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_19 |         51 |         51 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U8       |   bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_20 |         34 |         34 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         w_V_14_U                   |     bd_0_hls_inst_0_conv1_w_V_14_ROM_AUTO_1R |          1 |          1 |       0 |    0 |   4 |      0 |      0 |          0 |
+|         w_V_15_U                   |     bd_0_hls_inst_0_conv1_w_V_15_ROM_AUTO_1R |          0 |          0 |       0 |    0 |   3 |      0 |      0 |          0 |
+|         w_V_24_U                   |     bd_0_hls_inst_0_conv1_w_V_24_ROM_AUTO_1R |          3 |          3 |       0 |    0 |   4 |      0 |      0 |          0 |
+|         w_V_6_U                    |      bd_0_hls_inst_0_conv1_w_V_6_ROM_AUTO_1R |          0 |          0 |       0 |    0 |   1 |      0 |      0 |          0 |
++------------------------------------+----------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

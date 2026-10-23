@@ -153,3 +153,12 @@ table.metrics td.note { text-align: left; }
 .nn-arch .nn-dims { fill: var(--muted); font-size: 10.5px; font-family: var(--mono, 'IBM Plex Mono', monospace); }
 .nn-arch .nn-op { fill: var(--muted); font-size: 10px; }
 .nn-arch .nn-note { fill: var(--faint); font-size: 9px; }
+
+/* Página das redes: a mesma grade da página de síntese, controles à esquerda e abas à direita. */
+.nn-main .pane h2 { margin-top: 4px; }
+.nn-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 12px; align-items: start; }
+@media (max-width: 1300px) { .nn-split { grid-template-columns: 1fr; } }
+.code-view { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel-2); padding: 8px; max-height: 70vh; }
+.nn-search-out { display: grid; grid-template-columns: auto minmax(320px, 1fr); gap: 20px; align-items: start; }
+.nn-search-out .hls-table { width: auto; }
+@media (max-width: 1300px) { .nn-search-out { grid-template-columns: 1fr; } }

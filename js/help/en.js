@@ -235,7 +235,7 @@ const base = {
 </ul>
 <p>The search takes about 1 minute on MiniLenet and 2 minutes on the CIFAR 10 LeNet 5 with 2 workers; with more cores, the sensitivity phase gets proportionally faster, and the combination phase (one evaluation after another) does not change.</p>
 <h3>Export to Vitis HLS and Vivado</h3>
-<p>The <strong>Export project (Vitis HLS and Vivado)</strong> button, in the cost section, builds a .zip with the configuration of the page (the directives, the period and the units of the selectors or those of the applied search):</p>
+<p>The <strong>Export project (Vitis HLS and Vivado)</strong> button, in the Cost tab, builds a .zip with the configuration of the page (the directives, the period and the units of the selectors or those of the applied search):</p>
 <ul>
     <li><strong>network/</strong>: the whole network, for Vitis HLS 2022.2. kernel.cpp has one function per layer (the same elaborated design the cost model evaluates, with INLINE off so each function has its own report) and the top <code>network()</code>, which calls the layers in sequence with local arrays between them, as in the MiniLenet C code. Approximate units go in as RTL black boxes (the Verilog of the netlist with the wrapper Vitis requires, and the C model of the same netlist for csim), and the requantization as a function with the 32 × 32 bit multiplication in DSP. The testbench runs the requested test images and checks every output against the bit exact execution of the simulator (<code>AXC_MISMATCHES</code>) and counts the hits (<code>AXC_ACCURACY</code>);</li>
     <li><strong>layers/&lt;layer&gt;/</strong>: each layer alone, with its own partitions, which is what the cost model assumes; they serve to compare latency, II and resources layer by layer;</li>

@@ -1,0 +1,44 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Fri Oct 23 16:02:43 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 6 -file ./report/conv2_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++--------------------------------------+----------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+|               Instance               |                    Module                    | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
++--------------------------------------+----------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+| bd_0_wrapper                         |                                        (top) |       5294 |       5294 |       0 |    0 | 3125 |      0 |      3 |          2 |
+|   bd_0_i                             |                                         bd_0 |       5294 |       5294 |       0 |    0 | 3125 |      0 |      3 |          2 |
+|     hls_inst                         |                              bd_0_hls_inst_0 |       5294 |       5294 |       0 |    0 | 3125 |      0 |      3 |          2 |
+|       inst                           |                        bd_0_hls_inst_0_conv2 |       5294 |       5294 |       0 |    0 | 3125 |      0 |      3 |          2 |
+|         (inst)                       |                        bd_0_hls_inst_0_conv2 |       2545 |       2545 |       0 |    0 | 3054 |      0 |      0 |          0 |
+|         b_V_U                        |        bd_0_hls_inst_0_conv2_b_V_ROM_AUTO_1R |          0 |          0 |       0 |    0 |    4 |      0 |      0 |          0 |
+|         flow_control_loop_pipe_U     | bd_0_hls_inst_0_conv2_flow_control_loop_pipe |         56 |         56 |       0 |    0 |    1 |      0 |      0 |          0 |
+|         grp_axc_requant_fu_3474      |            bd_0_hls_inst_0_conv2_axc_requant |        327 |        327 |       0 |    0 |   46 |      0 |      0 |          2 |
+|           (grp_axc_requant_fu_3474)  |            bd_0_hls_inst_0_conv2_axc_requant |          9 |          9 |       0 |    0 |    0 |      0 |      0 |          0 |
+|           mul_25ns_23s_48_1_1_U1     |    bd_0_hls_inst_0_conv2_mul_25ns_23s_48_1_1 |        318 |        318 |       0 |    0 |   46 |      0 |      0 |          2 |
+|         grp_u_ADD24_LOA10_bb_fu_3468 |             bd_0_hls_inst_0_u_ADD24_LOA10_bb |        393 |        393 |       0 |    0 |    0 |      0 |      0 |          0 |
+|           u                          |                  bd_0_hls_inst_0_add24_loa10 |        393 |        393 |       0 |    0 |    0 |      0 |      0 |          0 |
+|         m_V_U                        |        bd_0_hls_inst_0_conv2_m_V_ROM_AUTO_1R |          2 |          2 |       0 |    0 |   20 |      0 |      0 |          0 |
+|         mul_3ns_8ns_10_1_1_U5        |     bd_0_hls_inst_0_conv2_mul_3ns_8ns_10_1_1 |          5 |          5 |       0 |    0 |    0 |      0 |      0 |          0 |
+|         mul_3ns_8ns_10_1_1_U6        |   bd_0_hls_inst_0_conv2_mul_3ns_8ns_10_1_1_0 |          6 |          6 |       0 |    0 |    0 |      0 |      0 |          0 |
+|         w_V_U                        |        bd_0_hls_inst_0_conv2_w_V_ROM_AUTO_1R |       1975 |       1975 |       0 |    0 |    0 |      0 |      3 |          0 |
++--------------------------------------+----------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

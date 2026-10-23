@@ -68,8 +68,10 @@ test('custo da rede: memória limita o II das convoluções, a reescala usa DSP,
     // 25 leituras de x por iteração com 2 portas: II 13; na conv2, 75 leituras: II 38.
     assert.equal(conv(ex, 'conv1').II, 13);
     assert.equal(conv(ex, 'conv2').II, 38);
-    // A reescala com os operandos da MiniLenet (acc de até 25 bits, m de 24): 2 DSP48 por camada, como no Vivado.
-    assert.equal(ex.totals.dsp, 2 * net.sites.length);
+    // A reescala com os operandos da MiniLenet (acc de até 25 bits, m de 24): 2 DSP48 por camada, como no Vivado; na
+    // rede, um módulo só, compartilhado entre as camadas (como o Vitis faz).
+    for (const l of ex.layers.filter((x) => x.site !== null)) assert.equal(l.dsp, 2, l.name);
+    assert.equal(ex.totals.dsp, 2);
     assert.equal(ex.totals.cycles, ex.layers.reduce((s, l) => s + l.cycles, 0));
     const mul = networkCost(net, { ...o, mul: 'MUL8 T4' });
     const add = networkCost(net, { ...o, add: 'ADD32 LOA10' });

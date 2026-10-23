@@ -13,7 +13,8 @@ const D = (f) => JSON.parse(readFileSync(new URL(`data/${f}`, R), 'utf8'));
 const synth = D('synth.json'), cells = D('hls-cells.json'), fpga = D('vivado-units.json');
 const net = decodeNet(D('nn/minilenet-mnist.json'));
 const testSet = decodeTestSet(readFileSync(new URL(net.dataset.file, R)), net.dataset);
-const dirs = [{}, { part: true }, { part: true, par: 7 }, {}];
+// Todos os filtros por iteração na conv1 (os pesos viram constantes e a tabela some), partição nas convoluções e na fc1.
+const dirs = [{ part: true, par: 3 }, { part: true }, { part: true, par: 7 }, {}];
 // Uma cascata (ADD16 LOA8 nas somas de 24 e 32 bits), unidades de 32 bits e um multiplicador por camada.
 const units = [{ mul: 'MUL8 T4', add: 'ADD16 LOA8' }, { mul: 'MUL8 T6 A4c', add: 'ADD32 LOA10' }, { mul: null, add: 'ADD32 TRUNC4' }, { mul: 'MUL8 MITCHELL', add: null }];
 
@@ -40,6 +41,21 @@ test('exportação da rede: topo com as camadas em sequência, caixas pretas, te
     const c = networkCost(net, { synth, cells, fpga, target: 'fpga', clockNs: 10, dirs, units });
     assert.equal(summary.totals.cycles, c.totals.cycles);
     assert.equal(summary.totals.luts, c.totals.luts);
+    // Cada partição depois da declaração do vetor, na mesma função (o Vitis recusa a diretiva antes: HLS 207-3776).
+    const checkDecl = (code, where) => {
+        for (const fn of code.split(/\n(?=(?:static )?(?:void|ap_uint<\d+>) \w+\()/)) {
+            fn.split('\n').forEach((line, i, all) => {
+                const m = /ARRAY_PARTITION variable=(\w+)/.exec(line);
+                if (!m) return;
+                const before = all.slice(0, i).join('\n');
+                assert.ok(new RegExp(`\\b${m[1]}\\[`).test(before), `${where}: ${m[1]} sem declaração antes da partição`);
+            });
+        }
+    };
+    checkDecl(k, 'network');
+    for (const n of names) checkDecl(files[`layers/${n}/kernel.cpp`], n);
+    // Fora dos laços com pipeline (o viés das densas), a unidade vai em C++ (uc_*), não na caixa preta (HLS 200-1918).
+    assert.ok(/uc_ADD\d+_TRUNC4\(/.test(k) && /static ap_uint<\d+> uc_ADD\d+_TRUNC4\(/.test(k), 'uc_ do somador da fc1');
     // Projetos por camada e o script.
     for (const n of names) assert.ok(files[`layers/${n}/kernel.cpp`] && files[`layers/${n}/run.tcl`], n);
     assert.ok(files['run_all.sh'].includes('layers/conv2') && files['LEIAME.txt'].includes('nnvitis'));

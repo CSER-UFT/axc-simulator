@@ -1,0 +1,62 @@
+{
+ "id": "minilenet-mnist_exata_10ns_fc2",
+ "note": "MiniLenet, camada fc2, unidades exatas",
+ "clockNs": 10,
+ "part": "xc7a100tcsg324-1",
+ "top": "fc2",
+ "delays": "fpga",
+ "assign": {},
+ "prediction": {
+  "cycles": 1540,
+  "timeNs": 15400,
+  "intervalNs": 10,
+  "critPs": 8253,
+  "luts": 287,
+  "carry4": 60,
+  "ff": 116,
+  "areaUm2": 66179.7372,
+  "energyFj": 19249762.50056,
+  "loops": [
+   {
+    "label": "fc2_o",
+    "mode": "sequential",
+    "trip": 10,
+    "II": null,
+    "iterLatency": 154,
+    "latency": 1540
+   },
+   {
+    "label": "fc2_i",
+    "mode": "pipelined",
+    "trip": 147,
+    "II": 1,
+    "iterLatency": 2,
+    "latency": 149
+   }
+  ],
+  "addrLuts": 44,
+  "units": [
+   {
+    "unit": "ADD24 exato",
+    "count": 2,
+    "luts": 48,
+    "carry4": 14
+   },
+   {
+    "unit": "MUL8 exato",
+    "count": 1,
+    "luts": 89,
+    "carry4": 10
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}
