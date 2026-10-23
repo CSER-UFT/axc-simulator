@@ -1,0 +1,39 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Fri Oct 23 13:21:56 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 6 -file ./report/fc1_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+-------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|                      Instance                      |                           Module                           | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| bd_0_wrapper                                       |                                                      (top) |        864 |        859 |       0 |    5 | 285 |     16 |      2 |          0 |
+|   bd_0_i                                           |                                                       bd_0 |        864 |        859 |       0 |    5 | 285 |     16 |      2 |          0 |
+|     hls_inst                                       |                                            bd_0_hls_inst_0 |        864 |        859 |       0 |    5 | 285 |     16 |      2 |          0 |
+|       inst                                         |                                        bd_0_hls_inst_0_fc1 |        864 |        859 |       0 |    5 | 285 |     16 |      2 |          0 |
+|         (inst)                                     |                                        bd_0_hls_inst_0_fc1 |         22 |         22 |       0 |    0 |  88 |      0 |      2 |          0 |
+|         grp_fc1_Pipeline_fc1_i_fu_112              |                     bd_0_hls_inst_0_fc1_fc1_Pipeline_fc1_i |        842 |        837 |       0 |    5 | 197 |     16 |      0 |          0 |
+|           (grp_fc1_Pipeline_fc1_i_fu_112)          |                     bd_0_hls_inst_0_fc1_fc1_Pipeline_fc1_i |         89 |         84 |       0 |    5 | 194 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U | bd_0_hls_inst_0_fc1_flow_control_loop_pipe_sequential_init |         17 |         17 |       0 |    0 |   2 |      0 |      0 |          0 |
+|           mul_25s_24ns_49_1_1_U2                   |                    bd_0_hls_inst_0_fc1_mul_25s_24ns_49_1_1 |        664 |        664 |       0 |    0 |   0 |      0 |      0 |          0 |
+|           mul_8s_8ns_16_1_1_U1                     |                      bd_0_hls_inst_0_fc1_mul_8s_8ns_16_1_1 |         52 |         52 |       0 |    0 |   0 |      0 |      0 |          0 |
+|           w_V_U                                    |     bd_0_hls_inst_0_fc1_fc1_Pipeline_fc1_i_w_V_ROM_AUTO_1R |         30 |         30 |       0 |    0 |   1 |     16 |      0 |          0 |
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

@@ -1,0 +1,41 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Fri Oct 23 13:21:18 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 6 -file ./report/fc2_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+-------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|                      Instance                      |                           Module                           | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| bd_0_wrapper                                       |                                                      (top) |        777 |        772 |       0 |    5 | 279 |      0 |      1 |          0 |
+|   bd_0_i                                           |                                                       bd_0 |        777 |        772 |       0 |    5 | 279 |      0 |      1 |          0 |
+|     hls_inst                                       |                                            bd_0_hls_inst_0 |        777 |        772 |       0 |    5 | 279 |      0 |      1 |          0 |
+|       inst                                         |                                        bd_0_hls_inst_0_fc2 |        777 |        772 |       0 |    5 | 279 |      0 |      1 |          0 |
+|         (inst)                                     |                                        bd_0_hls_inst_0_fc2 |         15 |         15 |       0 |    0 |  75 |      0 |      0 |          0 |
+|         b_V_U                                      |                        bd_0_hls_inst_0_fc2_b_V_ROM_AUTO_1R |          8 |          8 |       0 |    0 |  16 |      0 |      0 |          0 |
+|         grp_fc2_Pipeline_fc2_i_fu_112              |                     bd_0_hls_inst_0_fc2_fc2_Pipeline_fc2_i |        743 |        738 |       0 |    5 | 165 |      0 |      1 |          0 |
+|           (grp_fc2_Pipeline_fc2_i_fu_112)          |                     bd_0_hls_inst_0_fc2_fc2_Pipeline_fc2_i |         76 |         71 |       0 |    5 | 163 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U | bd_0_hls_inst_0_fc2_flow_control_loop_pipe_sequential_init |         23 |         23 |       0 |    0 |   2 |      0 |      0 |          0 |
+|           mul_24s_23ns_47_1_1_U2                   |                    bd_0_hls_inst_0_fc2_mul_24s_23ns_47_1_1 |        576 |        576 |       0 |    0 |   0 |      0 |      0 |          0 |
+|           mul_8s_8ns_16_1_1_U1                     |                      bd_0_hls_inst_0_fc2_mul_8s_8ns_16_1_1 |         52 |         52 |       0 |    0 |   0 |      0 |      0 |          0 |
+|           w_V_U                                    |     bd_0_hls_inst_0_fc2_fc2_Pipeline_fc2_i_w_V_ROM_AUTO_1R |         26 |         26 |       0 |    0 |   0 |      0 |      1 |          0 |
+|         m_V_U                                      |                        bd_0_hls_inst_0_fc2_m_V_ROM_AUTO_1R |         12 |         12 |       0 |    0 |  23 |      0 |      0 |          0 |
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

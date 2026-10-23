@@ -340,7 +340,13 @@ export function elaborate(ast, { ports = 2 } = {}) {
                     if (args.length !== 3) throw new HlsError('requant recebe 3 argumentos (acc, m, z)', e.line);
                     if (args.every((a) => a.k === 'const')) return cval(requantValue(args[0].v, args[1].v, args[2].v));
                     const [A, M, Z] = args.map((a) => use(a, e.line));
-                    return emit('rq', [asArg(A), asArg(M), asArg(Z)], [0, 255], e.line);
+                    const v = emit('rq', [asArg(A), asArg(M), asArg(Z)], [0, 255], e.line);
+                    // DSP48E1 (multiplicador de 25 x 18 bits com sinal): o Vitis estreita os operandos pela faixa (acc com
+                    // sinal, m sem sinal) e divide a multiplicação em blocos, na orientação que gasta menos.
+                    const wa = bitsFor(A.range), wb = magBits(M.range);
+                    const node = v.node ?? v;
+                    node.dsp = Math.min(Math.ceil(wa / 25) * Math.ceil(wb / 17), Math.ceil((wb + 1) / 25) * Math.ceil(wa / 18));
+                    return v;
                 }
                 throw new HlsError(`função ${e.name} não suportada (só min, max, abs e requant)`, e.line);
             }
@@ -508,6 +514,8 @@ export function elaborate(ast, { ports = 2 } = {}) {
             const p = parsePragma(b.text, b.line);
             if (p.name === 'pipeline') out.pipeline = { II: p.opts.ii ?? 1, line: p.line, off: !!p.opts.off };
             if (p.name === 'unroll') out.unroll = { factor: p.opts.factor ?? null, line: p.line, off: !!p.opts.off };
+            // Diretivas que o modelo não usa, mas que vão para o C++ exportado (dependence).
+            if (p.name === 'dependence') out.pragmas.push(b.text);
         }
         if (out.pipeline?.off) out.pipeline = null;
         if (out.unroll?.off) out.unroll = null;
@@ -534,7 +542,7 @@ export function elaborate(ast, { ports = 2 } = {}) {
         // Um laço desenrolado dentro de outro é executado várias vezes: a entrada na lista é uma só.
         let info = dryDepth ? null : loopOf.get(s);
         if (!info) {
-            info = { id: `L${loops.length + 1}`, label: s.label ?? null, line: s.line, v: s.v, trip, parent: ctx.loop?.id ?? null, pipeline: dir.pipeline, unroll: dir.unroll, mode: null, factor: 1 };
+            info = { id: `L${loops.length + 1}`, label: s.label ?? null, line: s.line, v: s.v, trip, parent: ctx.loop?.id ?? null, pipeline: dir.pipeline, unroll: dir.unroll, mode: null, factor: 1, pragmas: dir.pragmas };
             loops.push(info);
             if (!dryDepth) loopOf.set(s, info);
         }

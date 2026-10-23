@@ -215,7 +215,7 @@ const base = {
     <li><strong>a partição tira o gargalo</strong>: com a partição nas duas convoluções, as duas chegam a II 1 e a imagem leva 0,53 ms; a energia cai de 15 para 1,6 µJ, e a economia das unidades aproximadas sobe para 7,4%. Os bancos escolhidos em tempo de execução custam multiplexadores: no FPGA, de 7,4 mil para 35,6 mil LUTs;</li>
     <li><strong>o paralelismo leva a aproximação para a energia</strong>: com 7 produtos por iteração na fc1, 0,16 ms; com todos os filtros por iteração nas convoluções, 0,14 ms e 0,8 µJ, e a economia das unidades aproximadas chega a 12,6% da área e 14,6% da energia (mais operadores, menos ciclos de registradores);</li>
     <li><strong>o laço kx é o menor circuito com pipeline</strong>: um produto por ciclo na conv1, 1,63 ms por imagem, 2,8 mil LUTs no FPGA;</li>
-    <li><strong>a reescala domina as camadas densas</strong>: uma peça de 32 × 32 bits por camada (4 DSP48) é quase toda a área delas, e cada filtro calculado em paralelo pede mais uma.</li>
+    <li><strong>a reescala domina as camadas densas</strong>: uma peça de 32 × 32 bits por camada é quase toda a área delas (no FPGA, os DSP48 vêm da largura real dos operandos, como o Vitis faz: na MiniLenet, acc de até 25 bits e m de 24 bits, 2 DSP48 por camada, conferido no Vivado), e cada filtro calculado em paralelo pede mais uma.</li>
 </ul>
 <p>A partição de cada função é independente das outras: no Vitis, o vetor entre duas camadas teria uma partição só, e a da saída de uma camada teria de servir à seguinte.</p>
 <h3>Busca das unidades por camada</h3>

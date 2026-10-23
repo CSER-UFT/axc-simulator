@@ -68,7 +68,8 @@ test('custo da rede: memória limita o II das convoluções, a reescala usa DSP,
     // 25 leituras de x por iteração com 2 portas: II 13; na conv2, 75 leituras: II 38.
     assert.equal(conv(ex, 'conv1').II, 13);
     assert.equal(conv(ex, 'conv2').II, 38);
-    assert.equal(ex.totals.dsp, 4 * net.sites.length);
+    // A reescala com os operandos da MiniLenet (acc de até 25 bits, m de 24): 2 DSP48 por camada, como no Vivado.
+    assert.equal(ex.totals.dsp, 2 * net.sites.length);
     assert.equal(ex.totals.cycles, ex.layers.reduce((s, l) => s + l.cycles, 0));
     const mul = networkCost(net, { ...o, mul: 'MUL8 T4' });
     const add = networkCost(net, { ...o, add: 'ADD32 LOA10' });
@@ -150,7 +151,7 @@ test('diretivas: II, paralelismo e partição mudam o custo como esperado', asyn
     // Com 3 filtros por iteração (todos), a conv1 leva um terço dos ciclos e usa 3 reescalas (DSP).
     const pf = networkCost(net, { ...o, dirs: [{ part: true, par: 3 }, {}, {}, {}] });
     assert.ok(Math.abs(L(pf, 'conv1').cycles * 3 - L(part, 'conv1').cycles) < 50);
-    assert.equal(L(pf, 'conv1').dsp, 12);
+    assert.equal(L(pf, 'conv1').dsp, 6);
     // II pedido maior que o da memória.
     const ii = networkCost(net, { ...o, dirs: [{}, { ii: 50 }, {}, {}] });
     assert.equal(L(ii, 'conv2').II, 50);

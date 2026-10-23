@@ -200,7 +200,7 @@ ${top};
     let bbs = [];
     if (usedUnits.length && inline === 'rtl') { const bb = blackboxFiles(ks[0].result.lib, usedUnits); Object.assign(net_, bb.files); bbs = bb.jsons; }
     const note = `${net.name}, ${unitsText(net, units)}`;
-    net_['run.tcl'] = tclScript({ id: `${id}_network`, note, clockNs }, 'network', part, ['images.dat', 'expected.dat', 'labels.dat'], bbs);
+    net_['run.tcl'] = tclScript({ id: `${id}_network`, note, clockNs }, 'network', part, ['images.dat', 'expected.dat', 'labels.dat'], bbs, { autoPartition: false });
     const layerPred = ks.map((k) => ({ name: k.name, type: k.type, site: k.site, mul: k.row.mul, add: k.row.add, cycles: k.row.cycles, II: k.row.II, luts: k.row.luts, carry4: k.row.carry4, ff: k.row.ff, dsp: k.row.dsp, area: k.row.area, energy: k.row.energy, prediction: prediction(k.result) }));
     const summary = {
         id, model: net.id, name: net.name, clockNs, part, target, dirs, units, images: N, accuracySim: right / N,
@@ -214,7 +214,7 @@ ${top};
     if (o.layers !== false) {
         for (const k of ks) {
             const exp = k.first.res;
-            const lf = projectFiles(k.result, { inputs: new Map([[k.first.inName, k.first.input]]), expected: exp, part, clockNs, id: `${id}_${k.name}`, note: `${net.name}, camada ${k.name}${k.site !== null ? `, ${unitsText(net, [units[k.site]], [k.name])}` : ''}`, target });
+            const lf = projectFiles(k.result, { inputs: new Map([[k.first.inName, k.first.input]]), expected: exp, part, clockNs, id: `${id}_${k.name}`, note: `${net.name}, camada ${k.name}${k.site !== null ? `, ${unitsText(net, [units[k.site]], [k.name])}` : ''}`, target, tcl: { autoPartition: false } });
             for (const [f, c] of Object.entries(lf)) files[`layers/${k.name}/${f}`] = c;
             names.push(`layers/${k.name}`);
         }
@@ -232,16 +232,18 @@ const unitsText = (net, units, names = net.sites.map((l) => l.name)) => {
 function runAll(names) {
     return `#!/usr/bin/env bash
 # Roda o Vitis HLS em cada projeto desta pasta (gerados pelo axc-simulator).
-# Uso: bash run_all.sh [-j N] [--impl] [--cosim] [--only network,layers/conv1]
+# Uso: bash run_all.sh [-j N] [--impl] [--cosim] [--autopart] [--only network,layers/conv1]
+# --autopart: deixa o Vitis particionar sozinho os vetores (o padrão é só com as partições das diretivas).
 # Depois, para comparar com o modelo: node bin/axc.mjs nnvitis <esta pasta> (na pasta do axc-simulator).
 set -u
 cd "$(dirname "$0")"
-J=1; IMPL=0; COSIM=0; ONLY=""
+J=1; IMPL=0; COSIM=0; AUTOPART=0; ONLY=""
 while [ $# -gt 0 ]; do
   case "$1" in
     -j) J="$2"; shift 2 ;;
     --impl) IMPL=1; shift ;;
     --cosim) COSIM=1; shift ;;
+    --autopart) AUTOPART=1; shift ;;
     --only) ONLY="$2"; shift 2 ;;
     *) echo "opção desconhecida: $1"; exit 1 ;;
   esac
@@ -252,10 +254,10 @@ if [ -n "$ONLY" ]; then CASES="$(echo "$ONLY" | tr ',' ' ')"; fi
 run_one() {
   c="$1"
   echo "[$(date +%H:%M:%S)] $c"
-  ( cd "$c" && AXC_IMPL=$IMPL AXC_COSIM=$COSIM vitis_hls -f run.tcl > vitis_hls.log 2>&1 ) \\
+  ( cd "$c" && AXC_IMPL=$IMPL AXC_COSIM=$COSIM AXC_AUTOPART=$AUTOPART vitis_hls -f run.tcl > vitis_hls.log 2>&1 ) \\
     && echo "[$(date +%H:%M:%S)] $c pronto" || echo "[$(date +%H:%M:%S)] $c FALHOU (veja $c/vitis_hls.log)"
 }
-export -f run_one; export IMPL COSIM
+export -f run_one; export IMPL COSIM AUTOPART
 echo "$CASES" | tr ' ' '\\n' | xargs -P "$J" -I{} bash -c 'run_one {}'
 `;
 }
@@ -280,7 +282,11 @@ Depois de rodar, na pasta do axc-simulator: node bin/axc.mjs nnvitis <esta pasta
 
 Diretivas: ${s.dirs.map((d, i) => `${s.layers.filter((l) => l.site !== null)[i].name} ${d.pipe} II ${d.ii}${d.par > 1 ? ` par ${d.par}` : ''}${d.part ? ' part' : ''}`).join('; ')}
 Unidades: ${s.units.some((u) => u.mul || u.add) ? `${inline === 'rtl' ? 'caixa preta de RTL (u_*_bb.v, .json e o modelo C para a csim)' : 'C++ da netlist'}` : 'todas exatas'}; a reescala, (acc × m + 2^31) >> 32, em DSP.
-Configuração (run.tcl): multiplicações de 8 bits em LUT (config_op mul -impl fabric), sem pipeline automático de laços.
+Configuração (run.tcl): multiplicações de 8 bits em LUT (config_op mul -impl fabric), sem pipeline automático de laços
+e sem a partição automática do Vitis (config_array_partition -throughput_driven off): os vetores ficam só com as
+partições das diretivas, como no modelo. Com AXC_AUTOPART=1 (bash run_all.sh também repassa), o Vitis particiona
+sozinho os vetores locais lidos nos laços com pipeline; na MiniLenet, isso leva as convoluções a II 1, como a
+diretiva de partição do simulador.
 
 Previsões do modelo (atrasos ${s.target === 'fpga' ? 'do Vivado' : 'do sky130'}; a soma das camadas, cada uma com as suas partições)
   camada       ciclos   II     LUT      FF  DSP  unidades

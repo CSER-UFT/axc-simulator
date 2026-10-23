@@ -223,10 +223,13 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
     const cellGroups = new Map();
     for (const { me } of opsCells) {
         const k = `${me.cls}${me.W}`;
-        if (!cellGroups.has(k)) cellGroups.set(k, { key: k, cls: me.cls, W: me.W, count: 0, cell: me.unit });
-        cellGroups.get(k).count++;
+        if (!cellGroups.has(k)) cellGroups.set(k, { key: k, cls: me.cls, W: me.W, count: 0, cell: me.unit, dsp: 0 });
+        const g = cellGroups.get(k);
+        g.count++;
+        // A reescala usa os DSP da largura dos seus operandos (elab.js); as outras peças, os da peça.
+        g.dsp += me.n?.dsp ?? me.unit.dsp ?? 0;
     }
-    const cellList = [...cellGroups.values()].map((g) => ({ ...g, area: g.count * g.cell.area, luts: g.count * g.cell.luts, carry4: g.count * g.cell.carry4, dsp: g.count * (g.cell.dsp ?? 0) }));
+    const cellList = [...cellGroups.values()].map((g) => ({ ...g, area: g.count * g.cell.area, luts: g.count * g.cell.luts, carry4: g.count * g.cell.carry4 }));
     const timeNs = (totalCycles * clockPs) / 1000;
     const energy = {
         ops: energyOps,

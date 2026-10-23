@@ -194,7 +194,9 @@ export function networkKernels(net, dirs = null) {
 
 function padKernel(name, C, H, W, p, z, Hs = H, HPs = H + 2 * p) {
     // Cinco laços retangulares (linhas de cima e de baixo, colunas da esquerda e da direita, miolo): os índices
-    // ficam afins, e o total de escritas é o mesmo da função do C, (H + 2P) x (W + 2P).
+    // ficam afins, e o total de escritas é o mesmo da função do C, (H + 2P) x (W + 2P). As duas escritas de cada
+    // laço da borda nunca caem na mesma posição; sem a diretiva dependence, o Vitis 2022.2 não prova isso com o canal
+    // no laço de fora e põe II 2 no laço das colunas (relatório da MiniLenet, pad2).
     return `// ${name}: borda de ${p} pixels com o ponto zero da entrada (${z}), como a função de padding do C.
 #define C ${C}
 #define H ${H}
@@ -211,6 +213,7 @@ ${name}_top:
         for (int h = 0; h < P; h++)
             for (int w = 0; w < WP; w++) {
 #pragma HLS pipeline II=1
+#pragma HLS dependence variable=y type=inter false
                 y[c * ${HPs !== H + 2 * p ? 'HPS' : 'HP'} + h][w] = Z;
                 y[c * ${HPs !== H + 2 * p ? 'HPS' : 'HP'} + H + P + h][w] = Z;
             }
@@ -218,6 +221,7 @@ ${name}_side:
         for (int h = 0; h < H; h++)
             for (int w = 0; w < P; w++) {
 #pragma HLS pipeline II=1
+#pragma HLS dependence variable=y type=inter false
                 y[c * ${HPs !== H + 2 * p ? 'HPS' : 'HP'} + P + h][w] = Z;
                 y[c * ${HPs !== H + 2 * p ? 'HPS' : 'HP'} + P + h][W + P + w] = Z;
             }

@@ -215,7 +215,7 @@ const base = {
     <li><strong>partitioning removes the bottleneck</strong>: with partitioning on both convolutions, both reach II 1 and the image takes 0.53 ms; energy drops from 15 to 1.6 µJ, and the saving of the approximate units rises to 7.4%. Banks chosen at run time cost multiplexers: on the FPGA, from 7.4 thousand to 35.6 thousand LUTs;</li>
     <li><strong>parallelism brings the approximation to the energy</strong>: with 7 products per iteration on fc1, 0.16 ms; with all filters per iteration in the convolutions, 0.14 ms and 0.8 µJ, and the saving of the approximate units reaches 12.6% of the area and 14.6% of the energy (more operators, fewer register cycles);</li>
     <li><strong>the kx loop is the smallest pipelined circuit</strong>: one product per cycle on conv1, 1.63 ms per image, 2.8 thousand LUTs on the FPGA;</li>
-    <li><strong>requantization dominates the dense layers</strong>: one 32 × 32 bit block per layer (4 DSP48) is almost all of their area, and each filter computed in parallel needs another one.</li>
+    <li><strong>requantization dominates the dense layers</strong>: one 32 × 32 bit block per layer is almost all of their area (on the FPGA, the DSP48 count comes from the real operand widths, as Vitis does: on MiniLenet, acc up to 25 bits and m of 24 bits, 2 DSP48 per layer, checked in Vivado), and each filter computed in parallel needs another one.</li>
 </ul>
 <p>Each function is partitioned independently of the others: in Vitis, the array between two layers would have a single partitioning, and the one of a layer's output would have to serve the next layer.</p>
 <h3>Per layer unit search</h3>

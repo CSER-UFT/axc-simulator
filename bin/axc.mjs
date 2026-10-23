@@ -357,7 +357,16 @@ switch (cmd) {
             const t = read(lg), m = /AXC_MISMATCHES (\d+) OF (\d+)/.exec(t), a = /AXC_ACCURACY (\d+) OF (\d+)/.exec(t);
             return m ? { mismatches: +m[1], total: +m[2], ...(a ? { right: +a[1], images: +a[2] } : {}) } : null;
         };
-        const synOf = (d, fn) => { const f = walkF(join(d, 'proj'), /_csynth\.xml$/).find((x) => x.endsWith(`/${fn}_csynth.xml`)); return f ? csynthSummary(read(f)) : null; };
+        // O Vitis 2022.2 separa os laços com pipeline que não são achatados em funções (<f>_Pipeline_<laço>): os laços
+        // delas entram nos da função.
+        const synOf = (d, fn) => {
+            const all = walkF(join(d, 'proj'), /_csynth\.xml$/);
+            const f = all.find((x) => x.endsWith(`/${fn}_csynth.xml`));
+            if (!f) return null;
+            const r2 = csynthSummary(read(f));
+            for (const g of all.filter((x) => x.includes(`/${fn}_Pipeline_`))) r2.loops.push(...csynthSummary(read(g)).loops);
+            return r2;
+        };
         const implOf = (d) => {
             const f = walkF(join(d, 'proj'), /\.xml$/).filter((x) => x.includes('/impl/')).find((x) => /<AreaReport>|<TimingReport>/.test(read(x)));
             if (!f) return null;
@@ -389,6 +398,18 @@ switch (cmd) {
             `| FF (Vivado) | ${f(netModel.totals.ff)} | ${f(nImpl?.ff)} | ${dev(netModel.totals.ff, nImpl?.ff)} |`,
             `| DSP | ${f(netModel.totals.dsp)} | ${f(nImpl?.dsp ?? res.network.hls?.dsp)} | ${dev(netModel.totals.dsp, nImpl?.dsp ?? res.network.hls?.dsp)} |`,
             `| Período (ns) | ${f(netModel.clockNs, 1)} | ${f(nImpl?.achievedNs, 2)} | |`,
+            ...(() => {
+                // Soma das camadas sozinhas (o que o modelo supõe: cada camada com as suas partições).
+                const iso = rows.map((r2) => r2.iso);
+                if (!iso.every((x) => x?.hls)) return [];
+                const sum = (g) => iso.reduce((a, x) => a + (g(x) ?? 0), 0);
+                const lat = sum((x) => x.hls.latencyWorst), lut = iso.every((x) => x.impl) ? sum((x) => x.impl.lut) : null, ff = iso.every((x) => x.impl) ? sum((x) => x.impl.ff) : null, dsp = iso.every((x) => x.impl) ? sum((x) => x.impl.dsp) : null;
+                res.layersSum = { latency: lat, lut, ff, dsp };
+                return [`| Soma das camadas sozinhas: latência | ${f(netModel.totals.cycles)} | ${f(lat)} | ${dev(netModel.totals.cycles, lat)} |`,
+                    `| Soma das camadas sozinhas: LUT | ${f(netModel.totals.luts)} | ${f(lut)} | ${dev(netModel.totals.luts, lut)} |`,
+                    `| Soma das camadas sozinhas: FF | ${f(netModel.totals.ff)} | ${f(ff)} | ${dev(netModel.totals.ff, ff)} |`,
+                    `| Soma das camadas sozinhas: DSP | ${f(netModel.totals.dsp)} | ${f(dsp)} | ${dev(netModel.totals.dsp, dsp)} |`];
+            })(),
             `| csim | | ${res.network.csim ? `${res.network.csim.mismatches} diferenças em ${res.network.csim.total} saídas; ${res.network.csim.right ?? '-'} acertos em ${res.network.csim.images ?? '-'} imagens` : '-'} | |`, '',
             '## Camadas', '',
             'Modelo: cada camada com as suas partições. Sozinha: o projeto layers/<camada>. Na rede: a função dentro de network/ (csynth e o módulo no Vivado).', '',

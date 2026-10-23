@@ -233,11 +233,13 @@ ${body.replace(/^\s*\/\/.*\n/, '')}`.replace(/\n{3,}/g, '\n\n') + (params.length
 
 /**
  * Reescala das redes (requant da linguagem do simulador, js/hls/elab.js): (acc × m + 2^31) >> 32, mais z, saturada
- * entre 0 e 255. A multiplicação de 32 × 32 bits vai para DSP (como no modelo), mesmo com config_op mul -impl fabric.
+ * entre 0 e 255. A multiplicação vai para DSP (como no modelo), mesmo com config_op mul -impl fabric. Fica num módulo
+ * próprio (INLINE off): em linha, o Vitis 2022.2 levou a multiplicação das camadas densas para a função do laço com
+ * pipeline e perdeu o BIND_OP (aviso SYN 201-303; a multiplicação foi para LUTs).
  */
 export const REQUANT_CPP = `// Reescala das redes quantizadas: (acc x m + 2^31) >> 32, mais z, saturada entre 0 e 255 (multiplicação em DSP).
 static ap_uint<8> axc_requant(ap_int<32> acc, ap_uint<32> m, ap_int<32> z) {
-#pragma HLS INLINE
+#pragma HLS INLINE off
     ap_int<64> p = ap_int<64>(acc) * ap_int<64>(m);
 #pragma HLS BIND_OP variable=p op=mul impl=dsp
     ap_int<64> q = (p + (ap_int<64>(1) << 31)) >> 32;
@@ -357,6 +359,7 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
             }
             lines.push(`${ind(d)}${L.label ?? L.id}: for (int ${t} = 0; ${t} < ${L.tripHw}; ${t}++) {`);
             lines.push(L.mode === 'pipelined' ? `#pragma HLS PIPELINE II=${L.II ?? 1}` : '#pragma HLS PIPELINE off');
+            for (const t of L.pragmas ?? []) lines.push(`#pragma HLS ${t}`);
             emitRegion(it.region, d + 1);
             lines.push(`${ind(d)}}`);
         }
@@ -463,7 +466,7 @@ export const arrRange = (a) => typeRange(a.type);
  * de ambiente, a cosimulação (AXC_COSIM=1) e o Vivado com posicionamento e roteamento (AXC_IMPL=1).
  * @param {{id: string, note?: string, clockNs: number}} c
  */
-export function tclScript(c, top, part, dataFiles, blackboxes = [], { usage = 'vitis_hls -f run.tcl', by = 'axc-simulator' } = {}) {
+export function tclScript(c, top, part, dataFiles, blackboxes = [], { usage = 'vitis_hls -f run.tcl', by = 'axc-simulator', autoPartition = true } = {}) {
     return `# ${c.id}: ${c.note ?? ''}. Gerado por ${by} (Vitis HLS 2022.2).
 # Uso: ${usage}
 # Variáveis de ambiente: AXC_IMPL=1 roda também o Vivado (export_design -flow impl); AXC_COSIM=1 roda a cosimulação.
@@ -481,7 +484,12 @@ create_clock -period ${c.clockNs} -name default
 # Como no modelo: sem DSP (multiplicadores em LUT), sem pipeline automático de laços, memórias de 1 ciclo.
 config_op mul -impl fabric
 config_compile -pipeline_loops 0
-# Uma diferença na csim (testbench devolve 1) não impede a síntese; o resultado fica no log.
+${autoPartition ? '' : `# Sem a partição automática do Vitis (os vetores ficam só com as partições das diretivas, como no modelo); com
+# AXC_AUTOPART=1, o Vitis particiona sozinho os vetores lidos nos laços com pipeline.
+if {!([info exists ::env(AXC_AUTOPART)] && $::env(AXC_AUTOPART) == 1)} {
+    if {[catch {config_array_partition -throughput_driven off} err]} { puts "AXC_AVISO config_array_partition: $err" }
+}
+`}# Uma diferença na csim (testbench devolve 1) não impede a síntese; o resultado fica no log.
 if {[catch {csim_design} err]} { puts "AXC_CSIM_FALHOU $err" }
 csynth_design
 if {[info exists ::env(AXC_COSIM)] && $::env(AXC_COSIM) == 1} { cosim_design }
@@ -514,7 +522,7 @@ export function prediction(r) {
  * @param {{inputs: Map, expected: object, part?: string, clockNs: number, id?: string, note?: string, target?: string}} o
  * @returns {Record<string, string>} nome do arquivo -> conteúdo
  */
-export function projectFiles(result, { inputs, expected, part = 'xc7a100tcsg324-1', clockNs, id = result.design.name, note = '', target = 'asic' }) {
+export function projectFiles(result, { inputs, expected, part = 'xc7a100tcsg324-1', clockNs, id = result.design.name, note = '', target = 'asic', tcl = {} }) {
     const files = testbench(result.design, inputs, expected);
     files['kernel.h'] = kernelHeader(result.design);
     files['kernel.cpp'] = exportIR(result, { inline: 'rtl' });
@@ -522,7 +530,7 @@ export function projectFiles(result, { inputs, expected, part = 'xc7a100tcsg324-
     const names = [...new Set(result.assign.values())];
     let bbs = [];
     if (names.length) { const bb = blackboxFiles(result.lib, names); Object.assign(files, bb.files); bbs = bb.jsons; }
-    files['run.tcl'] = tclScript({ id, note, clockNs }, result.design.name, part, data, bbs);
+    files['run.tcl'] = tclScript({ id, note, clockNs }, result.design.name, part, data, bbs, tcl);
     files['model.json'] = `${JSON.stringify({ id, note, clockNs, part, top: result.design.name, delays: target, assign: Object.fromEntries(result.assign), prediction: prediction(result) }, null, 1)}\n`;
     const p = prediction(result);
     files['LEIAME.txt'] = `Projeto ${id}: ${result.design.name}${note ? ` (${note})` : ''}

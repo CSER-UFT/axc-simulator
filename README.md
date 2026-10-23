@@ -217,7 +217,7 @@ Redes neurais (feitas: etapa 1, formato comum, avaliador genérico, MiniLenet e 
 * max pooling também com diretivas (hoje II 2 pela memória);
 * a síntese de alto nível ainda faz o somador de 32 bits como dois de 16 em cascata; pode passar a usar os de 24 e 32 bits da biblioteca;
 * busca: incluir as diretivas no espaço da busca, e um limite com margem estatística (a validação de 1000 imagens tem ruído de 0,3 a 1,4 ponto);
-* rodar os projetos exportados (MiniLenet exata e aproximada, com e sem partição) no Vitis e no Vivado e calibrar o modelo das redes com `nnvitis`.
+* validação das redes no Vitis e no Vivado (results/nn-vitis): rodada 1 feita (MiniLenet exata; latência das camadas a 0,6%, LUT a 13%); falta a rodada 2 (exata, com partição e aproximada, com as correções da rodada 1) e calibrar o custo de LUT e FF das camadas pequenas e a chamada dos laços com pipeline que o Vitis separa em funções.
 
 * Exploração: diretivas com valores numéricos (II, fatores de unroll e de partição) e exploração em lote de vários kernels; estimativa do SSIM com erros correlacionados no espaço.
 * Recorrências com somadores aproximados no modelo de erro (execuções consecutivas no perfil).
