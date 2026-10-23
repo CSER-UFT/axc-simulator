@@ -586,7 +586,7 @@ function irText(r) {
             }
         }
     };
-    lines.push(`${r.design.name}: ${r.design.arrays.map((a) => `${a.name}[${a.dims.join('][')}] ${a.type.name}${a.kind === 'rom' ? ' const' : ''}${a.partition ? ` (${a.partition.type}${a.partition.type !== 'complete' ? ` ${a.partition.factor}` : ''}, dim ${a.partition.dim})` : ''}`).join(', ')}`);
+    lines.push(`${r.design.name}: ${r.design.arrays.map((a) => `${a.name}[${a.dims.join('][')}] ${a.type.name}${a.kind === 'rom' ? ' const' : ''}${a.partitions?.length ? ` (${a.partitions.map((p) => `${p.type}${p.type !== 'complete' ? ` ${p.factor}` : ''}, dim ${p.dim}`).join('; ')})` : ''}`).join(', ')}`);
     walk(r.design.top, '');
     return lines.join('\n');
 }

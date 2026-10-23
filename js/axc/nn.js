@@ -232,7 +232,8 @@ function requantize(l, acc, ch) {
  * Soma dos termos de todas as saídas com a unidade (fill(t, out) põe o termo t de cada saída em out):
  *   tree = 1: em cadeia, como o laço do C (acc = 0; acc += termo, um por vez);
  *   tree = U > 1: em árvores de U termos (os termos de cada grupo somados dois a dois, nível por nível, como a
- *     expressão de um laço desenrolado com EXPRESSION_BALANCE), e cada árvore somada ao acumulador;
+ *     expressão de um laço desenrolado com EXPRESSION_BALANCE), e cada árvore somada ao acumulador, que começa em 0
+ *     (acc = 0; acc += árvore, como o laço com o fator de desenrolamento U);
  *   tree = 0: todos os termos numa árvore só (o laço inteiro desenrolado).
  */
 export function sumTerms(nTerms, fill, n, add, tree, scratch = makeScratch()) {
@@ -257,7 +258,7 @@ export function sumTerms(nTerms, fill, n, add, tree, scratch = makeScratch()) {
             }
             len = w;
         }
-        if (g === 0) acc.set(level[0].subarray(0, n)); else add(acc, level[0], n);
+        if (U >= nTerms) acc.set(level[0].subarray(0, n)); else add(acc, level[0], n);
     }
     return acc;
 }

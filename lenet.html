@@ -38,7 +38,7 @@
                     <h2 style="margin-top:12px" data-i18n="nn.units">Unidades</h2>
                     <label><span data-i18n="nn.mul">Multiplicador</span> <select id="nnMul"></select></label>
                     <label><span data-i18n="nn.adder">Somador das acumulações</span> <select id="nnAdder"></select></label>
-                    <label><span data-i18n="nn.accum">Estrutura da soma</span> <select id="nnAccum"><option value="arch" data-i18n="nn.accumArch">como na arquitetura</option><option value="chain" data-i18n="nn.accumChain">em cadeia (laço)</option><option value="tree" data-i18n="nn.accumTree">em árvore (laço desenrolado)</option></select></label>
+                    <label><span data-i18n="nn.accum">Estrutura da soma</span> <select id="nnAccum"><option value="arch" data-i18n="nn.accumArch">conforme as diretivas</option><option value="chain" data-i18n="nn.accumChain">em cadeia (laço)</option><option value="tree" data-i18n="nn.accumTree">em árvore (laço desenrolado)</option></select></label>
                     <div id="nnUnitInfo"></div>
                     <h3 style="margin-top:10px" data-i18n="nn.layers">Camadas com a unidade aproximada:</h3>
                     <div class="row" id="nnLayers"></div>
@@ -58,8 +58,18 @@
                         <label><span data-i18n="nn.costClock">Período (ns)</span> <input type="number" id="nnClock" min="2" max="50" step="0.5" value="10" style="width:5em" /></label>
                         <label><span data-i18n="nn.costTarget">Alvo</span> <select id="nnTarget"><option value="asic" data-i18n="nn.costAsic">ASIC sky130</option><option value="fpga" data-i18n="nn.costFpga">FPGA xc7a100t</option></select></label>
                     </div>
-                    <div id="nnCost"></div>
+                    <h3 style="margin-top:10px" data-i18n="nn.dirTitle">Diretivas por camada</h3>
+                    <div class="scroll-box" id="nnDirs"></div>
+                    <div class="row" style="margin-top:6px">
+                        <button type="button" class="btn outline" id="nnDirReset" data-i18n="nn.dirReset">Diretivas padrão</button>
+                    </div>
+                    <div id="nnCost" style="margin-top:10px"></div>
                     <p class="note" id="nnCostNote"></p>
+                    <details style="margin-top:8px">
+                        <summary data-i18n="nn.codeTitle">Código gerado</summary>
+                        <label><span data-i18n="nn.codeLayer">Camada</span> <select id="nnCodeLayer"></select></label>
+                        <pre class="scroll-box mono" id="nnCode" style="max-height:360px;white-space:pre;font-size:12px"></pre>
+                    </details>
                 </section>
             </div>
             <div>

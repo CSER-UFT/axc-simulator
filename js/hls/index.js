@@ -33,24 +33,25 @@ export function partitionLogic(design, model = MODEL) {
     for (const seg of design.segments) for (const n of seg.nodes) {
         if (n.op !== 'load' && n.op !== 'store') continue;
         const piped = seg.region.loop?.mode === 'pipelined';
-        const arr = arrays.get(n.array), p = arr.partition;
-        if (p?.type === 'complete' || !n.idx) continue;
-        const pd = p ? (p.dim === 0 ? -1 : p.dim - 1) : null;
-        const F = p?.factor ?? 1;
-        const pow2 = (F & (F - 1)) === 0;
-        // Endereço no banco: dimensões com o tamanho dividido por F na dimensão particionada.
-        const dims = arr.dims.map((x, k) => (k === pd ? Math.ceil(x / F) : x));
+        const arr = arrays.get(n.array);
+        if (arr.regs || !n.idx) continue;
+        // Dimensões particionadas (uma diretiva por dimensão; dim=0: o índice linear do vetor inteiro).
+        const byDim = new Map(arr.banked.map((p) => [p.dim === 0 ? -1 : p.dim - 1, p]));
+        const flat0 = byDim.get(-1);
+        const pow2 = (F) => (F & (F - 1)) === 0;
+        // Endereço no banco: dimensões com o tamanho dividido por F nas dimensões particionadas.
+        const dims = arr.dims.map((x, k) => (byDim.has(k) ? Math.ceil(x / byDim.get(k).factor) : x));
         const stride = dims.map((_, k) => dims.slice(k + 1).reduce((a, b) => a * b, 1));
-        const size = dims.reduce((a, b) => a * b, 1) / (pd === -1 ? F : 1);
+        const size = dims.reduce((a, b) => a * b, 1) / (flat0 ? flat0.factor : 1);
         const aw = bitsFor([0, Math.max(1, size - 1)]);
         let terms = 0, off = 0;
         const key = [];
         n.idx.forEach((a, k) => {
             const vars = Object.keys(a.t).filter((v) => a.t[v] !== 0);
-            if (k === pd && !pow2 && vars.length) { terms += digits(stride[k]); key.push(`d(${affText(a)})`); return; }
-            const sc = k === pd ? F : 1;
-            for (const v of vars) { terms += digits(Math.abs(Math.floor(a.t[v] / sc) * stride[k])) || 0; key.push(`${v}*${Math.floor(a.t[v] / sc) * stride[k]}`); }
-            off += Math.floor(a.c / sc) * stride[k];
+            const F = byDim.get(k)?.factor ?? 1;
+            if (byDim.has(k) && !pow2(F) && vars.length) { terms += digits(stride[k]); key.push(`d(${affText(a)})`); return; }
+            for (const v of vars) { terms += digits(Math.abs(Math.floor(a.t[v] / F) * stride[k])) || 0; key.push(`${v}*${Math.floor(a.t[v] / F) * stride[k]}`); }
+            off += Math.floor(a.c / F) * stride[k];
         });
         // Sem pipeline, o Vitis reaproveita o endereço entre os estados (nos relatórios do Vivado, as variantes
         // sequenciais do gaussiano não têm a lógica de endereço das com pipeline): só entra com pipeline.
@@ -60,18 +61,23 @@ export function partitionLogic(design, model = MODEL) {
         if (off) offsets.add(`${bk}+${off}#${aw}`);
         }
         if (!n.bank || n.bank.exact || n.bank.banks <= 1) continue;
-        const d = p.dim === 0 ? 0 : p.dim - 1;
-        const w = bitsFor([0, (p.dim === 0 ? arr.size : arr.dims[d]) - 1]);
-        if (n.op === 'load') muxes.push({ array: arr.name, inputs: F, W: bitsFor(n.range) });
-        if (pow2) continue;
-        const a = p.dim === 0 ? null : n.idx[d];
-        const free = (k) => (p.type === 'cyclic' ? a.t[k] % F !== 0 : a.t[k] !== 0);
-        const vars = a ? Object.keys(a.t).filter(free).sort() : ['?'];
-        divs.set(`${arr.name}:${a ? affText(a) : n.text}`, { array: arr.name, w });
-        const ukey = `${arr.name}:${vars.join(',')}`;
-        if (!urems.has(ukey)) {
-            const loop = vars.filter((v) => depthOf.has(v)).sort((x, y) => depthOf.get(y) - depthOf.get(x))[0] ?? null;
-            urems.set(ukey, { array: arr.name, w, loop, latency: w + model.uremLatency });
+        // Bancos escolhidos em tempo de execução: só as dimensões em que o banco depende das variáveis dos laços.
+        const free = n.bank.parts.filter((x) => !x.exact && x.banks > 1);
+        if (n.op === 'load') muxes.push({ array: arr.name, inputs: free.reduce((s, x) => s * x.banks, 1), W: bitsFor(n.range) });
+        for (const { p } of free) {
+            const F = p.factor;
+            if (pow2(F)) continue;
+            const d = p.dim === 0 ? 0 : p.dim - 1;
+            const w = bitsFor([0, (p.dim === 0 ? arr.size : arr.dims[d]) - 1]);
+            const a = p.dim === 0 ? null : n.idx[d];
+            const isFree = (k) => (p.type === 'cyclic' ? a.t[k] % F !== 0 : a.t[k] !== 0);
+            const vars = a ? Object.keys(a.t).filter(isFree).sort() : ['?'];
+            divs.set(`${arr.name}:${p.dim}:${a ? affText(a) : n.text}`, { array: arr.name, w });
+            const ukey = `${arr.name}:${p.dim}:${vars.join(',')}`;
+            if (!urems.has(ukey)) {
+                const loop = vars.filter((v) => depthOf.has(v)).sort((x, y) => depthOf.get(y) - depthOf.get(x))[0] ?? null;
+                urems.set(ukey, { array: arr.name, w, loop, latency: w + model.uremLatency });
+            }
         }
     }
     const latency = new Map();

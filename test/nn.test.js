@@ -161,7 +161,8 @@ test('estrutura da soma: em cadeia e em árvore conferem com a definição, e s�
             if (U === 1) want = col.reduce((a, b) => f1(a, b), 0);
             else {
                 const G = U === 0 ? K : U;
-                want = null;
+                // Uma árvore só: o resultado é a árvore; com várias, acc = 0 e acc += árvore (o laço com fator U).
+                want = G >= K ? null : 0;
                 for (let g = 0; g < K; g += G) { const r = tree(col.slice(g, g + G)); want = want === null ? r : f1(want, r); }
             }
             assert.equal(got[j], want, `${label}, saída ${j}`);

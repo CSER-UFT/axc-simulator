@@ -111,7 +111,7 @@ export function elaborate(ast, { ports = 2 } = {}) {
                 while (flat.length < size) flat.push(0);
             }
         }
-        const arr = { name, type, dims, size, kind, init: flat, line, partition: null, ports, accesses: 0 };
+        const arr = { name, type, dims, size, kind, init: flat, line, partition: null, partitions: [], banked: [], regs: false, ports, accesses: 0 };
         arrays.set(name, arr);
         return arr;
     }
@@ -129,7 +129,15 @@ export function elaborate(ast, { ports = 2 } = {}) {
             const type = p.opts.type ?? (p.opts.complete ? 'complete' : p.opts.block ? 'block' : 'cyclic');
             const dim = p.opts.dim ?? 1;
             if (dim < 0 || dim > arr.dims.length) throw new HlsError(`array_partition: dim=${dim} inválida para ${arr.name}`, p.line);
-            arr.partition = { type, factor: type === 'complete' ? (dim === 0 ? arr.size : arr.dims[dim - 1]) : p.opts.factor ?? 2, dim };
+            const part = { type, factor: type === 'complete' ? (dim === 0 ? arr.size : arr.dims[dim - 1]) : p.opts.factor ?? 2, dim };
+            // Uma diretiva por dimensão (como no Vitis); dim=0 vale para o vetor inteiro.
+            arr.partitions = dim === 0 ? [part] : [...arr.partitions.filter((q) => q.dim !== dim && q.dim !== 0), part].sort((a, b) => a.dim - b.dim);
+            arr.partition = arr.partitions[0];
+            // Registradores: partição completa do vetor inteiro (dim=0, vetor de uma dimensão ou as duas dimensões).
+            const full = (q) => q.type === 'complete' && (q.dim === 0 || arr.dims.length === 1);
+            arr.regs = arr.partitions.some(full) || (arr.dims.length === 2 && arr.partitions.filter((q) => q.type === 'complete').length === 2);
+            // A partição completa de uma só dimensão de um vetor de duas: um banco por índice dessa dimensão.
+            arr.banked = arr.regs ? [] : arr.partitions.map((q) => (q.type === 'complete' ? { ...q, type: 'cyclic', complete: true } : q));
         } else if (p.name === 'allocation') {
             const op = String(p.opts.instances ?? '').toLowerCase();
             if (!['add', 'mul', 'sub'].includes(op)) throw new HlsError('allocation: instances=add ou instances=mul', p.line);
@@ -368,9 +376,21 @@ export function elaborate(ast, { ports = 2 } = {}) {
     }
     /** Banco de um acesso: chave (acessos com a mesma chave caem sempre no mesmo banco) e se é exata. */
     function bankOf(arr, idx) {
-        const p = arr.partition;
-        if (!p) return { key: `${arr.name}`, banks: 1, label: arr.name };
-        if (p.type === 'complete') return null;
+        if (!arr.partitions.length) return { key: `${arr.name}`, banks: 1, label: arr.name };
+        if (arr.regs) return null;
+        const parts = arr.banked.map((p) => ({ p, ...bankPart(arr, p, idx) }));
+        if (parts.length === 1) return { ...parts[0], parts };
+        const labelOf = (x) => x.label.slice(arr.name.length + 1);
+        return {
+            key: `${arr.name}#${parts.map((x) => x.key.slice(arr.name.length + 1)).join('|')}`,
+            banks: parts.reduce((s, x) => s * x.banks, 1),
+            exact: parts.every((x) => x.exact),
+            label: `${arr.name} ${parts.map((x) => `d${x.p.dim} ${labelOf(x)}`).join(', ')}`,
+            parts,
+        };
+    }
+    /** Banco de um acesso numa das dimensões particionadas. */
+    function bankPart(arr, p, idx) {
         const d = p.dim === 0 ? 0 : p.dim - 1;
         const a = p.dim === 0 ? affAdd(affScale(idx[0], arr.dims[1] ?? 1), idx[1] ?? affConst(0)) : idx[d];
         const F = p.factor;
@@ -396,7 +416,7 @@ export function elaborate(ast, { ports = 2 } = {}) {
         const constIdx = idx.every(affIsConst);
         const flatOf = (ix) => (ix.length === 2 ? ix[0].c * arr.dims[1] + ix[1].c : ix[0].c);
         if (arr.kind === 'rom' && constIdx) return cval(arr.init[flatOf(idx)]);
-        if (arr.partition?.type === 'complete') {
+        if (arr.regs) {
             if (!constIdx) throw new HlsError(`${arr.name} está particionado por completo: o índice precisa ser constante depois do desenrolamento`, e.line);
             const name = elemName(arr, idx);
             const s = env.get(name);
@@ -419,7 +439,7 @@ export function elaborate(ast, { ports = 2 } = {}) {
         if (arr.kind === 'rom') throw new HlsError(`${arr.name} é constante`, line);
         const idx = indexValues(target, arr, env);
         const v = clampType(value, arr.type, line);
-        if (arr.partition?.type === 'complete') {
+        if (arr.regs) {
             if (!idx.every(affIsConst)) throw new HlsError(`${arr.name} está particionado por completo: o índice precisa ser constante`, line);
             const name = elemName(arr, idx);
             env.set(name, { type: arr.type, value: v });

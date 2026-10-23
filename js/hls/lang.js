@@ -8,7 +8,8 @@
  *   expressões + - * / % << >> & | ^ ~ comparações, ?: e as funções min, max e abs; / e % só por potência de 2;
  *              requant(acc, m, z), a reescala das redes quantizadas (uma peça exata, js/axc/nngen.js);
  *   diretivas  #pragma HLS pipeline [II=n], unroll [factor=n], array_partition variable=v [type=]cyclic|block|complete
- *              [factor=n] [dim=d], allocation operation instances=add|mul limit=n.
+ *              [factor=n] [dim=d], allocation operation instances=add|mul limit=n; array_partition vale por dimensão (uma
+ *              diretiva por dimensão, os bancos das duas se combinam).
  *
  * O analisador produz uma árvore (AST) com a linha de cada nó; as diretivas viram comandos 'pragma' no lugar em que
  * aparecem, e a elaboração (elab.js) as associa ao laço que as contém ou à função.

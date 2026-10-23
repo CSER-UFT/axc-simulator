@@ -8,11 +8,15 @@
  *   node bin/axc.mjs sweep --group mul8 [--dist ...] [--format csv|json]
  *   node bin/axc.mjs synth <unidade>
  *   node bin/axc.mjs verilog <unidade> [--tb] [--out arquivo.v]
- *   node bin/axc.mjs lenet <multiplicador> [--add <somador>] [--tree] [--model lenet5-mnist|minilenet-mnist|...] [--layers conv1,conv2,...]
+ *   node bin/axc.mjs lenet <multiplicador> [--add <somador>] [--tree | --dirs "..."] [--model lenet5-mnist|minilenet-mnist|...]
+ *                          [--layers conv1,conv2,...]
  *   node bin/axc.mjs nncost [--model minilenet-mnist|...] [--mul <multiplicador>] [--add <somador>] [--layers conv1,...]
- *                           [--clock 10] [--target asic|fpga] [--flow delay|area|iso] [--kernels pasta]
+ *                           [--dirs "..."] [--clock 10] [--target asic|fpga] [--flow delay|area|iso] [--kernels pasta]
  *       custo da rede pelo modelo de síntese de alto nível (código gerado por js/axc/nngen.js), por camada e no total;
  *       --kernels grava o código de cada camada (na linguagem da página de síntese de alto nível)
+ *       --dirs: diretivas das camadas com pesos, "camada:item,item;camada:..." com os itens pixel|tap|off (conv),
+ *       input|off (densa), ii=N, par=N e part (por exemplo "conv1:pixel,part;conv2:tap;fc1:par=7,part"); as camadas
+ *       omitidas ficam com o padrão. No lenet, a estrutura da soma das camadas aproximadas passa a ser a das diretivas.
  *   node bin/axc.mjs hls <kernel.c | --example gauss|sobel|sharpen|fir|dot> [--clock ns] [--flow delay|area|iso] [--ports n]
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
@@ -37,7 +41,7 @@ import { toVerilog, testbench, moduleName } from '../js/axc/verilog.js';
 import { designSpace } from '../js/axc/designspace.js';
 import { PRESETS } from '../js/axc/presets.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize } from '../js/axc/nn.js';
-import { networkKernels, networkCost } from '../js/axc/nngen.js';
+import { networkCost, networkKernels, normalizeDirectives, directiveTrees, CONV_PIPES, DENSE_PIPES } from '../js/axc/nngen.js';
 
 import { synthesize } from '../js/hls/index.js';
 import { KERNELS } from '../js/hls/kernels.js';
@@ -89,6 +93,30 @@ const synthData = () => {
 };
 const groupOf = (c) => `${c.kind}${c.width}`;
 
+/** Diretivas das camadas com pesos: "conv1:pixel,par=3,part;fc1:par=7" ou JSON (lista na ordem das camadas). */
+function parseDirs(net, text) {
+    if (!text) return normalizeDirectives(net, null);
+    if (text.trim().startsWith('[')) return normalizeDirectives(net, JSON.parse(text));
+    const names = net.sites.map((l) => l.name);
+    const dirs = net.sites.map(() => ({}));
+    for (const part of text.split(';').map((x) => x.trim()).filter(Boolean)) {
+        const [name, items = ''] = part.split(':');
+        const i = names.indexOf(name.trim());
+        if (i < 0) die(`--dirs: camada desconhecida ${name} (${names.join(', ')})`);
+        const pipes = net.sites[i].type === 'conv' ? CONV_PIPES : DENSE_PIPES;
+        for (const it of items.split(',').map((x) => x.trim()).filter(Boolean)) {
+            const [k, v] = it.split('=');
+            if (pipes.includes(k)) dirs[i].pipe = k;
+            else if (k === 'part') dirs[i].part = true;
+            else if (k === 'ii' || k === 'par') dirs[i][k] = +v;
+            else die(`--dirs: item desconhecido ${it} em ${name} (${pipes.join(', ')}, ii=N, par=N, part)`);
+        }
+    }
+    const norm = normalizeDirectives(net, dirs);
+    norm.forEach((d, i) => { if (dirs[i].par && d.par !== dirs[i].par) die(`--dirs: par=${dirs[i].par} inválido em ${names[i]} (divisores de ${net.sites[i].type === 'conv' ? 'filtros, só com pixel' : 'entradas'})`); });
+    return norm;
+}
+
 switch (cmd) {
     case 'list': {
         const g = opt('--group');
@@ -131,6 +159,7 @@ switch (cmd) {
         break;
     }
     case 'lenet': {
+        const dirsOf = (net) => parseDirs(net, opt('--dirs'));
         const mul = cfgOf(pos[0]);
         if (mul.kind !== 'mul') die('o primeiro argumento do lenet é um multiplicador');
         const add = opt('--add') ? cfgOf(opt('--add')) : null;
@@ -145,14 +174,15 @@ switch (cmd) {
         const T = productTable(buildUnit(mul)), Tx = productTable(null);
         const acc = add ? adderAccumulate(buildUnit(add)) : null;
         const mask = names.map((l) => layers.includes(l));
-        // --tree: a soma das camadas aproximadas em árvore (o laço desenrolado), em vez de em cadeia.
-        const trees = names.map(() => (flag('--tree') ? 0 : 1));
+        // --tree: a soma das camadas aproximadas em árvore (o laço desenrolado), em vez de em cadeia; --dirs: a das
+        // diretivas (a mesma do código gerado e do custo).
+        const trees = opt('--dirs') ? directiveTrees(net, dirsOf(net)) : names.map(() => (flag('--tree') ? 0 : 1));
         const run = (tables, adds) => classifyRange(net, test, tables, adds, 0, test.n, new Uint8Array(test.n), trees);
         const ref = run(names.map(() => Tx), []);
         const preds = run(mask.map((m) => (m ? T : Tx)), mask.map((m) => (m ? acc : null)));
         const s = summarize(test, preds, ref, net.classes), s0 = summarize(test, ref, null, net.classes);
-        const r = { model: net.id, mul: unitName(mul), add: add ? unitName(add) : null, sum: add ? (flag('--tree') ? 'tree' : 'chain') : null, layers, accuracy: s.accuracy, exactAccuracy: s0.accuracy, broke: s.broke.length, fixed: s.fixed };
-        out(r, () => `${net.name}, ${r.mul}${r.add ? ` + ${r.add} (${r.sum === 'tree' ? 'árvore' : 'cadeia'})` : ''} em ${layers.join(', ')}: acurácia ${(100 * r.accuracy).toFixed(1)}% (exata ${(100 * r.exactAccuracy).toFixed(1)}%), ${r.broke} erradas a mais, ${r.fixed} corrigidas`);
+        const r = { model: net.id, mul: unitName(mul), add: add ? unitName(add) : null, sum: add ? (opt('--dirs') ? `dirs ${trees.join(',')}` : flag('--tree') ? 'tree' : 'chain') : null, layers, accuracy: s.accuracy, exactAccuracy: s0.accuracy, broke: s.broke.length, fixed: s.fixed };
+        out(r, () => `${net.name}, ${r.mul}${r.add ? ` + ${r.add} (${r.sum === 'tree' ? 'árvore' : r.sum === 'chain' ? 'cadeia' : `estrutura das diretivas: ${trees.join(', ')}`})` : ''} em ${layers.join(', ')}: acurácia ${(100 * r.accuracy).toFixed(1)}% (exata ${(100 * r.exactAccuracy).toFixed(1)}%), ${r.broke} erradas a mais, ${r.fixed} corrigidas`);
         break;
     }
     case 'nncost': {
@@ -163,9 +193,10 @@ switch (cmd) {
         const layers = (opt('--layers') ?? names.join(',')).split(',');
         for (const l of layers) if (!names.includes(l)) die(`camada desconhecida: ${l} (${names.join(', ')})`);
         const unitArg = (k, kind) => { const v = opt(k); if (!v) return null; const c = cfgOf(v); if (c.kind !== kind) die(`${k} espera um ${kind === 'mul' ? 'multiplicador' : 'somador'}`); return unitName(c); };
+        const dirs = parseDirs(net, opt('--dirs'));
         if (opt('--kernels')) {
             const dir = opt('--kernels');
-            for (const k of networkKernels(net)) writeFileSync(join(dir, `${k.name}.c`), k.src);
+            for (const k of networkKernels(net, dirs)) writeFileSync(join(dir, `${k.name}.c`), k.src);
         }
         let c;
         try {
@@ -173,15 +204,19 @@ switch (cmd) {
                 synth: synthData(), cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')),
                 fpga: existsSync(join(ROOT, 'data/vivado-units.json')) ? JSON.parse(readFileSync(join(ROOT, 'data/vivado-units.json'), 'utf8')) : null,
                 target: opt('--target', 'asic'), flow: opt('--flow', 'delay'), clockNs: +opt('--clock', 10),
-                mul: unitArg('--mul', 'mul'), add: unitArg('--add', 'add'), mask: names.map((l) => layers.includes(l)),
+                mul: unitArg('--mul', 'mul'), add: unitArg('--add', 'add'), mask: names.map((l) => layers.includes(l)), dirs,
             });
         } catch (e) { die(e.message); }
-        const r = { model: net.id, ...c };
+        const r = { model: net.id, dirs, ...c };
+        for (const l of r.layers) delete l.src;
+        const dirText = (d, l) => (l.type === 'conv' ? [d.pipe] : d.pipe === 'off' ? ['off'] : []).concat(d.pipe !== 'off' ? [`II ${d.ii}`] : [], d.par > 1 ? [`par ${d.par}`] : [], d.part ? ['part'] : []).join(' ');
         out(r, () => [
             `${net.name} (${net.dataset.name}), ${c.totals.clockNs} ns${opt('--mul') || opt('--add') ? `, ${[opt('--mul'), opt('--add')].filter(Boolean).join(' + ')} em ${layers.join(', ')}` : ', unidades exatas'}`,
             'camada       ciclos    II   área (µm²)    LUT     FF  DSP  energia (nJ)  unidades',
             ...c.layers.map((l) => `${l.name.padEnd(9)} ${String(l.cycles).padStart(9)} ${String(l.II ?? '-').padStart(5)} ${l.area.toFixed(0).padStart(12)} ${String(l.luts).padStart(6)} ${String(l.ff).padStart(6)} ${String(l.dsp).padStart(4)} ${(l.energy / 1e6).toFixed(2).padStart(13)}  ${l.units.map((u) => `${u.count} × ${u.name}`).join(', ')}`),
             `total     ${String(c.totals.cycles).padStart(9)} ${''.padStart(5)} ${c.totals.area.toFixed(0).padStart(12)} ${String(c.totals.luts).padStart(6)} ${String(c.totals.ff).padStart(6)} ${String(c.totals.dsp).padStart(4)} ${(c.totals.energy / 1e6).toFixed(2).padStart(13)}  (${c.totals.timeUs.toFixed(1)} µs por imagem)`,
+            `diretivas: ${net.sites.map((l, i) => `${l.name} ${dirText(dirs[i], l)}`).join('; ')}`,
+            ...c.layers.filter((l) => l.IIwhy && l.IIwhy.kind !== 'target').map((l) => `II de ${l.name} limitado por ${l.IIwhy.kind === 'mem' ? `memória (${l.IIwhy.label}: ${l.IIwhy.uses} acessos, ${l.IIwhy.cap} portas)` : l.IIwhy.kind === 'rec' ? `recorrência (${l.IIwhy.key})` : l.IIwhy.kind}`),
             ...c.warnings.map((w) => `aviso: ${w}`),
         ].join('\n'));
         break;

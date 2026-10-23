@@ -82,3 +82,88 @@ test('custo da rede: memória limita o II das convoluções, a reescala usa DSP,
     const names = synthesize('void k(u16 a[4], u16 b[4], u32 r[4]) { for (int i = 0; i < 4; i++) r[i] = a[i] + b[i] + 70000; }', { synth, cells }).cost.units.map((u) => u.unit.name);
     assert.ok(names.includes('ADD32 (2 × ADD16 exato)') && !names.includes('ADD32 exato'), names.join(', '));
 });
+
+test('partição em duas dimensões: uma diretiva por dimensão, os bancos se combinam', () => {
+    const src = (pr) => `void k(u8 x[34][34], u16 y[32][32]) {
+${pr}
+    for (int i = 0; i < 32; i++)
+        for (int j = 0; j < 32; j++) {
+#pragma HLS pipeline II=1
+            u16 s = 0;
+            for (int a = 0; a < 3; a++) for (int b = 0; b < 3; b++) s += x[i + a][j + b];
+            y[i][j] = s;
+        }
+}`;
+    const II = (pr) => synthesize(src(pr), { synth, cells, clockNs: 10 }).design.loops.find((l) => l.mode === 'pipelined').IIachieved;
+    assert.equal(II(''), 5);
+    assert.equal(II('#pragma HLS array_partition variable=x cyclic factor=4 dim=1'), 2);
+    assert.equal(II('#pragma HLS array_partition variable=x cyclic factor=4 dim=1\n#pragma HLS array_partition variable=x cyclic factor=4 dim=2'), 1);
+    // Partição completa de uma dimensão de um vetor de duas: um banco por linha (não registradores).
+    const d = elaborate(parse(src('#pragma HLS array_partition variable=x complete dim=1')), { ports: 2 });
+    const x = d.arrays.find((a) => a.name === 'x');
+    assert.ok(!x.regs && x.banked[0].factor === 34);
+});
+
+test('diretivas: o código gerado, executado com o somador aproximado, dá a soma da estrutura das diretivas', async () => {
+    const { adderAccumulate } = await import('../js/axc/nn.js');
+    const { buildUnit } = await import('../js/axc/units.js');
+    const { directiveTrees, parOptions } = await import('../js/axc/nngen.js');
+    const { net, test: ts } = load('minilenet-mnist');
+    const acc = adderAccumulate(buildUnit({ kind: 'add', width: 32, adder: 'seg', L: 8, P: 4 }));
+    const a1 = new Int32Array(1), b1 = new Int32Array(1);
+    const fadd = (x, y) => { a1[0] = x; b1[0] = y; acc(a1, b1, 1); return a1[0]; };
+    const img = ts.images.subarray(0, ts.size);
+    const sets = [
+        null,
+        net.sites.map((l) => ({ pipe: l.type === 'conv' ? 'tap' : 'input', part: true, par: l.type === 'dense' ? parOptions(l)[1] : 1 })),
+        net.sites.map((l) => ({ pipe: 'off' })),
+        net.sites.map((l) => ({ part: true, par: parOptions(l).at(-1) })),
+    ];
+    for (const dirs of sets) {
+        const trees = directiveTrees(net, dirs);
+        const want = [...infer(net, img, net.sites.map(() => productTable(null)), net.sites.map(() => acc), undefined, trees).out];
+        let x = Array.from(img, (p) => net.inputLuts[0][p]);
+        for (const k of networkKernels(net, dirs)) {
+            const d = elaborate(parse(k.src), { ports: 2 });
+            const ops = new Map();
+            if (k.site !== null) for (const s of d.segments) for (const n of s.nodes) if (n.op === 'add') ops.set(n.id, fadd);
+            const [inA] = inputArrays(d), [outA] = outputArrays(d);
+            x = [...execute(d, new Map([[inA.name ?? inA, Float64Array.from(x)]]), { ops }).mem.get(outA.name ?? outA)];
+        }
+        assert.deepEqual(x, want, `estrutura ${trees.join(',')}`);
+    }
+});
+
+test('diretivas: II, paralelismo e partição mudam o custo como esperado', async () => {
+    const { normalizeDirectives, directiveTrees } = await import('../js/axc/nngen.js');
+    const { net } = load('minilenet-mnist');
+    const o = { synth, cells, fpga, clockNs: 10 };
+    const L = (c, n) => c.layers.find((l) => l.name === n);
+    const base = networkCost(net, o);
+    // Padrão: a janela inteira em árvore nas conv, cadeia nas densas.
+    assert.deepEqual(directiveTrees(net, null), [0, 0, 1, 1]);
+    // Partição: a entrada e os pesos em bancos; o II cai para 1 nas duas conv.
+    const part = networkCost(net, { ...o, dirs: [{ part: true }, { part: true }, {}, {}] });
+    assert.equal(L(part, 'conv1').II, 1);
+    assert.equal(L(part, 'conv2').II, 1);
+    assert.ok(L(part, 'conv2').cycles * 20 < L(base, 'conv2').cycles);
+    // Com 3 filtros por iteração (todos), a conv1 leva um terço dos ciclos e usa 3 reescalas (DSP).
+    const pf = networkCost(net, { ...o, dirs: [{ part: true, par: 3 }, {}, {}, {}] });
+    assert.ok(Math.abs(L(pf, 'conv1').cycles * 3 - L(part, 'conv1').cycles) < 50);
+    assert.equal(L(pf, 'conv1').dsp, 12);
+    // II pedido maior que o da memória.
+    const ii = networkCost(net, { ...o, dirs: [{}, { ii: 50 }, {}, {}] });
+    assert.equal(L(ii, 'conv2').II, 50);
+    // Densa com 7 produtos por iteração, com e sem partição.
+    const u7 = networkCost(net, { ...o, dirs: [{}, {}, { par: 7, part: true }, {}] });
+    const u7n = networkCost(net, { ...o, dirs: [{}, {}, { par: 7 }, {}] });
+    assert.equal(L(u7, 'fc1').II, 1);
+    assert.equal(L(u7n, 'fc1').II, 4);
+    assert.equal(L(u7n, 'fc1').IIwhy.kind, 'mem');
+    // Laço kx: um produto por ciclo; sem pipeline: área menor, muito mais ciclos.
+    const tap = networkCost(net, { ...o, dirs: [{ pipe: 'tap' }, {}, {}, {}] });
+    assert.ok(L(tap, 'conv1').area < L(base, 'conv1').area && L(tap, 'conv1').cycles > 3 * 28 * 28 * 25);
+    // Valores inválidos voltam ao padrão.
+    assert.deepEqual(normalizeDirectives(net, [{ par: 2 }, { pipe: 'tap', par: 3 }, { pipe: 'x', ii: 0 }, {}]).map((d) => [d.pipe, d.ii, d.par]),
+        [['pixel', 1, 1], ['tap', 1, 1], ['input', 1, 1], ['input', 1, 1]]);
+});

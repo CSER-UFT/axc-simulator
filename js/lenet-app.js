@@ -8,7 +8,7 @@ import { buildUnit, unitName } from './axc/units.js';
 import { testInputs, errorMetrics } from './axc/metrics.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize, macsPerSite } from './axc/nn.js';
 import { archSvg } from './axc/nnsvg.js';
-import { networkCost } from './axc/nngen.js';
+import { networkCost, normalizeDirectives, directiveTrees, parOptions, CONV_PIPES, DENSE_PIPES } from './axc/nngen.js';
 import { esc } from './ui/plots.js';
 import { Help } from './ui/help.js';
 import { initFigureExport } from './ui/figexport.js';
@@ -27,6 +27,7 @@ let synth = null;           // data/synth.json: as unidades da biblioteca
 let fromUnits = null;       // configuração vinda da página de unidades
 let registry = null;        // data/nn/models.json
 let nnData = null, nnRun = 0;
+let nnDirs = null;           // diretivas de cada camada com pesos (js/axc/nngen.js), guardadas por modelo
 const modelCache = new Map(), testCache = new Map(), predCache = new Map(), tableCache = new Map(), unitCache = new Map();
 
 // Unidade vinda da página de unidades (#cfg=...), somador (#add=nome) e modelo (#model=id).
@@ -83,16 +84,21 @@ function tableOf(unit) {
     if (!tableCache.has(key)) tableCache.set(key, productTable(unit));
     return tableCache.get(key);
 }
-// Estrutura da soma nas camadas com o somador aproximado: em cadeia (1) ou numa árvore com todos os termos (0); como
-// na arquitetura do código gerado (js/axc/nngen.js): convoluções em árvore (a janela desenrolada) e densas em cadeia.
+// Estrutura da soma nas camadas com o somador aproximado: em cadeia (1), numa árvore com todos os termos (0) ou a
+// das diretivas de cada camada (js/axc/nngen.js, directiveTrees), a mesma do código gerado e do custo do hardware.
 const accumMode = () => $('nnAccum').value;
-const treeOf = (l) => (accumMode() === 'tree' || (accumMode() === 'arch' && l.type === 'conv') ? 0 : 1);
-const nnKey = (mul, add, mask) => `${nnData.net.id}|${mul ? unitName(mul.cfg) : 'exata'}|${add ? `${unitName(add.cfg)}|${accumMode()}` : 'exato'}|${mask.join('')}`;
+const nnTrees = () => {
+    const net = nnData.net;
+    if (accumMode() === 'tree') return net.sites.map(() => 0);
+    if (accumMode() === 'chain') return net.sites.map(() => 1);
+    return directiveTrees(net, nnDirs);
+};
+const nnKey = (mul, add, mask) => `${nnData.net.id}|${mul ? unitName(mul.cfg) : 'exata'}|${add ? `${unitName(add.cfg)}|${nnTrees().join(',')}` : 'exato'}|${mask.join('')}`;
 function nnSetup(mask) {
     const { mul, add } = nnUnits();
     const Tu = tableOf(mul), Tx = tableOf(null);
     const accum = add ? adderAccumulate(add) : null;
-    return { mul, add, tables: mask.map((m) => (m ? Tu : Tx)), adds: mask.map((m) => (m ? accum : null)), trees: nnData.net.sites.map(treeOf), key: nnKey(mul, add, mask) };
+    return { mul, add, tables: mask.map((m) => (m ? Tu : Tx)), adds: mask.map((m) => (m ? accum : null)), trees: nnTrees(), key: nnKey(mul, add, mask) };
 }
 
 const getJson = (f) => fetch(f).then((r) => (r.ok ? r.json() : Promise.reject(new Error(f))));
@@ -107,7 +113,7 @@ async function loadNN(id) {
     if (!testCache.has(ds.file)) testCache.set(ds.file, getBin(ds.file).then((b) => decodeTestSet(b, ds)));
     const changed = nnData?.net.id !== net.id;
     nnData = { net, test: await testCache.get(ds.file) };
-    if (changed) { fillLayers(); renderArch(); }
+    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); }
     return nnData;
 }
 
@@ -240,6 +246,67 @@ async function render() {
     renderCost();
 }
 
+// Diretivas por camada -------------------------------------------------------------------------------------------
+function loadDirs(net) {
+    try { return normalizeDirectives(net, JSON.parse(store.get(`nn.dirs.${net.id}`) ?? 'null')); } catch { return normalizeDirectives(net, null); }
+}
+/** Tabela das diretivas: pipeline, II pedido, paralelismo e partição de cada camada com pesos. */
+let fillingDirs = false;
+function fillDirs() {
+    const net = nnData.net;
+    fillingDirs = true;
+    const opt = (v, label, cur) => `<option value="${v}"${v === cur ? ' selected' : ''}>${esc(label)}</option>`;
+    let h = `<table class="kv"><tr><th></th><td class="note">${t('nn.dirPipe')}</td><td class="note">II</td><td class="note">${t('nn.dirPar')}</td><td class="note">${t('nn.dirPart')}</td></tr>`;
+    net.sites.forEach((l, i) => {
+        const d = nnDirs[i], conv = l.type === 'conv';
+        const pipes = conv ? CONV_PIPES : DENSE_PIPES;
+        const pars = conv && d.pipe !== 'pixel' ? [1] : parOptions(l);
+        h += `<tr data-i="${i}"><th class="mono">${esc(l.name)}</th>`
+            + `<td><select data-k="pipe">${pipes.map((p) => opt(p, t(`nn.pipe.${p}`), d.pipe)).join('')}</select></td>`
+            + `<td><input type="number" data-k="ii" min="1" max="256" step="1" value="${d.ii}" style="width:4em"${d.pipe === 'off' ? ' disabled' : ''} /></td>`
+            + `<td><select data-k="par" title="${esc(t(conv ? 'nn.dirParConv' : 'nn.dirParDense'))}"${pars.length < 2 ? ' disabled' : ''}>${pars.map((p) => opt(p, String(p), d.par)).join('')}</select></td>`
+            + `<td><input type="checkbox" data-k="part"${d.part ? ' checked' : ''}${d.pipe === 'off' ? ' disabled' : ''} /></td></tr>`;
+    });
+    $('nnDirs').innerHTML = `${h}</table>`;
+    fillingDirs = false;
+}
+function readDirs() {
+    return [...$('nnDirs').querySelectorAll('tr[data-i]')].map((tr) => {
+        const v = (k) => tr.querySelector(`[data-k="${k}"]`);
+        return { pipe: v('pipe').value, ii: +v('ii').value, par: +v('par').value, part: v('part').checked };
+    });
+}
+function dirsChanged(dirs) {
+    nnDirs = normalizeDirectives(nnData.net, dirs);
+    store.set(`nn.dirs.${nnData.net.id}`, JSON.stringify(nnDirs));
+    fillDirs();
+    // Com o somador aproximado, a estrutura da soma das diretivas muda a acurácia.
+    render();
+}
+// O campo do II dispara change ao perder o foco, inclusive quando a tabela é refeita: esse é ignorado.
+$('nnDirs').addEventListener('change', () => { if (!fillingDirs) setTimeout(() => dirsChanged(readDirs()), 0); });
+$('nnDirReset').onclick = () => { if (nnData) dirsChanged(null); };
+
+/** Código gerado de uma camada (o mesmo que o custo avalia; pode ser colado na página de síntese de alto nível). */
+let lastKernels = [];
+function renderCode() {
+    const sel = $('nnCodeLayer'), cur = sel.value;
+    sel.innerHTML = lastKernels.map((k) => `<option value="${esc(k.name)}">${esc(k.name)}</option>`).join('');
+    sel.value = lastKernels.some((k) => k.name === cur) ? cur : (lastKernels.find((k) => k.site !== null)?.name ?? '');
+    const k = lastKernels.find((x) => x.name === sel.value);
+    // Os pesos ficam numa linha só, que pode ser longa: o código vai como está.
+    $('nnCode').textContent = k ? k.src : '';
+}
+$('nnCodeLayer').addEventListener('change', renderCode);
+
+const whyText = (w) => {
+    if (!w || w.kind === 'target') return '';
+    if (w.kind === 'mem') return t('hls.why.mem', { arr: w.label ?? w.key, uses: w.uses, cap: w.cap });
+    if (w.kind === 'unit') return t('hls.why.unit', { key: w.key, uses: w.uses, cap: w.cap });
+    if (w.kind === 'rec') return t('hls.why.rec', { v: w.key, c: w.cycles });
+    return t('hls.why.schedule');
+};
+
 // Custo do hardware ---------------------------------------------------------------------------------------------
 let hlsData = null, costRun = 0;
 const costCache = new Map();
@@ -261,8 +328,11 @@ async function renderCost() {
     const o = { synth, cells: hd.cells, fpga: hd.fpga, target: $('nnTarget').value, clockNs: +$('nnClock').value || 10 };
     const mask = nnMask();
     const cost = (m, a, k) => {
-        const key = `${net.id}|${o.target}|${o.clockNs}|${m ?? '-'}|${a ?? '-'}|${k.join('')}`;
-        if (!costCache.has(key)) costCache.set(key, networkCost(net, { ...o, mul: m, add: a, mask: k }));
+        const key = `${net.id}|${o.target}|${o.clockNs}|${m ?? '-'}|${a ?? '-'}|${k.join('')}|${JSON.stringify(nnDirs)}`;
+        if (!costCache.has(key)) {
+            if (costCache.size > 200) costCache.delete(costCache.keys().next().value);
+            costCache.set(key, networkCost(net, { ...o, mul: m, add: a, mask: k, dirs: nnDirs }));
+        }
         return costCache.get(key);
     };
     let ex, c;
@@ -277,12 +347,15 @@ async function renderCost() {
     for (const l of c.layers) {
         const e = ex.layers.find((x) => x.name === l.name);
         const main = asic ? l.area : l.luts, mainEx = asic ? e.area : e.luts;
-        h += `<tr><th class="mono">${esc(l.name)}${l.approx ? ' *' : ''}</th><td class="mono">${nf(l.cycles)}</td><td class="mono">${l.II ?? '-'}</td><td class="mono">${nf(main, 0)}${main !== mainEx ? ` <span class="note">(${d(main, mainEx)})</span>` : ''}</td><td class="mono">${nf(l.ff)}</td><td class="mono">${l.dsp}</td><td class="mono">${nf(l.energy / 1e6, 2)}</td></tr>`;
+        h += `<tr><th class="mono">${esc(l.name)}${l.approx ? ' *' : ''}</th><td class="mono">${nf(l.cycles)}</td><td class="mono"${whyText(l.IIwhy) ? ` title="${esc(whyText(l.IIwhy))}"` : ''}>${l.II ?? '-'}${whyText(l.IIwhy) ? '<sup>†</sup>' : ''}</td><td class="mono">${nf(main, 0)}${main !== mainEx ? ` <span class="note">(${d(main, mainEx)})</span>` : ''}</td><td class="mono">${nf(l.ff)}</td><td class="mono">${l.dsp}</td><td class="mono">${nf(l.energy / 1e6, 2)}</td></tr>`;
     }
     const T = c.totals, X = ex.totals, main = asic ? T.area : T.luts, mainEx = asic ? X.area : X.luts;
     h += `<tr><th><b>${t('nn.costTotal')}</b></th><td class="mono"><b>${nf(T.cycles)}</b></td><td></td><td class="mono"><b>${nf(main, 0)}</b> (${d(main, mainEx)})</td><td class="mono">${nf(T.ff)}</td><td class="mono">${T.dsp}</td><td class="mono"><b>${nf(T.energy / 1e6, 1)}</b> (${d(T.energy, X.energy)})</td></tr></table>`;
     $('nnCost').innerHTML = h;
-    $('nnCostNote').innerHTML = t('nn.costNote', { us: nf(T.timeUs, 1), clock: nf(o.clockNs, 1) }) + (c.warnings.length ? ` ${esc(c.warnings.join('; '))}` : '');
+    lastKernels = c.layers.map((l) => ({ name: l.name, site: l.site, src: l.src }));
+    renderCode();
+    const limited = c.layers.filter((l) => whyText(l.IIwhy)).map((l) => `${esc(l.name)} (${esc(whyText(l.IIwhy))})`);
+    $('nnCostNote').innerHTML = (limited.length ? `${t('nn.whyNote', { list: limited.join('; ') })} ` : '') + t('nn.costNote', { us: nf(T.timeUs, 1), clock: nf(o.clockNs, 1) }) + (c.warnings.length ? ` ${esc(c.warnings.join('; '))}` : '');
 }
 for (const id of ['nnClock', 'nnTarget']) $(id).addEventListener('change', () => renderCost());
 

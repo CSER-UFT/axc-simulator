@@ -205,7 +205,7 @@ function interfacePragmas(design) {
     return design.arrays.filter((a) => a.kind === 'param').map((a) => `#pragma HLS INTERFACE mode=ap_memory port=${a.name} storage_type=${storage}`);
 }
 function partitionPragmas(design) {
-    return design.arrays.filter((a) => a.partition).map((a) => `#pragma HLS ARRAY_PARTITION variable=${a.name} type=${a.partition.type}${a.partition.type !== 'complete' ? ` factor=${a.partition.factor}` : ''} dim=${a.partition.dim}`);
+    return design.arrays.flatMap((a) => (a.partitions ?? []).map((p) => `#pragma HLS ARRAY_PARTITION variable=${a.name} type=${p.type}${p.type !== 'complete' ? ` factor=${p.factor}` : ''} dim=${p.dim}`));
 }
 
 /**

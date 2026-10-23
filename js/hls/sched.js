@@ -65,9 +65,7 @@ export function scheduleSegment(seg, ctx) {
         // Recurso: o banco de memória, ou o tipo de unidade (exatas e aproximadas da mesma largura não se misturam).
         const key = cls === 'mem' ? n.bank?.key ?? n.array : SHARED.has(cls) && !noShare ? unit.name : null;
         // Endereço de vetor particionado com fator que não é potência de 2: a divisão por constante vem antes do acesso.
-        const arr = cls === 'mem' ? ctx.arrays.get(n.array) : null;
-        const F = arr?.partition?.factor;
-        const minCycle = n.bank && !n.bank.exact && F > 1 && (F & (F - 1)) !== 0 ? model.divAddrCycles : 0;
+        const minCycle = n.bank?.parts?.some((x) => !x.exact && x.p.factor > 1 && (x.p.factor & (x.p.factor - 1)) !== 0) ? model.divAddrCycles : 0;
         info.set(n.id, { n, cls, W, delay, k, unit, key, noShare, minCycle, multi: delay > Tc });
     }
     // Prioridade: caminho mais longo (ps) do nó até o fim do trecho.
