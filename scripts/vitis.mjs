@@ -27,6 +27,7 @@ import { parseAssign, opFunction } from '../js/hls/approx.js';
 import { execute, makeInputs } from '../js/hls/exec.js';
 import { exportIR, exportSource, kernelHeader, testbench, cName, blackboxFiles, tclScript, prediction } from '../js/hls/vitis.js';
 import { explore, pragmaVariants } from '../js/hls/dse.js';
+import { tag, num, loopsOf, modulesOf } from '../js/hls/reports.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'build/vitis');
@@ -199,8 +200,6 @@ function doCheck() {
 }
 
 // Coleta ----------------------------------------------------------------------------------------------------------
-const tag = (xml, name) => { const m = new RegExp(`<${name}>([^<]*)</${name}>`).exec(xml); return m ? m[1].trim() : null; };
-const num = (v) => (v === null || v === undefined || v === '' || Number.isNaN(+v) ? null : +v);
 function walk(dir, re, out = []) {
     if (!existsSync(dir)) return out;
     for (const f of readdirSync(dir)) {
@@ -210,39 +209,6 @@ function walk(dir, re, out = []) {
     }
     return out;
 }
-/** Laços do csynth.xml: todos os elementos com PipelineII ou TripCount dentro de SummaryOfLoopLatency. */
-function loopsOf(xml) {
-    const sec = /<SummaryOfLoopLatency>([\s\S]*?)<\/SummaryOfLoopLatency>/.exec(xml)?.[1] ?? '';
-    const out = [];
-    const re = /<([A-Za-z_][\w.]*)>\s*<(?:Name|Slack|TripCount|Latency|IterationLatency|PipelineII|PipelineDepth)/g;
-    let m;
-    while ((m = re.exec(sec))) {
-        const name = m[1];
-        const start = m.index;
-        const end = sec.indexOf(`</${name}>`, start);
-        const body = sec.slice(start, end);
-        // Só os campos deste laço (antes do primeiro laço aninhado).
-        const own = body.replace(/<([A-Za-z_][\w.]*)>\s*<(?:Name|Slack|TripCount|Latency)[\s\S]*$/, (x, n2) => (n2 === name ? x : ''));
-        out.push({ name, trip: num(tag(own, 'TripCount')), latency: num(tag(own, 'Latency')), iterLatency: num(tag(own, 'IterationLatency')), II: num(tag(own, 'PipelineII')), depth: num(tag(own, 'PipelineDepth')) });
-    }
-    return out;
-}
-/** Módulos do relatório do Vivado (as unidades aproximadas são os u_*): LUT e FF de cada instância. */
-function modulesOf(xml) {
-    const out = new Map();
-    const re = /<RtlModule CELL="([^"]+)"[^>]*DEPTH="(\d+)"[^>]*MODULENAME="([^"]+)"[^>]*>\s*(?:<SubModules[^<]*<\/SubModules>\s*)?<Resources([^/]*)\/>/g;
-    let m;
-    while ((m = re.exec(xml))) {
-        if (m[2] === '0') continue;
-        const lut = +(/LUT="(\d+)"/.exec(m[4])?.[1] ?? 0), ff = +(/FF="(\d+)"/.exec(m[4])?.[1] ?? 0);
-        const k = m[3];
-        if (!out.has(k)) out.set(k, { module: k, count: 0, lut: 0, ff: 0 });
-        const o = out.get(k);
-        o.count++; o.lut += lut; o.ff += ff;
-    }
-    return [...out.values()];
-}
-
 /** Refaz a comparação com o modelo atual, a partir dos relatórios guardados em results/vitis. */
 function doCompare() {
     const sum = JSON.parse(readFileSync(join(RES, 'summary.json'), 'utf8'));

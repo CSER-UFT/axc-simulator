@@ -168,6 +168,8 @@ O arquivo `CITATION.cff` traz os mesmos metadados (o GitHub mostra "Cite this re
 | `js/axc/nn.js`, `js/axc/nnsvg.js`, `js/lenet-app.js` | inferência inteira das redes do formato `axc-nn/1` com a tabela de produtos e o somador das unidades; o diagrama da arquitetura em SVG; a página `lenet.html` |
 | `js/axc/nngen.js` | gerador do código de cada camada (na linguagem da página de síntese de alto nível) com as diretivas de cada uma (pipeline, II, paralelismo, partição), a estrutura da soma que elas dão e o custo da rede pelo modelo de HLS (`node bin/axc.mjs nncost --dirs ...`) |
 | `js/axc/nnsearch.js` | busca do multiplicador e do somador de cada camada de uma rede (candidatas pela fronteira de custo e erro sobre os operandos reais, sensibilidade ou sequencial, ativações guardadas por camada, avaliação em workers; `node bin/axc.mjs nnsearch`) |
+| `js/axc/nnexport.js` | exportação da rede para o Vitis HLS e o Vivado: a rede inteira (uma função por camada e o topo), cada camada sozinha, testbench com a execução bit a bit, run_all.sh (`node bin/axc.mjs nnexport`, e `nnvitis` para comparar os relatórios) |
+| `js/hls/reports.js` | leitura dos relatórios do Vitis HLS e do Vivado (csynth.xml, export_impl.xml, utilização) |
 | `scripts/nn/train.py` | treino em PyTorch e quantização das redes de `data/nn/` (MiniLenet e LeNet 5 em MNIST, Fashion MNIST e CIFAR 10), com os subconjuntos de teste e de validação |
 | `scripts/nn/import.mjs` | gera a MiniLenet do MNIST a partir dos cabeçalhos C do projeto para o Vitis, com a acurácia e as classes da rede exata |
 | `scripts/lenet5/train.py` | a LeNet 5 original, treinada com NumPy (gera `data/lenet5.json`, a fonte dos operandos reais de `scripts/operands.mjs`) |
@@ -208,14 +210,14 @@ Ajustes pendentes da síntese de alto nível, para retomar:
 * calibrar o custo dos multiplicadores aproximados com operando constante (causa da ordenação errada no FIR da quarta rodada);
 * sintetizar e caracterizar as unidades de 9 a 15 bits (sky130 e Vivado), para custos medidos nessas larguras.
 
-Redes neurais (feitas: etapa 1, formato comum, avaliador genérico, MiniLenet e diagrama; etapa 2, treino e quantização em PyTorch para MNIST, Fashion MNIST e CIFAR 10, com validação separada; etapa 3, somadores de 24 e 32 bits nas acumulações, sintetizados em sky130 e caracterizados no Vivado, e soma em cadeia ou em árvore; etapa 4, gerador de código das camadas e custo do hardware pelo modelo de HLS, com a reescala como peça exata; etapa 5, diretivas por camada, pipeline, II, paralelismo e partição, com a ordem das somas da acurácia igual à do circuito; etapa 6, busca das unidades de cada camada com limite de queda de acurácia na validação, em workers):
+Redes neurais (feitas: etapa 1, formato comum, avaliador genérico, MiniLenet e diagrama; etapa 2, treino e quantização em PyTorch para MNIST, Fashion MNIST e CIFAR 10, com validação separada; etapa 3, somadores de 24 e 32 bits nas acumulações, sintetizados em sky130 e caracterizados no Vivado, e soma em cadeia ou em árvore; etapa 4, gerador de código das camadas e custo do hardware pelo modelo de HLS, com a reescala como peça exata; etapa 5, diretivas por camada, pipeline, II, paralelismo e partição, com a ordem das somas da acurácia igual à do circuito; etapa 6, busca das unidades de cada camada com limite de queda de acurácia na validação, em workers; etapa 7, exportação da rede e de cada camada para o Vitis HLS e o Vivado, com testbench bit a bit e a comparação dos relatórios com o modelo):
 
 * validar o custo das etapas 4 e 5 com os relatórios do Vitis da MiniLenet (latência e II de cada função, LUT, FF, DSP), com as diretivas padrão e com partição;
 * partição coerente entre as camadas (hoje cada função tem a sua, e no Vitis o vetor entre duas camadas teria uma só) e janela deslizante com buffer de linhas nas convoluções, sem os multiplexadores dos bancos que giram com o pixel;
 * max pooling também com diretivas (hoje II 2 pela memória);
 * a síntese de alto nível ainda faz o somador de 32 bits como dois de 16 em cascata; pode passar a usar os de 24 e 32 bits da biblioteca;
 * busca: incluir as diretivas no espaço da busca, e um limite com margem estatística (a validação de 1000 imagens tem ruído de 0,3 a 1,4 ponto);
-* etapa 7: exportação do projeto para o Vitis e o Vivado.
+* rodar os projetos exportados (MiniLenet exata e aproximada, com e sem partição) no Vitis e no Vivado e calibrar o modelo das redes com `nnvitis`.
 
 * Exploração: diretivas com valores numéricos (II, fatores de unroll e de partição) e exploração em lote de vários kernels; estimativa do SSIM com erros correlacionados no espaço.
 * Recorrências com somadores aproximados no modelo de erro (execuções consecutivas no perfil).

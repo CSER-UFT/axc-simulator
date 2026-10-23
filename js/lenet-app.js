@@ -373,6 +373,44 @@ for (const id of ['nnClock', 'nnTarget']) $(id).addEventListener('change', () =>
 for (const id of ['nnMul', 'nnAdder', 'nnModel', 'nnAccum']) $(id).addEventListener('change', () => { store.set(`nn.${id}`, $(id).value); if (id !== 'nnAccum') setOverride(null); render(); });
 $('nnLayers').addEventListener('change', () => { setOverride(null); render(); });
 
+// Exportação para o Vitis HLS e o Vivado ---------------------------------------------------------------------------
+/** Unidades de cada camada com pesos na configuração da página (as da busca aplicada, ou os seletores e a máscara). */
+function pageUnits() {
+    if (nnOverride) return nnOverride.map((a) => ({ ...a }));
+    const { mul, add } = nnUnits(), mask = nnMask();
+    const m = mul ? unitName(mul.cfg) : null, a = add ? unitName(add.cfg) : null;
+    return sites().map((_, i) => (mask[i] ? { mul: m, add: a } : { mul: null, add: null }));
+}
+let exportWorker = null;
+$('nnExportBtn').onclick = () => {
+    if (!nnData || !registry || exportWorker) return;
+    const net = nnData.net, entry = registry.models.find((m) => m.id === net.id);
+    const units = pageUnits();
+    const inLib = (n) => !n || synth.designs.some((d) => d.name === n);
+    if (!units.every((u) => inLib(u.mul) && inLib(u.add))) { $('nnExportStatus').textContent = t('nn.costNoUnit'); return; }
+    const clockNs = +$('nnClock').value || 10;
+    const id = `${net.id}_${units.some((u) => u.mul || u.add) ? 'aprox' : 'exata'}_${String(clockNs).replace('.', 'p')}ns`;
+    $('nnExportBtn').disabled = true;
+    $('nnExportStatus').textContent = t('nn.searchLoading');
+    exportWorker = new Worker(new URL('./nn-export-worker.js', import.meta.url), { type: 'module' });
+    const done = (msg) => { exportWorker?.terminate(); exportWorker = null; $('nnExportBtn').disabled = false; $('nnExportStatus').textContent = msg; };
+    exportWorker.onmessage = ({ data: m }) => {
+        if (m.type === 'status') $('nnExportStatus').textContent = t(m.key);
+        else if (m.type === 'progress') $('nnExportStatus').textContent = t('nn.exportProgress', { k: m.k, n: m.n });
+        else if (m.type === 'error') done(m.message);
+        else if (m.type === 'done') {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(new Blob([m.zip], { type: 'application/zip' }));
+            link.download = `${id}.zip`;
+            document.body.append(link); link.click(); link.remove();
+            setTimeout(() => URL.revokeObjectURL(link.href), 2000);
+            done(t('nn.exportDone', { files: m.files, id, acc: pct(m.summary.accuracySim), n: m.summary.images }) + (m.summary.partitionNotes.length ? ` ${t('nn.exportWarn', { list: m.summary.partitionNotes.join('; ') })}` : '') + (m.summary.warnings.length ? ` ${m.summary.warnings.join('; ')}` : ''));
+        }
+    };
+    exportWorker.onerror = (e) => done(e.message || t('nn.searchError'));
+    exportWorker.postMessage({ file: entry.file, clockNs, dirs: nnDirs, units, images: Math.max(1, Math.min(1000, +$('nnExportImages').value || 50)), id, layers: $('nnExportLayers').checked });
+};
+
 // Busca das unidades por camada ------------------------------------------------------------------------------------
 /** Unidades por camada aplicadas da busca (null: as dos seletores). */
 function setOverride(assign) {

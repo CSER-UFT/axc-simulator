@@ -22,6 +22,16 @@
  *       busca do multiplicador e do somador de cada camada (js/axc/nnsearch.js): o menor custo com a queda de
  *       acurácia na validação até --max-drop pontos; a acurácia de teste do ponto escolhido no fim. --workers: threads
  *       de avaliação (padrão: os núcleos menos 1; 1 avalia na própria thread)
+ *   node bin/axc.mjs nnexport [--model ...] [--dirs "..."] [--mul <m> --add <s> --layers ... | --units "conv1:MUL8 T4+ADD32 LOA10;..."
+ *                             | --search resultado.json] [--clock 10] [--part xc7a100tcsg324-1] [--images 100] [--no-layers]
+ *                             [--netlist] [--out pasta]
+ *       projeto da rede para o Vitis HLS e o Vivado (js/axc/nnexport.js): network/ (a rede inteira, testbench com
+ *       --images imagens de teste), layers/<camada>/ (cada camada sozinha), run_all.sh; --search usa o modelo, as
+ *       diretivas e as unidades de um resultado de nnsearch --json; --netlist põe as unidades como C++ da netlist (o
+ *       padrão é a caixa preta de RTL)
+ *   node bin/axc.mjs nnvitis <pasta>
+ *       depois de rodar o Vitis (bash <pasta>/run_all.sh -j 4 --impl): lê os relatórios, compara com as previsões e
+ *       grava <pasta>/RESULTADOS.md e resultados.json
  *   node bin/axc.mjs hls <kernel.c | --example gauss|sobel|sharpen|fir|dot> [--clock ns] [--flow delay|area|iso] [--ports n]
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
@@ -37,7 +47,7 @@
  * diretivas do código, a restrição de erro e o objetivo dados; --heuristic all compara as heurísticas.
  * Todos os comandos aceitam --json.
  */
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildUnit, unitName } from '../js/axc/units.js';
@@ -49,6 +59,8 @@ import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate,
 import { networkCost, networkKernels, normalizeDirectives, directiveTrees, CONV_PIPES, DENSE_PIPES } from '../js/axc/nngen.js';
 import { prepareSearch, searchNetwork, poolEngine, initMessage, SEARCH_OBJECTIVES, SEARCH_HEURISTICS } from '../js/axc/nnsearch.js';
 import { Worker } from 'node:worker_threads';
+import { networkProject } from '../js/axc/nnexport.js';
+import { csynthSummary, implSummary, carry4Of } from '../js/hls/reports.js';
 import { availableParallelism } from 'node:os';
 
 import { synthesize } from '../js/hls/index.js';
@@ -280,6 +292,114 @@ switch (cmd) {
             ...r.best.assign.map((a, i) => `  ${net.sites[i].name.padEnd(6)} ${(a.mul ?? 'MUL8 exato').padEnd(18)} ${a.add ?? 'ADD32 exato'}`),
             `fronteira (custo, validação): ${r.front.map((p) => `${pct(p.cost / r.exact.cost)} ${pct(p.accVal)}`).join('; ')}`,
         ].join('\n'));
+        break;
+    }
+    case 'nnexport': {
+        const reg = JSON.parse(readFileSync(join(ROOT, 'data/nn/models.json'), 'utf8'));
+        const found = opt('--search') ? JSON.parse(readFileSync(opt('--search'), 'utf8')) : null;
+        const modelId = found?.model ?? opt('--model', 'minilenet-mnist');
+        const entry = reg.models.find((m) => m.id === modelId) ?? die(`modelo desconhecido: ${modelId} (${reg.models.map((m) => m.id).join(', ')})`);
+        const net = decodeNet(JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8')));
+        const names = net.sites.map((l) => l.name);
+        const dirs = found?.dirs ?? parseDirs(net, opt('--dirs'));
+        let units;
+        if (found) units = found.best.assign;
+        else if (opt('--units')) {
+            units = names.map(() => ({ mul: null, add: null }));
+            for (const part of opt('--units').split(';').map((x) => x.trim()).filter(Boolean)) {
+                const [name, list = ''] = part.split(':');
+                const i = names.indexOf(name.trim());
+                if (i < 0) die(`--units: camada desconhecida ${name} (${names.join(', ')})`);
+                for (const u of list.split('+').map((x) => x.trim()).filter(Boolean)) {
+                    const c = cfgOf(u);
+                    units[i][c.kind === 'mul' ? 'mul' : 'add'] = unitName(c);
+                }
+            }
+        } else {
+            const layers = (opt('--layers') ?? names.join(',')).split(',');
+            const m = opt('--mul') ? unitName(cfgOf(opt('--mul'))) : null, a = opt('--add') ? unitName(cfgOf(opt('--add'))) : null;
+            units = names.map((l) => (layers.includes(l) ? { mul: m, add: a } : { mul: null, add: null }));
+        }
+        const test = decodeTestSet(readFileSync(join(ROOT, net.dataset.file)), net.dataset);
+        const clockNs = +opt('--clock', found?.clockNs ?? 10);
+        const id = opt('--id', `${net.id}_${units.some((u) => u.mul || u.add) ? 'aprox' : 'exata'}_${String(clockNs).replace('.', 'p')}ns`);
+        const outDir = opt('--out', join(ROOT, 'build/nn', id));
+        let r;
+        try {
+            r = networkProject(net, {
+                synth: synthData(), cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')),
+                fpga: existsSync(join(ROOT, 'data/vivado-units.json')) ? JSON.parse(readFileSync(join(ROOT, 'data/vivado-units.json'), 'utf8')) : null,
+                target: 'fpga', clockNs, part: opt('--part', 'xc7a100tcsg324-1'), dirs, units, test, images: +opt('--images', 100), id,
+                layers: !flag('--no-layers'), inline: flag('--netlist') ? false : 'rtl',
+                progress: (k, n) => { if (!flag('--json') && (k === n || k % 20 === 0)) process.stderr.write(`  saída esperada: ${k} de ${n} imagens\n`); },
+            });
+        } catch (e) { die(e.message); }
+        rmSync(outDir, { recursive: true, force: true });
+        for (const [f, c] of Object.entries(r.files)) { mkdirSync(dirname(join(outDir, f)), { recursive: true }); writeFileSync(join(outDir, f), c); }
+        out({ out: outDir, files: Object.keys(r.files).length, ...r.summary }, () => [
+            `${net.name}: ${Object.keys(r.files).length} arquivos em ${outDir}`,
+            `unidades: ${net.sites.map((l, i) => `${l.name} ${[units[i].mul, units[i].add].filter(Boolean).join(' + ') || 'exatas'}`).join('; ')}`,
+            `testbench: ${r.summary.images} imagens, acurácia no simulador ${(100 * r.summary.accuracySim).toFixed(1)}%`,
+            `previsão: ${r.summary.totals.cycles} ciclos (${r.summary.totals.timeUs.toFixed(1)} µs), LUT ${r.summary.totals.luts}, FF ${r.summary.totals.ff}, DSP ${r.summary.totals.dsp}`,
+            ...r.summary.partitionNotes.map((w) => `partição: ${w}`),
+            ...r.summary.warnings.map((w) => `aviso: ${w}`),
+            `para rodar: bash ${join(outDir, 'run_all.sh')} -j 4 --impl; depois: node bin/axc.mjs nnvitis ${outDir}`,
+        ].join('\n'));
+        break;
+    }
+    case 'nnvitis': {
+        const dir = pos[0] ?? die('falta a pasta exportada por nnexport');
+        const walkF = (d, re, acc = []) => { if (!existsSync(d)) return acc; for (const f of readdirSync(d)) { const p2 = join(d, f); if (statSync(p2).isDirectory()) walkF(p2, re, acc); else if (re.test(f)) acc.push(p2); } return acc; };
+        const read = (f) => readFileSync(f, 'utf8');
+        const csimOf = (d) => {
+            const lg = walkF(join(d, 'proj'), /_csim\.log$/)[0] ?? join(d, 'vitis_hls.log');
+            if (!existsSync(lg)) return null;
+            const t = read(lg), m = /AXC_MISMATCHES (\d+) OF (\d+)/.exec(t), a = /AXC_ACCURACY (\d+) OF (\d+)/.exec(t);
+            return m ? { mismatches: +m[1], total: +m[2], ...(a ? { right: +a[1], images: +a[2] } : {}) } : null;
+        };
+        const synOf = (d, fn) => { const f = walkF(join(d, 'proj'), /_csynth\.xml$/).find((x) => x.endsWith(`/${fn}_csynth.xml`)); return f ? csynthSummary(read(f)) : null; };
+        const implOf = (d) => {
+            const f = walkF(join(d, 'proj'), /\.xml$/).filter((x) => x.includes('/impl/')).find((x) => /<AreaReport>|<TimingReport>/.test(read(x)));
+            if (!f) return null;
+            const r2 = implSummary(read(f));
+            const u = walkF(join(d, 'proj'), /utilization.*\.rpt$/).find((x) => /routed|place|impl/.test(x));
+            if (u) r2.carry4 = carry4Of(read(u));
+            return r2;
+        };
+        const netModel = JSON.parse(read(join(dir, 'network/model.json')));
+        const maxII = (s2) => (s2?.loops?.length ? Math.max(...s2.loops.map((l) => l.II ?? 0)) || null : null);
+        const rows = netModel.layers.map((l) => {
+            const ld = join(dir, 'layers', l.name);
+            const iso = existsSync(ld) ? { csim: csimOf(ld), hls: synOf(ld, l.name), impl: implOf(ld) } : null;
+            const inNet = synOf(join(dir, 'network'), l.name);
+            return { name: l.name, model: { cycles: l.cycles, II: l.II, luts: l.luts, ff: l.ff, dsp: l.dsp }, iso, inNet };
+        });
+        const nImpl = implOf(join(dir, 'network'));
+        if (nImpl) for (const r2 of rows) r2.inNetImpl = nImpl.modules.find((m) => m.module === r2.name || m.module.endsWith(`_${r2.name}`)) ?? null;
+        const res = { dir, model: netModel.model, clockNs: netModel.clockNs, network: { model: netModel.totals, csim: csimOf(join(dir, 'network')), hls: synOf(join(dir, 'network'), 'network'), impl: nImpl }, layers: rows };
+        const f = (v, d = 0) => (v === null || v === undefined ? '-' : (+v).toFixed(d));
+        const dev = (m, x) => (m && x ? `${((100 * (m - x)) / x).toFixed(0)}%` : '-');
+        const lines = [
+            `# ${netModel.name}: modelo contra Vitis HLS e Vivado`, '',
+            `Pasta ${dir}; período de ${netModel.clockNs} ns, parte ${netModel.part}. Gerado por \`node bin/axc.mjs nnvitis\` em ${new Date().toISOString().slice(0, 10)}.`, '',
+            '## Rede inteira (network/)', '',
+            '| | Modelo | Vitis / Vivado | Desvio |', '| --- | ---: | ---: | ---: |',
+            `| Latência (ciclos) | ${f(netModel.totals.cycles)} | ${f(res.network.hls?.latencyWorst)} | ${dev(netModel.totals.cycles, res.network.hls?.latencyWorst)} |`,
+            `| LUT (Vivado) | ${f(netModel.totals.luts)} | ${f(nImpl?.lut)} | ${dev(netModel.totals.luts, nImpl?.lut)} |`,
+            `| FF (Vivado) | ${f(netModel.totals.ff)} | ${f(nImpl?.ff)} | ${dev(netModel.totals.ff, nImpl?.ff)} |`,
+            `| DSP | ${f(netModel.totals.dsp)} | ${f(nImpl?.dsp ?? res.network.hls?.dsp)} | ${dev(netModel.totals.dsp, nImpl?.dsp ?? res.network.hls?.dsp)} |`,
+            `| Período (ns) | ${f(netModel.clockNs, 1)} | ${f(nImpl?.achievedNs, 2)} | |`,
+            `| csim | | ${res.network.csim ? `${res.network.csim.mismatches} diferenças em ${res.network.csim.total} saídas; ${res.network.csim.right ?? '-'} acertos em ${res.network.csim.images ?? '-'} imagens` : '-'} | |`, '',
+            '## Camadas', '',
+            'Modelo: cada camada com as suas partições. Sozinha: o projeto layers/<camada>. Na rede: a função dentro de network/ (csynth e o módulo no Vivado).', '',
+            '| Camada | Ciclos modelo | sozinha | na rede | II modelo | sozinha | na rede | LUT modelo | sozinha | na rede | FF modelo | sozinha | DSP modelo | sozinha | csim |',
+            '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
+            ...rows.map((r2) => `| ${r2.name} | ${f(r2.model.cycles)} | ${f(r2.iso?.hls?.latencyWorst)} | ${f(r2.inNet?.latencyWorst)} | ${f(r2.model.II)} | ${f(maxII(r2.iso?.hls))} | ${f(maxII(r2.inNet))} | ${f(r2.model.luts)} | ${f(r2.iso?.impl?.lut)} | ${f(r2.inNetImpl?.lut)} | ${f(r2.model.ff)} | ${f(r2.iso?.impl?.ff)} | ${f(r2.model.dsp)} | ${f(r2.iso?.impl?.dsp)} | ${r2.iso?.csim ? `${r2.iso.csim.mismatches}/${r2.iso.csim.total}` : '-'} |`),
+            '',
+        ];
+        writeFileSync(join(dir, 'RESULTADOS.md'), lines.join('\n'));
+        writeFileSync(join(dir, 'resultados.json'), `${JSON.stringify(res, null, 1)}\n`);
+        out(res, () => lines.join('\n'));
         break;
     }
     case 'hls': {

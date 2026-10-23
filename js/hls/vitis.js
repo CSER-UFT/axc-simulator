@@ -91,17 +91,20 @@ function unitFunctions(lib, names, inline = false) {
         if (done.has(name)) return;
         done.add(name);
         const u = lib.unitByName(name);
-        if (u.cfg.kind === 'add' && u.cfg.width === 32) {
+        if (u.composite) {
+            // Cascata: o somador de baixo (L bits, aproximado ou exato), um exato em cima, o vai um passando de um
+            // para o outro (o ADD32 de dois ADD16 exatos e as cascatas ADDW (ADDn X + ADDm exato) das redes).
             add(u.low);
+            const W = u.cfg.width, L = lib.unitByName(u.low).cfg.width, H = W - L;
             out.push([
-                `// ${name}: o somador de 16 bits de baixo aproximado, o de cima exato, o vai um passando de um para o outro.`,
-                `static ap_uint<33> ${cName(name)}(ap_uint<32> a, ap_uint<32> b) {`,
+                `// ${name}: o somador de ${L} bits de baixo, um exato de ${H} bits em cima, o vai um passando de um para o outro.`,
+                `static ap_uint<${W + 1}> ${cName(name)}(ap_uint<${W}> a, ap_uint<${W}> b) {`,
                 ...pragmasOf(inline),
-                `    ap_uint<17> lo = ${cName(u.low)}(a.range(15, 0), b.range(15, 0));`,
-                '    ap_uint<17> hi = ap_uint<17>(a.range(31, 16)) + ap_uint<17>(b.range(31, 16)) + ap_uint<17>(lo[16]);',
-                '    ap_uint<33> y = 0;',
-                '    y.range(15, 0) = lo.range(15, 0);',
-                '    y.range(32, 16) = hi;',
+                `    ap_uint<${L + 1}> lo = ${cName(u.low)}(a.range(${L - 1}, 0), b.range(${L - 1}, 0));`,
+                `    ap_uint<${H + 1}> hi = ap_uint<${H + 1}>(a.range(${W - 1}, ${L})) + ap_uint<${H + 1}>(b.range(${W - 1}, ${L})) + ap_uint<${H + 1}>(lo[${L}]);`,
+                `    ap_uint<${W + 1}> y = 0;`,
+                `    y.range(${L - 1}, 0) = lo.range(${L - 1}, 0);`,
+                `    y.range(${W}, ${L}) = hi;`,
                 '    return y;',
                 '}',
             ].join('\n'));
@@ -130,7 +133,7 @@ function unitFunctions(lib, names, inline = false) {
 /** Unidades com netlist usadas (os somadores de 32 bits compostos entram pelo de baixo). */
 function netUnits(lib, names) {
     const out = new Set();
-    for (const n of names) { const u = lib.unitByName(n); out.add(u.cfg.kind === 'add' && u.cfg.width === 32 ? u.low : n); }
+    for (const n of names) { const u = lib.unitByName(n); out.add(u.composite ? u.low : n); }
     return [...out];
 }
 
@@ -214,7 +217,7 @@ function partitionPragmas(design) {
  */
 export function exportSource(src, design) {
     const params = design.arrays.filter((a) => a.kind === 'param');
-    const body = src.replace(new RegExp(`(void\\s+${design.name}\\s*\\([^)]*\\)\\s*\\{)`), (m) => `${m}\n${interfacePragmas(design).join('\n')}`);
+    const body = src.replace(new RegExp(`(void\\s+${design.name}\\s*\\([^)]*\\)\\s*\\{)`), (m) => `${m}\n${interfacePragmas(design).join('\n')}\n`);
     return `${HEADER(`${design.name} (código original)`)}#include "kernel.h"
 
 // min, max e abs da linguagem do simulador (como macros, para não colidir com as da biblioteca padrão).
@@ -224,15 +227,53 @@ static inline long long axc_abs(long long a) { return a < 0 ? -a : a; }
 #define min(a, b) axc_min((long long)(a), (long long)(b))
 #define max(a, b) axc_max((long long)(a), (long long)(b))
 #define abs(a) axc_abs((long long)(a))
-
+${/\brequant\s*\(/.test(src) ? `\n${REQUANT_CPP}\n#define requant(acc, m, z) axc_requant(acc, m, z)\n` : ''}
 ${body.replace(/^\s*\/\/.*\n/, '')}`.replace(/\n{3,}/g, '\n\n') + (params.length ? '' : '');
 }
+
+/**
+ * Reescala das redes (requant da linguagem do simulador, js/hls/elab.js): (acc × m + 2^31) >> 32, mais z, saturada
+ * entre 0 e 255. A multiplicação de 32 × 32 bits vai para DSP (como no modelo), mesmo com config_op mul -impl fabric.
+ */
+export const REQUANT_CPP = `// Reescala das redes quantizadas: (acc x m + 2^31) >> 32, mais z, saturada entre 0 e 255 (multiplicação em DSP).
+static ap_uint<8> axc_requant(ap_int<32> acc, ap_uint<32> m, ap_int<32> z) {
+#pragma HLS INLINE
+    ap_int<64> p = ap_int<64>(acc) * ap_int<64>(m);
+#pragma HLS BIND_OP variable=p op=mul impl=dsp
+    ap_int<64> q = (p + (ap_int<64>(1) << 31)) >> 32;
+    ap_int<35> v = ap_int<35>(q) + ap_int<35>(z);
+    return v < 0 ? ap_uint<8>(0) : v > 255 ? ap_uint<8>(255) : ap_uint<8>(v);
+}`;
+const usesRequant = (design) => design.segments.some((s) => s.nodes.some((n) => n.op === 'rq'));
 
 /**
  * Kernel do projeto elaborado (IR), com as unidades atribuídas.
  * @param {object} result síntese (design, ops, assign, lib)
  */
 export function exportIR(result, { inline = false } = {}) {
+    const f = exportFunction(result);
+    const code = [
+        HEADER(`${result.design.name} (projeto elaborado${result.assign.size ? `, ${result.assign.size} operações aproximadas` : ''})`),
+        '#include "kernel.h"',
+        '',
+        unitFunctions(result.lib, f.units, inline),
+        '',
+        ...(f.requant ? [REQUANT_CPP, ''] : []),
+        f.code,
+    ];
+    return code.join('\n');
+}
+
+/** Unidades usadas por um conjunto de funções exportadas, como código C++ (cada unidade uma vez). */
+export function unitsCode(lib, names, inline = false) { return unitFunctions(lib, names, inline); }
+
+/**
+ * Só a função do kernel elaborado (sem cabeçalho e sem as unidades), para juntar várias num projeto (a rede).
+ * @param {{interfaces?: boolean, paramPartitions?: boolean}} o interfaces: as diretivas de interface (só no topo);
+ *   paramPartitions: as partições dos vetores dos parâmetros (na rede, ficam nos vetores do topo)
+ * @returns {{code: string, units: string[], requant: boolean}}
+ */
+export function exportFunction(result, { interfaces = true, paramPartitions = true } = {}) {
     const design = result.design;
     const asg = result.assign;
     const byId = new Map();
@@ -300,6 +341,7 @@ export function exportIR(result, { inline = false } = {}) {
             case 'cmp': set(`${val(a[0])} ${n.cond} ${val(a[1])}`); return;
             case 'sel': set(`${val(a[0])} ? ${T}(${val(a[1])}) : ${T}(${val(a[2])})`); return;
             case 'trunc': set(`${T}(${val(a[0])})`); return;
+            case 'rq': set(`${T}(axc_requant(${val(a[0])}, ${val(a[1])}, ${val(a[2])}))`); return;
             default: throw new Error(`exportação: operação ${n.op}`);
         }
     }
@@ -322,15 +364,11 @@ export function exportIR(result, { inline = false } = {}) {
     emitRegion(design.top, 1);
     const roms = design.arrays.filter((a) => a.kind === 'rom' && a.accesses > 0);
     const rams = design.arrays.filter((a) => a.kind === 'ram');
+    const keep = (a) => paramPartitions || a.kind !== 'param';
     const code = [
-        HEADER(`${design.name} (projeto elaborado${asg.size ? `, ${asg.size} operações aproximadas` : ''})`),
-        '#include "kernel.h"',
-        '',
-        unitFunctions(result.lib, [...unitsUsed], inline),
-        '',
         `${prototype(design)} {`,
-        ...interfacePragmas(design),
-        ...partitionPragmas(design),
+        ...(interfaces ? interfacePragmas(design) : []),
+        ...partitionPragmas({ arrays: design.arrays.filter(keep) }),
         ...roms.map((a) => `    static const ${arrType(a.type)} ${a.name}[${a.dims.join('][')}] = {${a.init.join(', ')}};`),
         ...rams.map((a) => `    ${arrType(a.type)} ${a.name}[${a.dims.join('][')}];`),
         ...[...hoist].filter((id) => byId.has(id)).map((id) => `    ${byId.get(id).op === 'cmp' ? 'bool' : cType(byId.get(id).range)} ${vName(id)} = 0;`),
@@ -339,7 +377,7 @@ export function exportIR(result, { inline = false } = {}) {
         '}',
         '',
     ];
-    return code.join('\n');
+    return { code: code.join('\n'), units: [...unitsUsed], requant: usesRequant(design) };
 }
 
 /** Cabeçalho comum: tipos e a declaração do kernel. */

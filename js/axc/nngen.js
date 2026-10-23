@@ -502,6 +502,8 @@ export function costModel(net, o) {
             units: r.cost.units.map((u) => ({ name: u.unit.name, count: u.count })),
             warnings,
         };
+        // A síntese (projeto, atribuição, biblioteca) fica junto, fora do JSON: é dela que sai o C++ (nnexport.js).
+        Object.defineProperty(row, 'result', { value: r, enumerable: false });
         cache.set(key, row);
         return row;
     };
