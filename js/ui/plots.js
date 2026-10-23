@@ -407,3 +407,35 @@ export function designSpaceSvg(pts, front, { xLabel, yLabel, logX = false, width
     });
     return `${s}</svg>`;
 }
+
+/**
+ * Custo contra acurácia (busca da página de redes): pts = [{x, y, label, front?, current?, infeasible?}], x e y em %;
+ * limit: a acurácia mínima (linha tracejada).
+ */
+export function accuracyCostSvg(pts, { xLabel, yLabel, limit = null, width = 560, height = 320 } = {}) {
+    const L = 60, B = 44, T = 14, R = 20;
+    const W = width - L - R, H = height - T - B;
+    let s = `<svg class="fig-svg pareto" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="max-width:100%;height:auto" role="img">`;
+    if (!pts.length) return `${s}</svg>`;
+    const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y).concat(limit !== null ? [limit] : []);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const pad = (a, b) => (b - a || 1) * 0.06;
+    const X = (v) => L + ((v - x0 + pad(x0, x1)) / (x1 - x0 + 2 * pad(x0, x1))) * W;
+    const Y = (v) => T + H - ((v - y0 + pad(y0, y1)) / (y1 - y0 + 2 * pad(y0, y1))) * H;
+    s += `<line class="axis" x1="${L}" y1="${T + H}" x2="${L + W}" y2="${T + H}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${T + H}"/>`;
+    for (const v of [x0, (x0 + x1) / 2, x1]) s += `<text class="small muted mono" x="${X(v)}" y="${T + H + 16}" text-anchor="middle">${fmt(v)}</text>`;
+    for (const v of [y0, (y0 + y1) / 2, y1]) s += `<text class="small muted mono" x="${L - 6}" y="${Y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+    s += `<text class="small muted" x="${L + W / 2}" y="${height - 6}" text-anchor="middle">${esc(xLabel)}</text>`;
+    s += `<text class="small muted" x="14" y="${T + H / 2}" text-anchor="middle" transform="rotate(-90 14 ${T + H / 2})">${esc(yLabel)}</text>`;
+    if (limit !== null) s += `<line class="axis" stroke-dasharray="5 4" x1="${L}" y1="${Y(limit)}" x2="${L + W}" y2="${Y(limit)}"/>`;
+    const f = pts.filter((p) => p.front).sort((a, b) => a.x - b.x);
+    if (f.length > 1) {
+        let d = `M${X(f[0].x)},${Y(f[0].y)}`;
+        for (let k = 1; k < f.length; k++) d += ` H${X(f[k].x)} V${Y(f[k].y)}`;
+        s += `<path class="front" d="${d}"/>`;
+    }
+    for (const p of [...pts].sort((a, b) => (a.current ? 1 : 0) - (b.current ? 1 : 0) || (a.front ? 1 : 0) - (b.front ? 1 : 0))) {
+        s += `<circle class="pt${p.front ? ' front' : ''}${p.current ? ' cur' : ''}" cx="${X(p.x)}" cy="${Y(p.y)}" r="${p.current ? 7 : 4}"${p.infeasible ? ' opacity="0.45"' : ''}><title>${esc(p.label)}: ${fmt(p.x)}%, ${fmt(p.y)}%</title></circle>`;
+    }
+    return `${s}</svg>`;
+}

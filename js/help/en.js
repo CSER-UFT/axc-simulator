@@ -218,6 +218,22 @@ const base = {
     <li><strong>requantization dominates the dense layers</strong>: one 32 × 32 bit block per layer (4 DSP48) is almost all of their area, and each filter computed in parallel needs another one.</li>
 </ul>
 <p>Each function is partitioned independently of the others: in Vitis, the array between two layers would have a single partitioning, and the one of a layer's output would have to serve the next layer.</p>
+<h3>Per layer unit search</h3>
+<p>The <strong>Per layer unit search</strong> section chooses the multiplier and adder of each layer with weights (different units in each one) that cost the least area (ASIC), LUTs (FPGA) or energy, with the accuracy drop on the <strong>validation set</strong> within the limit. The directives and period are those of the cost section, and the order of the sums is that of the directives. Test accuracy is measured only at the end, for the exact network and the chosen point: the choice does not see the test set.</p>
+<ul>
+    <li><strong>candidates</strong>: for each layer, the 8 bit multipliers and 32 bit adders of the library on the Pareto front between the unit cost and the error of the sum of one output, measured with the real operands of the layer (K products drawn from the activations of the exact network on the validation set and from the weights of the layer, added with the structure of the directives). Up to 12 of each are kept;</li>
+    <li><strong>sensitivity</strong>: evaluates each candidate alone, starting from the exact network, and then combines the swaps in order of saving per extra wrong image, checking each one together with those already accepted;</li>
+    <li><strong>sequential</strong>: layer by layer, in network order, the multiplier and then the adder; the cheapest candidate that keeps the limit stays;</li>
+    <li><strong>fast evaluation</strong>: the input activations of each layer of the current configuration are kept, and swapping the unit of layer i recomputes only layers i onward; evaluation stops as soon as the wrong images go past the limit. The sensitivity phase is spread over workers (the processor cores minus one).</li>
+</ul>
+<p>The <strong>Apply to the page</strong> button takes the units of each layer to the accuracy, the confusion matrix and the hardware cost, until you go back to the selector units. On the command line: <code>node bin/axc.mjs nnsearch --model minilenet-mnist --objective area --max-drop 1</code> (with <code>--heuristic</code>, <code>--dirs</code>, <code>--clock</code> and <code>--workers</code>).</p>
+<p>What the search shows (maximum drop of 1 point on validation, 10 ns):</p>
+<ul>
+    <li><strong>units per layer save more than a single unit</strong>: on MiniLenet, with the default directives, sensitivity cuts 8.8% of the area (sequential, 7.0%), against 6.9% for MUL8 T4 with ADD32 LOA10 on every layer. The layers choose different units (for example, MUL8 T6 A10c on conv1 and MUL8 MITCHELL on fc2);</li>
+    <li><strong>the architecture decides how much the approximation is worth in energy</strong>: with the default directives, the best configuration saves 3.4% of the energy; with partitioning and all filters per iteration in the convolutions and 7 products per iteration on fc1, 35.5%, because energy is no longer in the registers of a slow circuit but in the operators;</li>
+    <li><strong>the validation limit is not the test limit</strong>: with 1000 images, the measured accuracy has a standard deviation of about 1.4 points at 70% (CIFAR 10) and 0.3 point at 99% (MNIST). The search pushes against the limit and tends to pick points that were lucky on validation: on the CIFAR 10 LeNet 5, a drop of 0.8 point on validation became 2.1 points on test (7.2% of area); on MiniLenet with the energy objective, 0.9 point became 1.9. A limit below the acceptable drop gives a margin.</li>
+</ul>
+<p>The search takes about 1 minute on MiniLenet and 2 minutes on the CIFAR 10 LeNet 5 with 2 workers; with more cores, the sensitivity phase gets proportionally faster, and the combination phase (one evaluation after another) does not change.</p>
 <p>The confusion matrix shows where the errors go, and the grid shows the images the exact network gets right and the approximate one gets wrong. The MNIST images are distributed under the CC BY-SA 3.0 license.</p>`,
         },
         {

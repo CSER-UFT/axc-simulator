@@ -17,6 +17,11 @@
  *       --dirs: diretivas das camadas com pesos, "camada:item,item;camada:..." com os itens pixel|tap|off (conv),
  *       input|off (densa), ii=N, par=N e part (por exemplo "conv1:pixel,part;conv2:tap;fc1:par=7,part"); as camadas
  *       omitidas ficam com o padrão. No lenet, a estrutura da soma das camadas aproximadas passa a ser a das diretivas.
+ *   node bin/axc.mjs nnsearch [--model minilenet-mnist|...] [--objective area|luts|energy] [--max-drop 1]
+ *                             [--heuristic sensitivity|sequential] [--dirs "..."] [--clock 10] [--workers N] [--cands 12]
+ *       busca do multiplicador e do somador de cada camada (js/axc/nnsearch.js): o menor custo com a queda de
+ *       acurácia na validação até --max-drop pontos; a acurácia de teste do ponto escolhido no fim. --workers: threads
+ *       de avaliação (padrão: os núcleos menos 1; 1 avalia na própria thread)
  *   node bin/axc.mjs hls <kernel.c | --example gauss|sobel|sharpen|fir|dot> [--clock ns] [--flow delay|area|iso] [--ports n]
  *        [--ops] [--approx "alvo=unidade;..."] [--error] [--input image|uniform] [--model sampled|analytic]
  *   node bin/axc.mjs dse <kernel.c | --example id> [--objective area|luts|energy|latency|interval|weighted]
@@ -42,6 +47,9 @@ import { designSpace } from '../js/axc/designspace.js';
 import { PRESETS } from '../js/axc/presets.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize } from '../js/axc/nn.js';
 import { networkCost, networkKernels, normalizeDirectives, directiveTrees, CONV_PIPES, DENSE_PIPES } from '../js/axc/nngen.js';
+import { prepareSearch, searchNetwork, poolEngine, initMessage, SEARCH_OBJECTIVES, SEARCH_HEURISTICS } from '../js/axc/nnsearch.js';
+import { Worker } from 'node:worker_threads';
+import { availableParallelism } from 'node:os';
 
 import { synthesize } from '../js/hls/index.js';
 import { KERNELS } from '../js/hls/kernels.js';
@@ -218,6 +226,59 @@ switch (cmd) {
             `diretivas: ${net.sites.map((l, i) => `${l.name} ${dirText(dirs[i], l)}`).join('; ')}`,
             ...c.layers.filter((l) => l.IIwhy && l.IIwhy.kind !== 'target').map((l) => `II de ${l.name} limitado por ${l.IIwhy.kind === 'mem' ? `memória (${l.IIwhy.label}: ${l.IIwhy.uses} acessos, ${l.IIwhy.cap} portas)` : l.IIwhy.kind === 'rec' ? `recorrência (${l.IIwhy.key})` : l.IIwhy.kind}`),
             ...c.warnings.map((w) => `aviso: ${w}`),
+        ].join('\n'));
+        break;
+    }
+    case 'nnsearch': {
+        const reg = JSON.parse(readFileSync(join(ROOT, 'data/nn/models.json'), 'utf8'));
+        const entry = reg.models.find((m) => m.id === opt('--model', 'minilenet-mnist')) ?? die(`modelo desconhecido: ${opt('--model')} (${reg.models.map((m) => m.id).join(', ')})`);
+        const netJson = JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8'));
+        const net = decodeNet(netJson), ds = net.dataset;
+        if (!ds.val) die(`${net.id} não tem conjunto de validação`);
+        const valBuf = readFileSync(join(ROOT, ds.val.file));
+        const val = decodeTestSet(valBuf, { ...ds, n: ds.val.n }), test = decodeTestSet(readFileSync(join(ROOT, ds.file)), ds);
+        const objective = opt('--objective', 'area'), heuristic = opt('--heuristic', 'sensitivity');
+        if (!SEARCH_OBJECTIVES.includes(objective)) die(`objetivo: ${SEARCH_OBJECTIVES.join(', ')}`);
+        if (!SEARCH_HEURISTICS.includes(heuristic)) die(`heurística: ${SEARCH_HEURISTICS.join(', ')}`);
+        const dirs = parseDirs(net, opt('--dirs'));
+        const synthJ = synthData();
+        const fpgaJ = existsSync(join(ROOT, 'data/vivado-units.json')) ? JSON.parse(readFileSync(join(ROOT, 'data/vivado-units.json'), 'utf8')) : null;
+        const t0 = Date.now();
+        let P;
+        try {
+            P = prepareSearch(net, { val, test, synth: synthJ, cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')), fpga: fpgaJ, objective, dirs, clockNs: +opt('--clock', 10), maxCands: +opt('--cands', 12) });
+        } catch (e) { die(e.message); }
+        const prepMs = Date.now() - t0;
+        const nw = Math.max(1, +opt('--workers', Math.max(1, availableParallelism() - 1)));
+        let engine, workers = [];
+        if (nw > 1) {
+            const init = initMessage(netJson, valBuf, synthJ, P.trees);
+            workers = Array.from({ length: nw }, () => new Worker(new URL('./nn-eval-worker.mjs', import.meta.url)));
+            const send = workers.map((w) => {
+                let next = 0;
+                const wait = new Map();
+                w.on('message', ({ id, reply }) => { const f = wait.get(id); wait.delete(id); f(reply); });
+                return (msg) => new Promise((res, rej) => { const id = next++; wait.set(id, (r) => (r.type === 'error' ? rej(new Error(r.message)) : res(r))); w.postMessage({ id, msg }); });
+            });
+            await Promise.all(send.map((f) => f(init)));
+            engine = poolEngine(send);
+        }
+        let last = 0;
+        const progress = (p) => { if (!flag('--json') && Date.now() - last > 2000) { last = Date.now(); process.stderr.write(`  ${p.phase}: ${p.evals} avaliações, ${(p.ms / 1000).toFixed(0)} s, custo ${(100 * p.cost).toFixed(1)}% da exata\n`); } };
+        let r;
+        try { r = await searchNetwork(P, { heuristic, maxDrop: +opt('--max-drop', 1), progress }, engine); } catch (e) { die(e.message); } finally { for (const w of workers) w.terminate(); }
+        const unit = { area: 'µm²', luts: 'LUT', energy: 'nJ' }[objective];
+        const cv = (x) => (objective === 'energy' ? (x / 1e6).toFixed(1) : x.toFixed(0));
+        const pct = (v) => `${(100 * v).toFixed(1)}%`;
+        const res = { model: net.id, objective, heuristic, maxDrop: r.maxDrop, dirs, prepMs, ...r, points: flag('--points') ? r.points : r.points.length };
+        out(res, () => [
+            `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n})`,
+            `candidatas por camada: ${P.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} ×, ${c.add.length} +`).join('; ')}`,
+            `${r.evals} avaliações (${r.images} imagens), ${(r.ms / 1000).toFixed(1)} s com ${r.workers} worker(s); preparação ${(prepMs / 1000).toFixed(1)} s`,
+            `exata:   ${cv(r.exact.cost)} ${unit}, validação ${pct(r.exact.accVal)}, teste ${pct(r.exact.accTest)}`,
+            `melhor:  ${cv(r.best.cost)} ${unit} (${pct(-r.best.saving)}), validação ${pct(r.best.accVal)}, teste ${pct(r.best.accTest)}`,
+            ...r.best.assign.map((a, i) => `  ${net.sites[i].name.padEnd(6)} ${(a.mul ?? 'MUL8 exato').padEnd(18)} ${a.add ?? 'ADD32 exato'}`),
+            `fronteira (custo, validação): ${r.front.map((p) => `${pct(p.cost / r.exact.cost)} ${pct(p.accVal)}`).join('; ')}`,
         ].join('\n'));
         break;
     }

@@ -40,6 +40,7 @@
                     <label><span data-i18n="nn.adder">Somador das acumulações</span> <select id="nnAdder"></select></label>
                     <label><span data-i18n="nn.accum">Estrutura da soma</span> <select id="nnAccum"><option value="arch" data-i18n="nn.accumArch">conforme as diretivas</option><option value="chain" data-i18n="nn.accumChain">em cadeia (laço)</option><option value="tree" data-i18n="nn.accumTree">em árvore (laço desenrolado)</option></select></label>
                     <div id="nnUnitInfo"></div>
+                    <div id="nnOverride"></div>
                     <h3 style="margin-top:10px" data-i18n="nn.layers">Camadas com a unidade aproximada:</h3>
                     <div class="row" id="nnLayers"></div>
                     <div class="row" style="margin-top:8px">
@@ -70,6 +71,21 @@
                         <label><span data-i18n="nn.codeLayer">Camada</span> <select id="nnCodeLayer"></select></label>
                         <pre class="scroll-box mono" id="nnCode" style="max-height:360px;white-space:pre;font-size:12px"></pre>
                     </details>
+                </section>
+                <section style="margin-top:16px">
+                    <h2 data-i18n="nn.searchTitle">Busca das unidades por camada</h2>
+                    <p class="note" data-i18n="nn.searchIntro">Procura o multiplicador e o somador de cada camada com pesos que gastam menos, com a queda de acurácia no conjunto de validação dentro do limite. As diretivas e o período são os da seção de custo; a acurácia de teste do ponto escolhido só é medida no fim.</p>
+                    <div class="row">
+                        <label><span data-i18n="nn.searchObj">Objetivo</span> <select id="nnSearchObj"><option value="area" data-i18n="nn.searchObjArea">área (ASIC)</option><option value="luts" data-i18n="nn.searchObjLuts">LUTs (FPGA)</option><option value="energy" data-i18n="nn.searchObjEnergy">energia</option></select></label>
+                        <label><span data-i18n="nn.searchDrop">Queda máxima (pontos)</span> <input type="number" id="nnSearchDrop" min="0" max="50" step="0.1" value="1" style="width:5em" /></label>
+                        <label><span data-i18n="nn.searchHeur">Heurística</span> <select id="nnSearchHeur"><option value="sensitivity" data-i18n="nn.searchSens">sensibilidade</option><option value="sequential" data-i18n="nn.searchSeq">sequencial</option></select></label>
+                    </div>
+                    <div class="row" style="margin-top:6px">
+                        <button type="button" class="btn primary" id="nnSearchBtn" data-i18n="nn.searchBtn">Buscar</button>
+                        <button type="button" class="btn outline" id="nnSearchStop" data-i18n="nn.searchStop" disabled>Parar</button>
+                    </div>
+                    <p class="note" id="nnSearchStatus"></p>
+                    <div id="nnSearchResult"></div>
                 </section>
             </div>
             <div>

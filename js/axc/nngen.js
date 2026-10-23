@@ -461,49 +461,76 @@ function designOf(src, ports) {
 }
 
 /**
- * Custo da rede com as unidades escolhidas.
+ * Modelo de custo de uma rede com diretivas fixas: o custo de cada kernel, guardado por (kernel, multiplicador,
+ * somador). O da rede é a soma (as funções rodam uma depois da outra), então a busca troca a unidade de uma camada e
+ * recalcula só ela.
  * @param {object} net rede decodificada
- * @param {{synth, cells, fpga?, target?: 'asic'|'fpga', flow?: string, clockNs?: number, ports?: number,
- *          mul?: string|null, add?: string|null, mask?: boolean[], dirs?: object[]}} o mul e add: nomes das unidades
- *          da biblioteca nas camadas com mask[site] (null: exatas); dirs: diretivas de cada camada com pesos
- *          (defaultDirectives)
- * @returns {{layers: object[], totals: object, warnings: string[]}}
+ * @param {{synth, cells, fpga?, target?, flow?, clockNs?, ports?, dirs?}} o
  */
-export function networkCost(net, o) {
+export function costModel(net, o) {
     const kernels = networkKernels(net, o.dirs);
     const ports = o.ports ?? 2, clockNs = o.clockNs ?? 10;
     const base = { synth: o.synth, cells: o.cells, fpga: o.fpga ?? null, target: o.target ?? 'asic', flow: o.flow ?? 'delay', clockNs, ports, wide: true };
-    const layers = [], warnings = [];
-    for (const k of kernels) {
+    const cache = new Map();
+    /** Custo de um kernel com as unidades (null: exata). */
+    const kernel = (k, mul = null, add = null) => {
+        const key = `${k.name}|${mul ?? '-'}|${add ?? '-'}`;
+        if (cache.has(key)) return cache.get(key);
         const design = designOf(k.src, ports);
         const r0 = synthesize(k.src, { ...base, design });
         let r = r0;
-        const approx = k.site !== null && (o.mask?.[k.site] ?? true) && (o.mul || o.add);
+        const warnings = [];
+        const approx = k.site !== null && !!(mul || add);
         if (approx) {
             const assign = new Map();
             for (const op of r0.ops.list) {
                 let name = null;
-                if (op.cls === 'mul' && o.mul) name = op.candidates.includes(o.mul) ? o.mul : null;
-                if (op.cls === 'add' && o.add) name = r0.lib.adderFor(o.add, op.W);
-                if (op.cls === 'mul' && o.mul && !name) warnings.push(`${k.name}: ${o.mul} não serve para ${op.label} (fica o exato)`);
+                if (op.cls === 'mul' && mul) name = op.candidates.includes(mul) ? mul : null;
+                if (op.cls === 'add' && add) name = r0.lib.adderFor(add, op.W);
+                if (op.cls === 'mul' && mul && !name) warnings.push(`${k.name}: ${mul} não serve para ${op.label} (fica o exato)`);
                 if (name && name !== op.candidates[0]) assign.set(op.id, name);
             }
             r = synthesize(k.src, { ...base, design, assign });
         }
         const t = r.totals;
-        layers.push({
-            name: k.name, type: k.type, site: k.site, approx: !!approx, cycles: t.cycles, area: t.area, luts: t.luts, carry4: t.carry4,
-            ff: t.ff, dsp: t.dsp ?? 0, energy: t.energy, critPs: t.critPs,
+        const row = {
+            name: k.name, type: k.type, site: k.site, approx, mul: k.site !== null ? mul : null, add: k.site !== null ? add : null,
+            cycles: t.cycles, area: t.area, luts: t.luts, carry4: t.carry4, ff: t.ff, dsp: t.dsp ?? 0, energy: t.energy, critPs: t.critPs,
             II: r.design.loops.filter((x) => x.mode === 'pipelined').reduce((m, x) => Math.max(m ?? 0, x.IIachieved ?? 0), null),
             IIwhy: r.design.loops.find((x) => x.mode === 'pipelined')?.why ?? null,
             src: k.src,
             units: r.cost.units.map((u) => ({ name: u.unit.name, count: u.count })),
-        });
-    }
-    const sum = (f) => layers.reduce((s, x) => s + x[f], 0);
-    const cycles = sum('cycles');
-    return {
-        layers, warnings: [...new Set(warnings)],
-        totals: { cycles, timeUs: (cycles * clockNs) / 1000, area: sum('area'), luts: sum('luts'), carry4: sum('carry4'), ff: sum('ff'), dsp: sum('dsp'), energy: sum('energy'), clockNs },
+            warnings,
+        };
+        cache.set(key, row);
+        return row;
     };
+    const siteKernel = new Map(kernels.filter((k) => k.site !== null).map((k) => [k.site, k]));
+    /** Custo de uma camada com pesos com as unidades. */
+    const site = (si, mul = null, add = null) => kernel(siteKernel.get(si), mul, add);
+    /** Custo da rede: units[si] = {mul, add} (nomes da biblioteca; ausente ou null: exata). */
+    const network = (units = []) => {
+        const layers = kernels.map((k) => (k.site === null ? kernel(k) : kernel(k, units[k.site]?.mul ?? null, units[k.site]?.add ?? null)));
+        const sum = (f) => layers.reduce((a, x) => a + x[f], 0);
+        const cycles = sum('cycles');
+        return {
+            layers, warnings: [...new Set(layers.flatMap((l) => l.warnings))],
+            totals: { cycles, timeUs: (cycles * clockNs) / 1000, area: sum('area'), luts: sum('luts'), carry4: sum('carry4'), ff: sum('ff'), dsp: sum('dsp'), energy: sum('energy'), clockNs },
+        };
+    };
+    return { kernels, kernel, site, network, clockNs };
+}
+
+/**
+ * Custo da rede com as unidades escolhidas.
+ * @param {object} net rede decodificada
+ * @param {{synth, cells, fpga?, target?: 'asic'|'fpga', flow?: string, clockNs?: number, ports?: number,
+ *          mul?: string|null, add?: string|null, mask?: boolean[], units?: object[], dirs?: object[]}} o mul e add:
+ *          nomes das unidades da biblioteca nas camadas com mask[site] (null: exatas); units: {mul, add} de cada camada
+ *          com pesos (no lugar de mul, add e mask); dirs: diretivas de cada camada com pesos (defaultDirectives)
+ * @returns {{layers: object[], totals: object, warnings: string[]}}
+ */
+export function networkCost(net, o) {
+    const units = o.units ?? net.sites.map((_, si) => ((o.mask?.[si] ?? true) ? { mul: o.mul ?? null, add: o.add ?? null } : null));
+    return costModel(net, o).network(units);
 }

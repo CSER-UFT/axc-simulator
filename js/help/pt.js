@@ -218,6 +218,22 @@ const base = {
     <li><strong>a reescala domina as camadas densas</strong>: uma peça de 32 × 32 bits por camada (4 DSP48) é quase toda a área delas, e cada filtro calculado em paralelo pede mais uma.</li>
 </ul>
 <p>A partição de cada função é independente das outras: no Vitis, o vetor entre duas camadas teria uma partição só, e a da saída de uma camada teria de servir à seguinte.</p>
+<h3>Busca das unidades por camada</h3>
+<p>A seção <strong>Busca das unidades por camada</strong> escolhe o multiplicador e o somador de cada camada com pesos (unidades diferentes em cada uma) que gastam menos área (ASIC), LUTs (FPGA) ou energia, com a queda de acurácia no <strong>conjunto de validação</strong> até o limite. As diretivas e o período são os da seção de custo, e a ordem das somas é a das diretivas. A acurácia de teste é medida só no fim, para a exata e para o ponto escolhido: a escolha não vê o teste.</p>
+<ul>
+    <li><strong>candidatas</strong>: para cada camada, os multiplicadores de 8 bits e os somadores de 32 bits da biblioteca na fronteira de Pareto entre o custo da unidade e o erro da soma de uma saída, medido com os operandos reais da camada (K produtos sorteados das ativações da rede exata na validação e dos pesos da camada, somados com a estrutura das diretivas). Ficam até 12 de cada;</li>
+    <li><strong>sensibilidade</strong>: avalia cada candidata sozinha, a partir da rede exata, e depois junta as trocas em ordem de economia por imagem errada a mais, conferindo cada uma em conjunto com as já aceitas;</li>
+    <li><strong>sequencial</strong>: camada por camada, na ordem da rede, o multiplicador e depois o somador; fica a candidata mais barata que mantém o limite;</li>
+    <li><strong>avaliação rápida</strong>: as ativações da entrada de cada camada da configuração atual ficam guardadas, e trocar a unidade da camada i refaz só as camadas de i em diante; a avaliação para assim que as imagens erradas passam do limite. A fase de sensibilidade é distribuída entre workers (os núcleos do processador menos um).</li>
+</ul>
+<p>O botão <strong>Aplicar na página</strong> leva as unidades de cada camada para a acurácia, a matriz de confusão e o custo do hardware, até voltar às unidades dos seletores. Na linha de comando: <code>node bin/axc.mjs nnsearch --model minilenet-mnist --objective area --max-drop 1</code> (com <code>--heuristic</code>, <code>--dirs</code>, <code>--clock</code> e <code>--workers</code>).</p>
+<p>O que a busca mostra (queda máxima de 1 ponto na validação, 10 ns):</p>
+<ul>
+    <li><strong>unidades por camada economizam mais que uma unidade só</strong>: na MiniLenet, com as diretivas padrão, a sensibilidade corta 8,8% da área (a sequencial, 7,0%), contra 6,9% do MUL8 T4 com o ADD32 LOA10 em todas as camadas. As camadas escolhem unidades diferentes (por exemplo, MUL8 T6 A10c na conv1 e MUL8 MITCHELL na fc2);</li>
+    <li><strong>a arquitetura decide quanto a aproximação vale em energia</strong>: com as diretivas padrão, a melhor configuração economiza 3,4% da energia; com a partição e todos os filtros por iteração nas convoluções e 7 produtos por iteração na fc1, 35,5%, porque a energia deixa de estar nos registradores de um circuito lento e passa a estar nos operadores;</li>
+    <li><strong>o limite da validação não é o do teste</strong>: com 1000 imagens, a acurácia medida tem desvio padrão de cerca de 1,4 ponto a 70% (CIFAR 10) e de 0,3 ponto a 99% (MNIST). A busca encosta no limite e tende a escolher pontos que tiveram sorte na validação: na LeNet 5 do CIFAR 10, a queda de 0,8 ponto na validação virou 2,1 pontos no teste (7,2% de área); na MiniLenet com o objetivo de energia, 0,9 ponto virou 1,9. Um limite menor que a queda aceitável dá margem.</li>
+</ul>
+<p>A busca leva cerca de 1 minuto na MiniLenet e 2 minutos na LeNet 5 do CIFAR 10 com 2 workers; com mais núcleos, a fase de sensibilidade fica proporcionalmente mais rápida, e a de combinação (uma avaliação depois da outra) não muda.</p>
 <p>A matriz de confusão mostra para onde vão os erros, e a grade mostra as imagens que a rede exata acerta e a aproximada erra. As imagens do MNIST são distribuídas sob a licença CC BY-SA 3.0.</p>`,
         },
         {

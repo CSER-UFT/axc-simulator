@@ -166,16 +166,30 @@ export function adderAccumulate(unit) {
         const type = cfg.adder === 'trunc' || cfg.adder === 'loa' || cfg.adder === 'seg' ? cfg.adder : 'exact';
         const k = Math.min(cfg.k ?? 0, 32), km = k >= 31 ? (k === 31 ? 0x7fffffff : -1) : (1 << k) - 1;
         const L = Math.max(1, cfg.L ?? 4), P = Math.max(0, cfg.P ?? 0);
+        // Um laço por tipo (a escolha fora do laço: a busca da página de redes chama isto milhões de vezes).
+        if (type === 'exact' || (k === 0 && type !== 'seg')) {
+            return (acc, prod, n = acc.length) => { for (let i = 0; i < n; i++) acc[i] = (acc[i] + prod[i]) | 0; return acc; };
+        }
+        if (type === 'trunc') {
+            if (k >= 32) return (acc, prod, n = acc.length) => { acc.fill(0, 0, n); return acc; };
+            return (acc, prod, n = acc.length) => { for (let i = 0; i < n; i++) acc[i] = (((acc[i] >>> k) + (prod[i] >>> k)) << k) | 0; return acc; };
+        }
+        if (type === 'loa') {
+            if (k >= 32) return (acc, prod, n = acc.length) => { for (let i = 0; i < n; i++) acc[i] = acc[i] | prod[i]; return acc; };
+            const k1 = k - 1;
+            return (acc, prod, n = acc.length) => {
+                for (let i = 0; i < n; i++) {
+                    const x = acc[i], y = prod[i];
+                    acc[i] = ((((x >>> k) + (y >>> k) + ((x >>> k1) & (y >>> k1) & 1)) << k) | ((x | y) & km)) | 0;
+                }
+                return acc;
+            };
+        }
         return (acc, prod, n = acc.length) => {
             for (let i = 0; i < n; i++) {
                 const x = acc[i], y = prod[i];
                 let r;
-                if (type === 'exact' || k === 0 && type !== 'seg') r = x + y;
-                else if (type === 'trunc') r = k >= 32 ? 0 : ((x >>> k) + (y >>> k)) << k;
-                else if (type === 'loa') {
-                    if (k >= 32) r = x | y;
-                    else r = (((x >>> k) + (y >>> k) + ((x >>> (k - 1)) & (y >>> (k - 1)) & 1)) << k) | ((x | y) & km);
-                } else {
+                {
                     r = 0;
                     for (let s = 0; s < 32; s += L) {
                         const hi = s + L < 32 ? s + L : 32, w = hi - s, lo = s - P > 0 ? s - P : 0;
@@ -295,18 +309,20 @@ function convAcc(l, x, T, add, tree, scratch) {
         }
         return acc;
     }
-    // Com a unidade, a ordem conta: termo t = (ky, kx, canal), a ordem dos laços do C.
+    // Com a unidade, a ordem conta: termo t = (ky, kx, canal), a ordem dos laços do C. A entrada vai para o buffer
+    // com a borda (o ponto zero), como no caminho exato.
+    const PH = H + 2 * pad, PW = W + 2 * pad;
+    const xp = scratch.padded(C * PH * PW);
+    if (pad) xp.fill(z, 0, C * PH * PW);
+    for (let c = 0; c < C; c++) for (let y = 0; y < H; y++) xp.set(x.subarray((c * H + y) * W, (c * H + y + 1) * W), (c * PH + y + pad) * PW + pad);
     const fill = (t, out) => {
         const ky = Math.floor(t / (k * C)), kx = Math.floor(t / C) % k, c = t % C;
         let i = 0;
         for (let f = 0; f < F; f++) {
             const wo = (w[((f * C + c) * k + ky) * k + kx] + 128) * 256;
             for (let oy = 0; oy < OH; oy++) {
-                const iy = oy * s + ky - pad;
-                for (let ox = 0; ox < OW; ox++) {
-                    const ix = ox * s + kx - pad;
-                    out[i++] = T[wo + (iy >= 0 && iy < H && ix >= 0 && ix < W ? x[(c * H + iy) * W + ix] : z)];
-                }
+                let p = (c * PH + oy * s + ky) * PW + kx;
+                for (let ox = 0; ox < OW; ox++, p += s) out[i++] = T[wo + xp[p]];
             }
         }
     };
@@ -354,11 +370,26 @@ function makeScratch() {
  *   os termos; U: árvores de U termos). Com a soma exata, não muda nada.
  */
 export function infer(net, img, tables, adds = [], scratch = makeScratch(), trees = []) {
-    let x = new Uint8Array(img.length);
+    return inferFrom(net, inputActivations(net, img), 0, tables, adds, scratch, trees);
+}
+
+/** Ativações da entrada da rede (os pixels pela tabela de quantização de cada canal). */
+export function inputActivations(net, img, x = new Uint8Array(img.length)) {
     const luts = net.inputLuts, plane = img.length / luts.length;
     for (let c = 0, i = 0; c < luts.length; c++) { const T = luts[c]; for (let e = i + plane; i < e; i++) x[i] = T[img[i]]; }
+    return x;
+}
+
+/**
+ * Inferência a partir da camada net.layers[from], com x as ativações da entrada dela (não é alterado). record(li, x),
+ * se dado, recebe as ativações da entrada de cada camada li (a busca guarda as das camadas que não mudam).
+ */
+export function inferFrom(net, x, from, tables, adds = [], scratch = makeScratch(), trees = [], record = null) {
     let si = 0, out = null;
-    for (const l of net.layers) {
+    for (let li = 0; li < from; li++) if (net.layers[li].type === 'conv' || net.layers[li].type === 'dense') si++;
+    for (let li = from; li < net.layers.length; li++) {
+        const l = net.layers[li];
+        if (record) record(li, x);
         if (l.type === 'conv' || l.type === 'dense') {
             const T = tables[si], add = adds[si] ?? null, tree = trees[si] ?? 1;
             si++;

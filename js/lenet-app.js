@@ -9,7 +9,7 @@ import { testInputs, errorMetrics } from './axc/metrics.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize, macsPerSite } from './axc/nn.js';
 import { archSvg } from './axc/nnsvg.js';
 import { networkCost, normalizeDirectives, directiveTrees, parOptions, CONV_PIPES, DENSE_PIPES } from './axc/nngen.js';
-import { esc } from './ui/plots.js';
+import { esc, accuracyCostSvg } from './ui/plots.js';
 import { Help } from './ui/help.js';
 import { initFigureExport } from './ui/figexport.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale, dec } from './i18n/index.js';
@@ -27,7 +27,8 @@ let synth = null;           // data/synth.json: as unidades da biblioteca
 let fromUnits = null;       // configuração vinda da página de unidades
 let registry = null;        // data/nn/models.json
 let nnData = null, nnRun = 0;
-let nnDirs = null;           // diretivas de cada camada com pesos (js/axc/nngen.js), guardadas por modelo
+let nnDirs = null;
+let nnOverride = null;        // unidades de cada camada aplicadas da busca ([{mul, add}] com os nomes da biblioteca)           // diretivas de cada camada com pesos (js/axc/nngen.js), guardadas por modelo
 const modelCache = new Map(), testCache = new Map(), predCache = new Map(), tableCache = new Map(), unitCache = new Map();
 
 // Unidade vinda da página de unidades (#cfg=...), somador (#add=nome) e modelo (#model=id).
@@ -94,7 +95,16 @@ const nnTrees = () => {
     return directiveTrees(net, nnDirs);
 };
 const nnKey = (mul, add, mask) => `${nnData.net.id}|${mul ? unitName(mul.cfg) : 'exata'}|${add ? `${unitName(add.cfg)}|${nnTrees().join(',')}` : 'exato'}|${mask.join('')}`;
+const unitByName = (name) => (name ? unitOf(synth.designs.find((d) => d.name === name).cfg) : null);
+const accumCache = new Map();
+const accumOf = (name) => { if (!accumCache.has(name)) accumCache.set(name, adderAccumulate(unitByName(name))); return accumCache.get(name); };
 function nnSetup(mask) {
+    if (nnOverride) {
+        // Unidades por camada (da busca): a máscara e os seletores não valem.
+        const tables = nnOverride.map((a) => tableOf(unitByName(a.mul)));
+        const adds = nnOverride.map((a) => (a.add ? accumOf(a.add) : null));
+        return { mul: null, add: null, override: true, tables, adds, trees: nnTrees(), key: `${nnData.net.id}|busca|${JSON.stringify(nnOverride)}|${nnTrees().join(',')}` };
+    }
     const { mul, add } = nnUnits();
     const Tu = tableOf(mul), Tx = tableOf(null);
     const accum = add ? adderAccumulate(add) : null;
@@ -113,7 +123,7 @@ async function loadNN(id) {
     if (!testCache.has(ds.file)) testCache.set(ds.file, getBin(ds.file).then((b) => decodeTestSet(b, ds)));
     const changed = nnData?.net.id !== net.id;
     nnData = { net, test: await testCache.get(ds.file) };
-    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); }
+    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); $('nnSearchResult').innerHTML = ''; $('nnSearchStatus').textContent = ''; }
     return nnData;
 }
 
@@ -217,8 +227,9 @@ async function render() {
     const ref = net.expected;
     const sx = summarize(test, ref, null, classes), su = summarize(test, preds, ref, classes);
     const macs = macsPerSite(net), total = macs.reduce((a, b) => a + b, 0);
-    const approxMacs = macs.reduce((a, m, i) => a + (mask[i] ? m : 0), 0);
-    const label = `${setup.mul ? dn(unitName(setup.mul.cfg)) : t('nn.mulExact')} + ${setup.add ? dn(unitName(setup.add.cfg)) : t('nn.addExact')}`;
+    const approxOn = setup.override ? nnOverride.map((a) => !!(a.mul || a.add)) : mask;
+    const approxMacs = macs.reduce((a, m, i) => a + (approxOn[i] ? m : 0), 0);
+    const label = setup.override ? t('nn.searchLabel') : `${setup.mul ? dn(unitName(setup.mul.cfg)) : t('nn.mulExact')} + ${setup.add ? dn(unitName(setup.add.cfg)) : t('nn.addExact')}`;
     let h = '<table class="kv">';
     h += `<tr><th>${t('nn.accExact')}</th><td class="mono">${pct(sx.accuracy)}</td></tr>`;
     if (refUnitPreds) h += `<tr><th>${t('nn.accRefUnit', { name: dn(unitName(refUnit.cfg)) })}</th><td class="mono">${pct(summarize(test, refUnitPreds, null, classes).accuracy)}</td></tr>`;
@@ -227,7 +238,7 @@ async function render() {
     h += `<tr><th>${t('nn.approxMacs')}</th><td class="mono">${nf(approxMacs)} ${t('nn.of')} ${nf(total)} (${pct(approxMacs / total)})</td></tr>`;
     h += '</table>';
     $('nnTable').innerHTML = h;
-    $('nnNote').innerHTML = modelNote(net) + (refUnitPreds ? ` ${t('nn.booth8')}` : '') + (setup.add ? ` ${t(setup.add.cfg.width >= 32 ? 'nn.adderNote32' : 'nn.adderNote', { n: setup.add.cfg.width })} ${t({ tree: 'nn.accumTreeNote', chain: 'nn.accumChainNote', arch: 'nn.accumArchNote' }[accumMode()])}` : '');
+    $('nnNote').innerHTML = modelNote(net) + (refUnitPreds ? ` ${t('nn.booth8')}` : '') + (setup.override ? ` ${t('nn.accumArchNote')}` : '') + (setup.add ? ` ${t(setup.add.cfg.width >= 32 ? 'nn.adderNote32' : 'nn.adderNote', { n: setup.add.cfg.width })} ${t({ tree: 'nn.accumTreeNote', chain: 'nn.accumChainNote', arch: 'nn.accumArchNote' }[accumMode()])}` : '');
     // Nomes curtos (dígitos) vão direto na matriz; nomes longos viram índices, com a legenda embaixo.
     const names = net.dataset.classes ?? Array.from({ length: classes }, (_, k) => String(k));
     const short = names.every((n) => n.length <= 2) ? names : names.map((_, k) => String(k));
@@ -327,18 +338,18 @@ async function renderCost() {
     if (run !== costRun) return;
     const o = { synth, cells: hd.cells, fpga: hd.fpga, target: $('nnTarget').value, clockNs: +$('nnClock').value || 10 };
     const mask = nnMask();
-    const cost = (m, a, k) => {
-        const key = `${net.id}|${o.target}|${o.clockNs}|${m ?? '-'}|${a ?? '-'}|${k.join('')}|${JSON.stringify(nnDirs)}`;
+    const cost = (m, a, k, units = null) => {
+        const key = `${net.id}|${o.target}|${o.clockNs}|${m ?? '-'}|${a ?? '-'}|${k.join('')}|${JSON.stringify(nnDirs)}|${JSON.stringify(units)}`;
         if (!costCache.has(key)) {
             if (costCache.size > 200) costCache.delete(costCache.keys().next().value);
-            costCache.set(key, networkCost(net, { ...o, mul: m, add: a, mask: k, dirs: nnDirs }));
+            costCache.set(key, networkCost(net, { ...o, mul: m, add: a, mask: k, dirs: nnDirs, ...(units ? { units } : {}) }));
         }
         return costCache.get(key);
     };
     let ex, c;
     try {
         ex = cost(null, null, mask);
-        c = cost(mul ? unitName(mul.cfg) : null, add ? unitName(add.cfg) : null, mask);
+        c = nnOverride ? cost(null, null, mask, nnOverride) : cost(mul ? unitName(mul.cfg) : null, add ? unitName(add.cfg) : null, mask);
     } catch (e) { $('nnCost').innerHTML = `<p class="note">${esc(e.message)}</p>`; return; }
     if (run !== costRun) return;
     const d = (a, b) => (b ? `${a <= b ? '−' : '+'}${nf(Math.abs(100 * (1 - a / b)), 1)}%` : '');
@@ -359,8 +370,90 @@ async function renderCost() {
 }
 for (const id of ['nnClock', 'nnTarget']) $(id).addEventListener('change', () => renderCost());
 
-for (const id of ['nnMul', 'nnAdder', 'nnModel', 'nnAccum']) $(id).addEventListener('change', () => { store.set(`nn.${id}`, $(id).value); render(); });
-$('nnLayers').addEventListener('change', () => render());
+for (const id of ['nnMul', 'nnAdder', 'nnModel', 'nnAccum']) $(id).addEventListener('change', () => { store.set(`nn.${id}`, $(id).value); if (id !== 'nnAccum') setOverride(null); render(); });
+$('nnLayers').addEventListener('change', () => { setOverride(null); render(); });
+
+// Busca das unidades por camada ------------------------------------------------------------------------------------
+/** Unidades por camada aplicadas da busca (null: as dos seletores). */
+function setOverride(assign) {
+    nnOverride = assign ? assign.map((a) => ({ mul: a.mul ?? null, add: a.add ?? null })) : null;
+    if (!nnOverride) { $('nnOverride').innerHTML = ''; return; }
+    const rows = nnData.net.sites.map((l, i) => `<tr><th class="mono">${esc(l.name)}</th><td class="mono">${esc(dn(nnOverride[i].mul ?? 'MUL8 exato'))}</td><td class="mono">${esc(dn(nnOverride[i].add ?? 'ADD32 exato'))}</td></tr>`).join('');
+    $('nnOverride').innerHTML = `<div class="scroll-box" style="padding:8px;margin:8px 0"><p class="note"><b>${t('nn.searchApplied')}</b></p><table class="kv">${rows}</table>`
+        + `<button type="button" class="btn outline" id="nnOverrideOff">${t('nn.searchUnapply')}</button></div>`;
+    $('nnOverrideOff').onclick = () => { setOverride(null); render(); };
+}
+
+let searchWorker = null, lastSearch = null;
+const searchWorkers = () => Math.max(1, Math.min(8, (navigator.hardwareConcurrency || 2) - 1));
+function stopSearch(msg = '') {
+    if (searchWorker) { searchWorker.terminate(); searchWorker = null; }
+    $('nnSearchBtn').disabled = false;
+    $('nnSearchStop').disabled = true;
+    if (msg) $('nnSearchStatus').textContent = msg;
+}
+$('nnSearchStop').onclick = () => stopSearch(t('nn.searchStopped'));
+$('nnSearchBtn').onclick = () => {
+    if (!nnData || !registry) return;
+    stopSearch();
+    const net = nnData.net, entry = registry.models.find((m) => m.id === net.id);
+    if (!net.dataset.val) { $('nnSearchStatus').textContent = t('nn.searchNoVal'); return; }
+    const o = {
+        file: entry.file, objective: $('nnSearchObj').value, maxDrop: Math.max(0, +$('nnSearchDrop').value || 0), heuristic: $('nnSearchHeur').value,
+        dirs: nnDirs, trees: directiveTrees(net, nnDirs), clockNs: +$('nnClock').value || 10, workers: searchWorkers(),
+    };
+    $('nnSearchBtn').disabled = true;
+    $('nnSearchStop').disabled = false;
+    $('nnSearchResult').innerHTML = '';
+    const t0 = Date.now();
+    searchWorker = new Worker(new URL('./nn-search-worker.js', import.meta.url), { type: 'module' });
+    searchWorker.onmessage = ({ data: m }) => {
+        if (m.type === 'status') $('nnSearchStatus').textContent = t(m.key);
+        else if (m.type === 'progress') {
+            $('nnSearchStatus').textContent = t('nn.searchProgress', { phase: m.phase === 'sens' ? t('nn.searchPhaseSens') : m.phase === 'comb' ? t('nn.searchPhaseComb') : m.phase, evals: m.evals, s: nf((Date.now() - t0) / 1000, 0), cost: nf(100 * m.cost, 1) });
+        } else if (m.type === 'error') stopSearch(m.message);
+        else if (m.type === 'done') {
+            stopSearch(t('nn.searchDone', { evals: m.result.evals, images: nf(m.result.images), s: nf(m.result.ms / 1000, 1), workers: m.result.workers }));
+            lastSearch = { ...m.result, net: net.id, o };
+            renderSearch();
+        }
+    };
+    searchWorker.onerror = (e) => stopSearch(e.message || t('nn.searchError'));
+    searchWorker.postMessage(o);
+};
+
+function renderSearch() {
+    const r = lastSearch;
+    if (!r || !nnData || r.net !== nnData.net.id) return;
+    const net = nnData.net, obj = r.o.objective;
+    const unit = { area: 'µm²', luts: 'LUT', energy: 'nJ' }[obj];
+    const val = (x) => (obj === 'energy' ? x / 1e6 : x);
+    const pp = (a, b) => `${a >= b ? '+' : '−'}${nf(Math.abs(a - b) * 100, 1)} ${t('nn.pp')}`;
+    let h = `<table class="kv"><tr><th></th><td class="note">${t('nn.searchExact')}</td><td class="note">${t('nn.searchBest')}</td></tr>`;
+    h += `<tr><th>${t(`nn.searchObj_${obj}`)}</th><td class="mono">${nf(val(r.exact.cost), 0)} ${unit}</td><td class="mono"><b>${nf(val(r.best.cost), 0)} ${unit}</b> (−${nf(100 * r.best.saving, 1)}%)</td></tr>`;
+    h += `<tr><th>${t('nn.searchAccVal', { n: r.n })}</th><td class="mono">${pct(r.exact.accVal)}</td><td class="mono">${pct(r.best.accVal)} (${pp(r.best.accVal, r.exact.accVal)})</td></tr>`;
+    h += `<tr><th>${t('nn.searchAccTest', { n: r.testN })}</th><td class="mono">${pct(r.exact.accTest)}</td><td class="mono"><b>${pct(r.best.accTest)}</b> (${pp(r.best.accTest, r.exact.accTest)})</td></tr></table>`;
+    h += `<table class="kv" style="margin-top:8px"><tr><th></th><td class="note">${t('nn.mul')}</td><td class="note">${t('nn.adder')}</td><td class="note">${unit}</td></tr>`;
+    net.sites.forEach((l, i) => {
+        const a = r.best.assign[i], lb = r.layersBest.find((x) => x.site === i), le = r.layersExact.find((x) => x.site === i);
+        const v = val(lb[obj]), ve = val(le[obj]);
+        h += `<tr><th class="mono">${esc(l.name)}</th><td class="mono">${esc(dn(a.mul ?? 'MUL8 exato'))}</td><td class="mono">${esc(dn(a.add ?? 'ADD32 exato'))}</td><td class="mono">${nf(v, 0)}${v !== ve ? ` <span class="note">(−${nf(100 * (1 - v / ve), 1)}%)</span>` : ''}</td></tr>`;
+    });
+    h += '</table>';
+    h += `<div class="row" style="margin-top:6px"><button type="button" class="btn primary" id="nnSearchApply">${t('nn.searchApply')}</button></div>`;
+    // Pontos avaliados por inteiro (os inviáveis abandonados no meio não têm acurácia).
+    const pts = r.points.filter((p) => p.full).map((p) => ({ x: (100 * p.cost) / r.exact.cost, y: 100 * (1 - p.wrong / r.n), infeasible: !p.feasible, label: p.assign.map((a, i) => (a.mul || a.add ? `${net.sites[i].name}: ${[a.mul, a.add].filter(Boolean).join(' + ')}` : '')).filter(Boolean).join('; ') || t('nn.searchExact') }));
+    const front = new Set(r.front.map((f) => JSON.stringify(f.assign)));
+    for (const [k, p] of r.points.filter((q) => q.full).entries()) { if (front.has(JSON.stringify(p.assign))) pts[k].front = true; }
+    pts.push({ x: 100, y: 100 * r.exact.accVal, label: t('nn.searchExact') });
+    pts.push({ x: (100 * r.best.cost) / r.exact.cost, y: 100 * r.best.accVal, label: t('nn.searchBest'), current: true, front: true });
+    h += `<figure style="margin-top:8px">${accuracyCostSvg(pts, { xLabel: t('nn.searchPlotX', { obj: t(`nn.searchObj_${obj}`) }), yLabel: t('nn.searchPlotY'), limit: 100 * (r.exact.accVal - r.maxDrop / 100), width: 520, height: 300 })}</figure>`;
+    const se = (a, n) => 100 * Math.sqrt((a * (1 - a)) / n);
+    h += `<p class="note">${t('nn.searchNoise', { n: r.n, se: nf(se(r.exact.accVal, r.n), 1), seT: nf(se(r.exact.accTest, r.testN), 1), dv: nf(100 * (r.exact.accVal - r.best.accVal), 1), dt: nf(100 * (r.exact.accTest - r.best.accTest), 1) })}</p>`;
+    h += `<p class="note">${t('nn.searchNote', { cands: r.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} × ${c.add.length}`).join(', '), maxWrong: r.maxWrong, n: r.n })}</p>`;
+    $('nnSearchResult').innerHTML = h;
+    $('nnSearchApply').onclick = () => { setOverride(r.best.assign); render(); $('nnTable').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+}
 $('nnSensBtn').onclick = async () => {
     if (!nnData) return;
     const run = ++nnRun;
