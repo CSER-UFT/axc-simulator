@@ -206,9 +206,8 @@ Ajustes pendentes da síntese de alto nível, para retomar:
 * calibrar o custo dos multiplicadores aproximados com operando constante (causa da ordenação errada no FIR da quarta rodada);
 * sintetizar e caracterizar as unidades de 9 a 15 bits (sky130 e Vivado), para custos medidos nessas larguras.
 
-Redes neurais (feitas: etapa 1, formato comum, avaliador genérico, MiniLenet e diagrama; etapa 2, treino e quantização em PyTorch para MNIST, Fashion MNIST e CIFAR 10, com validação separada; etapa 3, somadores de 24 e 32 bits nas acumulações, sintetizados em sky130, e soma em cadeia ou em árvore):
+Redes neurais (feitas: etapa 1, formato comum, avaliador genérico, MiniLenet e diagrama; etapa 2, treino e quantização em PyTorch para MNIST, Fashion MNIST e CIFAR 10, com validação separada; etapa 3, somadores de 24 e 32 bits nas acumulações, sintetizados em sky130 e caracterizados no Vivado, e soma em cadeia ou em árvore):
 
-* rodar no Vivado os 212 somadores novos (`node scripts/vivado-units.mjs export --missing`, depois `run_units.sh` e `collect`);
 * a síntese de alto nível ainda faz o somador de 32 bits como dois de 16 em cascata; pode passar a usar os de 24 e 32 bits da biblioteca;
 * etapa 4: gerador de C a partir da descrição da rede, no estilo do template da MiniLenet, e custo pelo motor de HLS;
 * etapa 5: diretivas por camada (pipeline, II, paralelismo dos MACs, partição);
