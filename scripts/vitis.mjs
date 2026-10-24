@@ -396,7 +396,40 @@ function report(rows, meta) {
     log(`results/vitis: ${done.length} casos com csynth, ${impl.length} com impl, ${rows.filter((r) => r.csim).length} com csim`);
 }
 
+/**
+ * Base da calibração: para cada caso com o Vivado, as parcelas do modelo atual (LUT das unidades, das peças, dos
+ * multiplexadores, do controle e do endereço; bits de registrador e FF do endereço) e a medida. Grava
+ * build/calib/kernels.json (lido por scripts/calibrate.mjs).
+ */
+function doCalibData() {
+    const sum = JSON.parse(readFileSync(join(RES, 'summary.json'), 'utf8'));
+    const byId = new Map(cases().map((c) => [c.id, c]));
+    const rows = [];
+    for (const row of sum.rows) {
+        const c = byId.get(row.case);
+        if (!c || !row.impl?.lut) continue;
+        const saved = JSON.parse(readFileSync(join(RES, row.case, 'model.json'), 'utf8'));
+        const syn = { synth, cells, clockNs: c.clockNs, flow: 'delay', ports: 2, ...libOpts };
+        const base = synthesize(c.src, syn);
+        const r = synthesize(c.src, { ...syn, assign: new Map(Object.entries(saved.assign ?? {})), design: base.design });
+        rows.push({ id: row.case, kind: 'kernel', parts: partsOf(r), measured: { lut: row.impl.lut, ff: row.impl.ff, cycles: row.hls?.latencyWorst ?? null }, model: { lut: r.totals.luts, ff: r.totals.ff, cycles: r.totals.cycles } });
+    }
+    mkdirSync(join(ROOT, 'build/calib'), { recursive: true });
+    writeFileSync(join(ROOT, 'build/calib/kernels.json'), `${JSON.stringify(rows, null, 1)}\n`);
+    log(`build/calib/kernels.json: ${rows.length} casos`);
+}
+/** Parcelas de LUT e FF de uma síntese (as mesmas somas de js/hls/cost.js). */
+export function partsOf(r) {
+    const c = r.cost, s = (xs, f) => (xs ?? []).reduce((a, x) => a + (f(x) ?? 0), 0);
+    return {
+        units: s(c.units, (u) => u.luts), cells: s(c.cells, (x) => x.luts), mux: s(c.muxes, (m) => m.luts), control: s(c.control, (x) => x.luts),
+        addr: c.addr?.luts ?? 0, srl: c.fpga.srlLuts ?? 0, regBits: c.regBits, addrFf: c.addr?.ff ?? 0, srlFf: c.regBits + (c.addr?.ff ?? 0) - c.fpga.ff,
+        loops: r.design.loops.filter((l) => l.mode !== 'unrolled').length,
+    };
+}
+
 switch (cmd) {
+    case 'calibdata': doCalibData(); break;
     case 'export': doExport(); break;
     case 'check': doCheck(); break;
     case 'collect': doCollect(); break;

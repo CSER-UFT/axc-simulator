@@ -258,8 +258,8 @@ const usesRequant = (design) => design.segments.some((s) => s.nodes.some((n) => 
  * Kernel do projeto elaborado (IR), com as unidades atribuídas.
  * @param {object} result síntese (design, ops, assign, lib)
  */
-export function exportIR(result, { inline = false } = {}) {
-    const f = exportFunction(result);
+export function exportIR(result, { inline = false, romStorage = null } = {}) {
+    const f = exportFunction(result, { romStorage });
     const code = [
         HEADER(`${result.design.name} (projeto elaborado${result.assign.size ? `, ${result.assign.size} operações aproximadas` : ''})`),
         '#include "kernel.h"',
@@ -283,7 +283,7 @@ export function unitsCode(lib, names, inline = false) { return unitFunctions(lib
  *   paramPartitions: as partições dos vetores dos parâmetros (na rede, ficam nos vetores do topo)
  * @returns {{code: string, units: string[], requant: boolean}}
  */
-export function exportFunction(result, { interfaces = true, paramPartitions = true } = {}) {
+export function exportFunction(result, { interfaces = true, paramPartitions = true, romStorage = null } = {}) {
     const design = result.design;
     const asg = result.assign;
     const byId = new Map();
@@ -392,6 +392,9 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
         ...rams.map((a) => `    ${arrType(a.type)} ${a.name}[${a.dims.join('][')}];`),
         // Só os vetores declarados (uma tabela sem acesso, com os índices todos constantes, não existe no C++).
         ...partitionPragmas({ arrays: design.arrays.filter((a) => keep(a) && (a.kind !== 'rom' || a.accesses > 0)) }),
+        // Tabelas sem partição numa memória fixa (romStorage: 'bram'): com ROM_AUTO, o Vitis escolheu BRAM para os pesos
+        // da conv2 da MiniLenet exata e LUTs (1977) para os da aproximada, uma variação que o modelo não tem.
+        ...(romStorage ? roms.filter((a) => !a.partitions?.length && a.size >= 64).map((a) => `#pragma HLS BIND_STORAGE variable=${a.name} type=rom_2p impl=${romStorage}`) : []),
         ...[...hoist].filter((id) => byId.has(id)).map((id) => `    ${byId.get(id).op === 'cmp' ? 'bool' : cType(byId.get(id).range)} ${vName(id)} = 0;`),
         ...carries.map((n) => `    ${cType(n.range)} c${vName(n.id)} = 0;`),
         ...lines,
@@ -540,10 +543,10 @@ export function prediction(r) {
  * @param {{inputs: Map, expected: object, part?: string, clockNs: number, id?: string, note?: string, target?: string}} o
  * @returns {Record<string, string>} nome do arquivo -> conteúdo
  */
-export function projectFiles(result, { inputs, expected, part = 'xc7a100tcsg324-1', clockNs, id = result.design.name, note = '', target = 'asic', tcl = {} }) {
+export function projectFiles(result, { inputs, expected, part = 'xc7a100tcsg324-1', clockNs, id = result.design.name, note = '', target = 'asic', tcl = {}, romStorage = null }) {
     const files = testbench(result.design, inputs, expected);
     files['kernel.h'] = kernelHeader(result.design);
-    files['kernel.cpp'] = exportIR(result, { inline: 'rtl' });
+    files['kernel.cpp'] = exportIR(result, { inline: 'rtl', romStorage });
     const data = Object.keys(files).filter((f) => f.endsWith('.dat'));
     const names = [...new Set(result.assign.values())];
     let bbs = [];

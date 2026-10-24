@@ -101,7 +101,7 @@ export function networkProject(net, o) {
     const partLines = (t) => t.parts.map((p) => `#pragma HLS ARRAY_PARTITION variable=${t.name} type=${p.type}${p.type !== 'complete' ? ` factor=${p.factor}` : ''} dim=${p.dim}`);
 
     // C++ das camadas e do topo.
-    const fns = ks.map((k) => exportFunction(k.result, { interfaces: false, paramPartitions: false }));
+    const fns = ks.map((k) => exportFunction(k.result, { interfaces: false, paramPartitions: false, romStorage: 'bram' }));
     const usedUnits = [...new Set(fns.flatMap((f) => f.units))];
     // Na rede, as unidades vão como a netlist em C++ (INLINE off): com a mesma caixa preta de RTL chamada de duas
     // funções (o MUL8 T6 A10c na conv1 e na fc1), o Vitis 2022.2 gerou uma instância com a porta ap_ready, que o
@@ -219,7 +219,7 @@ ${top};
     if (o.layers !== false) {
         for (const k of ks) {
             const exp = k.first.res;
-            const lf = projectFiles(k.result, { inputs: new Map([[k.first.inName, k.first.input]]), expected: exp, part, clockNs, id: `${id}_${k.name}`, note: `${net.name}, camada ${k.name}${k.site !== null ? `, ${unitsText(net, [units[k.site]], [k.name])}` : ''}`, target, tcl: { autoPartition: false } });
+            const lf = projectFiles(k.result, { inputs: new Map([[k.first.inName, k.first.input]]), expected: exp, part, clockNs, id: `${id}_${k.name}`, note: `${net.name}, camada ${k.name}${k.site !== null ? `, ${unitsText(net, [units[k.site]], [k.name])}` : ''}`, target, tcl: { autoPartition: false }, romStorage: 'bram' });
             for (const [f, c] of Object.entries(lf)) files[`layers/${k.name}/${f}`] = c;
             names.push(`layers/${k.name}`);
         }

@@ -247,7 +247,10 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
     const fpga = {
         luts: sum(unitList, (u) => u.luts) + sum(cellList, (c) => c.luts) + sum(muxes, (m) => m.luts) + sum(control, (c) => c.luts) + (addr?.luts ?? 0) + srlLuts,
         carry4: sum(unitList, (u) => u.carry4) + sum(cellList, (c) => c.carry4) + sum(control, (c) => c.carry4),
-        ff: regBits - srlFf + (addr?.ff ?? 0),
+        // Mais os registradores de controle de cada laço mantido (contador, estado e o sinal de saída): 11 FF por laço,
+        // calibrado no Vivado com as camadas das redes (results/nn-vitis; erro de FF das camadas de 35% para 13%, o dos
+        // kernels de 20,7% para 21,4%).
+        ff: regBits - srlFf + (addr?.ff ?? 0) + (model.ffPerLoop ?? 0) * design.loops.filter((l) => l.mode !== 'unrolled').length,
         srlLuts,
         addrLuts: addr?.luts ?? 0,
         dsp: sum(cellList, (c) => c.dsp ?? 0),

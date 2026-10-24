@@ -61,3 +61,13 @@ relatórios ficam guardados (csynth.xml, export_impl.xml, utilização hierárqu
 * A rede não chegou ao Vivado: a mesma caixa preta (MUL8 T6 A10c) chamada da conv1 e da fc1 saiu, na fc1, com a
   porta ap_ready, que o invólucro não tem (Synth 8-448). A partir daqui, a rede exportada usa a netlist das unidades
   em C++ (INLINE off), e as caixas pretas ficam nos projetos por camada.
+
+## Rodada 4: MiniLenet aproximada, rede com as unidades em C++ (minilenet_aprox_r4)
+
+* Só o projeto network/ (sem as camadas). A rede chegou ao Vivado: 8758 LUT, 5309 FF, 2 DSP48, período 9,89 ns;
+  csim sem diferenças (99 acertos em 100).
+* Latência 125160 ciclos contra 125002 do modelo (0,1%).
+* LUT 19% acima do modelo (7120). A maior parte é a conv2 (5761 contra 4061): os pesos foram para LUTs (ROM_AUTO),
+  como na rodada 3. A partir daqui as tabelas de pesos sem partição vão para BRAM (BIND_STORAGE rom_2p bram).
+* As duas maxpool saíram com II 1 (o modelo dá II 2, limitado pela memória) e metade dos ciclos.
+* O FF do modelo nesta tabela ainda é o anterior à calibração do controle dos laços (11 FF por laço).

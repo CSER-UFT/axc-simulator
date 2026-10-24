@@ -29,6 +29,7 @@ export const MODEL = {
     flatten: true,       // achatamento de laços perfeitos com o interno em pipeline (padrão do Vitis)
     uremLatency: 4,      // o resto da divisão leva w + 4 ciclos (Vitis 2022.2, urem de w bits)
     divAddrCycles: 1,    // ciclos do endereço (divisão por constante) antes do acesso a um banco de fator não potência de 2
+    ffPerLoop: 11,       // FF de controle de cada laço mantido (scripts/calibrate.mjs, Vivado 2022.2)
 };
 
 /**
