@@ -212,11 +212,13 @@ Ajustes pendentes da síntese de alto nível, para retomar:
 
 Redes neurais (feitas: etapa 1, formato comum, avaliador genérico, MiniLenet e diagrama; etapa 2, treino e quantização em PyTorch para MNIST, Fashion MNIST e CIFAR 10, com validação separada; etapa 3, somadores de 24 e 32 bits nas acumulações, sintetizados em sky130 e caracterizados no Vivado, e soma em cadeia ou em árvore; etapa 4, gerador de código das camadas e custo do hardware pelo modelo de HLS, com a reescala como peça exata; etapa 5, diretivas por camada, pipeline, II, paralelismo e partição, com a ordem das somas da acurácia igual à do circuito; etapa 6, busca das unidades de cada camada com limite de queda de acurácia na validação, em workers; etapa 7, exportação da rede e de cada camada para o Vitis HLS e o Vivado, com testbench bit a bit e a comparação dos relatórios com o modelo):
 
-* validar o custo das etapas 4 e 5 com os relatórios do Vitis da MiniLenet (latência e II de cada função, LUT, FF, DSP), com as diretivas padrão e com partição;
+* validação no Vitis e no Vivado (results/nn-vitis, rodadas 1 a 3): latência a 0,1% a 1% na rede e nas camadas, LUT a 8% a 13% na soma das camadas; falta a rede aproximada no Vivado (agora com as unidades em C++) e a janela deslizante;
 * partição coerente entre as camadas (hoje cada função tem a sua, e no Vitis o vetor entre duas camadas teria uma só) e janela deslizante com buffer de linhas nas convoluções, sem os multiplexadores dos bancos que giram com o pixel;
 * max pooling também com diretivas (hoje II 2 pela memória);
 * a síntese de alto nível ainda faz o somador de 32 bits como dois de 16 em cascata; pode passar a usar os de 24 e 32 bits da biblioteca;
 * busca: incluir as diretivas no espaço da busca, e um limite com margem estatística (a validação de 1000 imagens tem ruído de 0,3 a 1,4 ponto);
+* busca: as heurísticas da página de síntese (busca local, tabu, GRASP, genético, aleatória) sobre as unidades das camadas;
+* calibrar o modelo das redes com os relatórios de results/nn-vitis: FF (subestimados nas camadas pequenas), LUT das caixas pretas compartilhadas (conv2 aproximada) e a chamada de 4 ciclos dos laços com pipeline que o Vitis separa em funções;
 * validação das redes no Vitis e no Vivado (results/nn-vitis): rodada 1 feita (MiniLenet exata; latência das camadas a 0,6%, LUT a 13%); falta a rodada 2 (exata, com partição e aproximada, com as correções da rodada 1) e calibrar o custo de LUT e FF das camadas pequenas e a chamada dos laços com pipeline que o Vitis separa em funções.
 
 * Exploração: diretivas com valores numéricos (II, fatores de unroll e de partição) e exploração em lote de vários kernels; estimativa do SSIM com erros correlacionados no espaço.

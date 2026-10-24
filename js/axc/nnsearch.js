@@ -96,6 +96,19 @@ class Evaluator {
     }
 }
 
+/**
+ * Amostra estratificada de um conjunto (decodeTestSet): as primeiras imagens de cada classe, o mesmo número de cada
+ * uma (n / classes), na ordem do arquivo. Com n >= set.n, o próprio conjunto.
+ */
+export function stratified(set, n, classes) {
+    if (!n || n >= set.n) return set;
+    const per = Math.max(1, Math.floor(n / classes)), cnt = new Array(classes).fill(0), keep = [];
+    for (let k = 0; k < set.n && keep.length < per * classes; k++) { const c = set.labels[k]; if (cnt[c] < per) { cnt[c]++; keep.push(k); } }
+    const labels = new Uint8Array(keep.length), images = new Uint8Array(keep.length * set.size);
+    keep.forEach((k, i) => { labels[i] = set.labels[k]; images.set(set.images.subarray(k * set.size, (k + 1) * set.size), i * set.size); });
+    return { ...set, n: keep.length, labels, images };
+}
+
 /** Põe a configuração como base do avaliador (as ativações guardadas), se ainda não for. */
 function ensureBase(ev, base) {
     if (ev.firstDiff(base) !== null) ev.run(base, { record: true });
@@ -137,9 +150,9 @@ export function poolEngine(send) {
     };
 }
 /** Mensagem de início de um worker de avaliação: a rede (JSON), o conjunto de validação e as unidades. */
-export function initMessage(netJson, valBuf, synth, trees) {
+export function initMessage(netJson, valBuf, synth, trees, sample = 0) {
     const used = synth.designs.filter((d) => (d.cfg.kind === 'mul' && d.cfg.width === 8) || (d.cfg.kind === 'add' && d.cfg.width === 32));
-    return { type: 'init', net: netJson, buf: valBuf, designs: used.map((d) => ({ name: d.name, cfg: d.cfg })), trees };
+    return { type: 'init', net: netJson, buf: valBuf, designs: used.map((d) => ({ name: d.name, cfg: d.cfg })), trees, sample };
 }
 /** Tratador das mensagens de um worker de avaliação (o mesmo no navegador e no Node). */
 export function evalHandler() {
@@ -147,7 +160,7 @@ export function evalHandler() {
     return (m) => {
         if (m.type === 'init') {
             const net = decodeNet(m.net), ds = net.dataset;
-            const set = decodeTestSet(m.buf, { ...ds, n: ds.val.n });
+            const set = stratified(decodeTestSet(m.buf, { ...ds, n: ds.val.n }), m.sample, net.classes);
             const cfgs = new Map(m.designs.map((d) => [d.name, d.cfg])), units = new Map();
             const unitOf = (name) => { if (!units.has(name)) units.set(name, buildUnit(cfgs.get(name))); return units.get(name); };
             ev = new Evaluator(net, set, m.trees, unitOf);
@@ -213,7 +226,11 @@ export function prepareSearch(net, o) {
         return units.get(name);
     };
     const metric = (x) => x[objective];
-    const val = new Evaluator(net, o.val, trees, unitOf);
+    // A busca usa uma amostra estratificada da validação (o.sample imagens; todas, sem o.sample); o ponto escolhido é
+    // conferido no fim na validação inteira e no teste.
+    const valSet = stratified(o.val, o.sample, net.classes);
+    const val = new Evaluator(net, valSet, trees, unitOf);
+    const fullVal = valSet !== o.val ? new Evaluator(net, o.val, trees, unitOf) : null;
     const test = o.test ? new Evaluator(net, o.test, trees, unitOf) : null;
     const exact = net.sites.map(() => ({ mul: null, add: null }));
     // Rede exata na validação, com as ativações guardadas (são também as dos operandos).
@@ -261,7 +278,7 @@ export function prepareSearch(net, o) {
             .filter((x) => x.cost < exactCost[kind])), maxCands);
         return { mul: of('mul'), add: of('add') };
     });
-    return { net, objective, target, trees, cm, lib, val, test, exact, exactWrong, cands, metric, sumError, n: o.val.n };
+    return { net, objective, target, trees, cm, lib, val, fullVal, test, exact, exactWrong, cands, metric, sumError, n: valSet.n, sample: valSet.n, valN: o.val.n };
 }
 
 /**
@@ -297,7 +314,9 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
         progress({ evals, images, phase, cost: bestCost / exactCost, ms: Date.now() - t0 });
         return r;
     };
+    const accepted = [];
     const accept = (next, why) => {
+        accepted.push({ site: why.site, kind: why.kind, prev: cur[why.site][why.kind] });
         cur = copy(next);
         bestCost = total(cur);
         trace.push({ ...why, cost: bestCost });
@@ -350,14 +369,39 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
         }
     }
 
+    // Reparo (com amostra): o ponto tem de caber no limite na validação inteira; se não couber, as últimas trocas
+    // aceitas são desfeitas, da mais recente para a mais antiga, até caber.
+    let repaired = 0;
+    if (P.fullVal) {
+        phase = 'repair';
+        const fv = P.fullVal, N = fv.set.n;
+        const exW = fv.run(P.exact, { record: true }).wrong;
+        const limit = exW + Math.floor((maxDrop * N) / 100 + 1e-9);
+        let r = fv.run(cur);
+        while (r.wrong > limit && accepted.length) {
+            const a = accepted.pop();
+            cur = cur.map((x, j) => (j === a.site ? { ...x, [a.kind]: a.prev } : { ...x }));
+            repaired++;
+            progress({ evals, images, phase, cost: total(cur) / exactCost, ms: Date.now() - t0 });
+            await new Promise((res) => setTimeout(res, 0));
+            r = fv.run(cur);
+        }
+    }
     const best = cur;
     const fin = await engine.run(best, { base: best });
     const res = {
-        heuristic, objective: P.objective, maxDrop, maxWrong, workers: engine.size,
+        heuristic, objective: P.objective, maxDrop, maxWrong, workers: engine.size, sample: P.sample, repaired,
         exact: { cost: exactCost, wrongVal: P.exactWrong, accVal: 1 - P.exactWrong / P.n },
         best: { assign: best, cost: total(best), wrongVal: fin.wrong, accVal: 1 - fin.wrong / P.n, saving: 1 - total(best) / exactCost },
         evals, images, points, trace, ms: Date.now() - t0, phaseMs,
     };
+    // Com a amostra: a validação inteira, para a exata e o ponto escolhido.
+    if (P.fullVal) {
+        const ex = P.fullVal.run(P.exact, { record: true }), b = P.fullVal.run(best);
+        res.exact.accValFull = 1 - ex.wrong / P.fullVal.set.n;
+        res.best.accValFull = 1 - b.wrong / P.fullVal.set.n;
+        res.valN = P.fullVal.set.n;
+    }
     // Teste: só no fim, para a exata e o ponto escolhido.
     if (P.test) {
         const ex = P.test.run(P.exact, { record: true }), b = P.test.run(best);

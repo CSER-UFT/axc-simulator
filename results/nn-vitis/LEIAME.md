@@ -51,3 +51,13 @@ relatórios ficam guardados (csynth.xml, export_impl.xml, utilização hierárqu
   o run_all.sh ganhou um limite de tempo por projeto (--timeout, 3 h por padrão) e a página avisa quando a partição
   tende a ser pesada para o Vitis. A saída de verdade para as convoluções grandes é a janela deslizante com buffer de
   linhas (sem bancos que mudam a cada pixel).
+
+## Rodada 3: MiniLenet aproximada, unidades da busca (minilenet_aprox_r3)
+
+* As três falhas da rodada 2 corrigidas: tudo sintetizou, e as csims sem nenhuma diferença (99 acertos em 100).
+* Latência: a rede 125149 ciclos (csynth), contra 125002 do modelo (0,1%); a soma das camadas sozinhas, 126014.
+* LUT, soma das camadas sozinhas: 7737, contra 7120 do modelo (8% abaixo); a maior diferença é a conv2 aproximada
+  (MUL8 MITCHELL e ADD32 LOA7 em caixa preta: 5303 contra 4061). FF: o modelo fica 19% abaixo.
+* A rede não chegou ao Vivado: a mesma caixa preta (MUL8 T6 A10c) chamada da conv1 e da fc1 saiu, na fc1, com a
+  porta ap_ready, que o invólucro não tem (Synth 8-448). A partir daqui, a rede exportada usa a netlist das unidades
+  em C++ (INLINE off), e as caixas pretas ficam nos projetos por camada.

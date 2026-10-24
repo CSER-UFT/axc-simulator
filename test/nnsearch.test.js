@@ -66,3 +66,19 @@ test('busca: o ponto escolhido respeita o limite (conferido de forma independent
     assert.ok(s.best.wrongVal <= s.maxWrong && s.best.cost < s.exact.cost);
     assert.equal(s.best.wrongVal, wrongOf(s.best.assign));
 });
+
+test('busca com amostra: estratificada, e o reparo põe o ponto dentro do limite na validação inteira', async () => {
+    const { stratified } = await import('../js/axc/nnsearch.js');
+    const sub = stratified(val, 250, 10);
+    const per = new Array(10).fill(0);
+    for (const y of sub.labels) per[y]++;
+    assert.deepEqual(per, new Array(10).fill(25));
+    const Ps = prepareSearch(net, { val, test: testSet, synth, cells, fpga, objective: 'area', maxCands: 4, sample: 250 });
+    assert.equal(Ps.n, 250);
+    const r = await searchNetwork(Ps, { heuristic: 'sequential', maxDrop: 1 });
+    assert.ok(r.best.cost < r.exact.cost);
+    // Na validação inteira (conferido de forma independente), a queda fica dentro do limite.
+    const wFull = wrongOf(r.best.assign), wEx = wrongOf(P.exact);
+    assert.equal(1 - wFull / val.n, r.best.accValFull);
+    assert.ok(wFull <= wEx + 10, `${wFull} erradas contra ${wEx} da exata`);
+});

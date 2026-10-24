@@ -78,7 +78,7 @@
                         <div id="nnSens"></div>
                         <div class="nn-split">
                             <div>
-                                <h3 data-i18n="nn.conf">Matriz de confusão (linhas: dígito real; colunas: previsto)</h3>
+                                <div class="row" style="justify-content:space-between;margin:0"><h3 style="margin:0" data-i18n="nn.conf">Matriz de confusão (linhas: dígito real; colunas: previsto)</h3><button type="button" class="btn outline small" id="nnConfCsv" data-i18n="nn.confCsv">Baixar CSV</button></div>
                                 <div class="scroll-box" id="nnConf"></div>
                             </div>
                             <div>
@@ -110,6 +110,7 @@
                         <div class="row">
                             <label><span data-i18n="nn.searchObj">Objetivo</span> <select id="nnSearchObj"><option value="area" data-i18n="nn.searchObjArea">área (ASIC)</option><option value="luts" data-i18n="nn.searchObjLuts">LUTs (FPGA)</option><option value="energy" data-i18n="nn.searchObjEnergy">energia</option></select></label>
                             <label><span data-i18n="nn.searchDrop">Queda máxima (pontos)</span> <input type="number" id="nnSearchDrop" min="0" max="50" step="0.1" value="1" style="width:5em" /></label>
+                            <label><span data-i18n="nn.searchSample">Imagens da validação</span> <select id="nnSearchSample"><option value="250" selected>250</option><option value="500">500</option><option value="0" data-i18n="nn.searchSampleAll">todas (1000)</option></select></label>
                             <label><span data-i18n="nn.searchHeur">Heurística</span> <select id="nnSearchHeur"><option value="sensitivity" data-i18n="nn.searchSens">sensibilidade</option><option value="sequential" data-i18n="nn.searchSeq">sequencial</option></select></label>
                             <button type="button" class="btn primary" id="nnSearchBtn" data-i18n="nn.searchBtn">Buscar</button>
                             <button type="button" class="btn outline" id="nnSearchStop" data-i18n="nn.searchStop" disabled>Parar</button>

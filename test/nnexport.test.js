@@ -31,9 +31,12 @@ test('exportação da rede: topo com as camadas em sequência, caixas pretas, te
     assert.ok(k.includes('axc_requant(') && k.includes('BIND_OP variable=p op=mul impl=dsp'));
     // A cascata vira uma função com o somador de baixo de 16 bits.
     assert.ok(/u_ADD\d+_ADD16_LOA8_ADD\d+_exato/.test(k), 'cascata');
-    assert.ok(files['network/run.tcl'].includes('set_top network') && files['network/run.tcl'].includes('add_files -blackbox u_ADD16_LOA8_bb.json'));
+    // Na rede, as unidades em C++ (a mesma caixa preta em duas funções falha no Vivado); nas camadas, caixas pretas.
+    assert.ok(files['network/run.tcl'].includes('set_top network') && !files['network/run.tcl'].includes('-blackbox'));
+    assert.ok(/static ap_uint<16> u_MUL8_T4\(ap_uint<8> a, ap_uint<8> b\) \{\n#pragma HLS INLINE off/.test(k), 'MUL8 T4 em C++ na rede');
+    assert.ok(files['layers/conv1/run.tcl'].includes('add_files -blackbox u_ADD16_LOA8_bb.json'));
     // Os somadores entram na largura de cada soma (ADD32 LOA10 vira ADD24 LOA10 nas somas de 24 bits).
-    const bbs = Object.keys(files).filter((f) => /^network\/u_.*_bb\.v$/.test(f)).join(' ');
+    const bbs = Object.keys(files).filter((f) => /^layers\/\w+\/u_.*_bb\.v$/.test(f)).join(' ');
     for (const u of ['MUL8_T4', 'MUL8_T6_A4c', 'ADD\\d+_LOA10', 'ADD\\d+_TRUNC4', 'MUL8_MITCHELL', 'ADD16_LOA8']) assert.match(bbs, new RegExp(`u_${u}_bb\\.v`), u);
     assert.equal(files['network/expected.dat'].trim().split('\n').length, 3);
     assert.equal(files['network/images.dat'].trim().split('\n')[0].split(' ').length, testSet.size);
@@ -69,7 +72,7 @@ test('exportação da rede: g++ com ap_int dá as mesmas saídas do simulador (s
     try {
         for (const [f, c] of Object.entries(files)) { mkdirSync(dirname(join(dir, f)), { recursive: true }); writeFileSync(join(dir, f), c); }
         const nd = join(dir, 'network');
-        execSync(`g++ -O0 -std=c++14 -w -I${inc} -I. kernel.cpp tb.cpp u_*_bb.cpp -o tb`, { cwd: nd, stdio: 'pipe' });
+        execSync(`g++ -O0 -std=c++14 -w -I${inc} -I. kernel.cpp tb.cpp $(ls u_*_bb.cpp 2>/dev/null) -o tb`, { cwd: nd, stdio: 'pipe' });
         const outp = execSync('./tb', { cwd: nd }).toString();
         assert.match(outp, /AXC_MISMATCHES 0 OF 30/);
         assert.match(outp, /AXC_ACCURACY \d+ OF 3/);

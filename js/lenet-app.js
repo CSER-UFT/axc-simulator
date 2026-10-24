@@ -252,6 +252,7 @@ async function render() {
     });
     const legend = short === names ? '' : `<p class="note">${names.map((n, k) => `${k} ${esc(n)}`).join(', ')}</p>`;
     $('nnConf').innerHTML = `${c}</table>${legend}`;
+    lastConf = { names, conf: su.conf, ref: sx.conf, label, model: net.id, acc: su.accuracy, accRef: sx.accuracy };
     const shown = su.broke.slice(0, 60);
     $('nnBroke').innerHTML = shown.length ? shown.map((k) => `<figure title="${esc(names[test.labels[k]])} → ${esc(names[preds[k]])}"><canvas data-k="${k}"></canvas><figcaption>${esc(short[test.labels[k]])} → ${esc(short[preds[k]])}</figcaption></figure>`).join('')
         + (su.broke.length > shown.length ? `<p class="note">${t('nn.more', { n: su.broke.length - shown.length })}</p>` : '')
@@ -259,6 +260,25 @@ async function render() {
     for (const cv of $('nnBroke').querySelectorAll('canvas')) drawImage(cv, test.images.subarray(+cv.dataset.k * test.size, (+cv.dataset.k + 1) * test.size), test.shape);
     renderCost();
 }
+
+// Matriz de confusão em CSV: a da configuração da página e a da rede exata, uma depois da outra.
+let lastConf = null;
+const csvCell = (v) => (/[",;\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
+$('nnConfCsv').onclick = () => {
+    if (!lastConf) return;
+    const { names, conf, ref } = lastConf;
+    const block = (title, m, acc) => [
+        `# ${title}; ${t('nn.csvAcc')} ${(100 * acc).toFixed(2)}%`,
+        [t('nn.csvCorner'), ...names].map(csvCell).join(','),
+        ...m.map((row, y) => [names[y], ...row].map(csvCell).join(',')),
+    ].join('\n');
+    const text = `${block(`${lastConf.model}, ${lastConf.label}`, conf, lastConf.acc)}\n\n${block(`${lastConf.model}, ${t('nn.csvExact')}`, ref, lastConf.accRef)}\n`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
+    a.download = `${lastConf.model}_confusao.csv`;
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
 
 // Abas (como na página de síntese de alto nível) ------------------------------------------------------------------
 let tab = ['result', 'cost', 'code', 'search', 'arch'].includes(store.get('nn.tab')) ? store.get('nn.tab') : 'result';
@@ -465,7 +485,7 @@ $('nnSearchBtn').onclick = () => {
     if (!net.dataset.val) { $('nnSearchStatus').textContent = t('nn.searchNoVal'); return; }
     const o = {
         file: entry.file, objective: $('nnSearchObj').value, maxDrop: Math.max(0, +$('nnSearchDrop').value || 0), heuristic: $('nnSearchHeur').value,
-        dirs: nnDirs, trees: directiveTrees(net, nnDirs), clockNs: +$('nnClock').value || 10, workers: searchWorkers(),
+        dirs: nnDirs, trees: directiveTrees(net, nnDirs), clockNs: +$('nnClock').value || 10, workers: searchWorkers(), sample: +$('nnSearchSample').value,
     };
     $('nnSearchBtn').disabled = true;
     $('nnSearchStop').disabled = false;
@@ -475,7 +495,7 @@ $('nnSearchBtn').onclick = () => {
     searchWorker.onmessage = ({ data: m }) => {
         if (m.type === 'status') $('nnSearchStatus').textContent = t(m.key);
         else if (m.type === 'progress') {
-            $('nnSearchStatus').textContent = t('nn.searchProgress', { phase: m.phase === 'sens' ? t('nn.searchPhaseSens') : m.phase === 'comb' ? t('nn.searchPhaseComb') : m.phase, evals: m.evals, s: nf((Date.now() - t0) / 1000, 0), cost: nf(100 * m.cost, 1) });
+            $('nnSearchStatus').textContent = t('nn.searchProgress', { phase: m.phase === 'sens' ? t('nn.searchPhaseSens') : m.phase === 'comb' ? t('nn.searchPhaseComb') : m.phase === 'repair' ? t('nn.searchPhaseRepair') : m.phase, evals: m.evals, s: nf((Date.now() - t0) / 1000, 0), cost: nf(100 * m.cost, 1) });
         } else if (m.type === 'error') stopSearch(m.message);
         else if (m.type === 'done') {
             stopSearch(t('nn.searchDone', { evals: m.result.evals, images: nf(m.result.images), s: nf(m.result.ms / 1000, 1), workers: m.result.workers }));
@@ -497,6 +517,7 @@ function renderSearch() {
     let h = `<table class="hls-table"><tr><th></th><td class="note">${t('nn.searchExact')}</td><td class="note">${t('nn.searchBest')}</td></tr>`;
     h += `<tr><th>${t(`nn.searchObj_${obj}`)}</th><td class="mono">${nf(val(r.exact.cost), 0)} ${unit}</td><td class="mono"><b>${nf(val(r.best.cost), 0)} ${unit}</b> (−${nf(100 * r.best.saving, 1)}%)</td></tr>`;
     h += `<tr><th>${t('nn.searchAccVal', { n: r.n })}</th><td class="mono">${pct(r.exact.accVal)}</td><td class="mono">${pct(r.best.accVal)} (${pp(r.best.accVal, r.exact.accVal)})</td></tr>`;
+    if (r.exact.accValFull !== undefined) h += `<tr><th>${t('nn.searchAccValFull', { n: r.valN })}</th><td class="mono">${pct(r.exact.accValFull)}</td><td class="mono">${pct(r.best.accValFull)} (${pp(r.best.accValFull, r.exact.accValFull)})</td></tr>`;
     h += `<tr><th>${t('nn.searchAccTest', { n: r.testN })}</th><td class="mono">${pct(r.exact.accTest)}</td><td class="mono"><b>${pct(r.best.accTest)}</b> (${pp(r.best.accTest, r.exact.accTest)})</td></tr></table>`;
     h += `<table class="hls-table" style="margin-top:8px"><tr><th></th><td class="note">${t('nn.mul')}</td><td class="note">${t('nn.adder')}</td><td class="note">${unit}</td></tr>`;
     net.sites.forEach((l, i) => {

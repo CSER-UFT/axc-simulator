@@ -19,16 +19,18 @@
  *       omitidas ficam com o padrão. No lenet, a estrutura da soma das camadas aproximadas passa a ser a das diretivas.
  *   node bin/axc.mjs nnsearch [--model minilenet-mnist|...] [--objective area|luts|energy] [--max-drop 1]
  *                             [--heuristic sensitivity|sequential] [--dirs "..."] [--clock 10] [--workers N] [--cands 12]
+ *                             [--sample 250] (amostra estratificada da validação na busca; o ponto escolhido é conferido
+ *                             na validação inteira e no teste)
  *       busca do multiplicador e do somador de cada camada (js/axc/nnsearch.js): o menor custo com a queda de
  *       acurácia na validação até --max-drop pontos; a acurácia de teste do ponto escolhido no fim. --workers: threads
  *       de avaliação (padrão: os núcleos menos 1; 1 avalia na própria thread)
  *   node bin/axc.mjs nnexport [--model ...] [--dirs "..."] [--mul <m> --add <s> --layers ... | --units "conv1:MUL8 T4+ADD32 LOA10;..."
  *                             | --search resultado.json] [--clock 10] [--part xc7a100tcsg324-1] [--images 100] [--no-layers]
- *                             [--netlist] [--out pasta]
+ *                             [--rtl-network] [--out pasta]
  *       projeto da rede para o Vitis HLS e o Vivado (js/axc/nnexport.js): network/ (a rede inteira, testbench com
  *       --images imagens de teste), layers/<camada>/ (cada camada sozinha), run_all.sh; --search usa o modelo, as
- *       diretivas e as unidades de um resultado de nnsearch --json; --netlist põe as unidades como C++ da netlist (o
- *       padrão é a caixa preta de RTL)
+ *       diretivas e as unidades de um resultado de nnsearch --json; na rede, as unidades vão como C++ da netlist
+ *       (--rtl-network: caixa preta de RTL também na rede); nas camadas, caixa preta de RTL
  *   node bin/axc.mjs nnvitis <pasta>
  *       depois de rodar o Vitis (bash <pasta>/run_all.sh -j 4 --impl): lê os relatórios, compara com as previsões e
  *       grava <pasta>/RESULTADOS.md e resultados.json
@@ -258,13 +260,13 @@ switch (cmd) {
         const t0 = Date.now();
         let P;
         try {
-            P = prepareSearch(net, { val, test, synth: synthJ, cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')), fpga: fpgaJ, objective, dirs, clockNs: +opt('--clock', 10), maxCands: +opt('--cands', 12) });
+            P = prepareSearch(net, { val, test, synth: synthJ, cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')), fpga: fpgaJ, objective, dirs, clockNs: +opt('--clock', 10), maxCands: +opt('--cands', 12), sample: +opt('--sample', 0) });
         } catch (e) { die(e.message); }
         const prepMs = Date.now() - t0;
         const nw = Math.max(1, +opt('--workers', Math.max(1, availableParallelism() - 1)));
         let engine, workers = [];
         if (nw > 1) {
-            const init = initMessage(netJson, valBuf, synthJ, P.trees);
+            const init = initMessage(netJson, valBuf, synthJ, P.trees, +opt('--sample', 0));
             workers = Array.from({ length: nw }, () => new Worker(new URL('./nn-eval-worker.mjs', import.meta.url)));
             const send = workers.map((w) => {
                 let next = 0;
@@ -284,11 +286,11 @@ switch (cmd) {
         const pct = (v) => `${(100 * v).toFixed(1)}%`;
         const res = { model: net.id, objective, heuristic, maxDrop: r.maxDrop, dirs, prepMs, ...r, points: flag('--points') ? r.points : r.points.length };
         out(res, () => [
-            `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n})`,
+            `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n}${P.fullVal ? `, amostra de ${P.n} das ${P.valN}` : ''})`,
             `candidatas por camada: ${P.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} ×, ${c.add.length} +`).join('; ')}`,
             `${r.evals} avaliações (${r.images} imagens), ${(r.ms / 1000).toFixed(1)} s com ${r.workers} worker(s); preparação ${(prepMs / 1000).toFixed(1)} s`,
-            `exata:   ${cv(r.exact.cost)} ${unit}, validação ${pct(r.exact.accVal)}, teste ${pct(r.exact.accTest)}`,
-            `melhor:  ${cv(r.best.cost)} ${unit} (${pct(-r.best.saving)}), validação ${pct(r.best.accVal)}, teste ${pct(r.best.accTest)}`,
+            `exata:   ${cv(r.exact.cost)} ${unit}, validação ${pct(r.exact.accVal)}${r.exact.accValFull !== undefined ? ` (inteira ${pct(r.exact.accValFull)})` : ''}, teste ${pct(r.exact.accTest)}`,
+            `melhor:  ${cv(r.best.cost)} ${unit} (${pct(-r.best.saving)}), validação ${pct(r.best.accVal)}${r.best.accValFull !== undefined ? ` (inteira ${pct(r.best.accValFull)})` : ''}, teste ${pct(r.best.accTest)}`,
             ...r.best.assign.map((a, i) => `  ${net.sites[i].name.padEnd(6)} ${(a.mul ?? 'MUL8 exato').padEnd(18)} ${a.add ?? 'ADD32 exato'}`),
             `fronteira (custo, validação): ${r.front.map((p) => `${pct(p.cost / r.exact.cost)} ${pct(p.accVal)}`).join('; ')}`,
         ].join('\n'));
@@ -330,7 +332,7 @@ switch (cmd) {
                 synth: synthData(), cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')),
                 fpga: existsSync(join(ROOT, 'data/vivado-units.json')) ? JSON.parse(readFileSync(join(ROOT, 'data/vivado-units.json'), 'utf8')) : null,
                 target: 'fpga', clockNs, part: opt('--part', 'xc7a100tcsg324-1'), dirs, units, test, images: +opt('--images', 100), id,
-                layers: !flag('--no-layers'), inline: flag('--netlist') ? false : 'rtl',
+                layers: !flag('--no-layers'), inline: flag('--rtl-network') ? 'rtl' : false,
                 progress: (k, n) => { if (!flag('--json') && (k === n || k % 20 === 0)) process.stderr.write(`  saída esperada: ${k} de ${n} imagens\n`); },
             });
         } catch (e) { die(e.message); }
@@ -405,10 +407,12 @@ switch (cmd) {
                 const sum = (g) => iso.reduce((a, x) => a + (g(x) ?? 0), 0);
                 const lat = sum((x) => x.hls.latencyWorst), lut = iso.every((x) => x.impl) ? sum((x) => x.impl.lut) : null, ff = iso.every((x) => x.impl) ? sum((x) => x.impl.ff) : null, dsp = iso.every((x) => x.impl) ? sum((x) => x.impl.dsp) : null;
                 res.layersSum = { latency: lat, lut, ff, dsp };
-                return [`| Soma das camadas sozinhas: latência | ${f(netModel.totals.cycles)} | ${f(lat)} | ${dev(netModel.totals.cycles, lat)} |`,
-                    `| Soma das camadas sozinhas: LUT | ${f(netModel.totals.luts)} | ${f(lut)} | ${dev(netModel.totals.luts, lut)} |`,
-                    `| Soma das camadas sozinhas: FF | ${f(netModel.totals.ff)} | ${f(ff)} | ${dev(netModel.totals.ff, ff)} |`,
-                    `| Soma das camadas sozinhas: DSP | ${f(netModel.totals.dsp)} | ${f(dsp)} | ${dev(netModel.totals.dsp, dsp)} |`];
+                // Do lado do modelo, a soma das camadas também (sem a reescala compartilhada, que só existe na rede).
+                const ms = (k) => netModel.layers.reduce((a, l) => a + (l[k] ?? 0), 0);
+                return [`| Soma das camadas sozinhas: latência | ${f(ms('cycles'))} | ${f(lat)} | ${dev(ms('cycles'), lat)} |`,
+                    `| Soma das camadas sozinhas: LUT | ${f(ms('luts'))} | ${f(lut)} | ${dev(ms('luts'), lut)} |`,
+                    `| Soma das camadas sozinhas: FF | ${f(ms('ff'))} | ${f(ff)} | ${dev(ms('ff'), ff)} |`,
+                    `| Soma das camadas sozinhas: DSP | ${f(ms('dsp'))} | ${f(dsp)} | ${dev(ms('dsp'), dsp)} |`];
             })(),
             `| csim | | ${res.network.csim ? `${res.network.csim.mismatches} diferenças em ${res.network.csim.total} saídas; ${res.network.csim.right ?? '-'} acertos em ${res.network.csim.images ?? '-'} imagens` : '-'} | |`, '',
             '## Camadas', '',

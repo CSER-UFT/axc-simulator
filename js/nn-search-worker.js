@@ -20,12 +20,12 @@ self.onmessage = async ({ data: o }) => {
         const [valBuf, testBuf] = await Promise.all([getBin(url(ds.val.file)), getBin(url(ds.file))]);
         const val = decodeTestSet(valBuf, { ...ds, n: ds.val.n }), test = decodeTestSet(testBuf, ds);
         self.postMessage({ type: 'status', key: 'nn.searchPreparing' });
-        const P = prepareSearch(net, { val, test, synth, cells, fpga, objective: o.objective, dirs: o.dirs, trees: o.trees, clockNs: o.clockNs, maxCands: o.maxCands });
+        const P = prepareSearch(net, { val, test, synth, cells, fpga, objective: o.objective, dirs: o.dirs, trees: o.trees, clockNs: o.clockNs, maxCands: o.maxCands, sample: o.sample });
         let engine;
         const n = Math.max(1, o.workers ?? 1);
         if (n > 1 && typeof Worker !== 'undefined') {
             try {
-                const init = initMessage(netJson, valBuf, synth, P.trees);
+                const init = initMessage(netJson, valBuf, synth, P.trees, o.sample);
                 const send = [];
                 for (let i = 0; i < n; i++) {
                     const w = new Worker(new URL('./nn-eval-worker.js', import.meta.url), { type: 'module' });

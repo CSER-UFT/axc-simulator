@@ -103,7 +103,10 @@ export function networkProject(net, o) {
     // C++ das camadas e do topo.
     const fns = ks.map((k) => exportFunction(k.result, { interfaces: false, paramPartitions: false }));
     const usedUnits = [...new Set(fns.flatMap((f) => f.units))];
-    const inline = o.inline ?? 'rtl';
+    // Na rede, as unidades vão como a netlist em C++ (INLINE off): com a mesma caixa preta de RTL chamada de duas
+    // funções (o MUL8 T6 A10c na conv1 e na fc1), o Vitis 2022.2 gerou uma instância com a porta ap_ready, que o
+    // invólucro não tem, e a síntese do Vivado falhou (Synth 8-448). Nos projetos por camada ficam as caixas pretas.
+    const inline = o.inline ?? false;
     const layerCode = fns.map((f) => f.code.replace(/^(void [^\n]*\{)\n/, '$1\n#pragma HLS INLINE off\n'));
     const top = `void network(${decl(input)}, ${decl(tensors.at(-1))})`;
     const kernelCpp = [
@@ -292,7 +295,7 @@ Depois de rodar, na pasta do axc-simulator: node bin/axc.mjs nnvitis <esta pasta
 (compara os relatórios com as previsões de model.json e grava RESULTADOS.md aqui).
 
 Diretivas: ${s.dirs.map((d, i) => `${s.layers.filter((l) => l.site !== null)[i].name} ${d.pipe} II ${d.ii}${d.par > 1 ? ` par ${d.par}` : ''}${d.part ? ' part' : ''}`).join('; ')}
-Unidades: ${s.units.some((u) => u.mul || u.add) ? `${inline === 'rtl' ? 'caixa preta de RTL (u_*_bb.v, .json e o modelo C para a csim)' : 'C++ da netlist'}` : 'todas exatas'}; a reescala, (acc × m + 2^31) >> 32, em DSP.
+Unidades: ${s.units.some((u) => u.mul || u.add) ? `${inline === 'rtl' ? 'caixa preta de RTL em todos os projetos' : 'na rede, a netlist de cada unidade em C++ (INLINE off; a mesma caixa preta em duas funções falha no Vivado); nos projetos por camada, caixa preta de RTL (u_*_bb.v, .json e o modelo C para a csim)'}` : 'todas exatas'}; a reescala, (acc × m + 2^31) >> 32, em DSP.
 Configuração (run.tcl): multiplicações de 8 bits em LUT (config_op mul -impl fabric), sem pipeline automático de laços
 e sem a partição automática do Vitis (config_array_partition -throughput_driven off): os vetores ficam só com as
 partições das diretivas, como no modelo. Com AXC_AUTOPART=1 (bash run_all.sh também repassa), o Vitis particiona
