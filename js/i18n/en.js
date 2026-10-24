@@ -176,6 +176,7 @@ export default {
     'nn.exportTitle': 'Project for Vitis HLS and Vivado',
     'nn.codeNote': 'The code the cost evaluates, in the language of the high level synthesis page (it can be pasted there).',
     'nn.approxMacsShort': 'approximate operations',
+    'nn.slowPart': 'Heavy partitioning for Vitis in {list} reads per iteration: the banks read change with every pixel, and scheduling can take an hour or more (MiniLenet conv2, 75 reads: about 1 h).',
     'nn.accum': 'Sum structure',
     'nn.adderNote32': 'The 32 bit adder computes the whole accumulator (the int32 of the C code); the carry out of bit 31 is lost, as in C. Adding a small negative value propagates a carry through all bits, precisely the case where the segmented adder fails.',
     'nn.adderLeft': 'the unit on the left (adder)',

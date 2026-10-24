@@ -1,0 +1,377 @@
+<profile>
+  <RunData>
+    <RUN_TYPE>impl</RUN_TYPE>
+    <VIVADO_VERSION>v.2022.2</VIVADO_VERSION>
+    <ROOT_MODULE_CELL>bd_0_i/hls_inst</ROOT_MODULE_CELL>
+  </RunData>
+  <TimingReport>
+    <TargetClockPeriod>10.000</TargetClockPeriod>
+    <AchievedClockPeriod>8.406</AchievedClockPeriod>
+    <CLOCK_NAME>ap_clk</CLOCK_NAME>
+    <CP_FINAL>8.406</CP_FINAL>
+    <CP_ROUTE>8.406</CP_ROUTE>
+    <CP_SYNTH>6.372</CP_SYNTH>
+    <CP_TARGET>10.000</CP_TARGET>
+    <SLACK_FINAL>1.594</SLACK_FINAL>
+    <SLACK_ROUTE>1.594</SLACK_ROUTE>
+    <SLACK_SYNTH>3.628</SLACK_SYNTH>
+    <TIMING_MET>TRUE</TIMING_MET>
+    <TNS_FINAL>0.000</TNS_FINAL>
+    <TNS_ROUTE>0.000</TNS_ROUTE>
+    <TNS_SYNTH>0.000</TNS_SYNTH>
+    <WNS_FINAL>1.594</WNS_FINAL>
+    <WNS_ROUTE>1.594</WNS_ROUTE>
+    <WNS_SYNTH>3.628</WNS_SYNTH>
+  </TimingReport>
+  <AreaReport>
+    <Resources>
+      <BRAM>0</BRAM>
+      <CLB>0</CLB>
+      <DSP>2</DSP>
+      <FF>995</FF>
+      <LATCH>0</LATCH>
+      <LUT>2974</LUT>
+      <SLICE>900</SLICE>
+      <SRL>15</SRL>
+      <URAM>0</URAM>
+    </Resources>
+    <AvailableResources>
+      <BRAM>270</BRAM>
+      <CLB>0</CLB>
+      <DSP>240</DSP>
+      <FF>126800</FF>
+      <LUT>63400</LUT>
+      <SLICE>15850</SLICE>
+      <URAM>0</URAM>
+    </AvailableResources>
+  </AreaReport>
+  <RtlModules>
+    <RtlModule CELL="inst" DEPTH="0" IS_TOP="1" TYPE="function" MODULENAME="conv1" DISPNAME="inst" RTLNAME="conv1">
+      <SubModules count="73">conv1_ap_uint_8_32_ap_uint_8_28_w_8_U conv1_ap_uint_8_32_ap_uint_8_28_w_9_U flow_control_loop_pipe_U grp_axc_requant_fu_13766 mul_8ns_6ns_14_1_1_U248 mul_8ns_6ns_14_1_1_U252 mul_8ns_7ns_15_1_1_U231 mul_8ns_7ns_15_1_1_U244 mul_8ns_7ns_15_1_1_U250 mul_8ns_7ns_15_1_1_U251 mul_8ns_7s_15_1_1_U239 mul_8ns_7s_15_1_1_U246 mul_8ns_7s_15_1_1_U253 mul_8ns_8s_16_1_1_U230 mul_8ns_8s_16_1_1_U232 mul_8ns_8s_16_1_1_U233 mul_8ns_8s_16_1_1_U234 mul_8ns_8s_16_1_1_U235 mul_8ns_8s_16_1_1_U236 mul_8ns_8s_16_1_1_U237 mul_8ns_8s_16_1_1_U238 mul_8ns_8s_16_1_1_U240 mul_8ns_8s_16_1_1_U241 mul_8ns_8s_16_1_1_U242 mul_8ns_8s_16_1_1_U243 mul_8ns_8s_16_1_1_U245 mul_8ns_8s_16_1_1_U247 mul_8ns_8s_16_1_1_U249 mul_8ns_8s_16_1_1_U256 mux_83_8_1_1_U103 mux_83_8_1_1_U112 mux_83_8_1_1_U121 mux_83_8_1_1_U130 mux_83_8_1_1_U139 mux_83_8_1_1_U14 mux_83_8_1_1_U148 mux_83_8_1_1_U15 mux_83_8_1_1_U157 mux_83_8_1_1_U16 mux_83_8_1_1_U166 mux_83_8_1_1_U17 mux_83_8_1_1_U175 mux_83_8_1_1_U18 mux_83_8_1_1_U184 mux_83_8_1_1_U19 mux_83_8_1_1_U20 mux_83_8_1_1_U21 mux_83_8_1_1_U23 mux_83_8_1_1_U24 mux_83_8_1_1_U25 mux_83_8_1_1_U26 mux_83_8_1_1_U27 mux_83_8_1_1_U28 mux_83_8_1_1_U29 mux_83_8_1_1_U30 mux_83_8_1_1_U32 mux_83_8_1_1_U33 mux_83_8_1_1_U34 mux_83_8_1_1_U35 mux_83_8_1_1_U36 mux_83_8_1_1_U37 mux_83_8_1_1_U38 mux_83_8_1_1_U39 mux_83_8_1_1_U58 mux_83_8_1_1_U67 mux_83_8_1_1_U76 mux_83_8_1_1_U85 mux_83_8_1_1_U94 p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_U p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_U p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_U p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_U p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_U</SubModules>
+      <Resources DSP="2" FF="995" LUT="2974"/>
+      <LocalResources FF="986" LUT="735"/>
+    </RtlModule>
+    <RtlModule CELL="inst/conv1_ap_uint_8_32_ap_uint_8_28_w_8_U" BINDMODULE="conv1_conv1_ap_uint_8_32_ap_uint_8_28_w_8_ROM_AUTO_1R" DEPTH="1" TYPE="rtl" MODULENAME="conv1_ap_uint_8_32_ap_uint_8_28_w_8_ROM_AUTO_1R" DISPNAME="ap_uint_8_32_ap_uint_8_28_w_8_U" RTLNAME="conv1_conv1_ap_uint_8_32_ap_uint_8_28_w_8_ROM_AUTO_1R">
+      <Resources FF="1" LUT="1"/>
+    </RtlModule>
+    <RtlModule CELL="inst/conv1_ap_uint_8_32_ap_uint_8_28_w_9_U" BINDMODULE="conv1_conv1_ap_uint_8_32_ap_uint_8_28_w_9_ROM_AUTO_1R" DEPTH="1" TYPE="rtl" MODULENAME="conv1_ap_uint_8_32_ap_uint_8_28_w_9_ROM_AUTO_1R" DISPNAME="ap_uint_8_32_ap_uint_8_28_w_9_U" RTLNAME="conv1_conv1_ap_uint_8_32_ap_uint_8_28_w_9_ROM_AUTO_1R">
+      <Resources FF="2"/>
+    </RtlModule>
+    <RtlModule CELL="inst/flow_control_loop_pipe_U" BINDMODULE="conv1_flow_control_loop_pipe" DEPTH="1" TYPE="rtl" MODULENAME="flow_control_loop_pipe" DISPNAME="flow_control_loop_pipe_U" RTLNAME="conv1_flow_control_loop_pipe">
+      <Resources FF="1" LUT="31"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_axc_requant_fu_13766" DEPTH="1" TYPE="function" MODULENAME="axc_requant" DISPNAME="grp_axc_requant_fu_13766" RTLNAME="conv1_axc_requant">
+      <SubModules count="1">mul_24ns_20s_44_1_1_U1</SubModules>
+      <Resources DSP="2" LUT="34"/>
+      <LocalResources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_axc_requant_fu_13766/mul_24ns_20s_44_1_1_U1" BINDMODULE="conv1_mul_24ns_20s_44_1_1" DEPTH="2" TYPE="resource" MODULENAME="mul_24ns_20s_44_1_1" DISPNAME="mul_24ns_20s_44_1_1_U1" RTLNAME="conv1_mul_24ns_20s_44_1_1">
+      <Resources DSP="2" LUT="26"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="1" ID="" IMPL="dsp" LATENCY="0" LOOP="" OPTYPE="mul" PRAGMA="yes" RTLNAME="mul_24ns_20s_44_1_1_U1" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_49"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_6ns_14_1_1_U248" BINDMODULE="conv1_mul_8ns_6ns_14_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_6ns_14_1_1" DISPNAME="mul_8ns_6ns_14_1_1_U248" RTLNAME="conv1_mul_8ns_6ns_14_1_1">
+      <Resources LUT="46"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_6ns_14_1_1_U248" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_34"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_6ns_14_1_1_U252" BINDMODULE="conv1_mul_8ns_6ns_14_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_6ns_14_1_1" DISPNAME="mul_8ns_6ns_14_1_1_U252" RTLNAME="conv1_mul_8ns_6ns_14_1_1">
+      <Resources LUT="45"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_6ns_14_1_1_U252" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_41"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_7ns_15_1_1_U231" BINDMODULE="conv1_mul_8ns_7ns_15_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_7ns_15_1_1" DISPNAME="mul_8ns_7ns_15_1_1_U231" RTLNAME="conv1_mul_8ns_7ns_15_1_1">
+      <Resources LUT="41"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7ns_15_1_1_U231" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_1"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_7ns_15_1_1_U244" BINDMODULE="conv1_mul_8ns_7ns_15_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_7ns_15_1_1" DISPNAME="mul_8ns_7ns_15_1_1_U244" RTLNAME="conv1_mul_8ns_7ns_15_1_1">
+      <Resources LUT="52"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7ns_15_1_1_U244" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_25"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_7ns_15_1_1_U250" BINDMODULE="conv1_mul_8ns_7ns_15_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_7ns_15_1_1" DISPNAME="mul_8ns_7ns_15_1_1_U250" RTLNAME="conv1_mul_8ns_7ns_15_1_1">
+      <Resources LUT="52"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7ns_15_1_1_U250" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_38"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_7ns_15_1_1_U251" BINDMODULE="conv1_mul_8ns_7ns_15_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_7ns_15_1_1" DISPNAME="mul_8ns_7ns_15_1_1_U251" RTLNAME="conv1_mul_8ns_7ns_15_1_1">
+      <Resources LUT="57"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7ns_15_1_1_U251" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_39"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_7s_15_1_1_U239" BINDMODULE="conv1_mul_8ns_7s_15_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_7s_15_1_1" DISPNAME="mul_8ns_7s_15_1_1_U239" RTLNAME="conv1_mul_8ns_7s_15_1_1">
+      <Resources LUT="53"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7s_15_1_1_U239" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_16"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_7s_15_1_1_U246" BINDMODULE="conv1_mul_8ns_7s_15_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_7s_15_1_1" DISPNAME="mul_8ns_7s_15_1_1_U246" RTLNAME="conv1_mul_8ns_7s_15_1_1">
+      <Resources LUT="53"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7s_15_1_1_U246" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_31"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_7s_15_1_1_U253" BINDMODULE="conv1_mul_8ns_7s_15_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_7s_15_1_1" DISPNAME="mul_8ns_7s_15_1_1_U253" RTLNAME="conv1_mul_8ns_7s_15_1_1">
+      <Resources LUT="60"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_7s_15_1_1_U253" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_42"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U230" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U230" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="48"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U230" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U232" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U232" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="49"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U232" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_3"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U233" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U233" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="49"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U233" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_4"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U234" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U234" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="53"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U234" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_7"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U235" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U235" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="59"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U235" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U236" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U236" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="55"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U236" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_10"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U237" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U237" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="44"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U237" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_11"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U238" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U238" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="42"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U238" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_15"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U240" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U240" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="57"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U240" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_18"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U241" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U241" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="48"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U241" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_19"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U242" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U242" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="58"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U242" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_22"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U243" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U243" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="47"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U243" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_23"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U245" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U245" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="61"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U245" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_26"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U247" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U247" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="46"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U247" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_32"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U249" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U249" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="35"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U249" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_35"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mul_8ns_8s_16_1_1_U256" BINDMODULE="conv1_mul_8ns_8s_16_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_8s_16_1_1" DISPNAME="mul_8ns_8s_16_1_1_U256" RTLNAME="conv1_mul_8ns_8s_16_1_1">
+      <Resources LUT="58"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U256" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_46"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U103" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U103" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="112"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U112" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U112" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U121" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U121" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U130" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U130" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U139" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U139" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="40"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U14" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U14" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U148" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U148" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U15" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U15" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U157" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U157" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U16" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U16" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U166" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U166" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U17" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U17" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="36"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U175" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U175" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U18" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U18" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U184" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U184" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U19" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U19" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U20" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U20" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U21" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U21" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U23" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U23" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U24" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U24" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U25" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U25" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U26" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U26" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="36"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U27" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U27" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U28" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U28" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U29" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U29" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U30" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U30" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U32" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U32" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U33" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U33" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U34" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U34" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U35" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U35" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="36"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U36" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U36" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U37" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U37" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U38" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U38" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U39" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U39" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="20"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U58" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U58" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="96"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U67" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U67" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U76" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U76" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U85" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U85" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="8"/>
+    </RtlModule>
+    <RtlModule CELL="inst/mux_83_8_1_1_U94" BINDMODULE="conv1_mux_83_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_83_8_1_1" DISPNAME="mux_83_8_1_1_U94" RTLNAME="conv1_mux_83_8_1_1">
+      <Resources LUT="40"/>
+    </RtlModule>
+    <RtlModule CELL="inst/p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_U" BINDMODULE="conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_ROM_AUTO_1R" DEPTH="1" TYPE="resource" MODULENAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_ROM_AUTO_1R" DISPNAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_U" RTLNAME="conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_ROM_AUTO_1R">
+      <Resources FF="1" LUT="1"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_U" SOURCE="" URAM="0" VARIABLE="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10"/>
+    </RtlModule>
+    <RtlModule CELL="inst/p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_U" BINDMODULE="conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_ROM_AUTO_1R" DEPTH="1" TYPE="resource" MODULENAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_ROM_AUTO_1R" DISPNAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_U" RTLNAME="conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_ROM_AUTO_1R">
+      <Resources FF="1" LUT="1"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_U" SOURCE="" URAM="0" VARIABLE="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14"/>
+    </RtlModule>
+    <RtlModule CELL="inst/p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_U" BINDMODULE="conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_ROM_AUTO_1R" DEPTH="1" TYPE="resource" MODULENAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_ROM_AUTO_1R" DISPNAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_U" RTLNAME="conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_ROM_AUTO_1R">
+      <Resources FF="1" LUT="1"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_U" SOURCE="" URAM="0" VARIABLE="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15"/>
+    </RtlModule>
+    <RtlModule CELL="inst/p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_U" BINDMODULE="conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_ROM_AUTO_1R" DEPTH="1" TYPE="resource" MODULENAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_ROM_AUTO_1R" DISPNAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_U" RTLNAME="conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_ROM_AUTO_1R">
+      <Resources FF="1" LUT="1"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_U" SOURCE="" URAM="0" VARIABLE="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17"/>
+    </RtlModule>
+    <RtlModule CELL="inst/p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_U" BINDMODULE="conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_ROM_AUTO_1R" DEPTH="1" TYPE="resource" MODULENAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_ROM_AUTO_1R" DISPNAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_U" RTLNAME="conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_ROM_AUTO_1R">
+      <Resources FF="1" LUT="1"/>
+      <BindNode BINDTYPE="storage" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_storage rom_1p" DSP="0" ID="" IMPL="auto" LATENCY="1" LOOP="" OPTYPE="rom_1p" PRAGMA="" RTLNAME="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_U" SOURCE="" URAM="0" VARIABLE="p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24"/>
+    </RtlModule>
+  </RtlModules>
+  <TimingPaths>
+    <TPATH DATAPATH_DELAY="8.352" DATAPATH_LOGIC_DELAY="0.642" DATAPATH_NET_DELAY="7.710" ENDPOINT_PIN="v1_22_V_reg_30331_reg[3]/D" LOGIC_LEVELS="1" MAX_FANOUT="128" SLACK="1.594" STARTPOINT_PIN="select_ln31_3_reg_21782_pp0_iter2_reg_reg[1]/C">
+      <CELL NAME="select_ln31_3_reg_21782_pp0_iter2_reg_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="2447"/>
+      <CELL NAME="mux_83_8_1_1_U67/v1_22_V_reg_30331[3]_i_1" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="61"/>
+      <CELL NAME="v1_22_V_reg_30331_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="8762"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="8.333" DATAPATH_LOGIC_DELAY="0.642" DATAPATH_NET_DELAY="7.691" ENDPOINT_PIN="v1_7_V_reg_30311_reg[6]/D" LOGIC_LEVELS="1" MAX_FANOUT="128" SLACK="1.614" STARTPOINT_PIN="select_ln31_3_reg_21782_pp0_iter2_reg_reg[1]/C">
+      <CELL NAME="select_ln31_3_reg_21782_pp0_iter2_reg_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="2447"/>
+      <CELL NAME="mux_83_8_1_1_U26/v1_7_V_reg_30311[6]_i_1" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="61"/>
+      <CELL NAME="v1_7_V_reg_30311_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="8778"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="8.374" DATAPATH_LOGIC_DELAY="0.642" DATAPATH_NET_DELAY="7.732" ENDPOINT_PIN="v1_25_V_reg_30336_reg[7]/D" LOGIC_LEVELS="1" MAX_FANOUT="128" SLACK="1.621" STARTPOINT_PIN="select_ln31_3_reg_21782_pp0_iter2_reg_reg[1]/C">
+      <CELL NAME="select_ln31_3_reg_21782_pp0_iter2_reg_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="2447"/>
+      <CELL NAME="mux_83_8_1_1_U76/v1_25_V_reg_30336[7]_i_1" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="61"/>
+      <CELL NAME="v1_25_V_reg_30336_reg[7]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="8763"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="8.355" DATAPATH_LOGIC_DELAY="0.642" DATAPATH_NET_DELAY="7.713" ENDPOINT_PIN="v1_25_V_reg_30336_reg[6]/D" LOGIC_LEVELS="1" MAX_FANOUT="128" SLACK="1.640" STARTPOINT_PIN="select_ln31_3_reg_21782_pp0_iter2_reg_reg[1]/C">
+      <CELL NAME="select_ln31_3_reg_21782_pp0_iter2_reg_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="2447"/>
+      <CELL NAME="mux_83_8_1_1_U76/v1_25_V_reg_30336[6]_i_1" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="61"/>
+      <CELL NAME="v1_25_V_reg_30336_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="8763"/>
+    </TPATH>
+    <TPATH DATAPATH_DELAY="8.213" DATAPATH_LOGIC_DELAY="0.642" DATAPATH_NET_DELAY="7.571" ENDPOINT_PIN="v1_7_V_reg_30311_reg[7]/D" LOGIC_LEVELS="1" MAX_FANOUT="128" SLACK="1.784" STARTPOINT_PIN="select_ln31_3_reg_21782_pp0_iter2_reg_reg[1]/C">
+      <CELL NAME="select_ln31_3_reg_21782_pp0_iter2_reg_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="2447"/>
+      <CELL NAME="mux_83_8_1_1_U26/v1_7_V_reg_30311[7]_i_1" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="61"/>
+      <CELL NAME="v1_7_V_reg_30311_reg[7]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="8778"/>
+    </TPATH>
+  </TimingPaths>
+  <VivadoReportFiles>
+    <ReportFile TYPE="design_analysis" PATH="verilog/report/conv1_design_analysis_routed.rpt"/>
+    <ReportFile TYPE="failfast" PATH="verilog/report/conv1_failfast_routed.rpt"/>
+    <ReportFile TYPE="status" PATH="verilog/report/conv1_status_routed.rpt"/>
+    <ReportFile TYPE="timing" PATH="verilog/report/conv1_timing_routed.rpt"/>
+    <ReportFile TYPE="timing_paths" PATH="verilog/report/conv1_timing_paths_routed.rpt"/>
+    <ReportFile TYPE="utilization" PATH="verilog/report/conv1_utilization_routed.rpt"/>
+    <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/conv1_utilization_hierarchical_routed.rpt"/>
+  </VivadoReportFiles>
+  <GeneralInfo NAME="General Information">
+    <item NAME="Date" VALUE="Fri Oct 23 16:43:54 -03 2026"/>
+    <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
+    <item NAME="Project" VALUE="proj"/>
+    <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>
+    <item NAME="Product family" VALUE="artix7"/>
+    <item NAME="Target device" VALUE="xc7a100t-csg324-1"/>
+  </GeneralInfo>
+  <RunOptions NAME="Run Constraints &amp; Options">
+    <General NAME="Design Constraints &amp; Options">
+      <item NAME="Place &amp; Route target clock" VALUE="10 ns"/>
+      <item NAME="C-Synthesis target clock" VALUE="10 ns"/>
+      <item NAME="C-Synthesis uncertainty" VALUE="27%"/>
+      <item NAME="config_export -ip_xdc_file" VALUE=""/>
+      <item NAME="config_export -ip_xdc_ooc_file" VALUE=""/>
+    </General>
+    <Syn NAME="RTL Synthesis Options">
+      <item NAME="config_export -vivado_synth_strategy" VALUE="default"/>
+      <item NAME="config_export -vivado_synth_design_args" VALUE="-directive sdx_optimization_effort_high"/>
+    </Syn>
+    <Impl NAME="Place &amp; Route Options">
+      <item NAME="config_export -vivado_impl_strategy" VALUE="default"/>
+      <item NAME="config_export -vivado_phys_opt" VALUE="none"/>
+      <item NAME="config_export -vivado_pblock" VALUE=""/>
+    </Impl>
+    <Reporting NAME="Reporting Options">
+      <item NAME="config_export -vivado_report_level" VALUE="2"/>
+      <item NAME="config_export -vivado_max_timing_paths" VALUE="10"/>
+    </Reporting>
+  </RunOptions>
+</profile>
+

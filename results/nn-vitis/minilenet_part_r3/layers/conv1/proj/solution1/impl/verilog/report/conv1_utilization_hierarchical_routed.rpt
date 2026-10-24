@@ -1,0 +1,108 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Fri Oct 23 16:43:42 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 6 -file ./report/conv1_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-------------------------------------------------------+-------------------------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|                        Instance                       |                                     Module                                    | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++-------------------------------------------------------+-------------------------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| bd_0_wrapper                                          |                                                                         (top) |       2974 |       2959 |       0 |   15 | 995 |      0 |      0 |          2 |
+|   bd_0_i                                              |                                                                          bd_0 |       2974 |       2959 |       0 |   15 | 995 |      0 |      0 |          2 |
+|     hls_inst                                          |                                                               bd_0_hls_inst_0 |       2974 |       2959 |       0 |   15 | 995 |      0 |      0 |          2 |
+|       inst                                            |                                                         bd_0_hls_inst_0_conv1 |       2974 |       2959 |       0 |   15 | 995 |      0 |      0 |          2 |
+|         (inst)                                        |                                                         bd_0_hls_inst_0_conv1 |        735 |        720 |       0 |   15 | 986 |      0 |      0 |          0 |
+|         conv1_ap_uint_8_32_ap_uint_8_28_w_8_U         |         bd_0_hls_inst_0_conv1_conv1_ap_uint_8_32_ap_uint_8_28_w_8_ROM_AUTO_1R |          1 |          1 |       0 |    0 |   1 |      0 |      0 |          0 |
+|         conv1_ap_uint_8_32_ap_uint_8_28_w_9_U         |         bd_0_hls_inst_0_conv1_conv1_ap_uint_8_32_ap_uint_8_28_w_9_ROM_AUTO_1R |          0 |          0 |       0 |    0 |   2 |      0 |      0 |          0 |
+|         flow_control_loop_pipe_U                      |                                  bd_0_hls_inst_0_conv1_flow_control_loop_pipe |         31 |         31 |       0 |    0 |   1 |      0 |      0 |          0 |
+|         grp_axc_requant_fu_13766                      |                                             bd_0_hls_inst_0_conv1_axc_requant |         34 |         34 |       0 |    0 |   0 |      0 |      0 |          2 |
+|           (grp_axc_requant_fu_13766)                  |                                             bd_0_hls_inst_0_conv1_axc_requant |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|           mul_24ns_20s_44_1_1_U1                      |                                     bd_0_hls_inst_0_conv1_mul_24ns_20s_44_1_1 |         26 |         26 |       0 |    0 |   0 |      0 |      0 |          2 |
+|         mul_8ns_6ns_14_1_1_U248                       |                                      bd_0_hls_inst_0_conv1_mul_8ns_6ns_14_1_1 |         46 |         46 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_6ns_14_1_1_U252                       |                                    bd_0_hls_inst_0_conv1_mul_8ns_6ns_14_1_1_0 |         45 |         45 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7ns_15_1_1_U231                       |                                      bd_0_hls_inst_0_conv1_mul_8ns_7ns_15_1_1 |         41 |         41 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7ns_15_1_1_U244                       |                                    bd_0_hls_inst_0_conv1_mul_8ns_7ns_15_1_1_1 |         52 |         52 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7ns_15_1_1_U250                       |                                    bd_0_hls_inst_0_conv1_mul_8ns_7ns_15_1_1_2 |         52 |         52 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7ns_15_1_1_U251                       |                                    bd_0_hls_inst_0_conv1_mul_8ns_7ns_15_1_1_3 |         57 |         57 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7s_15_1_1_U239                        |                                       bd_0_hls_inst_0_conv1_mul_8ns_7s_15_1_1 |         53 |         53 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7s_15_1_1_U246                        |                                     bd_0_hls_inst_0_conv1_mul_8ns_7s_15_1_1_4 |         53 |         53 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_7s_15_1_1_U253                        |                                     bd_0_hls_inst_0_conv1_mul_8ns_7s_15_1_1_5 |         60 |         60 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U230                        |                                       bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1 |         48 |         48 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U232                        |                                     bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_6 |         49 |         49 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U233                        |                                     bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_7 |         49 |         49 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U234                        |                                     bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_8 |         53 |         53 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U235                        |                                     bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_9 |         59 |         59 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U236                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_10 |         55 |         55 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U237                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_11 |         44 |         44 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U238                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_12 |         42 |         42 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U240                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_13 |         57 |         57 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U241                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_14 |         48 |         48 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U242                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_15 |         58 |         58 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U243                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_16 |         47 |         47 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U245                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_17 |         61 |         61 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U247                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_18 |         46 |         46 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U249                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_19 |         35 |         35 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mul_8ns_8s_16_1_1_U256                        |                                    bd_0_hls_inst_0_conv1_mul_8ns_8s_16_1_1_20 |         58 |         58 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U103                             |                                            bd_0_hls_inst_0_conv1_mux_83_8_1_1 |        112 |        112 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U112                             |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_21 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U121                             |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_22 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U130                             |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_23 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U139                             |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_24 |         40 |         40 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U14                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_25 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U148                             |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_26 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U15                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_27 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U157                             |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_28 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U16                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_29 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U166                             |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_30 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U17                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_31 |         36 |         36 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U175                             |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_32 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U18                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_33 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U184                             |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_34 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U19                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_35 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U20                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_36 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U21                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_37 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U23                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_38 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U24                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_39 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U25                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_40 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U26                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_41 |         36 |         36 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U27                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_42 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U28                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_43 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U29                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_44 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U30                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_45 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U32                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_46 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U33                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_47 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U34                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_48 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U35                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_49 |         36 |         36 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U36                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_50 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U37                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_51 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U38                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_52 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U39                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_53 |         20 |         20 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U58                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_54 |         96 |         96 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U67                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_55 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U76                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_56 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U85                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_57 |          8 |          8 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         mux_83_8_1_1_U94                              |                                         bd_0_hls_inst_0_conv1_mux_83_8_1_1_58 |         40 |         40 |       0 |    0 |   0 |      0 |      0 |          0 |
+|         p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_U | bd_0_hls_inst_0_conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_ROM_AUTO_1R |          1 |          1 |       0 |    0 |   1 |      0 |      0 |          0 |
+|         p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_U | bd_0_hls_inst_0_conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_ROM_AUTO_1R |          1 |          1 |       0 |    0 |   1 |      0 |      0 |          0 |
+|         p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_U | bd_0_hls_inst_0_conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_ROM_AUTO_1R |          1 |          1 |       0 |    0 |   1 |      0 |      0 |          0 |
+|         p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_U | bd_0_hls_inst_0_conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_ROM_AUTO_1R |          1 |          1 |       0 |    0 |   1 |      0 |      0 |          0 |
+|         p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_U | bd_0_hls_inst_0_conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_ROM_AUTO_1R |          1 |          1 |       0 |    0 |   1 |      0 |      0 |          0 |
++-------------------------------------------------------+-------------------------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

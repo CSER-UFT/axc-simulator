@@ -389,8 +389,11 @@ async function renderCost() {
     ].join('')}</div>`;
     lastKernels = c.layers.map((l) => ({ name: l.name, site: l.site, src: l.src }));
     renderCode();
+    // Partição da janela inteira: cada uma das K x K x C leituras escolhe entre K x K x C bancos que mudam a cada pixel.
+    // O escalonamento do Vitis cresce muito com isso (conv1 da MiniLenet, 25 leituras: 27 s; conv2, 75: cerca de 1 h).
+    const slow = net.sites.map((l, i) => ({ l, d: nnDirs[i] })).filter(({ l, d }) => l.type === 'conv' && d.part && d.pipe === 'pixel' && (l.inShape[0] * l.k * l.k) ** 2 > 2000).map(({ l }) => `${l.name} (${l.inShape[0] * l.k * l.k})`);
     const limited = c.layers.filter((l) => whyText(l.IIwhy)).map((l) => `${esc(l.name)} (${esc(whyText(l.IIwhy))})`);
-    $('nnCostNote').innerHTML = (limited.length ? `${t('nn.whyNote', { list: limited.join('; ') })} ` : '') + t('nn.costNote', { us: nf(T.timeUs, 1), clock: nf(o.clockNs, 1) }) + (c.warnings.length ? ` ${esc(c.warnings.join('; '))}` : '');
+    $('nnCostNote').innerHTML = (slow.length ? `<b>${esc(t('nn.slowPart', { list: slow.join(', ') }))}</b> ` : '') + (limited.length ? `${t('nn.whyNote', { list: limited.join('; ') })} ` : '') + t('nn.costNote', { us: nf(T.timeUs, 1), clock: nf(o.clockNs, 1) }) + (c.warnings.length ? ` ${esc(c.warnings.join('; '))}` : '');
 }
 for (const id of ['nnClock', 'nnTarget']) $(id).addEventListener('change', () => renderCost());
 

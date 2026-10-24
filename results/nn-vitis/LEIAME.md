@@ -39,3 +39,15 @@ relatórios ficam guardados (csynth.xml, export_impl.xml, utilização hierárqu
   * aproximada (fc1, fc2 e a rede): a caixa preta de RTL (ap_ctrl_none) não pode ficar fora de um laço com pipeline
     (HLS 200-1918), e a soma do viés das densas fica; fora dos laços com pipeline, a unidade vai como a netlist em C++
     (uc_*).
+
+## Rodada 3: MiniLenet com partição nas duas convoluções (minilenet_part_r3)
+
+* Tudo sintetizado; a conv2 sozinha não chegou ao Vivado (interrompida). As csims sem nenhuma diferença.
+* A rede: 53008 ciclos, contra 53267 do modelo (0,5%); LUT 31911, contra 35483 (11%); 2 DSP48; período de 8,47 ns.
+  O custo dos multiplexadores dos bancos que mudam a cada pixel ficou certo; os FF, abaixo (2800 contra 5434).
+* Tempo da ferramenta: o escalonamento da conv2 levou 16734 s (4,6 h) e o da conv1, 496 s, com os fatores potência de
+  2 que o gerador escolhia (16 x 8 e 8 x 8 bancos). Na rodada 1, com os fatores que o Vitis escolheu sozinho (23 x 5 e
+  5 x 5), 3706 s e 27 s. O gerador passou a usar os fatores mínimos (um banco por posição da janela: 15 x 5 e 5 x 5),
+  o run_all.sh ganhou um limite de tempo por projeto (--timeout, 3 h por padrão) e a página avisa quando a partição
+  tende a ser pesada para o Vitis. A saída de verdade para as convoluções grandes é a janela deslizante com buffer de
+  linhas (sem bancos que mudam a cada pixel).

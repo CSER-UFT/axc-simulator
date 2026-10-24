@@ -1,0 +1,61 @@
+{
+ "id": "minilenet-mnist_exata_10ns_conv2",
+ "note": "MiniLenet, camada conv2, unidades exatas",
+ "clockNs": 10,
+ "part": "xc7a100tcsg324-1",
+ "top": "conv2",
+ "delays": "fpga",
+ "assign": {},
+ "prediction": {
+  "cycles": 1180,
+  "timeNs": 11800,
+  "intervalNs": 10,
+  "critPs": 8762,
+  "luts": 27589,
+  "carry4": 1239,
+  "ff": 1658,
+  "areaUm2": 392477.6300000003,
+  "energyFj": 541049112.0372013,
+  "loops": [
+   {
+    "label": "conv2_f_conv2_h_conv2_w",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 1176,
+    "II": 1,
+    "iterLatency": 4,
+    "latency": 1180
+   }
+  ],
+  "addrLuts": 19263,
+  "units": [
+   {
+    "unit": "ADD16 exato",
+    "count": 37,
+    "luts": 592,
+    "carry4": 185
+   },
+   {
+    "unit": "ADD24 exato",
+    "count": 38,
+    "luts": 912,
+    "carry4": 266
+   },
+   {
+    "unit": "MUL8 exato",
+    "count": 75,
+    "luts": 6675,
+    "carry4": 750
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1
+  }
+ }
+}

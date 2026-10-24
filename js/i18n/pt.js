@@ -176,6 +176,7 @@ export default {
     'nn.exportTitle': 'Projeto para o Vitis HLS e o Vivado',
     'nn.codeNote': 'O código que o custo avalia, na linguagem da página de síntese de alto nível (dá para colar lá).',
     'nn.approxMacsShort': 'operações aproximadas',
+    'nn.slowPart': 'Partição pesada para o Vitis em {list} leituras por iteração: os bancos lidos mudam a cada pixel, e o escalonamento pode levar uma hora ou mais (conv2 da MiniLenet, 75 leituras: cerca de 1 h).',
     'nn.accum': 'Estrutura da soma',
     'nn.adderNote32': 'O somador de 32 bits faz o acumulador inteiro (o int32 do C); o vai um que sai do bit 31 se perde, como no C. Somar um valor negativo pequeno propaga vai um por todos os bits, justamente o caso em que o somador segmentado erra.',
     'nn.adderLeft': 'a unidade da esquerda (somador)',

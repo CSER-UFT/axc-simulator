@@ -234,18 +234,21 @@ const unitsText = (net, units, names = net.sites.map((l) => l.name)) => {
 function runAll(names) {
     return `#!/usr/bin/env bash
 # Roda o Vitis HLS em cada projeto desta pasta (gerados pelo axc-simulator).
-# Uso: bash run_all.sh [-j N] [--impl] [--cosim] [--autopart] [--only network,layers/conv1]
+# Uso: bash run_all.sh [-j N] [--impl] [--cosim] [--autopart] [--timeout 3h] [--only network,layers/conv1]
+# --timeout: limite de cada projeto (padrão 3h; o formato do comando timeout: 90m, 2h ...). Com -j, cada projeto
+#   grande usa de 3 a 4 GB de memória no Vivado: com 16 GB, -j 3 é o máximo seguro.
 # --autopart: deixa o Vitis particionar sozinho os vetores (o padrão é só com as partições das diretivas).
 # Depois, para comparar com o modelo: node bin/axc.mjs nnvitis <esta pasta> (na pasta do axc-simulator).
 set -u
 cd "$(dirname "$0")"
-J=1; IMPL=0; COSIM=0; AUTOPART=0; ONLY=""
+J=1; IMPL=0; COSIM=0; AUTOPART=0; ONLY=""; TMAX=3h
 while [ $# -gt 0 ]; do
   case "$1" in
     -j) J="$2"; shift 2 ;;
     --impl) IMPL=1; shift ;;
     --cosim) COSIM=1; shift ;;
     --autopart) AUTOPART=1; shift ;;
+    --timeout) TMAX="$2"; shift 2 ;;
     --only) ONLY="$2"; shift 2 ;;
     *) echo "opção desconhecida: $1"; exit 1 ;;
   esac
@@ -256,10 +259,16 @@ if [ -n "$ONLY" ]; then CASES="$(echo "$ONLY" | tr ',' ' ')"; fi
 run_one() {
   c="$1"
   echo "[$(date +%H:%M:%S)] $c"
-  ( cd "$c" && AXC_IMPL=$IMPL AXC_COSIM=$COSIM AXC_AUTOPART=$AUTOPART vitis_hls -f run.tcl > vitis_hls.log 2>&1 ) \\
-    && echo "[$(date +%H:%M:%S)] $c pronto" || echo "[$(date +%H:%M:%S)] $c FALHOU (veja $c/vitis_hls.log)"
+  ( cd "$c" && AXC_IMPL=$IMPL AXC_COSIM=$COSIM AXC_AUTOPART=$AUTOPART timeout -k 60 "$TMAX" vitis_hls -f run.tcl > vitis_hls.log 2>&1 )
+  st=$?
+  if [ $st -eq 0 ]; then echo "[$(date +%H:%M:%S)] $c pronto"
+  elif [ $st -eq 124 ] || [ $st -eq 137 ]; then
+    # Passou do limite: encerra também o Vivado que o Vitis abriu para este projeto.
+    pkill -f "$(pwd)/$c/proj" 2>/dev/null
+    echo "[$(date +%H:%M:%S)] $c PASSOU DO LIMITE de $TMAX (veja $c/vitis_hls.log; --timeout muda o limite)"
+  else echo "[$(date +%H:%M:%S)] $c FALHOU (veja $c/vitis_hls.log)"; fi
 }
-export -f run_one; export IMPL COSIM AUTOPART
+export -f run_one; export IMPL COSIM AUTOPART TMAX
 echo "$CASES" | tr ' ' '\\n' | xargs -P "$J" -I{} bash -c 'run_one {}'
 `;
 }

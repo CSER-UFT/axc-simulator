@@ -40,7 +40,7 @@ const divisors = (n) => Array.from({ length: n }, (_, i) => i + 1).filter((d) =>
  *          par   filtros calculados por iteração (só com 'pixel'; divide o número de filtros); com todos, os pesos
  *                viram constantes;
  *          part  partição dos vetores para alimentar os produtos de uma iteração: a entrada em linhas e colunas
- *                (cyclic, fator potência de 2), os pesos por coluna e, com par > 1, a saída, os viéses e os M;
+ *                (cyclic, um banco por posição da janela), os pesos por coluna e, com par > 1, a saída, os viéses e os M;
  *   dense  pipe  'input': pipeline no laço das entradas (com par = I, no laço das saídas); 'off': sem pipeline;
  *          ii, part como na conv;
  *          par   produtos por iteração (fator de desenrolamento do laço das entradas; divide o número de entradas),
@@ -100,7 +100,7 @@ function treeExpr(terms) {
 /**
  * Plano da rede: os kernels em sequência e os tensores entre eles (C x H x W guardados em [C * Hs][W]: Hs >= H é o
  * passo das linhas entre canais). Com a partição das linhas da entrada de uma conv de vários canais, o passo do
- * tensor é escolhido para que as linhas lidas numa iteração caiam em bancos diferentes com fator potência de 2
+ * tensor é escolhido para que as linhas lidas numa iteração caiam em bancos diferentes com o menor fator, F = g x C
  * (Hs mod F = g, com g = K na janela inteira e 1 no laço kx); a entrada da rede tem o passo fixo (H), e então o
  * fator é o menor que separa as linhas.
  */
@@ -144,11 +144,15 @@ function plan(net, dirs) {
     for (const s of steps) {
         if (s.type !== 'conv' || !s.d.part || s.d.pipe === 'off') continue;
         const t = tensors[s.in], [C, H] = t.shape, K = s.l.k;
+        // Fatores mínimos: um banco por posição da janela (K colunas; K linhas por canal, C canais). Com fatores
+        // potência de 2 (8 x 8 na conv1, 16 x 8 na conv2 da MiniLenet), o escalonamento do Vitis 2022.2 levou 496 s e
+        // 4,6 h, contra 27 s e 1 h com os fatores que ele mesmo escolhe (5 x 5, 23 x 5): o tempo cresce com os bancos,
+        // que mudam a cada pixel.
         const g = s.d.pipe === 'pixel' ? K : 1;
-        s.colF = s.d.pipe === 'pixel' ? nextPow2(K) : null;
-        if (C === 1) { s.rowF = g > 1 ? nextPow2(g) : null; continue; }
+        s.colF = s.d.pipe === 'pixel' ? K : null;
+        if (C === 1) { s.rowF = g > 1 ? g : null; continue; }
         if (!t.fixed) {
-            const F = nextPow2(g * C);
+            const F = g * C;
             let Hs = H;
             while (Hs % F !== g % F) Hs++;
             t.stride = Hs;
