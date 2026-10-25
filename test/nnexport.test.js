@@ -37,7 +37,8 @@ test('exportação da rede: topo com as camadas em sequência, caixas pretas, te
     assert.ok(files['layers/conv1/run.tcl'].includes('add_files -blackbox u_ADD16_LOA8_bb.json'));
     // Os somadores entram na largura de cada soma (ADD32 LOA10 vira ADD24 LOA10 nas somas de 24 bits).
     const bbs = Object.keys(files).filter((f) => /^layers\/\w+\/u_.*_bb\.v$/.test(f)).join(' ');
-    for (const u of ['MUL8_T4', 'MUL8_T6_A4c', 'ADD\\d+_LOA10', 'ADD\\d+_TRUNC4', 'MUL8_MITCHELL', 'ADD16_LOA8']) assert.match(bbs, new RegExp(`u_${u}_bb\\.v`), u);
+    // Os multiplicadores com peso de sinal variável ficam em C++ dentro de su*_ (INLINE off), sem caixa preta.
+    for (const u of ['MUL8_T4', 'ADD\\d+_LOA10', 'ADD\\d+_TRUNC4', 'ADD16_LOA8']) assert.match(bbs, new RegExp(`u_${u}_bb\\.v`), u);
     assert.equal(files['network/expected.dat'].trim().split('\n').length, 3);
     assert.equal(files['network/images.dat'].trim().split('\n')[0].split(' ').length, testSet.size);
     // As previsões são as do modelo de custo com as mesmas diretivas e unidades.

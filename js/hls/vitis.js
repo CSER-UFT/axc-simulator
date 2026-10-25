@@ -335,26 +335,31 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
                 if (!name) { set(`${T}(${val(a[0])} ${n.op === 'add' ? '+' : n.op === 'sub' ? '-' : '*'} ${val(a[1])})`); return; }
                 const u = result.lib.unitByName(name), N = u.cfg.width, W = u.cfg.kind === 'mul' ? 2 * N : N + 1;
                 const f = piped ? cName(name) : seqName(name);
-                (piped ? unitsUsed : seqUnits).add(name);
-                if (u.cfg.kind === 'add' && n.op === 'sub') { set(`${T}(ap_uint<${N}>(~ap_uint<${N}>(${f}(ap_uint<${N}>(~ap_uint<${N}>(${val(a[0])})), ap_uint<${N}>(${val(a[1])})))))`); return; }
+                const use = () => (piped ? unitsUsed : seqUnits).add(name);
+                if (u.cfg.kind === 'add' && n.op === 'sub') { use(); set(`${T}(ap_uint<${N}>(~ap_uint<${N}>(${f}(ap_uint<${N}>(~ap_uint<${N}>(${val(a[0])})), ap_uint<${N}>(${val(a[1])})))))`); return; }
                 if (u.cfg.kind === 'add') {
+                    use();
                     // Soma com sinal: módulo 2^N (sem o vai um); sem sinal, o vai um faz parte do resultado.
                     const sgn = n.range[0] < 0 || a.some((z) => (z.c !== undefined ? z.c < 0 : byId.get(z.n).range[0] < 0));
                     set(sgn ? `${T}(ap_uint<${N}>(${f}(ap_uint<${N}>(${val(a[0])}), ap_uint<${N}>(${val(a[1])}))))` : `${T}(${f}(ap_uint<${N}>(${val(a[0])}), ap_uint<${N}>(${val(a[1])})))`);
                     return;
                 }
-                if (u.cfg.method === 'booth') { set(`${T}(ap_int<${W}>(${f}(ap_uint<${N}>(${val(a[0])}), ap_uint<${N}>(${val(a[1])}))))`); return; }
+                if (u.cfg.method === 'booth') { use(); set(`${T}(ap_int<${W}>(${f}(ap_uint<${N}>(${val(a[0])}), ap_uint<${N}>(${val(a[1])}))))`); return; }
                 // Sem sinal: os módulos na unidade e o sinal depois.
                 const x = val(a[0]), y = val(a[1]);
                 const signedArgs = a.some((z) => (z.c !== undefined ? z.c < 0 : byId.get(z.n).range[0] < 0));
-                if (!signedArgs) { set(`${T}(${f}(ap_uint<${N}>(${x}), ap_uint<${N}>(${y})))`); return; }
+                if (!signedArgs) { use(); set(`${T}(${f}(ap_uint<${N}>(${x}), ap_uint<${N}>(${y})))`); return; }
                 // Produto com sinal numa função própria (INLINE off) que recebe o valor lido uma vez: com o módulo e
                 // o sinal escritos no laço, o Vitis lê de novo a tabela de pesos em cada uso do valor (rodada do fim
                 // de semana: a chamada nos dois ramos de um ?:, 3 leituras por produto, II 38 em vez de 13 na conv1
                 // da MiniLenet; rodada 5: o módulo e o sinal em comandos separados, 2 leituras, II 25).
                 const neg = a.map((z) => (z.c !== undefined ? z.c < 0 : byId.get(z.n).range[0] < 0));
                 const pt = (i) => (neg[i] ? `ap_int<${N + 1}>` : `ap_uint<${N}>`);
-                const sw = `s${f}_${neg.map((b) => (b ? 's' : 'u')).join('')}`;
+                // Dentro da função, a netlist em C++ (uc_*): a caixa preta de RTL numa função INLINE off é uma região
+                // sequencial para o Vitis 2022.2 (HLS 200-1918, rodada 6 nos projetos por camada).
+                const fs = seqName(name);
+                seqUnits.add(name);
+                const sw = `s${fs}_${neg.map((b) => (b ? 's' : 'u')).join('')}`;
                 if (!signedFns.has(sw)) {
                     const mag = (z, i) => (neg[i] ? `ap_uint<${N}>(${z} < 0 ? ap_int<${N + 1}>(-${z}) : ${z})` : `ap_uint<${N}>(${z})`);
                     const sg = ['x', 'y'].filter((z, i) => neg[i]).map((z) => `(${z} < 0)`).join(' != ');
@@ -362,7 +367,7 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
                         `// Produto com sinal de ${name}: os módulos na unidade, o sinal no resultado.`,
                         `static ap_int<${W + 1}> ${sw}(${pt(0)} x, ${pt(1)} y) {`,
                         '#pragma HLS INLINE off',
-                        `    ap_uint<${W}> p = ${f}(${mag('x', 0)}, ${mag('y', 1)});`,
+                        `    ap_uint<${W}> p = ${fs}(${mag('x', 0)}, ${mag('y', 1)});`,
                         `    return ${sg} ? ap_int<${W + 1}>(-ap_int<${W + 1}>(p)) : ap_int<${W + 1}>(p);`,
                         '}',
                     ].join('\n'));
@@ -571,7 +576,8 @@ export function projectFiles(result, { inputs, expected, part = 'xc7a100tcsg324-
     files['kernel.h'] = kernelHeader(result.design);
     files['kernel.cpp'] = exportIR(result, { inline: 'rtl', romStorage });
     const data = Object.keys(files).filter((f) => f.endsWith('.dat'));
-    const names = [...new Set(result.assign.values())];
+    // Só as unidades chamadas como caixa preta (o produto com sinal usa a netlist em C++ dentro de su*_).
+    const names = exportFunction(result, { romStorage }).units;
     let bbs = [];
     if (names.length) { const bb = blackboxFiles(result.lib, names); Object.assign(files, bb.files); bbs = bb.jsons; }
     files['run.tcl'] = tclScript({ id, note, clockNs }, result.design.name, part, data, bbs, tcl);

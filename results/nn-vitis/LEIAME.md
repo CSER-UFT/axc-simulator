@@ -102,3 +102,16 @@ pesos sem partição em BRAM. Todas as csims sem diferenças (MiniLenet 99 acert
   MUL8 T6 A4c na conv2 (II 75), com 1047 LUTs incluindo os multiplexadores das entradas.
 * A exportação passou a pôr o produto com sinal numa função INLINE off (`su_*`), que recebe o peso lido uma vez; a
   rodada 6 (`R=r6 scripts/rodada-aprox.sh`) mede de novo. Calibração das unidades aproximadas adiada para ela.
+
+## Rodada 6: produto com sinal numa função INLINE off (*_aprox_r6) e fim da calibração
+
+* Redes inteiras corretas: csim sem diferenças, II das convoluções igual ao do modelo (13 e 38 na MiniLenet, 38 e
+  75 na LeNet 5). MiniLenet aproximada: 125185 ciclos (modelo 125002), 4603 LUT (modelo 5272, +15%), 3635 FF
+  (+20%), 2 DSP48. LeNet 5 aproximada: 362689 ciclos (362736), 9820 LUT (10050, +2%), 7170 FF (+37%).
+* No Vivado, a MiniLenet aproximada ficou com 4603 LUT contra 4659 da exata: a economia das unidades da busca no
+  FPGA é pequena, como o modelo prevê depois da calibração do produto exato do Vitis.
+* Os projetos por camada com multiplicador aproximado falharam (HLS 200-1918: caixa preta dentro da função
+  INLINE off é região sequencial). A exportação passou a usar a netlist em C++ dentro de su*_ (conferida com g++);
+  os projetos por camada não foram medidos de novo.
+* Calibração encerrada aqui. Fica como limitação: custo das unidades aproximadas por camada no Vitis, FF das redes
+  aproximadas e da partição (modelo abaixo ou acima em 20% a 37%), II 1 das maxpool dentro da rede.

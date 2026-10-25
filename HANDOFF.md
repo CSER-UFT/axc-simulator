@@ -40,12 +40,19 @@ Ruído da validação: desvio padrão de sqrt(p(1-p)/n), 0,3 p.p. no MNIST e 1,4
   LeNet 5 +7%, MiniLenet com partição -15%. Kernels de imagem sem mudança (LUT 14,6%, FF 21,1%).
 * Ferramentas: `node scripts/vitis.mjs calibdata`, `node scripts/calibrate.mjs [--nn] [--nnaddr] [--loo] [--rows]
   [--rounds regex]`.
-* Pendente: rodada 5 (`scripts/rodada-aprox.sh`), as redes aproximadas com a chamada única da unidade (a chamada nos
-  dois ramos do sinal triplicava o II e duplicava as unidades). Com ela, calibrar o custo das unidades aproximadas
-  em Vitis. Atenção para a busca: com o produto exato a 64 LUTs, MUL8 T4 com ADD32 LOA10 já dá mais LUTs que a rede
-  exata no modelo (5427 contra 5355); no FPGA, o objetivo LUT tende a escolher as unidades exatas. Área e energia
-  (sky130) continuam com economia.
-* Também pendente: II 1 das maxpool dentro da rede (2 sozinhas); chamada outlined das densas (cerca de 4 ciclos).
+* Calibração encerrada na rodada 6 (ver results/nn-vitis/LEIAME.md). Redes aproximadas no Vivado: MiniLenet
+  4603 LUT (modelo 5272), LeNet 5 9820 (10050), latência dentro de 0,2%. Limitações registradas: custo das unidades
+  aproximadas por camada no Vitis, FF das aproximadas e da partição (20% a 37%), II 1 das maxpool na rede.
+* No FPGA, a economia de LUT das unidades aproximadas é pequena (o produto exato do Vitis tem 64 LUTs); o objetivo
+  LUT tende a escolher unidades exatas. Área e energia (sky130) continuam com economia.
+
+## Próxima conversa: busca híbrida e interface da página das redes (lenet.html)
+
+1. A busca híbrida descrita acima, com as heurísticas da página HLS.
+2. Lista dos pontos da fronteira de Pareto, como na página HLS (tabela com custo, queda de acurácia e unidades por
+   camada; clicar aplica o ponto).
+3. Animação da busca, como na página HLS (pontos avaliados aparecendo no gráfico custo x erro durante a busca).
+Os itens 2 e 3 dependem de a busca expor o progresso por ponto avaliado; vale desenhar a API junto com o item 1.
 
 ## Regras do projeto
 

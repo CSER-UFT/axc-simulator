@@ -1,0 +1,45 @@
+{
+ "id": "lenet5-cifar10_aprox_10ns_pool1",
+ "note": "LeNet 5, camada pool1",
+ "clockNs": 10,
+ "part": "xc7a100tcsg324-1",
+ "top": "pool1",
+ "delays": "fpga",
+ "assign": {},
+ "prediction": {
+  "cycles": 2354,
+  "timeNs": 23540,
+  "intervalNs": 20,
+  "critPs": 4978,
+  "luts": 156,
+  "carry4": 9,
+  "ff": 106,
+  "areaUm2": 3588.4692000000005,
+  "energyFj": 13433617.090536,
+  "loops": [
+   {
+    "label": "pool1_c_pool1_h_pool1_w",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 1176,
+    "II": 2,
+    "iterLatency": 3,
+    "latency": 2354
+   }
+  ],
+  "addrLuts": 159,
+  "units": [],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1,
+   "ffPerLoop": 11,
+   "addrScale": 0.5,
+   "controlScale": 0.6
+  }
+ }
+}

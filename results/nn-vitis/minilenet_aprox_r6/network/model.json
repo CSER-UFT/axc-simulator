@@ -1,0 +1,677 @@
+{
+ "id": "minilenet-mnist_aprox_10ns",
+ "model": "minilenet-mnist",
+ "name": "MiniLenet",
+ "clockNs": 10,
+ "part": "xc7a100tcsg324-1",
+ "target": "fpga",
+ "dirs": [
+  {
+   "pipe": "pixel",
+   "ii": 1,
+   "par": 1,
+   "part": false
+  },
+  {
+   "pipe": "pixel",
+   "ii": 1,
+   "par": 1,
+   "part": false
+  },
+  {
+   "pipe": "input",
+   "ii": 1,
+   "par": 1,
+   "part": false
+  },
+  {
+   "pipe": "input",
+   "ii": 1,
+   "par": 1,
+   "part": false
+  }
+ ],
+ "units": [
+  {
+   "mul": "MUL8 T6 A10c",
+   "add": "ADD32 LOA11"
+  },
+  {
+   "mul": "MUL8 T6 A4c",
+   "add": "ADD32 LOA10"
+  },
+  {
+   "mul": "MUL8 T6 A10c",
+   "add": "ADD32 LOA6"
+  },
+  {
+   "mul": "MUL8 MITCHELL",
+   "add": "ADD32 LOA7"
+  }
+ ],
+ "images": 100,
+ "accuracySim": 0.99,
+ "totals": {
+  "cycles": 125002,
+  "timeUs": 1250.02,
+  "area": 323707.7844000001,
+  "luts": 5272,
+  "carry4": 587,
+  "ff": 4375,
+  "dsp": 2,
+  "energy": 15453347454.922441,
+  "clockNs": 10,
+  "requantShared": true
+ },
+ "layers": [
+  {
+   "name": "pad1",
+   "type": "pad",
+   "site": null,
+   "mul": null,
+   "add": null,
+   "cycles": 974,
+   "II": 1,
+   "luts": 136,
+   "carry4": 18,
+   "ff": 151,
+   "dsp": 0,
+   "area": 4874.7472,
+   "energy": 8174190.240456,
+   "prediction": {
+    "cycles": 974,
+    "timeNs": 9740,
+    "intervalNs": null,
+    "critPs": 812,
+    "luts": 136,
+    "carry4": 18,
+    "ff": 151,
+    "areaUm2": 4874.7472,
+    "energyFj": 8174190.240456,
+    "loops": [
+     {
+      "label": "pad1_c",
+      "mode": "sequential",
+      "trip": 1,
+      "II": null,
+      "iterLatency": 974,
+      "latency": 974
+     },
+     {
+      "label": "pad1_top_L3",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 64,
+      "II": 1,
+      "iterLatency": 1,
+      "latency": 65
+     },
+     {
+      "label": "pad1_left_L5",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 56,
+      "II": 1,
+      "iterLatency": 1,
+      "latency": 57
+     },
+     {
+      "label": "pad1_right_L7",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 56,
+      "II": 1,
+      "iterLatency": 1,
+      "latency": 57
+     },
+     {
+      "label": "pad1_in_L9",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 784,
+      "II": 1,
+      "iterLatency": 2,
+      "latency": 786
+     }
+    ],
+    "addrLuts": 100,
+    "units": [],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11,
+     "addrScale": 0.5,
+     "controlScale": 0.6
+    }
+   }
+  },
+  {
+   "name": "conv1",
+   "type": "conv",
+   "site": 0,
+   "mul": "MUL8 T6 A10c",
+   "add": "ADD32 LOA11",
+   "cycles": 30579,
+   "II": 13,
+   "luts": 1022,
+   "carry4": 150,
+   "ff": 959,
+   "dsp": 2,
+   "area": 113034.58080000001,
+   "energy": 2614540843.1814837,
+   "prediction": {
+    "cycles": 30579,
+    "timeNs": 305790,
+    "intervalNs": 130,
+    "critPs": 8636,
+    "luts": 1022,
+    "carry4": 150,
+    "ff": 959,
+    "areaUm2": 113034.58080000001,
+    "energyFj": 2614540843.1814837,
+    "loops": [
+     {
+      "label": "conv1_f_conv1_h_conv1_w",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 2352,
+      "II": 13,
+      "iterLatency": 15,
+      "latency": 30579
+     }
+    ],
+    "addrLuts": 282,
+    "units": [
+     {
+      "unit": "ADD16 exato",
+      "count": 12,
+      "luts": 192,
+      "carry4": 60
+     },
+     {
+      "unit": "ADD24 LOA11",
+      "count": 13,
+      "luts": 312,
+      "carry4": 52
+     },
+     {
+      "unit": "MUL8 T6 A10c",
+      "count": 2,
+      "luts": 98,
+      "carry4": 0
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11,
+     "addrScale": 0.5,
+     "controlScale": 0.6
+    }
+   }
+  },
+  {
+   "name": "pool1",
+   "type": "maxpool",
+   "site": null,
+   "mul": null,
+   "add": null,
+   "cycles": 1178,
+   "II": 2,
+   "luts": 150,
+   "carry4": 9,
+   "ff": 103,
+   "dsp": 0,
+   "area": 3568.45,
+   "energy": 6656014.887599999,
+   "prediction": {
+    "cycles": 1178,
+    "timeNs": 11780,
+    "intervalNs": 20,
+    "critPs": 4978,
+    "luts": 150,
+    "carry4": 9,
+    "ff": 103,
+    "areaUm2": 3568.45,
+    "energyFj": 6656014.887599999,
+    "loops": [
+     {
+      "label": "pool1_c_pool1_h_pool1_w",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 588,
+      "II": 2,
+      "iterLatency": 3,
+      "latency": 1178
+     }
+    ],
+    "addrLuts": 146,
+    "units": [],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11,
+     "addrScale": 0.5,
+     "controlScale": 0.6
+    }
+   }
+  },
+  {
+   "name": "pad2",
+   "type": "pad",
+   "site": null,
+   "mul": null,
+   "add": null,
+   "cycles": 906,
+   "II": 1,
+   "luts": 231,
+   "carry4": 18,
+   "ff": 146,
+   "dsp": 0,
+   "area": 4794.6704,
+   "energy": 7401472.873848001,
+   "prediction": {
+    "cycles": 906,
+    "timeNs": 9060,
+    "intervalNs": null,
+    "critPs": 812,
+    "luts": 231,
+    "carry4": 18,
+    "ff": 146,
+    "areaUm2": 4794.6704,
+    "energyFj": 7401472.873848001,
+    "loops": [
+     {
+      "label": "pad2_c",
+      "mode": "sequential",
+      "trip": 3,
+      "II": null,
+      "iterLatency": 302,
+      "latency": 906
+     },
+     {
+      "label": "pad2_top_L3",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 36,
+      "II": 1,
+      "iterLatency": 1,
+      "latency": 37
+     },
+     {
+      "label": "pad2_left_L5",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 28,
+      "II": 1,
+      "iterLatency": 1,
+      "latency": 29
+     },
+     {
+      "label": "pad2_right_L7",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 28,
+      "II": 1,
+      "iterLatency": 1,
+      "latency": 29
+     },
+     {
+      "label": "pad2_in_L9",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 196,
+      "II": 1,
+      "iterLatency": 2,
+      "latency": 198
+     }
+    ],
+    "addrLuts": 290,
+    "units": [],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11,
+     "addrScale": 0.5,
+     "controlScale": 0.6
+    }
+   }
+  },
+  {
+   "name": "conv2",
+   "type": "conv",
+   "site": 1,
+   "mul": "MUL8 T6 A4c",
+   "add": "ADD32 LOA10",
+   "cycles": 44692,
+   "II": 38,
+   "luts": 3259,
+   "carry4": 375,
+   "ff": 2589,
+   "dsp": 2,
+   "area": 236340.07680000007,
+   "energy": 12300871414.654753,
+   "prediction": {
+    "cycles": 44692,
+    "timeNs": 446920,
+    "intervalNs": 380,
+    "critPs": 8867,
+    "luts": 3259,
+    "carry4": 375,
+    "ff": 2589,
+    "areaUm2": 236340.07680000007,
+    "energyFj": 12300871414.654753,
+    "loops": [
+     {
+      "label": "conv2_f_conv2_h_conv2_w",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 1176,
+      "II": 38,
+      "iterLatency": 41,
+      "latency": 44692
+     }
+    ],
+    "addrLuts": 1508,
+    "units": [
+     {
+      "unit": "ADD16 exato",
+      "count": 37,
+      "luts": 592,
+      "carry4": 185
+     },
+     {
+      "unit": "ADD24 LOA10",
+      "count": 38,
+      "luts": 912,
+      "carry4": 152
+     },
+     {
+      "unit": "MUL8 T6 A4c",
+      "count": 2,
+      "luts": 132,
+      "carry4": 0
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11,
+     "addrScale": 0.5,
+     "controlScale": 0.6
+    }
+   }
+  },
+  {
+   "name": "pool2",
+   "type": "maxpool",
+   "site": null,
+   "mul": null,
+   "add": null,
+   "cycles": 590,
+   "II": 2,
+   "luts": 143,
+   "carry4": 9,
+   "ff": 100,
+   "dsp": 0,
+   "area": 3548.4308,
+   "energy": 3299938.4984399998,
+   "prediction": {
+    "cycles": 590,
+    "timeNs": 5900,
+    "intervalNs": 20,
+    "critPs": 4978,
+    "luts": 143,
+    "carry4": 9,
+    "ff": 100,
+    "areaUm2": 3548.4308,
+    "energyFj": 3299938.4984399998,
+    "loops": [
+     {
+      "label": "pool2_c_pool2_h_pool2_w",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 294,
+      "II": 2,
+      "iterLatency": 3,
+      "latency": 590
+     }
+    ],
+    "addrLuts": 133,
+    "units": [],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11,
+     "addrScale": 0.5,
+     "controlScale": 0.6
+    }
+   }
+  },
+  {
+   "name": "flatten",
+   "type": "flatten",
+   "site": null,
+   "mul": null,
+   "add": null,
+   "cycles": 296,
+   "II": 1,
+   "luts": 37,
+   "carry4": 4,
+   "ff": 48,
+   "dsp": 0,
+   "area": 1241.2064,
+   "energy": 682213.230688,
+   "prediction": {
+    "cycles": 296,
+    "timeNs": 2960,
+    "intervalNs": 10,
+    "critPs": 812,
+    "luts": 37,
+    "carry4": 4,
+    "ff": 48,
+    "areaUm2": 1241.2064,
+    "energyFj": 682213.230688,
+    "loops": [
+     {
+      "label": "flatten_r_flatten_w",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 294,
+      "II": 1,
+      "iterLatency": 2,
+      "latency": 296
+     }
+    ],
+    "addrLuts": 36,
+    "units": [],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11,
+     "addrScale": 0.5,
+     "controlScale": 0.6
+    }
+   }
+  },
+  {
+   "name": "fc1",
+   "type": "dense",
+   "site": 2,
+   "mul": "MUL8 T6 A10c",
+   "add": "ADD32 LOA6",
+   "cycles": 44247,
+   "II": 1,
+   "luts": 219,
+   "carry4": 52,
+   "ff": 141,
+   "dsp": 2,
+   "area": 64322.9448,
+   "energy": 494749110.134412,
+   "prediction": {
+    "cycles": 44247,
+    "timeNs": 442470,
+    "intervalNs": 10,
+    "critPs": 9157,
+    "luts": 219,
+    "carry4": 52,
+    "ff": 141,
+    "areaUm2": 64322.9448,
+    "energyFj": 494749110.134412,
+    "loops": [
+     {
+      "label": "fc1_o",
+      "mode": "sequential",
+      "trip": 147,
+      "II": null,
+      "iterLatency": 301,
+      "latency": 44247
+     },
+     {
+      "label": "fc1_i",
+      "mode": "pipelined",
+      "trip": 294,
+      "II": 1,
+      "iterLatency": 2,
+      "latency": 296
+     }
+    ],
+    "addrLuts": 64,
+    "units": [
+     {
+      "unit": "ADD32 LOA6",
+      "count": 2,
+      "luts": 64,
+      "carry4": 14
+     },
+     {
+      "unit": "MUL8 T6 A10c",
+      "count": 1,
+      "luts": 49,
+      "carry4": 0
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11,
+     "addrScale": 0.5,
+     "controlScale": 0.6
+    }
+   }
+  },
+  {
+   "name": "fc2",
+   "type": "dense",
+   "site": 3,
+   "mul": "MUL8 MITCHELL",
+   "add": "ADD32 LOA7",
+   "cycles": 1540,
+   "II": 1,
+   "luts": 210,
+   "carry4": 48,
+   "ff": 138,
+   "dsp": 2,
+   "area": 63998.8972,
+   "energy": 16972257.220760003,
+   "prediction": {
+    "cycles": 1540,
+    "timeNs": 15400,
+    "intervalNs": 10,
+    "critPs": 8818,
+    "luts": 210,
+    "carry4": 48,
+    "ff": 138,
+    "areaUm2": 63998.8972,
+    "energyFj": 16972257.220760003,
+    "loops": [
+     {
+      "label": "fc2_o",
+      "mode": "sequential",
+      "trip": 10,
+      "II": null,
+      "iterLatency": 154,
+      "latency": 1540
+     },
+     {
+      "label": "fc2_i",
+      "mode": "pipelined",
+      "trip": 147,
+      "II": 1,
+      "iterLatency": 2,
+      "latency": 149
+     }
+    ],
+    "addrLuts": 44,
+    "units": [
+     {
+      "unit": "ADD24 LOA7",
+      "count": 2,
+      "luts": 48,
+      "carry4": 10
+     },
+     {
+      "unit": "MUL8 MITCHELL",
+      "count": 1,
+      "luts": 76,
+      "carry4": 2
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11,
+     "addrScale": 0.5,
+     "controlScale": 0.6
+    }
+   }
+  }
+ ],
+ "warnings": [],
+ "partitionNotes": []
+}

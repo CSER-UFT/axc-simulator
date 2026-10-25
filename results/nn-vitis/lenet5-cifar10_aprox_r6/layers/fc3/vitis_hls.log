@@ -1,0 +1,88 @@
+
+****** Vitis HLS - High-Level Synthesis from C, C++ and OpenCL v2022.2 (64-bit)
+  **** SW Build 3670227 on Oct 13 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source /tools/Xilinx/Vitis_HLS/2022.2/scripts/vitis_hls/hls.tcl -notrace
+INFO: [HLS 200-10] Running '/tools/Xilinx/Vitis_HLS/2022.2/bin/unwrapped/lnx64.o/vitis_hls'
+INFO: [HLS 200-10] For user 'tiago' on host 'Avell' (Linux_x86_64 version 5.15.0-139-generic) on Sun Oct 25 12:02:15 -03 2026
+INFO: [HLS 200-10] On os Ubuntu 20.04.6 LTS
+INFO: [HLS 200-10] In directory '/home/tiago/axc-simulator/build/r6/lenet5-cifar10_aprox/layers/fc3'
+Sourcing Tcl script 'run.tcl'
+INFO: [HLS 200-1510] Running: open_project -reset proj 
+INFO: [HLS 200-10] Creating and opening project '/home/tiago/axc-simulator/build/r6/lenet5-cifar10_aprox/layers/fc3/proj'.
+INFO: [HLS 200-1510] Running: set_top fc3 
+INFO: [HLS 200-1510] Running: add_files -blackbox u_MUL8_DRUM3_bb.json 
+INFO: [HLS 200-10] Adding black box file 'u_MUL8_DRUM3_bb.json' to the project
+INFO: [HLS 200-1510] Running: add_files -blackbox u_ADD24_LOA5_bb.json 
+INFO: [HLS 200-10] Adding black box file 'u_ADD24_LOA5_bb.json' to the project
+INFO: [HLS 200-1510] Running: add_files kernel.cpp -cflags -I/home/tiago/axc-simulator/build/r6/lenet5-cifar10_aprox/layers/fc3 
+INFO: [HLS 200-10] Adding design file 'kernel.cpp' to the project
+INFO: [HLS 200-1510] Running: add_files -tb tb.cpp -cflags -I/home/tiago/axc-simulator/build/r6/lenet5-cifar10_aprox/layers/fc3 
+INFO: [HLS 200-10] Adding test bench file 'tb.cpp' to the project
+INFO: [HLS 200-1510] Running: add_files -tb in_x.dat 
+INFO: [HLS 200-10] Adding test bench file 'in_x.dat' to the project
+INFO: [HLS 200-1510] Running: add_files -tb exp_y.dat 
+INFO: [HLS 200-10] Adding test bench file 'exp_y.dat' to the project
+INFO: [HLS 200-1510] Running: open_solution -reset solution1 -flow_target vivado 
+INFO: [HLS 200-10] Creating and opening solution '/home/tiago/axc-simulator/build/r6/lenet5-cifar10_aprox/layers/fc3/proj/solution1'.
+INFO: [HLS 200-10] Cleaning up the solution database.
+INFO: [HLS 200-1505] Using flow_target 'vivado'
+Resolution: For help on HLS 200-1505 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-1505.html
+INFO: [HLS 200-435] Setting 'open_solution -flow_target vivado' configuration: config_interface -m_axi_latency=0
+INFO: [HLS 200-1510] Running: set_part xc7a100tcsg324-1 
+INFO: [HLS 200-1611] Setting target device to 'xc7a100t-csg324-1'
+INFO: [HLS 200-1510] Running: create_clock -period 10 -name default 
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [HLS 200-1510] Running: config_op mul -impl fabric 
+INFO: [HLS 200-1445] Configure operator 'mul' with implementation style 'fabric'.
+INFO: [HLS 200-1510] Running: config_compile -pipeline_loops 0 
+INFO: [HLS 200-1510] Running: config_array_partition -throughput_driven off 
+INFO: [HLS 200-1510] Running: csim_design 
+Running Dispatch Server on port: 41739
+INFO: [SIM 211-2] *************** CSIM start ***************
+INFO: [SIM 211-4] CSIM will launch GCC as the compiler.
+   Compiling ../../../../tb.cpp in debug mode
+   Compiling ../../../../kernel.cpp in debug mode
+   Compiling ../../../../u_ADD24_LOA5_bb.cpp in debug mode
+   Compiling ../../../../u_MUL8_DRUM3_bb.cpp in debug mode
+   Generating csim.exe
+AXC_MISMATCHES 0 OF 10
+INFO: [SIM 211-1] CSim done with 0 errors.
+INFO: [SIM 211-3] *************** CSIM finish ***************
+INFO: [HLS 200-111] Finished Command csim_design CPU user time: 8.86 seconds. CPU system time: 1.01 seconds. Elapsed time: 9.99 seconds; current allocated memory: 0.000 MB.
+INFO: [HLS 200-1510] Running: csynth_design 
+WARNING: [HLS 200-40] Skipped source file 'u_ADD24_LOA5_bb.json'. Source files must have extensions .c, .C, .cc, .cpp, .c++, .cp, or .cxx.
+WARNING: [HLS 200-40] Skipped source file 'u_MUL8_DRUM3_bb.json'. Source files must have extensions .c, .C, .cc, .cpp, .c++, .cp, or .cxx.
+INFO: [HLS 200-111] Finished File checks and directory preparation: CPU user time: 0.01 seconds. CPU system time: 0 seconds. Elapsed time: 0.01 seconds; current allocated memory: 754.203 MB.
+INFO: [HLS 200-10] Analyzing design file 'kernel.cpp' ... 
+INFO: [HLS 200-10] Analyzing design file 'u_ADD24_LOA5_bb.cpp' ... 
+INFO: [HLS 200-10] Analyzing design file 'u_MUL8_DRUM3_bb.cpp' ... 
+INFO: [HLS 200-111] Finished Source Code Analysis and Preprocessing: CPU user time: 15.04 seconds. CPU system time: 2.16 seconds. Elapsed time: 17.31 seconds; current allocated memory: 756.602 MB.
+INFO: [HLS 200-777] Using interface defaults for 'Vivado' flow target.
+INFO: [HLS 214-131] Inlining function 'u_MUL8_DRUM3(ap_uint<8>, ap_uint<8>)' into 'su_MUL8_DRUM3_us(ap_uint<8>, ap_int<9>)' (kernel.cpp:122:18)
+INFO: [HLS 214-131] Inlining function 'uc_ADD24_LOA5(ap_uint<24>, ap_uint<24>)' into 'fc3(ap_uint<8>*, ap_uint<8>*)' (kernel.cpp:159:50)
+INFO: [HLS 214-131] Inlining function 'u_ADD24_LOA5(ap_uint<24>, ap_uint<24>)' into 'fc3(ap_uint<8>*, ap_uint<8>*)' (kernel.cpp:154:43)
+INFO: [HLS 200-111] Finished Compiling Optimization and Transform: CPU user time: 5.73 seconds. CPU system time: 0.63 seconds. Elapsed time: 6.41 seconds; current allocated memory: 757.051 MB.
+INFO: [HLS 200-111] Finished Checking Pragmas: CPU user time: 0 seconds. CPU system time: 0 seconds. Elapsed time: 0.01 seconds; current allocated memory: 757.051 MB.
+INFO: [HLS 200-10] Starting code transformations ...
+INFO: [HLS 200-111] Finished Standard Transforms: CPU user time: 0.1 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.11 seconds; current allocated memory: 769.203 MB.
+INFO: [HLS 200-10] Checking synthesizability ...
+INFO: [HLS 200-111] Finished Checking Synthesizability: CPU user time: 0.2 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.21 seconds; current allocated memory: 785.051 MB.
+INFO: [XFORM 203-401] Performing if-conversion on hyperblock to (kernel.cpp:134:1) in function 'axc_requant'... converting 3 basic blocks.
+INFO: [HLS 200-111] Finished Loop, function and other optimizations: CPU user time: 0.28 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.3 seconds; current allocated memory: 821.539 MB.
+WARNING: [HLS 200-960] Cannot flatten loop 'fc3_o' (kernel.cpp:144:16) in function 'fc3' the outer loop is not a perfect loop because there is nontrivial logic in the loop latch.
+Resolution: For help on HLS 200-960 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-960.html
+ERROR: [HLS 200-1918] Ap_ctrl_none blackbox module 'u_MUL8_DRUM3_bb' can not be used in sequential region.
+ERROR: [HLS 200-70] Failed building synthesis data model.
+INFO: [HLS 200-111] Finished Command csynth_design CPU user time: 21.52 seconds. CPU system time: 2.84 seconds. Elapsed time: 24.53 seconds; current allocated memory: 70.141 MB.
+command 'ap_source' returned error code
+    while executing
+"source run.tcl"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel \#0 [list source $arg] "
+
+INFO: [HLS 200-112] Total CPU user time: 35.04 seconds. Total CPU system time: 4.45 seconds. Total elapsed time: 49.81 seconds; peak allocated memory: 824.160 MB.
+INFO: [Common 17-206] Exiting vitis_hls at Sun Oct 25 12:03:04 2026...
