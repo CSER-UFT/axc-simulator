@@ -9,9 +9,9 @@ import { testInputs, errorMetrics } from './axc/metrics.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize, macsPerSite } from './axc/nn.js';
 import { archSvg } from './axc/nnsvg.js';
 import { networkCost, normalizeDirectives, directiveTrees, parOptions, CONV_PIPES, DENSE_PIPES } from './axc/nngen.js';
-import { esc, accuracyCostSvg } from './ui/plots.js';
+import { esc } from './ui/plots.js';
 import { highlightC } from './hls/highlight.js';
-import { dseStepSvg } from './hls/ui.js';
+import { dseStepSvg, accSearchSvg } from './hls/ui.js';
 import { Help } from './ui/help.js';
 import { initFigureExport } from './ui/figexport.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale, dec } from './i18n/index.js';
@@ -125,7 +125,7 @@ async function loadNN(id) {
     if (!testCache.has(ds.file)) testCache.set(ds.file, getBin(ds.file).then((b) => decodeTestSet(b, ds)));
     const changed = nnData?.net.id !== net.id;
     nnData = { net, test: await testCache.get(ds.file) };
-    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); $('nnSearchResult').innerHTML = ''; $('nnSearchStatus').textContent = ''; $('nnSearchFrontBox').classList.add('hidden'); stopPlay(); $('nnStepBox').classList.add('hidden'); }
+    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); $('nnSearchResult').innerHTML = ''; $('nnSearchStatus').textContent = ''; $('nnSearchFrontBox').classList.add('hidden'); stopPlay(); $('nnStepBox').classList.add('hidden'); renderSearchFig(); }
     return nnData;
 }
 
@@ -373,40 +373,54 @@ async function renderCost() {
     if (run !== costRun) return;
     const o = { synth, cells: hd.cells, fpga: hd.fpga, target: $('nnTarget').value, clockNs: +$('nnClock').value || 10 };
     const mask = nnMask();
-    const cost = (m, a, k, units = null) => {
-        const key = `${net.id}|${o.target}|${o.clockNs}|${m ?? '-'}|${a ?? '-'}|${k.join('')}|${JSON.stringify(nnDirs)}|${JSON.stringify(units)}`;
+    // Os dois alvos: área e energia do modelo ASIC (sky130), LUT, CARRY4, FF e DSP do modelo FPGA (xc7a100t, quando
+    // data/vivado-units.json existe); ciclos e II do alvo escolhido.
+    const cost = (target, m, a, k, units = null) => {
+        const key = `${net.id}|${target}|${o.clockNs}|${m ?? '-'}|${a ?? '-'}|${k.join('')}|${JSON.stringify(nnDirs)}|${JSON.stringify(units)}`;
         if (!costCache.has(key)) {
             if (costCache.size > 200) costCache.delete(costCache.keys().next().value);
-            costCache.set(key, networkCost(net, { ...o, mul: m, add: a, mask: k, dirs: nnDirs, ...(units ? { units } : {}) }));
+            costCache.set(key, networkCost(net, { ...o, target, mul: m, add: a, mask: k, dirs: nnDirs, ...(units ? { units } : {}) }));
         }
         return costCache.get(key);
     };
-    let ex, c;
+    const both = (m, a, units = null) => {
+        const asic = cost('asic', m, a, mask, units), fpga = hd.fpga ? cost('fpga', m, a, mask, units) : null;
+        return { asic, fpga, sel: o.target === 'fpga' && fpga ? fpga : asic };
+    };
+    let EX, C;
     try {
-        ex = cost(null, null, mask);
-        c = nnOverride ? cost(null, null, mask, nnOverride) : cost(mul ? unitName(mul.cfg) : null, add ? unitName(add.cfg) : null, mask);
+        EX = both(null, null);
+        C = nnOverride ? both(null, null, nnOverride) : both(mul ? unitName(mul.cfg) : null, add ? unitName(add.cfg) : null);
     } catch (e) { $('nnCost').innerHTML = `<p class="note">${esc(e.message)}</p>`; return; }
     if (run !== costRun) return;
+    const c = C.sel, ex = EX.sel;
     const d = (a, b) => (b ? `${a <= b ? '−' : '+'}${nf(Math.abs(100 * (1 - a / b)), 1)}%` : '');
-    const asic = o.target === 'asic';
-    let h = `<table class="hls-table"><tr><th></th><th>${t('nn.costCycles')}</th><th>II</th><th>${asic ? 'µm²' : 'LUT'}</th><th>FF</th><th>DSP</th><th>nJ</th><th class="left">${t('nn.costUnits')}</th></tr>`;
+    const cmp = (v, ve, digits = 0) => `${nf(v, digits)}${v !== ve ? ` <span class="note">(${d(v, ve)})</span>` : ''}`;
+    const fp = !!C.fpga;
+    const layerOf = (r, name) => r?.layers.find((x) => x.name === name);
+    let h = `<table class="hls-table"><tr><th></th><th>${t('nn.costCycles')}</th><th>II</th><th>µm²</th><th>nJ</th>${fp ? '<th>LUT</th><th>CARRY4</th><th>FF</th><th>DSP</th>' : ''}<th class="left">${t('nn.costUnits')}</th></tr>`;
     for (const l of c.layers) {
-        const e = ex.layers.find((x) => x.name === l.name);
-        const main = asic ? l.area : l.luts, mainEx = asic ? e.area : e.luts;
+        const la = layerOf(C.asic, l.name), lea = layerOf(EX.asic, l.name), lf = layerOf(C.fpga, l.name), lef = layerOf(EX.fpga, l.name);
         const us = l.units.filter((u) => !/ exato$/.test(u.name) || l.site !== null).map((u) => `${u.count} × ${esc(dn(u.name))}`).join(', ');
-        h += `<tr><td class="mono">${esc(l.name)}${l.approx ? ' *' : ''}</td><td class="mono">${nf(l.cycles)}</td><td class="mono"${whyText(l.IIwhy) ? ` title="${esc(whyText(l.IIwhy))}"` : ''}>${l.II ?? '-'}${whyText(l.IIwhy) ? '<sup>†</sup>' : ''}</td><td class="mono">${nf(main, 0)}${main !== mainEx ? ` <span class="note">(${d(main, mainEx)})</span>` : ''}</td><td class="mono">${nf(l.ff)}</td><td class="mono">${l.dsp}</td><td class="mono">${nf(l.energy / 1e6, 2)}</td><td class="units">${us}</td></tr>`;
+        h += `<tr><td class="mono">${esc(l.name)}${l.approx ? ' *' : ''}</td><td class="mono">${nf(l.cycles)}</td><td class="mono"${whyText(l.IIwhy) ? ` title="${esc(whyText(l.IIwhy))}"` : ''}>${l.II ?? '-'}${whyText(l.IIwhy) ? '<sup>†</sup>' : ''}</td>`
+            + `<td class="mono">${cmp(la.area, lea.area)}</td><td class="mono">${nf(la.energy / 1e6, 2)}</td>`
+            + (fp ? `<td class="mono">${cmp(lf.luts, lef.luts)}</td><td class="mono">${nf(lf.carry4)}</td><td class="mono">${nf(lf.ff)}</td><td class="mono">${lf.dsp}</td>` : '')
+            + `<td class="units">${us}</td></tr>`;
     }
-    const T = c.totals, X = ex.totals, main = asic ? T.area : T.luts, mainEx = asic ? X.area : X.luts;
-    h += `<tr class="best"><td>${t('nn.costTotal')}</td><td class="mono">${nf(T.cycles)}</td><td></td><td class="mono">${nf(main, 0)} (${d(main, mainEx)})</td><td class="mono">${nf(T.ff)}</td><td class="mono">${T.dsp}</td><td class="mono">${nf(T.energy / 1e6, 1)} (${d(T.energy, X.energy)})</td><td class="units">${T.requantShared ? esc(t('nn.costShared')) : ''}</td></tr></table>`;
+    const T = c.totals, TA = C.asic.totals, XA = EX.asic.totals, TF = C.fpga?.totals, XF = EX.fpga?.totals;
+    h += `<tr class="best"><td>${t('nn.costTotal')}</td><td class="mono">${nf(T.cycles)}</td><td></td><td class="mono">${nf(TA.area, 0)} (${d(TA.area, XA.area)})</td><td class="mono">${nf(TA.energy / 1e6, 1)} (${d(TA.energy, XA.energy)})</td>`
+        + (fp ? `<td class="mono">${nf(TF.luts)} (${d(TF.luts, XF.luts)})</td><td class="mono">${nf(TF.carry4)}</td><td class="mono">${nf(TF.ff)}</td><td class="mono">${TF.dsp}</td>` : '')
+        + `<td class="units">${T.requantShared ? esc(t('nn.costShared')) : ''}</td></tr></table>`;
     $('nnCost').innerHTML = h;
     const card = (k, v, u = '') => `<div class="metric"><div class="k">${esc(k)}</div><div class="v">${v}</div><div class="u">${esc(u)}</div></div>`;
     $('nnCostSummary').innerHTML = `<div class="metrics-grid">${[
         card(t('nn.m.cycles'), nf(T.cycles), t('nn.m.cyclesU', { ns: nf(o.clockNs, 1) })),
         card(t('nn.m.time'), nf(T.timeUs, 1), 'µs'),
-        asic ? card(t('nn.m.area'), nf(T.area, 0), `µm² (sky130) ${mainEx !== main ? d(main, mainEx) : ''}`) : card(t('nn.m.luts'), nf(T.luts), `LUT, ${nf(T.carry4)} CARRY4 ${mainEx !== main ? d(main, mainEx) : ''}`),
-        card('FF', nf(T.ff), t('nn.m.ffU')),
-        card('DSP48', nf(T.dsp), t('nn.m.dspU')),
-        card(t('nn.m.energy'), nf(T.energy / 1e6, 1), `nJ ${T.energy !== X.energy ? d(T.energy, X.energy) : ''}`),
+        card(t('nn.m.area'), nf(TA.area, 0), `µm² (sky130) ${TA.area !== XA.area ? d(TA.area, XA.area) : ''}`),
+        fp ? card(t('nn.m.luts'), nf(TF.luts), `LUT, ${nf(TF.carry4)} CARRY4 ${TF.luts !== XF.luts ? d(TF.luts, XF.luts) : ''}`) : '',
+        fp ? card('FF', nf(TF.ff), t('nn.m.ffU')) : '',
+        fp ? card('DSP48', nf(TF.dsp), t('nn.m.dspU')) : '',
+        card(t('nn.m.energy'), nf(TA.energy / 1e6, 1), `nJ ${TA.energy !== XA.energy ? d(TA.energy, XA.energy) : ''}`),
     ].join('')}</div>`;
     lastKernels = c.layers.map((l) => ({ name: l.name, site: l.site, src: l.src }));
     renderCode();
@@ -470,10 +484,11 @@ function setOverride(assign) {
     $('nnOverrideOff').onclick = () => { setOverride(null); render(); };
 }
 
-let searchWorker = null, lastSearch = null;
+var searchWorker = null, lastSearch = null; // eslint-disable-line no-var
 const searchWorkers = () => Math.max(1, Math.min(8, (navigator.hardwareConcurrency || 2) - 1));
 function stopSearch(msg = '') {
     if (searchWorker) { searchWorker.terminate(); searchWorker = null; }
+    if (live) { live = null; renderSearchFig(); }
     $('nnSearchBtn').disabled = false;
     $('nnSearchStop').disabled = true;
     if (msg) $('nnSearchStatus').textContent = msg;
@@ -495,10 +510,15 @@ $('nnSearchBtn').onclick = () => {
     $('nnSearchFrontBox').classList.add('hidden');
     stopPlay();
     $('nnStepBox').classList.add('hidden');
+    live = { o, meta: null, pts: [], key: cmpKeyOf(net.id, o) };
+    lastSearch = null;
+    renderSearchFig();
     const t0 = Date.now();
     searchWorker = new Worker(new URL('./nn-search-worker.js', import.meta.url), { type: 'module' });
     searchWorker.onmessage = ({ data: m }) => {
         if (m.type === 'status') $('nnSearchStatus').textContent = t(m.key);
+        else if (m.type === 'meta') { if (live) live.meta = m; }
+        else if (m.type === 'points') { if (live?.meta) { live.pts.push(...m.pts); scheduleFig(); } }
         else if (m.type === 'progress') {
             const phase = { sens: 'nn.searchPhaseSens', comb: 'nn.searchPhaseComb', repair: 'nn.searchPhaseRepair', calib: 'nn.searchPhaseCalib', search: 'nn.searchPhaseSearch', verify: 'nn.searchPhaseVerify' }[m.phase];
             const ph = phase ? t(phase) : m.phase, s = nf((Date.now() - t0) / 1000, 0);
@@ -509,7 +529,8 @@ $('nnSearchBtn').onclick = () => {
             stopSearch(R.hybrid
                 ? t('nn.searchDoneHyb', { calib: R.calib.length, evals: nf(R.evals), verified: R.verified, s: nf(R.ms / 1000, 1), sc: nf(R.phaseMs.calib / 1000, 1), ss: nf(R.phaseMs.search / 1000, 1), sv: nf(R.phaseMs.verify / 1000, 1), workers: R.workers }) + (R.error ? ` ${R.error}` : '')
                 : t('nn.searchDone', { evals: R.evals, images: nf(R.images), s: nf(R.ms / 1000, 1), workers: R.workers }));
-            lastSearch = { ...m.result, net: net.id, o };
+            lastSearch = { ...m.result, net: net.id, o, id: ++searchId };
+            live = null;
             renderSearch();
         }
     };
@@ -539,26 +560,73 @@ function renderSearch() {
     h += `<div class="row" style="margin-top:6px"><button type="button" class="btn primary" id="nnSearchApply">${t('nn.searchApply')}</button></div>`;
     const left = h;
     h = '';
-    // Pontos avaliados por inteiro (os inviáveis abandonados no meio não têm acurácia). Na híbrida, a acurácia é a
-    // estimada (a da exata menos a queda estimada).
-    const shown = r.hybrid ? r.points : r.points.filter((p) => p.full);
-    const pts = shown.map((p) => ({ x: (100 * p.cost) / r.exact.cost, y: r.hybrid ? 100 * r.exact.accVal - p.drop : 100 * (1 - p.wrong / r.n), infeasible: !p.feasible, label: unitsText(net, p.assign) || t('nn.searchExact') }));
-    const front = new Set(r.front.map((f) => JSON.stringify(f.assign)));
-    for (const [k, p] of shown.entries()) { if (front.has(JSON.stringify(p.assign))) pts[k].front = true; }
-    pts.push({ x: 100, y: 100 * r.exact.accVal, label: t('nn.searchExact') });
-    pts.push({ x: (100 * r.best.cost) / r.exact.cost, y: 100 * r.best.accVal, label: t('nn.searchBest'), current: true, front: true });
-    h += `<figure style="margin:0">${accuracyCostSvg(pts, { xLabel: t('nn.searchPlotX', { obj: t(`nn.searchObj_${obj}`) }), yLabel: t(r.hybrid ? 'nn.searchPlotYHyb' : 'nn.searchPlotY'), limit: 100 * (r.exact.accVal - r.maxDrop / 100), width: 520, height: 300 })}</figure>`;
     const se = (a, n) => 100 * Math.sqrt((a * (1 - a)) / n);
-    const plot = h;
-    h = '';
     h += `<p class="note">${t('nn.searchNoise', { n: r.n, se: nf(se(r.exact.accVal, r.n), 1), seT: nf(se(r.exact.accTest, r.testN), 1), dv: nf(100 * (r.exact.accVal - r.best.accVal), 1), dt: nf(100 * (r.exact.accTest - r.best.accTest), 1) })}</p>`;
     const cands = r.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} × ${c.add.length}`).join(', ');
     h += `<p class="note">${r.hybrid ? t('nn.searchNoteHyb', { cands, calib: r.calib.length, n: r.n, verified: r.verified }) : t('nn.searchNote', { cands, maxWrong: r.maxWrong, n: r.n })}</p>`;
-    $('nnSearchResult').innerHTML = `<div class="nn-search-out"><div>${left}</div><div>${plot}</div></div>${h}`;
+    $('nnSearchResult').innerHTML = `${left}${h}`;
     $('nnSearchApply').onclick = () => { setOverride(r.best.assign); setTab('result'); render(); };
     renderFront(r);
     initSteps(r);
+    renderSearchFig();
 }
+
+// Gráfico das buscas: a atual (ao vivo durante a busca) e as guardadas para comparação, com a mesma rede, objetivo,
+// diretivas, período e amostra (o mesmo eixo de custo e a mesma acurácia da exata).
+// var: lidos também ao trocar de modelo, o que pode acontecer antes desta linha na carga da página.
+var nnCompare = [], live = null, searchId = 0, figPending = false; // eslint-disable-line no-var
+const cmpKeyOf = (netId, o) => JSON.stringify([netId, o.objective, o.dirs, o.clockNs, o.sample]);
+const hName = (o) => `${o.hybrid ? t(`nn.hyb.${o.heuristic}`) : t(o.heuristic === 'sensitivity' ? 'nn.searchSens' : 'nn.searchSeq')} · ${t(o.hybrid ? 'nn.kindHyb' : 'nn.kindMeas')} · ${nf(o.maxDrop, 2)} ${t('nn.pp')}`;
+/** Série do gráfico a partir de um resultado da busca (pontos em % do custo da exata e % de acurácia). */
+function seriesOf(r) {
+    const acc = 100 * r.exact.accVal, E = r.exact.cost, span = Math.max(5, 4 * r.maxDrop);
+    const X = (c) => (100 * c) / E;
+    const points = r.hybrid
+        ? r.points.filter((p) => p.drop <= span).map((p) => ({ x: X(p.cost), y: acc - p.drop, feasible: p.feasible, my: p.measured ? acc - p.measured.drop : undefined }))
+        : r.points.filter((p) => p.full).map((p) => ({ x: X(p.cost), y: 100 * (1 - p.wrong / r.n), feasible: p.feasible }));
+    const front = (r.hybrid ? r.front.filter((p) => p.drop <= span).map((p) => ({ x: X(p.cost), y: acc - p.drop })) : r.front.map((p) => ({ x: X(p.cost), y: 100 * p.accVal })));
+    return { label: hName(r.o), heuristic: r.hybrid ? r.o.heuristic : 'exhaustive', shape: r.hybrid ? undefined : (r.o.heuristic === 'sensitivity' ? 'circle' : 'square'), points, front, chosen: { x: X(r.best.cost), y: 100 * r.best.accVal }, acc, span, maxDrop: r.maxDrop };
+}
+/** Série da busca em andamento (os pontos que o worker já mandou). */
+function liveSeries() {
+    const m = live.meta, acc = 100 * m.accVal, span = Math.max(5, 4 * m.maxDrop), X = (c) => (100 * c) / m.exactCost;
+    const points = [];
+    for (const p of live.pts) {
+        if (live.o.hybrid) { if (p.d <= span || p.v) points.push({ x: X(p.c), y: acc - p.d, feasible: p.f, my: p.v ? acc - p.m : undefined }); }
+        else if (p.full) points.push({ x: X(p.c), y: 100 * (1 - p.w / m.n), feasible: p.f });
+    }
+    return { label: `${hName(live.o)} (${t('nn.searchLive')})`, heuristic: live.o.hybrid ? live.o.heuristic : 'exhaustive', shape: live.o.hybrid ? undefined : (live.o.heuristic === 'sensitivity' ? 'circle' : 'square'), points, front: [], chosen: null, acc, span, maxDrop: m.maxDrop };
+}
+const scheduleFig = () => { if (figPending) return; figPending = true; requestAnimationFrame(() => { figPending = false; renderSearchFig(); }); };
+function renderSearchFig() {
+    if (!nnData || !nnCompare) return; // nnCompare ainda não existe na carga da página
+    const net = nnData.net;
+    const cur = live?.meta ? liveSeries() : lastSearch && lastSearch.net === net.id ? seriesOf(lastSearch) : null;
+    const curKey = live ? live.key : lastSearch && lastSearch.net === net.id ? cmpKeyOf(net.id, lastSearch.o) : null;
+    const same = nnCompare.filter((e) => e.key === curKey || !curKey && e.net === net.id), other = nnCompare.length - same.length;
+    let runs = same.map((e) => e.run);
+    if (cur && !(lastSearch && !live && same.some((e) => e.id === lastSearch.id))) runs.push(same.length && !live ? { ...cur, label: `${cur.label} (${t('dse.cmpCurrent')})` } : cur);
+    // Duas buscas com a mesma heurística: a segunda em outra cor, com a fronteira tracejada.
+    const seen = new Set();
+    runs = runs.map((r) => { const k = `${r.heuristic}|${r.shape ?? ''}`, dup = seen.has(k); seen.add(k); return dup ? { ...r, cls: 'h-alt' } : r; });
+    $('nnCmpAdd').disabled = !lastSearch || !!live || lastSearch.net !== net.id;
+    $('nnCmpClear').disabled = !nnCompare.length;
+    if (!runs.length) { $('nnSearchFig').innerHTML = ''; $('nnSearchFigNote').textContent = ''; return; }
+    const ref = cur ?? runs[0];
+    const obj = (live ?? lastSearch)?.o.objective ?? 'area';
+    $('nnSearchFig').innerHTML = accSearchSvg(runs, {
+        xLabel: t('nn.searchPlotX', { obj: t(`nn.searchObj_${obj}`) }), yLabel: t('nn.searchPlotYCmp'), accExact: ref.acc, limit: ref.acc - ref.maxDrop,
+        bot: ref.acc - Math.max(...runs.map((r) => r.span)), chosenLabel: t('nn.searchBest'), exactLabel: t('nn.searchExact'),
+    });
+    $('nnSearchFigNote').textContent = t('nn.searchFigNote') + (nnCompare.length ? ` ${t('nn.cmpNote', { n: same.length })}${other ? ` ${t('nn.cmpOther', { n: other })}` : ''}` : '');
+}
+$('nnCmpAdd').addEventListener('click', () => {
+    const r = lastSearch;
+    if (!r || live || nnCompare.some((e) => e.id === r.id)) return;
+    nnCompare.push({ id: r.id, net: r.net, key: cmpKeyOf(r.net, r.o), run: seriesOf(r) });
+    renderSearchFig();
+});
+$('nnCmpClear').addEventListener('click', () => { nnCompare = []; renderSearchFig(); });
 
 // Passo a passo da busca híbrida: a calibração, cada iteração da heurística no modelo estático e as verificações por
 // classificação, no gráfico de custo contra a acurácia estimada (a da exata menos a queda estimada).

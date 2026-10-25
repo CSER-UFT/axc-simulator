@@ -42,9 +42,22 @@ self.onmessage = async ({ data: o }) => {
         }
         let last = 0;
         const progress = (p) => { const now = Date.now(); if (now - last > 200) { last = now; self.postMessage({ type: 'progress', ...p }); } };
+        // Animação ao vivo: o custo e a acurácia da exata, e depois os pontos avaliados, em lotes (a cada 150 ms).
+        const exactCost = P.metric(P.cm.network(P.exact).totals);
+        self.postMessage({ type: 'meta', exactCost, accVal: 1 - P.exactWrong / P.n, n: P.n, maxDrop: o.maxDrop });
+        let batch = [], lastB = 0;
+        const flush = () => { if (batch.length) { self.postMessage({ type: 'points', pts: batch }); batch = []; } lastB = Date.now(); };
+        const onPoint = (e) => {
+            if (e.phase === 'calib') return;
+            batch.push(o.hybrid
+                ? { v: e.phase === 'verify', c: e.cost, d: e.phase === 'verify' ? e.est : e.drop, m: e.phase === 'verify' ? e.drop : undefined, f: e.feasible }
+                : { c: e.cost, w: e.wrong, f: e.feasible, full: e.full });
+            if (Date.now() - lastB > 150) flush();
+        };
         const r = o.hybrid
-            ? await hybridSearch(P, { heuristic: o.heuristic, maxDrop: o.maxDrop, progress }, engine)
-            : await searchNetwork(P, { heuristic: o.heuristic, maxDrop: o.maxDrop, progress }, engine);
+            ? await hybridSearch(P, { heuristic: o.heuristic, maxDrop: o.maxDrop, progress, onPoint }, engine)
+            : await searchNetwork(P, { heuristic: o.heuristic, maxDrop: o.maxDrop, progress, onPoint }, engine);
+        flush();
         // Custo de cada camada do ponto escolhido e da exata (para a tabela).
         const layers = (assign) => P.cm.network(assign).layers.map((l) => ({ name: l.name, site: l.site, area: l.area, luts: l.luts, energy: l.energy, cycles: l.cycles }));
         // Na híbrida, os pontos do modelo estático são milhares: só os perto do limite vão para o gráfico; o passo a

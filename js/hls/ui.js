@@ -128,8 +128,8 @@ export function dfgSvg(seg, sch) {
     return `${s}</svg>`;
 }
 
-const DSE_SHAPES = { efficiency: 'circle', sequential: 'square', exhaustive: 'triangle', random: 'ring', local: 'square', tabu: 'triangle', grasp: 'circle', ga: 'square' };
-const mark = (shape, x, y, r, cls) => {
+export const DSE_SHAPES = { efficiency: 'circle', sequential: 'square', exhaustive: 'triangle', random: 'ring', local: 'square', tabu: 'triangle', grasp: 'circle', ga: 'square' };
+export const mark = (shape, x, y, r, cls) => {
     if (shape === 'square') return `<rect class="${cls}" x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" rx="1"/>`;
     if (shape === 'triangle') return `<path class="${cls}" d="M${x},${y - r * 1.2} L${x + r * 1.1},${y + r * 0.8} L${x - r * 1.1},${y + r * 0.8} Z"/>`;
     return `<circle class="${cls}" cx="${x}" cy="${y}" r="${r}"/>`;
@@ -184,6 +184,56 @@ export function dseSvg(runs, { xLabel, psnrMin = null, refScore, names, chosenLa
     runs.forEach((r, k) => {
         const x = L + 8 + k * step;
         s += `${mark(r.shape ?? DSE_SHAPES[r.heuristic] ?? 'circle', x, 16, 4.5, `pt ${r.cls ?? `h-${r.heuristic}`}`)}<text class="small" x="${x + 10}" y="20">${esc(nameOf(r).length > step / 6.2 ? `${nameOf(r).slice(0, Math.floor(step / 6.2) - 1)}…` : nameOf(r))}</text>`;
+    });
+    return `${s}</svg>`;
+}
+
+/**
+ * Buscas das redes (página das redes): custo em % da rede exata (x) contra a acurácia na validação em % (y), uma
+ * série por busca, com o estilo do gráfico da exploração (forma e cor pela heurística, fronteira, ponto escolhido).
+ * Os pontos da busca híbrida têm a acurácia estimada; os verificados por classificação aparecem também com a medida
+ * (anel), ligada à estimada por um traço.
+ * @param {{label: string, heuristic: string, cls?: string, shape?: string, points: {x, y, feasible, my?}[],
+ *          front: {x, y}[], chosen?: {x, y}}[]} runs
+ * @param {{xLabel: string, yLabel: string, accExact: number, limit: number, bot: number, chosenLabel: string,
+ *          exactLabel: string}} o
+ */
+export function accSearchSvg(runs, { xLabel, yLabel, accExact, limit, bot, chosenLabel, exactLabel }) {
+    const W = 1000, H = 400, L = 64, R = 16, T = 34, B = 46;
+    const all = runs.flatMap((r) => r.points);
+    const xs = all.map((p) => p.x).concat(100);
+    let x0 = Math.min(...xs), x1 = Math.max(...xs);
+    const pad = (x1 - x0) * 0.04 || 1;
+    x0 -= pad; x1 += pad;
+    const yTop = accExact + (accExact - bot) * 0.05, yBot = bot;
+    const X = (v) => L + ((v - x0) / (x1 - x0)) * (W - L - R);
+    const Y = (v) => T + (1 - (Math.max(yBot, Math.min(v, yTop)) - yBot) / (yTop - yBot)) * (H - T - B);
+    const f1 = (v) => v.toFixed(1);
+    let s = `<svg class="fig-svg hls-dse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img">`;
+    for (let k = 0; k <= 5; k++) {
+        const v = yBot + ((yTop - yBot) * k) / 5, y = Y(v);
+        s += `<line class="grid" x1="${L}" y1="${y}" x2="${W - R}" y2="${y}"/><text class="small muted" x="${L - 6}" y="${y + 4}" text-anchor="end">${f1(v)}</text>`;
+        const xv = x0 + ((x1 - x0) * k) / 5;
+        s += `<text class="small muted" x="${X(xv)}" y="${H - B + 16}" text-anchor="middle">${f1(xv)}</text>`;
+    }
+    s += `<line class="axis" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H - B}"/>`;
+    s += `<text class="small" x="${(L + W - R) / 2}" y="${H - 8}" text-anchor="middle">${esc(xLabel)}</text>`;
+    s += `<text class="small" transform="translate(14 ${(T + H - B) / 2}) rotate(-90)" text-anchor="middle">${esc(yLabel)}</text>`;
+    s += `<line class="limit" x1="${L}" y1="${Y(limit)}" x2="${W - R}" y2="${Y(limit)}"/><text class="small muted" x="${W - R - 4}" y="${Y(limit) - 5}" text-anchor="end">${esc(f1(limit))}%</text>`;
+    s += `<line class="ref" x1="${X(100)}" y1="${T}" x2="${X(100)}" y2="${H - B}"/><text class="small muted" x="${X(100) - 4}" y="${T + 10}" text-anchor="end">${esc(exactLabel)}</text>`;
+    runs.forEach((r) => {
+        const cls = r.cls ?? `h-${r.heuristic}`, shape = r.shape ?? DSE_SHAPES[r.heuristic] ?? 'circle';
+        for (const p of r.points) {
+            s += `<g>${mark(shape, X(p.x), Y(p.y), 3.2, `pt ${cls}${p.feasible ? '' : ' off'}`)}<title>${esc(`${r.label}: ${f1(p.x)}%, ${p.y.toFixed(2)}%`)}</title></g>`;
+            if (p.my !== undefined && p.my !== null) s += `<line class="ref" x1="${X(p.x)}" y1="${Y(p.y)}" x2="${X(p.x)}" y2="${Y(p.my)}"/><circle class="chosen ${cls}" cx="${X(p.x)}" cy="${Y(p.my)}" r="4"><title>${esc(`${r.label}: ${f1(p.x)}%, ${p.my.toFixed(2)}%`)}</title></circle>`;
+        }
+        if (r.front.length > 1) s += `<path class="front ${cls}" d="${r.front.map((p, k) => `${k ? 'L' : 'M'}${X(p.x)},${Y(p.y)}`).join(' ')}"/>`;
+        if (r.chosen) s += `<g>${mark(shape, X(r.chosen.x), Y(r.chosen.y), 7, `chosen ${cls}`)}<title>${esc(`${r.label}: ${chosenLabel}`)}</title></g>`;
+    });
+    const step = Math.min(runs.length <= 3 ? 320 : 240, (W - L - R) / Math.max(1, runs.length));
+    runs.forEach((r, k) => {
+        const x = L + 8 + k * step, n = r.label;
+        s += `${mark(r.shape ?? DSE_SHAPES[r.heuristic] ?? 'circle', x, 16, 4.5, `pt ${r.cls ?? `h-${r.heuristic}`}`)}<text class="small" x="${x + 10}" y="20">${esc(n.length > step / 6.2 ? `${n.slice(0, Math.floor(step / 6.2) - 1)}…` : n)}</text>`;
     });
     return `${s}</svg>`;
 }

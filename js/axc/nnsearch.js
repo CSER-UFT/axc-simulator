@@ -588,8 +588,9 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
 /**
  * Busca.
  * @param {object} P preparação (prepareSearch)
- * @param {{heuristic?: string, maxDrop?: number, progress?: function}} o maxDrop: queda máxima de acurácia na validação
- *   (pontos percentuais)
+ * @param {{heuristic?: string, maxDrop?: number, progress?: function, onPoint?: function}} o maxDrop: queda máxima de
+ *   acurácia na validação (pontos percentuais); onPoint({phase, cost, wrong, feasible, full}) a cada configuração
+ *   classificada
  * @param {object} engine motor de avaliação (localEngine, o padrão, ou poolEngine)
  */
 export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
@@ -615,6 +616,7 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
         images += r.seen;
         const p = { assign: copy(next), cost: total(next), wrong: r.wrong, feasible: r.feasible, full: r.feasible || r.seen === P.n };
         points.push(p);
+        o.onPoint?.({ phase, cost: p.cost, wrong: p.wrong, feasible: p.feasible, full: p.full });
         progress({ evals, images, phase, cost: bestCost / exactCost, ms: Date.now() - t0 });
         return r;
     };
