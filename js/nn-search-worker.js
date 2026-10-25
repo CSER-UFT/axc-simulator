@@ -64,7 +64,7 @@ self.onmessage = async ({ data: o }) => {
         // passo (calibração, iterações da heurística e verificações) vai para a animação.
         const points = o.hybrid
             ? r.points.filter((p) => p.drop <= Math.max(5, 4 * r.maxDrop) || p.measured).map((p) => ({ cost: p.cost, drop: p.drop, feasible: p.feasible, measured: p.measured, assign: p.assign }))
-            : r.points.map((p) => ({ cost: p.cost, wrong: p.wrong, feasible: p.feasible, full: p.full, assign: p.assign }));
+            : r.points.map((p) => ({ cost: p.cost, wrong: p.wrong, feasible: p.feasible, full: p.full, assign: p.assign, fullOk: p.fullOk }));
         self.postMessage({
             type: 'done',
             result: {

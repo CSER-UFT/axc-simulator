@@ -192,8 +192,8 @@ export function dseSvg(runs, { xLabel, psnrMin = null, refScore, names, chosenLa
  * Buscas das redes (página das redes): custo em % da rede exata (x) contra a acurácia na validação em % (y), uma
  * série por busca, com o estilo do gráfico da exploração (forma e cor pela heurística, fronteira, ponto escolhido).
  * Os pontos da busca híbrida têm a acurácia estimada; os verificados por classificação aparecem também com a medida
- * (anel), ligada à estimada por um traço.
- * @param {{label: string, heuristic: string, cls?: string, shape?: string, points: {x, y, feasible, my?}[],
+ * (anel), ligada à estimada por um traço. Os reprovados na validação inteira (com amostra) levam um ×.
+ * @param {{label: string, heuristic: string, cls?: string, shape?: string, points: {x, y, feasible, my?, rej?}[],
  *          front: {x, y}[], chosen?: {x, y}}[]} runs
  * @param {{xLabel: string, yLabel: string, accExact: number, limit: number, bot: number, chosenLabel: string,
  *          exactLabel: string}} o
@@ -225,6 +225,7 @@ export function accSearchSvg(runs, { xLabel, yLabel, accExact, limit, bot, chose
         const cls = r.cls ?? `h-${r.heuristic}`, shape = r.shape ?? DSE_SHAPES[r.heuristic] ?? 'circle';
         for (const p of r.points) {
             s += `<g>${mark(shape, X(p.x), Y(p.y), 3.2, `pt ${cls}${p.feasible ? '' : ' off'}`)}<title>${esc(`${r.label}: ${f1(p.x)}%, ${p.y.toFixed(2)}%`)}</title></g>`;
+            if (p.rej) s += `<path class="rej" d="M${X(p.x) - 5},${Y(p.y) - 5} L${X(p.x) + 5},${Y(p.y) + 5} M${X(p.x) - 5},${Y(p.y) + 5} L${X(p.x) + 5},${Y(p.y) - 5}"/>`;
             if (p.my !== undefined && p.my !== null) s += `<line class="ref" x1="${X(p.x)}" y1="${Y(p.y)}" x2="${X(p.x)}" y2="${Y(p.my)}"/><circle class="chosen ${cls}" cx="${X(p.x)}" cy="${Y(p.my)}" r="4"><title>${esc(`${r.label}: ${f1(p.x)}%, ${p.my.toFixed(2)}%`)}</title></circle>`;
         }
         if (r.front.length > 1) s += `<path class="front ${cls}" d="${r.front.map((p, k) => `${k ? 'L' : 'M'}${X(p.x)},${Y(p.y)}`).join(' ')}"/>`;

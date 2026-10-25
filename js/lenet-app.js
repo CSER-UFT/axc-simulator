@@ -582,10 +582,10 @@ function seriesOf(r) {
     const acc = 100 * r.exact.accVal, E = r.exact.cost, span = Math.max(5, 4 * r.maxDrop);
     const X = (c) => (100 * c) / E;
     const points = r.hybrid
-        ? r.points.filter((p) => p.drop <= span).map((p) => ({ x: X(p.cost), y: acc - p.drop, feasible: p.feasible, my: p.measured ? acc - p.measured.drop : undefined }))
-        : r.points.filter((p) => p.full).map((p) => ({ x: X(p.cost), y: 100 * (1 - p.wrong / r.n), feasible: p.feasible }));
+        ? r.points.filter((p) => p.drop <= span).map((p) => ({ x: X(p.cost), y: acc - p.drop, feasible: p.feasible, my: p.measured ? acc - p.measured.drop : undefined, rej: p.measured?.fullOk === false }))
+        : r.points.filter((p) => p.full).map((p) => ({ x: X(p.cost), y: 100 * (1 - p.wrong / r.n), feasible: p.feasible, rej: p.fullOk === false }));
     const front = (r.hybrid ? r.front.filter((p) => p.drop <= span).map((p) => ({ x: X(p.cost), y: acc - p.drop })) : r.front.map((p) => ({ x: X(p.cost), y: 100 * p.accVal })));
-    return { label: hName(r.o), heuristic: r.hybrid ? r.o.heuristic : 'exhaustive', shape: r.hybrid ? undefined : (r.o.heuristic === 'sensitivity' ? 'circle' : 'square'), points, front, chosen: { x: X(r.best.cost), y: 100 * r.best.accVal }, acc, span, maxDrop: r.maxDrop };
+    return { label: hName(r.o), heuristic: r.hybrid ? r.o.heuristic : r.o.heuristic === 'sensitivity' ? 'msens' : 'mseq', shape: r.hybrid ? undefined : (r.o.heuristic === 'sensitivity' ? 'circle' : 'square'), points, front, chosen: { x: X(r.best.cost), y: 100 * r.best.accVal }, acc, span, maxDrop: r.maxDrop };
 }
 /** Série da busca em andamento (os pontos que o worker já mandou). */
 function liveSeries() {
@@ -595,7 +595,7 @@ function liveSeries() {
         if (live.o.hybrid) { if (p.d <= span || p.v) points.push({ x: X(p.c), y: acc - p.d, feasible: p.f, my: p.v ? acc - p.m : undefined }); }
         else if (p.full) points.push({ x: X(p.c), y: 100 * (1 - p.w / m.n), feasible: p.f });
     }
-    return { label: `${hName(live.o)} (${t('nn.searchLive')})`, heuristic: live.o.hybrid ? live.o.heuristic : 'exhaustive', shape: live.o.hybrid ? undefined : (live.o.heuristic === 'sensitivity' ? 'circle' : 'square'), points, front: [], chosen: null, acc, span, maxDrop: m.maxDrop };
+    return { label: `${hName(live.o)} (${t('nn.searchLive')})`, heuristic: live.o.hybrid ? live.o.heuristic : live.o.heuristic === 'sensitivity' ? 'msens' : 'mseq', shape: live.o.hybrid ? undefined : (live.o.heuristic === 'sensitivity' ? 'circle' : 'square'), points, front: [], chosen: null, acc, span, maxDrop: m.maxDrop };
 }
 const scheduleFig = () => { if (figPending) return; figPending = true; requestAnimationFrame(() => { figPending = false; renderSearchFig(); }); };
 function renderSearchFig() {
@@ -649,6 +649,7 @@ function stepText(st, r) {
     const feas = (st.tries ?? []).filter((x) => x.feasible).length;
     const c = st.state ? sc(st.state.score) : '', d = st.state ? dp(st.state.drop) : '';
     switch (st.kind) {
+        case 'round': return t('nn.st.round', { n: st.n, lim: dp(st.limit), f: nf(100 * st.frac, 0) });
         case 'calib': return t('nn.st.calib', { n: st.n, sites: st.sites.map((x) => `${x.name} ${x.n}`).join(', ') });
         case 'start': return st.order ? t('nn.st.startSeq', { order: st.order.join(', ') }) : st.moves ? t(st.lazy ? 'nn.st.startEffLazy' : 'nn.st.startEff', { moves: st.moves, refresh: st.refresh }) : t('nn.st.start');
         case 'seq': return t(st.chosen ? 'nn.st.seq' : 'nn.st.seqKeep', { g: st.group, n: st.tries.length, f: feas, u: dn(st.chosen ?? ''), c, d });
@@ -663,6 +664,7 @@ function stepText(st, r) {
         case 'imp': return t(`nn.st.${st.h}`, { k: st.n, n: st.tries.length, f: feas, m: st.chosen ?? '-', c, d }) + ((st.h === 'local' || st.h === 'grasp') && !st.chosen ? ` ${t('nn.st.impNone')}` : '');
         case 'verify': return st.fullRejected
             ? t('nn.st.verifyFull', { k: st.n, e: dp(st.drop), m: dp(st.measured), w: st.wrongFull, lim: st.fullLimit })
+            : st.late ? t('nn.st.verifyLate', { k: st.n, e: dp(st.drop), m: dp(st.measured) })
             : t(st.ok ? 'nn.st.verifyOk' : 'nn.st.verifyBad', { k: st.n, e: dp(st.drop), m: st.capped ? `> ${dp(r.maxDrop)}` : dp(st.measured) });
         default: return '';
     }
@@ -737,6 +739,33 @@ function renderFront(r) {
     $('nnSearchFrontBox').classList.remove('hidden');
 }
 var lastFront = []; // eslint-disable-line no-var
+const dlText = (name, text, type) => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = name;
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+const searchFileId = (r) => `${r.net}_${r.o.objective}_${r.hybrid ? `hibrida-${r.o.heuristic}` : r.o.heuristic}_${String(r.maxDrop).replace('.', 'p')}pp`;
+// Fronteira inteira da busca (não só as linhas da tabela): custo, quedas (estimada e medida) e unidades por camada.
+$('nnFrontCsv').onclick = () => {
+    const r = lastSearch;
+    if (!r || !nnData) return;
+    const sites = nnData.net.sites.map((l) => l.name);
+    const head = ['custo', 'economia', 'queda_estimada_pp', 'queda_medida_pp', 'viavel', 'aprovado_validacao_inteira', ...sites.flatMap((n) => [`${n}_mul`, `${n}_add`])];
+    const rows = r.front.map((p) => {
+        const meas = r.hybrid ? (p.measured ? p.measured.drop : '') : 100 * (r.exact.accVal - p.accVal);
+        const full = r.hybrid ? (p.measured?.fullOk ?? '') : (p.fullOk ?? '');
+        return [p.cost, 1 - p.cost / r.exact.cost, r.hybrid ? p.drop : '', meas, r.hybrid ? p.feasible && (p.measured ? p.measured.ok : true) : p.feasible, full, ...p.assign.flatMap((a) => [a.mul ?? 'MUL8 exato', a.add ?? 'ADD32 exato'])];
+    });
+    dlText(`${searchFileId(r)}_fronteira.csv`, `${[head, ...rows].map((x) => x.map(csvCell).join(',')).join('\n')}\n`, 'text/csv');
+};
+$('nnFrontJson').onclick = () => {
+    const r = lastSearch;
+    if (!r) return;
+    const { steps, ...rest } = r;
+    dlText(`${searchFileId(r)}.json`, `${JSON.stringify(rest, null, 1)}\n`, 'application/json');
+};
 $('nnSearchFront').addEventListener('click', (e) => {
     const b = e.target.closest('[data-front]');
     if (!b || !lastFront[+b.dataset.front]) return;

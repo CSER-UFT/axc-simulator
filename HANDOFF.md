@@ -11,7 +11,7 @@ Resumo para continuar o trabalho numa conversa nova. Estado do repositório no c
 * Exportação: `js/axc/nnexport.js`; validação: `node bin/axc.mjs nnvitis`; rodadas em `results/nn-vitis/`.
 * Documentos (fora do repositório): `modelos_e_heuristicas.tex` e `redes_neurais.tex`.
 
-## Busca híbrida (itens 1 a 5 implementados; interface pendente)
+## Busca híbrida (itens 1 a 5 implementados)
 
 1. Modelo estático de erro por camada: o erro RMS da soma (já calculado em `pareto`, com os histogramas reais de
    operandos e a estrutura das diretivas), convertido em LSB da saída pela escala do requant da camada.
@@ -37,9 +37,49 @@ passo das heurísticas, com `drop` no lugar de `psnr`) servem à animação e à
 | Híbrida (local, tabu, GRASP, genético, eficiência) | 12,3%, 32 + 1 a 2 | 9,1%, 49 + 14 a 16 |
 | Híbrida sequencial | 1,0% | 9,0% |
 
-Pendências da busca: a sequencial fica presa em escolhas otimistas (na MiniLenet); no CIFAR 10 o modelo é otimista
-perto do limite e a verificação reprova muitos pontos (ideias: margem aprendida com as reprovações, base de ativações
-mais próxima do ponto verificado).
+Pendências da busca: tratadas em 25/out (ver a seção seguinte); a base de ativações mais próxima do ponto verificado
+(para verificar mais rápido) continua como ideia.
+
+## Correções de 25/out (busca com amostra) e pipeline de avaliação
+
+Sintoma (página, MiniLenet MNIST, 250 imagens): o ponto escolhido ficava coberto por pontos viáveis visitados, e a
+sequencial medida voltava para a exata. Causas e correções:
+
+1. Amostra enviesada: `stratified` pegava as primeiras imagens de cada classe, as mais fáceis (a exata acertava 100%
+   das 250 primeiras, contra 99,3% da validação inteira). Agora sorteia com semente fixa dentro de cada classe.
+2. Reparo cego: desfazia as últimas trocas aceitas até caber, e o ponto resultante nem tinha sido avaliado. Agora a
+   escolha é o mais barato entre os viáveis visitados que passa na validação inteira (conferidos em ordem de custo,
+   até maxVerify); se nenhum passa (a sequencial aceita cada troca no limite da amostra), volta para a exata, uma por
+   vez, a unidade cuja volta dá o ponto mais barato que passa. No gráfico, × marca os reprovados na validação inteira.
+3. Híbrida: verificação em rodadas com o limite estimado apertado (1; 0,75; 0,5; 0,25 do limite) quando os
+   verificados não passam; um ponto medido para a tabela que passa e custa menos vira o escolhido.
+4. Página: cores próprias para as buscas medidas na comparação; exportação da fronteira em CSV e JSON; ajuda atualizada.
+
+Com a validação inteira, a calibração do custo das redes (b5179a3) não piorou a busca: sensibilidade, MiniLenet
+MNIST, área 12,9% antes (3d72c68) e agora, LUT 11,4% antes e 12,9% agora. A piora vista na página vinha da amostra.
+
+Pipeline: `node scripts/nnbench.mjs` roda a matriz de casos (padrão: MiniLenet MNIST, área e LUT, amostra de 250 e
+validação inteira, sensibilidade, sequencial, híbrida local e híbrida sequencial) e grava results/nn-search/<id>/
+(LEIAME.md, casos.csv, casos.json). Rodadas guardadas: `antes` (baebedf), `depois` (estas correções), `cifar`
+(LeNet 5 CIFAR 10, área). Opções: --models, --objectives, --samples, --heuristics (h:<heurística> para a híbrida),
+--drops, --workers, --id, --quick.
+
+Economia de área (limite 1 p.p.; entre parênteses, a queda na validação inteira em p.p.):
+
+| | MiniLenet 250, antes | MiniLenet 250, depois | MiniLenet 1000 | LeNet 5 CIFAR 10, 1000 | CIFAR 10, 250 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Sensibilidade | 11,9% (0,9) | 12,5% (0,5) | 12,9% (1,0) | 9,6% (0,8) | 9,1% (0,4) |
+| Sequencial medida | 0,0% | 10,7% (1,0) | 10,3% (1,0) | | |
+| Híbrida local | 10,8% (0,3) | 12,1% (0,5) | 12,4% (0,8) | 9,1% (0,7), 10 verificados | 9,5% (0,0) |
+| Híbrida sequencial | 1,2% | 10,4% (0,5) | 11,4% (0,3) | 9,2% (0,9), 1 verificado | 3,3% (0,4), 18 verificados |
+
+Pendências: a híbrida local no objetivo LUT com a validação inteira (MiniLenet: 8,9%, contra 12,9% da
+sensibilidade, 20 verificados em 4 rodadas); a híbrida sequencial no CIFAR 10 com amostra; a queda no teste do
+CIFAR 10 (2 a 3 p.p. com 1 p.p. na validação, pelo ruído de 1,4 p.p. da validação de 1000 imagens).
+
+Próximos passos sugeridos: rodar a matriz com vários workers e nas outras redes (--models
+minilenet-fashion,lenet5-mnist,lenet5-fashion,lenet5-cifar10); conferir no CIFAR 10 se as rodadas reduzem as
+verificações; decidir o padrão de amostra da página (250 com o reparo novo, ou 500).
 
 ## Números do teste do proxy (scratch proxy.mjs / proxy2.mjs, refazer se preciso)
 
@@ -67,8 +107,9 @@ Ruído da validação: desvio padrão de sqrt(p(1-p)/n), 0,3 p.p. no MNIST e 1,4
 
 ## Interface da página das redes (lenet.html): feita
 
-Os três itens abaixo estão implementados (out/2026): a aba Busca tem as oito heurísticas híbridas (e a busca medida),
-a tabela da fronteira (custo, economia, queda estimada e medida, unidades por camada, Aplicar) e o passo a passo
+Os três itens abaixo estão implementados (out/2026), com os ajustes de 25/out (aba Custo com ASIC e FPGA juntos,
+comparação de buscas no gráfico, pontos aparecendo durante a busca): a aba Busca tem as oito heurísticas híbridas (e
+a busca medida), a tabela da fronteira (custo, economia, queda estimada e medida, unidades por camada, Aplicar) e o passo a passo
 (calibração, iterações da heurística, verificações), com `dseStepSvg` de `js/hls/ui.js` num eixo y de acurácia
 estimada (opção `yAxis`; o SVG da HLS ficou idêntico em 86 passos conferidos).
 

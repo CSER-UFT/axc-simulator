@@ -12,6 +12,7 @@
     "operands": "node scripts/operands.mjs",
     "axc": "node bin/axc.mjs",
     "experiments": "node scripts/experiments.mjs",
+    "nnbench": "node scripts/nnbench.mjs",
     "vitis:export": "node scripts/vitis.mjs export",
     "vitis:check": "node scripts/vitis.mjs check",
     "vitis:run": "bash build/vitis/run_all.sh",

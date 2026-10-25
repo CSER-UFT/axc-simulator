@@ -299,7 +299,7 @@ switch (cmd) {
             `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n}${P.fullVal ? `, amostra de ${P.n} das ${P.valN}` : ''})`,
             `candidatas por camada: ${P.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} ×, ${c.add.length} +`).join('; ')}`,
             r.hybrid
-                ? `híbrida: ${r.calib.length} trocas isoladas na calibração (${ms(r.phaseMs.calib)}), ${r.evals} pontos no modelo estático (${ms(r.phaseMs.search)}), ${r.verified} verificados (${ms(r.phaseMs.verify)}${r.repaired ? `, ${r.repaired} reprovados na validação inteira` : ''}); ${ms(r.ms)} com ${r.workers} worker(s); preparação ${ms(prepMs)}${r.error ? `; ${r.error}` : ''}`
+                ? `híbrida: ${r.calib.length} trocas isoladas na calibração (${ms(r.phaseMs.calib)}), ${r.evals} pontos no modelo estático (${ms(r.phaseMs.search)}), ${r.verified} verificados em ${r.rounds} rodada(s) (${ms(r.phaseMs.verify)}${r.repaired ? `, ${r.repaired} reprovados na validação inteira` : ''}); ${ms(r.ms)} com ${r.workers} worker(s); preparação ${ms(prepMs)}${r.error ? `; ${r.error}` : ''}`
                 : `${r.evals} avaliações (${r.images} imagens), ${ms(r.ms)} com ${r.workers} worker(s); preparação ${ms(prepMs)}`,
             `exata:   ${cv(r.exact.cost)} ${unit}, validação ${pct(r.exact.accVal)}${r.exact.accValFull !== undefined ? ` (inteira ${pct(r.exact.accValFull)})` : ''}, teste ${pct(r.exact.accTest)}`,
             `melhor:  ${cv(r.best.cost)} ${unit} (${pct(-r.best.saving)}), validação ${pct(r.best.accVal)}${r.best.accValFull !== undefined ? ` (inteira ${pct(r.best.accValFull)})` : ''}, teste ${pct(r.best.accTest)}`,

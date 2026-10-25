@@ -81,6 +81,12 @@ test('busca com amostra: estratificada, e o reparo põe o ponto dentro do limite
     const wFull = wrongOf(r.best.assign), wEx = wrongOf(P.exact);
     assert.equal(1 - wFull / val.n, r.best.accValFull);
     assert.ok(wFull <= wEx + 10, `${wFull} erradas contra ${wEx} da exata`);
+    // O escolhido é um ponto avaliado, e todo ponto viável na amostra mais barato que ele foi reprovado na validação
+    // inteira (o reparo não inventa pontos, e nenhum ponto melhor fica de fora).
+    const key = (a) => JSON.stringify(a);
+    const chosen = r.points.find((p) => key(p.assign) === key(r.best.assign));
+    assert.ok(chosen && (chosen.feasible || chosen.repair) && chosen.fullOk === true);
+    for (const p of r.points) if (p.feasible && p.cost < chosen.cost - 1e-9) assert.equal(p.fullOk, false, `${p.cost} < ${chosen.cost}`);
 });
 
 test('curva monótona: origem, regressão isotônica, quedas negativas em zero e cauda inclinada', async () => {
@@ -105,7 +111,8 @@ test('busca híbrida: calibração, busca no modelo estático e ponto verificado
     // O ponto escolhido foi conferido por classificação (de forma independente) e cabe no limite.
     assert.equal(r.best.wrongVal, wrongOf(r.best.assign));
     assert.ok(r.best.wrongVal <= r.maxWrong);
-    assert.ok(r.best.estDrop <= 1 + 1e-9);
+    // A estimada pode passar do limite (até o dobro, nos pontos medidos para a tabela): quem decide é a medida.
+    assert.ok(r.best.estDrop <= 2 + 1e-9);
     assert.ok(Math.abs(estimateDrop(P, P.calib.curves, r.best.assign) - r.best.estDrop) < 1e-12);
     // Eventos por ponto: um por calibração, um por ponto da busca, um por verificação.
     assert.equal(ev.calib, r.calib.length);
@@ -117,7 +124,8 @@ test('busca híbrida: calibração, busca no modelo estático e ponto verificado
     assert.ok(r.steps.some((s) => s.kind === 'imp'));
     const vs = r.steps.filter((s) => s.kind === 'verify');
     assert.ok(vs.at(-1).ok && Math.abs(vs.at(-1).score - r.best.cost) < 1e-6);
-    assert.ok(vs.slice(0, -1).every((s) => !s.ok));
+    // Nenhum ponto classificado que passou custa menos que o escolhido.
+    for (const p of r.points) if (p.measured?.ok) assert.ok(p.cost >= r.best.cost - 1e-6, `${p.cost} < ${r.best.cost}`);
     // A fronteira estimada: custo crescente, queda decrescente.
     for (let k = 1; k < r.front.length; k++) assert.ok(r.front[k].cost >= r.front[k - 1].cost && r.front[k].drop <= r.front[k - 1].drop + 1e-6);
     // O erro estático da exata é zero, e o de uma troca, positivo.

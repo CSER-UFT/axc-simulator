@@ -98,13 +98,24 @@ class Evaluator {
 }
 
 /**
- * Amostra estratificada de um conjunto (decodeTestSet): as primeiras imagens de cada classe, o mesmo número de cada
- * uma (n / classes), na ordem do arquivo. Com n >= set.n, o próprio conjunto.
+ * Amostra estratificada de um conjunto (decodeTestSet): o mesmo número de imagens de cada classe (n / classes),
+ * sorteadas com semente fixa dentro de cada classe e na ordem do arquivo. Com n >= set.n, o próprio conjunto.
+ *
+ * As primeiras imagens de cada classe (a versão anterior) são as mais fáceis nos arquivos de validação: a rede exata
+ * acertava 100% das 250 primeiras da MiniLenet no MNIST, contra 99,3% na validação inteira, e a busca não via os
+ * erros que as unidades aproximadas causam nas imagens difíceis (a validação inteira reprovava o ponto escolhido).
  */
-export function stratified(set, n, classes) {
+export function stratified(set, n, classes, seed = 2026) {
     if (!n || n >= set.n) return set;
-    const per = Math.max(1, Math.floor(n / classes)), cnt = new Array(classes).fill(0), keep = [];
-    for (let k = 0; k < set.n && keep.length < per * classes; k++) { const c = set.labels[k]; if (cnt[c] < per) { cnt[c]++; keep.push(k); } }
+    const per = Math.max(1, Math.floor(n / classes));
+    const by = Array.from({ length: classes }, () => []);
+    for (let k = 0; k < set.n; k++) by[set.labels[k]]?.push(k);
+    const R = rng(seed), keep = [];
+    for (const list of by) {
+        for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+        keep.push(...list.slice(0, per));
+    }
+    keep.sort((x, y) => x - y);
     const labels = new Uint8Array(keep.length), images = new Uint8Array(keep.length * set.size);
     keep.forEach((k, i) => { labels[i] = set.labels[k]; images.set(set.images.subarray(k * set.size, (k + 1) * set.size), i * set.size); });
     return { ...set, n: keep.length, labels, images };
@@ -469,6 +480,9 @@ export const HYBRID_HEURISTICS = HEURISTICS;
  *                do motor); o primeiro que passa no limite é conferido na validação inteira (com amostra) e, se não
  *                passar, segue o próximo (o reparo). Até maxVerify pontos (25 por padrão). Os verifyFront pontos mais
  *                baratos da fronteira estimada (custo × queda) também são classificados, para a tabela da página.
+ *   rodadas      se os verificados de uma rodada passam do limite, a heurística roda de novo com o limite estimado
+ *                apertado (rounds, frações do limite real: 1, 0,75, 0,5 e 0,25 por padrão) e verifica até
+ *                verifyPerRound pontos novos (a última rodada, o que sobra de maxVerify).
  *
  * onPoint(ev) recebe cada ponto: { phase: 'calib' | 'search' | 'verify', cost, drop, units, feasible, ... }; na
  * busca, drop é a queda estimada; na calibração e na verificação, a medida (com est, a estimada, na verificação).
@@ -495,26 +509,16 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
         P.calib = calib;
     }
     phaseMs.calib = Date.now() - t0;
-    // 2. Busca no modelo estático.
-    const Pn = nnProblem(P, calib.curves, { maxDrop });
-    const exactCost = Pn.cost(Pn.groups.map((g) => g.exact));
-    const t1 = Date.now();
-    let last = 0;
-    const ctx = newContext({
-        progress: (n, p) => {
-            onPoint({ phase: 'search', n, cost: p.score, drop: p.drop, feasible: p.feasible, units: p.units });
-            const now = Date.now();
-            if (now - last > 100) { last = now; progress({ phase: 'search', evals: n, ms: now - t0 }); }
-        },
-    });
-    // Primeiro passo do passo a passo: a calibração (as trocas isoladas medidas e as curvas por camada).
+    // 2 e 3. Busca no modelo estático e verificação por classificação, em rodadas: se os pontos verificados de uma
+    // rodada passam do limite na classificação (o modelo é otimista perto do limite), a heurística roda de novo com
+    // um limite estimado mais apertado (rounds: frações do limite real) e os novos pontos são verificados. A busca
+    // estática leva segundos; a classificação é a parte cara, por isso cada rodada verifica poucos pontos
+    // (verifyPerRound) e o total fica em maxVerify.
+    const exactCost = P.metric(P.cm.network(P.exact).totals);
     const exactState = { score: exactCost, drop: 0, units: [] };
-    ctx.steps.push({ kind: 'calib', n: calib.points.length, sites: P.net.sites.map((l, si) => ({ name: l.name, n: calib.points.filter((q) => q.site === si).length, max: Math.max(0, ...calib.points.filter((q) => q.site === si).map((q) => q.drop)) })), state: exactState });
-    let error = null;
-    try { runHeuristic(heuristic, Pn, ctx, { granularity: 'class', ...o }); } catch (e) { error = e.message; }
-    phaseMs.search = Date.now() - t1;
-    // 3. Verificação por classificação.
-    const t2 = Date.now();
+    const steps = [];
+    // Primeiro passo do passo a passo: a calibração (as trocas isoladas medidas e as curvas por camada).
+    steps.push({ kind: 'calib', n: calib.points.length, sites: P.net.sites.map((l, si) => ({ name: l.name, n: calib.points.filter((q) => q.site === si).length, max: Math.max(0, ...calib.points.filter((q) => q.site === si).map((q) => q.drop)) })), state: exactState });
     const maxWrong = P.exactWrong + Math.floor((maxDrop * P.n) / 100 + 1e-9);
     let fullLimit = null;
     if (P.fullVal) {
@@ -522,52 +526,97 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
         fullLimit = exW + Math.floor((maxDrop * P.fullVal.set.n) / 100 + 1e-9);
     }
     const exactBase = P.exact.map((x) => ({ ...x }));
+    const all = new Map(); // chave → ponto (o primeiro objeto avaliado com a chave guarda a medida)
     const measure = async (p) => {
         if (p.measured) return p;
         const r = await engine.run(p.assign, { maxWrong, base: exactBase });
         p.measured = { wrong: r.wrong, seen: r.seen, drop: ((r.wrong - P.exactWrong) * 100) / P.n, ok: r.feasible };
         onPoint({ phase: 'verify', cost: p.score, drop: p.measured.drop, est: p.drop, feasible: r.feasible, full: r.feasible || r.seen === P.n, units: p.units });
-        progress({ phase: 'verify', evals: ctx.points.length, ms: Date.now() - t0 });
+        progress({ phase: 'verify', evals: all.size, ms: Date.now() - t0 });
         return p;
     };
-    // Ordem da verificação: os viáveis da fronteira estimada, do mais barato para o mais caro (cada falha leva a um
-    // ponto de queda estimada estritamente menor), e depois os outros viáveis, em ordem de custo. Os mais baratos de
-    // todos, em geral, estão num mesmo caminho da heurística, com a mesma queda estimada, e falham juntos.
-    const front = paretoPoints(ctx.points);
-    const onFront = new Set(front);
-    const feasible = [...front.filter((p) => p.feasible), ...ctx.points.filter((p) => p.feasible && !onFront.has(p)).sort((a, b) => a.score - b.score)].slice(0, o.maxVerify ?? 25);
-    let chosen = null, verified = 0, repaired = 0, nv = 0;
+    const rounds = o.rounds ?? [1, 0.75, 0.5, 0.25];
+    const maxVerify = o.maxVerify ?? 25, perRound = o.verifyPerRound ?? Math.max(engine.size, 6);
+    let chosen = null, verified = 0, repaired = 0, nv = 0, error = null, last = 0;
+    phaseMs.search = 0; phaseMs.verify = 0;
     /** Passo de verificação (na ordem em que a decisão é tomada). */
-    const vstep = (p, extra = {}) => ctx.steps.push({ kind: 'verify', n: ++nv, label: p.units.join(', ') || 'exato', score: p.score, drop: p.drop, measured: p.measured.drop, ok: p.measured.ok, capped: !p.measured.ok, state: { score: p.score, drop: p.drop, units: p.units }, ...extra });
-    for (let b = 0; b < feasible.length && !chosen; b += engine.size) {
-        const batch = feasible.slice(b, b + engine.size);
-        await mapLimit(batch, engine.size, measure);
-        verified += batch.length;
-        for (const p of batch) {
-            if (!p.measured.ok) { vstep(p); continue; }
-            if (P.fullVal) {
-                const w = P.fullVal.run(p.assign).wrong;
-                p.measured.wrongFull = w;
-                if (w > fullLimit) { repaired++; vstep(p, { ok: false, fullRejected: true, wrongFull: w, fullLimit }); continue; }
+    const vstep = (p, extra = {}) => steps.push({ kind: 'verify', n: ++nv, label: p.units.join(', ') || 'exato', score: p.score, drop: p.drop, measured: p.measured.drop, ok: p.measured.ok, capped: !p.measured.ok, state: { score: p.score, drop: p.drop, units: p.units }, ...extra });
+    let round = 0;
+    for (; round < rounds.length && !chosen && verified < maxVerify; round++) {
+        const lim = maxDrop * rounds[round];
+        const t1 = Date.now();
+        const Pn = nnProblem(P, calib.curves, { maxDrop: lim });
+        const ctx = newContext({
+            progress: (n, p) => {
+                if (all.has(p.key)) return;
+                all.set(p.key, p);
+                onPoint({ phase: 'search', n: all.size, cost: p.score, drop: p.drop, feasible: p.drop <= maxDrop + 1e-9, units: p.units });
+                const now = Date.now();
+                if (now - last > 100) { last = now; progress({ phase: 'search', evals: all.size, ms: now - t0 }); }
+            },
+        });
+        ctx.steps = steps;
+        if (round > 0) steps.push({ kind: 'round', n: round + 1, limit: lim, frac: rounds[round], state: exactState });
+        try { runHeuristic(heuristic, Pn, ctx, { granularity: 'class', ...o }); } catch (e) { error = e.message; }
+        phaseMs.search += Date.now() - t1;
+        // Ordem da verificação: os viáveis da fronteira estimada desta rodada, do mais barato para o mais caro (cada
+        // falha leva a um ponto de queda estimada estritamente menor), e depois os outros viáveis, em ordem de custo.
+        const t2 = Date.now();
+        const pts = [...new Set(ctx.points.map((p) => all.get(p.key) ?? p))];
+        const front = paretoPoints(pts), onFront = new Set(front);
+        const ok = (p) => p.drop <= lim + 1e-9 && !p.measured;
+        const lastRound = round === rounds.length - 1;
+        const cands = [...front.filter(ok), ...pts.filter((p) => ok(p) && !onFront.has(p)).sort((a, b) => a.score - b.score)].slice(0, Math.min(maxVerify - verified, lastRound ? Infinity : perRound));
+        for (let b = 0; b < cands.length && !chosen; b += engine.size) {
+            const batch = cands.slice(b, b + engine.size);
+            await mapLimit(batch, engine.size, measure);
+            verified += batch.length;
+            for (const p of batch) {
+                if (!p.measured.ok) { vstep(p); continue; }
+                if (P.fullVal) {
+                    const w = P.fullVal.run(p.assign).wrong;
+                    p.measured.wrongFull = w;
+                    p.measured.fullOk = w <= fullLimit;
+                    if (w > fullLimit) { repaired++; vstep(p, { ok: false, fullRejected: true, wrongFull: w, fullLimit }); continue; }
+                }
+                vstep(p);
+                chosen = p;
+                break;
             }
-            vstep(p);
-            chosen = p;
-            break;
         }
+        phaseMs.verify += Date.now() - t2;
     }
+    // Todos os pontos visitados nas rodadas, com a viabilidade estimada no limite real.
+    const allPts = [...all.values()];
+    for (const p of allPts) p.feasible = p.drop <= maxDrop + 1e-9;
+    const front = paretoPoints(allPts);
+    const t3 = Date.now();
     // Para a tabela: os pontos da fronteira estimada perto do limite (até o dobro dele), os mais baratos.
     await mapLimit(front.filter((p) => p.score < exactCost && !p.measured && p.drop <= 2 * maxDrop).slice(0, o.verifyFront ?? 8), engine.size, measure);
-    phaseMs.verify = Date.now() - t2;
+    // Um ponto medido para a tabela pode passar e custar menos que o escolhido: ele passa a ser o escolhido (com
+    // amostra, depois de conferido na validação inteira).
+    for (const p of allPts.filter((q) => q.measured?.ok && q.measured.fullOk === undefined && (!chosen || q.score < chosen.score)).sort((x, y) => x.score - y.score)) {
+        if (P.fullVal) {
+            const w = P.fullVal.run(p.assign).wrong;
+            p.measured.wrongFull = w;
+            p.measured.fullOk = w <= fullLimit;
+            if (!p.measured.fullOk) continue;
+        }
+        chosen = p;
+        vstep(p, { late: true });
+        break;
+    }
+    phaseMs.verify += Date.now() - t3;
     // O exato, se nada passou.
     const bestAssign = chosen ? chosen.assign : P.exact.map((x) => ({ ...x }));
     const fin = await engine.run(bestAssign, { base: bestAssign });
     const total = (a) => P.metric(P.cm.network(a).totals);
     const res = {
-        heuristic, hybrid: true, objective: P.objective, maxDrop, maxWrong, workers: engine.size, sample: P.sample, repaired, error,
+        heuristic, hybrid: true, objective: P.objective, maxDrop, maxWrong, workers: engine.size, sample: P.sample, repaired, error, rounds: round,
         exact: { cost: exactCost, wrongVal: P.exactWrong, accVal: 1 - P.exactWrong / P.n },
         best: { assign: bestAssign, cost: total(bestAssign), wrongVal: fin.wrong, accVal: 1 - fin.wrong / P.n, saving: 1 - total(bestAssign) / exactCost, estDrop: chosen?.drop ?? 0 },
-        calib: calib.points, evals: ctx.points.length, verified, steps: ctx.steps,
-        points: ctx.points.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, feasible: p.feasible, measured: p.measured ?? null })),
+        calib: calib.points, evals: allPts.length, verified, steps,
+        points: allPts.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, feasible: p.feasible, measured: p.measured ?? null })),
         front: front.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, feasible: p.feasible, units: p.units, measured: p.measured ?? null, saving: 1 - p.score / exactCost })),
         ms: Date.now() - t0, phaseMs,
     };
@@ -675,31 +724,67 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
         }
     }
 
-    // Reparo (com amostra): o ponto tem de caber no limite na validação inteira; se não couber, as últimas trocas
-    // aceitas são desfeitas, da mais recente para a mais antiga, até caber.
-    let repaired = 0;
+    // Escolha: o ponto viável mais barato entre os avaliados (qualquer ponto avaliado é uma rede válida; o fim do
+    // caminho da heurística fica em last). Com amostra, os viáveis na amostra são conferidos na validação inteira, do
+    // mais barato para o mais caro, até maxVerify deles, e fica o primeiro que cabe no limite (o reparo). A versão
+    // anterior desfazia as últimas trocas aceitas até caber, e o ponto resultante podia nem ter sido avaliado: no
+    // gráfico, ficava coberto por pontos viáveis mais baratos.
+    const last = cur;
+    const byCost = points.filter((p) => p.feasible).sort((a, b) => a.cost - b.cost);
+    let repaired = 0, chosen = null;
     if (P.fullVal) {
         phase = 'repair';
         const fv = P.fullVal, N = fv.set.n;
         const exW = fv.run(P.exact, { record: true }).wrong;
         const limit = exW + Math.floor((maxDrop * N) / 100 + 1e-9);
-        let r = fv.run(cur);
-        while (r.wrong > limit && accepted.length) {
-            const a = accepted.pop();
-            cur = cur.map((x, j) => (j === a.site ? { ...x, [a.kind]: a.prev } : { ...x }));
-            repaired++;
-            progress({ evals, images, phase, cost: total(cur) / exactCost, ms: Date.now() - t0 });
+        for (const p of byCost.slice(0, o.maxVerify ?? 25)) {
+            const r = fv.run(p.assign, { maxWrong: limit });
+            p.fullWrong = r.feasible ? r.wrong : null;
+            p.fullOk = r.feasible;
+            progress({ evals, images, phase, cost: p.cost / exactCost, ms: Date.now() - t0 });
             await new Promise((res) => setTimeout(res, 0));
-            r = fv.run(cur);
+            if (r.feasible) { chosen = p; break; }
+            repaired++;
         }
-    }
+        // Nenhum ponto visitado passou (a sequencial aceita cada troca no limite da amostra, então todos os seus
+        // viáveis ficam no limite): a partir do mais barato reprovado, a cada passo, volta para a exata o
+        // multiplicador ou o somador de uma camada; se alguma volta cabe na validação inteira, fica a mais barata
+        // delas; senão, segue com a volta que dá menos imagens erradas. Cada configuração testada entra nos pontos.
+        let budget = Math.max(0, (o.maxVerify ?? 25) - repaired - (chosen ? 1 : 0));
+        let from = chosen ? null : byCost[0] ?? null;
+        while (!chosen && from && budget > 0) {
+            const opts = [];
+            from.assign.forEach((a, si) => { for (const kind of ['mul', 'add']) if (a[kind]) opts.push(from.assign.map((x, j) => (j === si ? { ...x, [kind]: null } : { ...x }))); });
+            if (!opts.length) break;
+            const tried = [];
+            for (const assign of opts.map((a) => ({ a, c: total(a) })).sort((x, y) => x.c - y.c)) {
+                if (budget-- <= 0) break;
+                const r = fv.run(assign.a, { maxWrong: limit });
+                const q = { assign: copy(assign.a), cost: assign.c, wrong: null, feasible: true, full: false, repair: true, fullWrong: r.feasible ? r.wrong : null, fullOk: r.feasible, fullSeen: r.seen, fullWrongSeen: r.wrong };
+                points.push(q);
+                tried.push(q);
+                progress({ evals, images, phase, cost: q.cost / exactCost, ms: Date.now() - t0 });
+                await new Promise((res) => setTimeout(res, 0));
+                if (r.feasible) { chosen = q; break; }
+                repaired++;
+            }
+            // A volta mais perto de passar: menos erradas por imagem vista (a classificação para no limite).
+            from = chosen ? null : tried.sort((x, y) => x.fullWrongSeen / x.fullSeen - y.fullWrongSeen / y.fullSeen)[0] ?? null;
+        }
+        // A acurácia na amostra dos pontos do reparo (para o gráfico, no mesmo eixo dos outros).
+        for (const q of points.filter((x) => x.repair && x.wrong === null)) {
+            const r = await engine.run(q.assign, { base: q.assign });
+            q.wrong = r.wrong; q.full = true; q.feasible = r.wrong <= maxWrong;
+        }
+    } else chosen = byCost[0] ?? null;
+    cur = chosen ? copy(chosen.assign) : copy(P.exact);
     const best = cur;
     const fin = await engine.run(best, { base: best });
     const res = {
         heuristic, objective: P.objective, maxDrop, maxWrong, workers: engine.size, sample: P.sample, repaired,
         exact: { cost: exactCost, wrongVal: P.exactWrong, accVal: 1 - P.exactWrong / P.n },
         best: { assign: best, cost: total(best), wrongVal: fin.wrong, accVal: 1 - fin.wrong / P.n, saving: 1 - total(best) / exactCost },
-        evals, images, points, trace, ms: Date.now() - t0, phaseMs,
+        evals, images, points, trace, last, ms: Date.now() - t0, phaseMs,
     };
     // Com a amostra: a validação inteira, para a exata e o ponto escolhido.
     if (P.fullVal) {
