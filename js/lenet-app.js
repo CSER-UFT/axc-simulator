@@ -11,6 +11,7 @@ import { archSvg } from './axc/nnsvg.js';
 import { networkCost, normalizeDirectives, directiveTrees, parOptions, CONV_PIPES, DENSE_PIPES } from './axc/nngen.js';
 import { esc, accuracyCostSvg } from './ui/plots.js';
 import { highlightC } from './hls/highlight.js';
+import { dseStepSvg } from './hls/ui.js';
 import { Help } from './ui/help.js';
 import { initFigureExport } from './ui/figexport.js';
 import { LANGUAGES, getLanguage, setLanguage, t, locale, dec } from './i18n/index.js';
@@ -124,7 +125,7 @@ async function loadNN(id) {
     if (!testCache.has(ds.file)) testCache.set(ds.file, getBin(ds.file).then((b) => decodeTestSet(b, ds)));
     const changed = nnData?.net.id !== net.id;
     nnData = { net, test: await testCache.get(ds.file) };
-    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); $('nnSearchResult').innerHTML = ''; $('nnSearchStatus').textContent = ''; $('nnSearchFrontBox').classList.add('hidden'); }
+    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); $('nnSearchResult').innerHTML = ''; $('nnSearchStatus').textContent = ''; $('nnSearchFrontBox').classList.add('hidden'); stopPlay(); $('nnStepBox').classList.add('hidden'); }
     return nnData;
 }
 
@@ -492,6 +493,8 @@ $('nnSearchBtn').onclick = () => {
     $('nnSearchStop').disabled = false;
     $('nnSearchResult').innerHTML = '';
     $('nnSearchFrontBox').classList.add('hidden');
+    stopPlay();
+    $('nnStepBox').classList.add('hidden');
     const t0 = Date.now();
     searchWorker = new Worker(new URL('./nn-search-worker.js', import.meta.url), { type: 'module' });
     searchWorker.onmessage = ({ data: m }) => {
@@ -554,7 +557,84 @@ function renderSearch() {
     $('nnSearchResult').innerHTML = `<div class="nn-search-out"><div>${left}</div><div>${plot}</div></div>${h}`;
     $('nnSearchApply').onclick = () => { setOverride(r.best.assign); setTab('result'); render(); };
     renderFront(r);
+    initSteps(r);
 }
+
+// Passo a passo da busca híbrida: a calibração, cada iteração da heurística no modelo estático e as verificações por
+// classificação, no gráfico de custo contra a acurácia estimada (a da exata menos a queda estimada).
+// var: o estado é lido também ao trocar de modelo, que pode acontecer antes desta linha na carga da página.
+var stTimer = null, stSearch = null; // eslint-disable-line no-var
+function stopPlay() { if (stTimer) { clearInterval(stTimer); stTimer = null; } $('nnStPlay').textContent = '▶'; }
+function initSteps(r) {
+    stopPlay();
+    stSearch = r.hybrid && r.steps?.length ? r : null;
+    $('nnStepBox').classList.toggle('hidden', !stSearch);
+    if (!stSearch) return;
+    $('nnStSlider').max = String(r.steps.length - 1);
+    $('nnStSlider').value = '0';
+    renderStep();
+}
+function stepText(st, r) {
+    const obj = r.o.objective, unit = { area: 'µm²', luts: 'LUT', energy: 'nJ' }[obj];
+    const sc = (v) => `${nf(obj === 'energy' ? v / 1e6 : v, 0)} ${unit} (${nf((100 * v) / r.exact.cost, 1)}%)`;
+    const dp = (v) => nf(v, 2);
+    const feas = (st.tries ?? []).filter((x) => x.feasible).length;
+    const c = st.state ? sc(st.state.score) : '', d = st.state ? dp(st.state.drop) : '';
+    switch (st.kind) {
+        case 'calib': return t('nn.st.calib', { n: st.n, sites: st.sites.map((x) => `${x.name} ${x.n}`).join(', ') });
+        case 'start': return st.order ? t('nn.st.startSeq', { order: st.order.join(', ') }) : st.moves ? t(st.lazy ? 'nn.st.startEffLazy' : 'nn.st.startEff', { moves: st.moves, refresh: st.refresh }) : t('nn.st.start');
+        case 'seq': return t(st.chosen ? 'nn.st.seq' : 'nn.st.seqKeep', { g: st.group, n: st.tries.length, f: feas, u: dn(st.chosen ?? ''), c, d });
+        case 'eff': return t(st.zeroErr ? 'nn.st.effZero' : 'nn.st.eff', { k: st.n, n: st.tries.length, sk: st.skipped, f: feas, m: st.chosen, ds: sc(st.ds), de: dp(st.de), c, d });
+        case 'effEnd': return t('nn.st.effEnd', { n: st.tries.length, sk: st.skipped });
+        case 'prune': return t(st.cut ? 'nn.st.pruneCut' : 'nn.st.prune', { g: st.group, k: st.kept - 1, of: st.of - 1, cut: st.cut });
+        case 'exhStop': return t('nn.st.exhStop', { n: nf(st.total), max: nf(st.max) });
+        case 'order': return t('nn.st.order', { n: nf(st.total) });
+        case 'exh': return t(st.found ? 'nn.st.exhFound' : 'nn.st.exh', { a: st.from, b: st.to, n: nf(st.total), f: feas, found: st.found });
+        case 'rnd': return t('nn.st.rnd', { a: st.from, b: st.to, n: st.total, f: feas, c, d });
+        case 'seed': return t('nn.st.seed', { n: st.n ?? 1, c, d });
+        case 'imp': return t(`nn.st.${st.h}`, { k: st.n, n: st.tries.length, f: feas, m: st.chosen ?? '-', c, d }) + ((st.h === 'local' || st.h === 'grasp') && !st.chosen ? ` ${t('nn.st.impNone')}` : '');
+        case 'verify': return st.fullRejected
+            ? t('nn.st.verifyFull', { k: st.n, e: dp(st.drop), m: dp(st.measured), w: st.wrongFull, lim: st.fullLimit })
+            : t(st.ok ? 'nn.st.verifyOk' : 'nn.st.verifyBad', { k: st.n, e: dp(st.drop), m: st.capped ? `> ${dp(r.maxDrop)}` : dp(st.measured) });
+        default: return '';
+    }
+}
+function renderStep() {
+    const r = stSearch;
+    if (!r) return;
+    const k = Math.min(+$('nnStSlider').value, r.steps.length - 1), st = r.steps[k], obj = r.o.objective;
+    const chosenLabel = st.kind === 'seq' ? st.chosen : st.kind === 'eff' ? st.chosen : st.kind === 'exh' ? st.found : null;
+    const acc = 100 * r.exact.accVal, span = Math.max(5, 4 * r.maxDrop);
+    const yAxis = { of: (p) => acc - p.drop, measured: (q) => acc - q.measured, top: acc + span * 0.05, bot: acc - span, limit: acc - r.maxDrop, fmt: (v) => nf(v, 1) };
+    $('nnStFig').innerHTML = dseStepSvg(r.steps, k, { xLabel: t('nn.searchObj_' + obj), yLabel: t('nn.searchPlotYHyb'), refScore: r.exact.cost, chosenLabel, yAxis });
+    const state = st.state ? `${t('dse.st.state')}: ${nf((100 * st.state.score) / r.exact.cost, 1)}% ${t('nn.st.ofExact')} · ${t('nn.st.dropEst')} ${nf(st.state.drop, 2)} ${t('nn.pp')}${st.state.units?.length ? ` · ${st.state.units.map(dn).join(', ')}` : ''}` : '';
+    $('nnStText').innerHTML = `<div class="k">${esc(t('dse.st.iter', { k: k + 1, n: r.steps.length }))}</div><div>${esc(stepText(st, r))}</div><div class="state">${esc(state)}</div>`;
+    // O escolhido primeiro; depois, pela eficiência (quando há) ou pelo custo.
+    const tries = [...(st.tries ?? [])].sort((a, b) => (b.label === chosenLabel) - (a.label === chosenLabel) || (b.eff ?? -1) - (a.eff ?? -1) || a.score - b.score).slice(0, 300);
+    $('nnStTries').innerHTML = tries.length ? `<tr><th class="left">${t('dse.st.th.try')}</th><th>${t('nn.st.thCost')}</th><th>${t('nn.st.thDrop')}</th><th>${t('dse.st.th.ok')}</th>${tries.some((x) => x.eff !== undefined) ? `<th>${t('dse.st.th.eff')}</th>` : ''}</tr>`
+        + tries.map((x) => `<tr class="${x.label === chosenLabel ? 'pick' : ''}"><td class="units">${esc(dn(x.label).replace(/\b(MUL8|ADD32) /g, ''))}</td><td class="mono">${nf((100 * x.score) / r.exact.cost, 1)}%</td><td class="mono">${nf(x.drop, 2)}</td><td>${x.feasible ? '✓' : '✗'}</td>${x.eff !== undefined ? `<td>${x.eff === null ? '-' : x.eff > 1e14 ? t('dse.st.free') : x.eff.toExponential(2)}</td>` : ''}</tr>`).join('') : '';
+}
+$('nnStSlider').addEventListener('input', () => { stopPlay(); renderStep(); });
+const stGo = (d) => { if (!stSearch) return; $('nnStSlider').value = String(Math.max(0, Math.min(stSearch.steps.length - 1, d(+$('nnStSlider').value, stSearch.steps.length)))); renderStep(); };
+$('nnStFirst').addEventListener('click', () => { stopPlay(); stGo(() => 0); });
+$('nnStPrev').addEventListener('click', () => { stopPlay(); stGo((v) => v - 1); });
+$('nnStNext').addEventListener('click', () => { stopPlay(); stGo((v) => v + 1); });
+$('nnStLast').addEventListener('click', () => { stopPlay(); stGo((v, n) => n - 1); });
+$('nnStPlay').addEventListener('click', () => {
+    if (stTimer) { stopPlay(); return; }
+    const r = stSearch;
+    if (!r) return;
+    if (+$('nnStSlider').value >= r.steps.length - 1) $('nnStSlider').value = '0';
+    $('nnStPlay').textContent = '⏸';
+    renderStep();
+    stTimer = setInterval(() => {
+        const v = +$('nnStSlider').value;
+        if (v >= r.steps.length - 1) { stopPlay(); return; }
+        $('nnStSlider').value = String(v + 1);
+        renderStep();
+    }, +$('nnStSpeed').value);
+});
+$('nnStSpeed').addEventListener('change', () => { if (stTimer) { stopPlay(); $('nnStPlay').click(); } });
 
 /** Nome curto de uma unidade (sem a largura, que é sempre a mesma: MUL8 e ADD32). */
 const shortUnit = (name) => name.replace(/^(MUL8|ADD32) /, '');
@@ -588,7 +668,7 @@ function renderFront(r) {
             + `<td><button type="button" class="btn outline small" data-front="${i}">${t('dse.apply')}</button></td></tr>`).join('');
     $('nnSearchFrontBox').classList.remove('hidden');
 }
-let lastFront = [];
+var lastFront = []; // eslint-disable-line no-var
 $('nnSearchFront').addEventListener('click', (e) => {
     const b = e.target.closest('[data-front]');
     if (!b || !lastFront[+b.dataset.front]) return;

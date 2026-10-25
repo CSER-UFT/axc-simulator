@@ -111,6 +111,13 @@ test('busca híbrida: calibração, busca no modelo estático e ponto verificado
     assert.equal(ev.calib, r.calib.length);
     assert.equal(ev.search, r.evals);
     assert.ok(ev.verify >= 1 && ev.verify === r.points.filter((p) => p.measured).length);
+    // Passo a passo: começa pela calibração, tem as iterações da heurística e termina na verificação que passou.
+    assert.equal(r.steps[0].kind, 'calib');
+    assert.equal(r.steps[0].n, r.calib.length);
+    assert.ok(r.steps.some((s) => s.kind === 'imp'));
+    const vs = r.steps.filter((s) => s.kind === 'verify');
+    assert.ok(vs.at(-1).ok && Math.abs(vs.at(-1).score - r.best.cost) < 1e-6);
+    assert.ok(vs.slice(0, -1).every((s) => !s.ok));
     // A fronteira estimada: custo crescente, queda decrescente.
     for (let k = 1; k < r.front.length; k++) assert.ok(r.front[k].cost >= r.front[k - 1].cost && r.front[k].drop <= r.front[k - 1].drop + 1e-6);
     // O erro estático da exata é zero, e o de uma troca, positivo.

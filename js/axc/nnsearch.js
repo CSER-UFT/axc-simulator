@@ -507,6 +507,9 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
             if (now - last > 100) { last = now; progress({ phase: 'search', evals: n, ms: now - t0 }); }
         },
     });
+    // Primeiro passo do passo a passo: a calibração (as trocas isoladas medidas e as curvas por camada).
+    const exactState = { score: exactCost, drop: 0, units: [] };
+    ctx.steps.push({ kind: 'calib', n: calib.points.length, sites: P.net.sites.map((l, si) => ({ name: l.name, n: calib.points.filter((q) => q.site === si).length, max: Math.max(0, ...calib.points.filter((q) => q.site === si).map((q) => q.drop)) })), state: exactState });
     let error = null;
     try { runHeuristic(heuristic, Pn, ctx, { granularity: 'class', ...o }); } catch (e) { error = e.message; }
     phaseMs.search = Date.now() - t1;
@@ -533,18 +536,21 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
     const front = paretoPoints(ctx.points);
     const onFront = new Set(front);
     const feasible = [...front.filter((p) => p.feasible), ...ctx.points.filter((p) => p.feasible && !onFront.has(p)).sort((a, b) => a.score - b.score)].slice(0, o.maxVerify ?? 25);
-    let chosen = null, verified = 0, repaired = 0;
+    let chosen = null, verified = 0, repaired = 0, nv = 0;
+    /** Passo de verificação (na ordem em que a decisão é tomada). */
+    const vstep = (p, extra = {}) => ctx.steps.push({ kind: 'verify', n: ++nv, label: p.units.join(', ') || 'exato', score: p.score, drop: p.drop, measured: p.measured.drop, ok: p.measured.ok, capped: !p.measured.ok, state: { score: p.score, drop: p.drop, units: p.units }, ...extra });
     for (let b = 0; b < feasible.length && !chosen; b += engine.size) {
         const batch = feasible.slice(b, b + engine.size);
         await mapLimit(batch, engine.size, measure);
         verified += batch.length;
         for (const p of batch) {
-            if (!p.measured.ok) continue;
+            if (!p.measured.ok) { vstep(p); continue; }
             if (P.fullVal) {
                 const w = P.fullVal.run(p.assign).wrong;
                 p.measured.wrongFull = w;
-                if (w > fullLimit) { repaired++; continue; }
+                if (w > fullLimit) { repaired++; vstep(p, { ok: false, fullRejected: true, wrongFull: w, fullLimit }); continue; }
             }
+            vstep(p);
             chosen = p;
             break;
         }

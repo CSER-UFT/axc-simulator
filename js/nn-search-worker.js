@@ -47,15 +47,15 @@ self.onmessage = async ({ data: o }) => {
             : await searchNetwork(P, { heuristic: o.heuristic, maxDrop: o.maxDrop, progress }, engine);
         // Custo de cada camada do ponto escolhido e da exata (para a tabela).
         const layers = (assign) => P.cm.network(assign).layers.map((l) => ({ name: l.name, site: l.site, area: l.area, luts: l.luts, energy: l.energy, cycles: l.cycles }));
-        // Na híbrida, os pontos do modelo estático são milhares: só os perto do limite vão para o gráfico, e os passos
-        // (o passo a passo das heurísticas) ficam para a animação.
+        // Na híbrida, os pontos do modelo estático são milhares: só os perto do limite vão para o gráfico; o passo a
+        // passo (calibração, iterações da heurística e verificações) vai para a animação.
         const points = o.hybrid
             ? r.points.filter((p) => p.drop <= Math.max(5, 4 * r.maxDrop) || p.measured).map((p) => ({ cost: p.cost, drop: p.drop, feasible: p.feasible, measured: p.measured, assign: p.assign }))
             : r.points.map((p) => ({ cost: p.cost, wrong: p.wrong, feasible: p.feasible, full: p.full, assign: p.assign }));
         self.postMessage({
             type: 'done',
             result: {
-                ...r, points, steps: undefined,
+                ...r, points, steps: o.hybrid ? r.steps : undefined,
                 cands: P.cands.map((c) => ({ mul: c.mul.map((x) => x.name), add: c.add.map((x) => x.name) })),
                 layersBest: layers(r.best.assign), layersExact: layers(P.exact), n: P.n, testN: test.n,
             },

@@ -117,6 +117,22 @@
                         </div>
                         <p class="note" id="nnSearchStatus"></p>
                         <div id="nnSearchResult"></div>
+                        <div id="nnStepBox" class="hidden">
+                            <h3 style="margin-top:12px" data-i18n="dse.stepTitle">Passo a passo da busca</h3>
+                            <div class="dse-player">
+                                <button type="button" class="btn outline" id="nnStFirst" data-i18n-title="nn.st.first">⏮</button>
+                                <button type="button" class="btn outline" id="nnStPrev" data-i18n-title="nn.st.prev">◀</button>
+                                <button type="button" class="btn primary" id="nnStPlay">▶</button>
+                                <button type="button" class="btn outline" id="nnStNext" data-i18n-title="nn.st.next">▶|</button>
+                                <button type="button" class="btn outline" id="nnStLast" data-i18n-title="nn.st.last">⏭</button>
+                                <input type="range" id="nnStSlider" min="0" max="0" value="0" />
+                                <select id="nnStSpeed"><option value="1500" data-i18n="dse.speed.slow">devagar</option><option value="700" selected data-i18n="dse.speed.normal">normal</option><option value="250" data-i18n="dse.speed.fast">rápido</option></select>
+                            </div>
+                            <div class="dse-step">
+                                <div><div class="fig-box" id="nnStFig"></div><p class="note" data-i18n="nn.st.legend">Cinza: avaliado antes; azul: avaliado nesta iteração e viável pela estimativa; vazado: passa do limite estimado; laranja: o escolhido; a linha liga os estados da busca e o anel é o estado atual. Na verificação, o ponto verde (ou vazado, se não passar) é a acurácia medida por classificação.</p></div>
+                                <div><div class="dse-expl" id="nnStText"></div><div class="scroll-box" style="max-height:340px"><table id="nnStTries" class="hls-table"></table></div></div>
+                            </div>
+                        </div>
                         <div id="nnSearchFrontBox" class="hidden">
                             <h3 style="margin-top:12px" data-i18n="nn.frontTitle">Fronteira de Pareto</h3>
                             <p class="note" id="nnSearchFrontNote"></p>

@@ -65,7 +65,14 @@ Ruído da validação: desvio padrão de sqrt(p(1-p)/n), 0,3 p.p. no MNIST e 1,4
 * No FPGA, a economia de LUT das unidades aproximadas é pequena (o produto exato do Vitis tem 64 LUTs); o objetivo
   LUT tende a escolher unidades exatas. Área e energia (sky130) continuam com economia.
 
-## Próxima conversa: busca híbrida e interface da página das redes (lenet.html)
+## Interface da página das redes (lenet.html): feita
+
+Os três itens abaixo estão implementados (out/2026): a aba Busca tem as oito heurísticas híbridas (e a busca medida),
+a tabela da fronteira (custo, economia, queda estimada e medida, unidades por camada, Aplicar) e o passo a passo
+(calibração, iterações da heurística, verificações), com `dseStepSvg` de `js/hls/ui.js` num eixo y de acurácia
+estimada (opção `yAxis`; o SVG da HLS ficou idêntico em 86 passos conferidos).
+
+## Plano original da interface
 
 1. A busca híbrida descrita acima, com as heurísticas da página HLS.
 2. Lista dos pontos da fronteira de Pareto, como na página HLS (tabela com custo, queda de acurácia e unidades por
