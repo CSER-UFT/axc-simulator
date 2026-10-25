@@ -68,7 +68,7 @@
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U8" BINDMODULE="gauss_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U8" RTLNAME="gauss_mul_8ns_10ns_17_1_1">
       <Resources LUT="49"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U8" SOURCE="kernel.cpp:101" URAM="0" VARIABLE="mul_ln101"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U8" SOURCE="kernel.cpp:103" URAM="0" VARIABLE="mul_ln103"/>
     </RtlModule>
     <RtlModule CELL="inst/tmp_11_u_MUL8_T4_C_bb_fu_445" DEPTH="1" TYPE="function" MODULENAME="u_MUL8_T4_C_bb" DISPNAME="tmp_11_u_MUL8_T4_C_bb_fu_445" RTLNAME="u_MUL8_T4_C_bb">
       <SubModules count="1">u</SubModules>
@@ -236,8 +236,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="tmp_18_reg_1227_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1330"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.263" DATAPATH_LOGIC_DELAY="3.101" DATAPATH_NET_DELAY="2.162" ENDPOINT_PIN="tmp_30_reg_1255_reg[6]/D" LOGIC_LEVELS="6" MAX_FANOUT="13" SLACK="-0.285" STARTPOINT_PIN="add_ln101_reg_1244_reg[6]/C">
-      <CELL NAME="add_ln101_reg_1244_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1293"/>
+    <TPATH DATAPATH_DELAY="5.263" DATAPATH_LOGIC_DELAY="3.101" DATAPATH_NET_DELAY="2.162" ENDPOINT_PIN="tmp_30_reg_1255_reg[6]/D" LOGIC_LEVELS="6" MAX_FANOUT="13" SLACK="-0.285" STARTPOINT_PIN="add_ln103_reg_1244_reg[6]/C">
+      <CELL NAME="add_ln103_reg_1244_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1293"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U8/tmp_30_reg_1255_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U8/tmp_30_reg_1255_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U8/tmp_30_reg_1255_reg[6]_i_9" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
@@ -246,8 +246,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U8/tmp_30_reg_1255_reg[6]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_30_reg_1255_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1272"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.216" DATAPATH_LOGIC_DELAY="2.941" DATAPATH_NET_DELAY="2.275" ENDPOINT_PIN="tmp_30_reg_1255_reg[4]/D" LOGIC_LEVELS="6" MAX_FANOUT="13" SLACK="-0.238" STARTPOINT_PIN="add_ln101_reg_1244_reg[6]/C">
-      <CELL NAME="add_ln101_reg_1244_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1293"/>
+    <TPATH DATAPATH_DELAY="5.216" DATAPATH_LOGIC_DELAY="2.941" DATAPATH_NET_DELAY="2.275" ENDPOINT_PIN="tmp_30_reg_1255_reg[4]/D" LOGIC_LEVELS="6" MAX_FANOUT="13" SLACK="-0.238" STARTPOINT_PIN="add_ln103_reg_1244_reg[6]/C">
+      <CELL NAME="add_ln103_reg_1244_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1293"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U8/tmp_30_reg_1255_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U8/tmp_30_reg_1255_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U8/tmp_30_reg_1255[2]_i_21" PRIMITIVE_TYPE="LUT.others.LUT3" LINE_NUMBER="10"/>
@@ -267,7 +267,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/gauss_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Mon Oct 19 07:35:43 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 22:02:23 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

@@ -1,0 +1,67 @@
+{
+ "id": "minilenet-mnist_aprox_10ns_fc2",
+ "note": "MiniLenet, camada fc2, fc2: MUL8 MITCHELL + ADD32 LOA7",
+ "clockNs": 10,
+ "part": "xc7a100tcsg324-1",
+ "top": "fc2",
+ "delays": "fpga",
+ "assign": {
+  "S1.3": "MUL8 MITCHELL",
+  "S1.4": "ADD24 LOA7",
+  "S2.2": "ADD24 LOA7"
+ },
+ "prediction": {
+  "cycles": 1540,
+  "timeNs": 15400,
+  "intervalNs": 10,
+  "critPs": 8818,
+  "luts": 274,
+  "carry4": 48,
+  "ff": 138,
+  "areaUm2": 63998.8972,
+  "energyFj": 16972257.220760003,
+  "loops": [
+   {
+    "label": "fc2_o",
+    "mode": "sequential",
+    "trip": 10,
+    "II": null,
+    "iterLatency": 154,
+    "latency": 1540
+   },
+   {
+    "label": "fc2_i",
+    "mode": "pipelined",
+    "trip": 147,
+    "II": 1,
+    "iterLatency": 2,
+    "latency": 149
+   }
+  ],
+  "addrLuts": 44,
+  "units": [
+   {
+    "unit": "ADD24 LOA7",
+    "count": 2,
+    "luts": 48,
+    "carry4": 10
+   },
+   {
+    "unit": "MUL8 MITCHELL",
+    "count": 1,
+    "luts": 76,
+    "carry4": 2
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
+  }
+ }
+}

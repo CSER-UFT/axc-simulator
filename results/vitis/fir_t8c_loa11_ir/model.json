@@ -44,7 +44,7 @@
   "critPs": 4523,
   "luts": 978,
   "carry4": 12,
-  "ff": 733,
+  "ff": 744,
   "areaUm2": 43879.27185105105,
   "energyFj": 115026528.18886663,
   "loops": [
@@ -60,12 +60,6 @@
   "addrLuts": 522,
   "units": [
    {
-    "unit": "MUL8 T8 +C",
-    "count": 14,
-    "luts": 78,
-    "carry4": 8
-   },
-   {
     "unit": "ADD16 LOA11",
     "count": 11,
     "luts": 137,
@@ -76,6 +70,12 @@
     "count": 4,
     "luts": 44,
     "carry4": 0
+   },
+   {
+    "unit": "MUL8 T8 +C",
+    "count": 14,
+    "luts": 78,
+    "carry4": 8
    }
   ],
   "model": {
@@ -85,7 +85,8 @@
    "pipelineOverhead": 1,
    "flatten": true,
    "uremLatency": 4,
-   "divAddrCycles": 1
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
   }
  }
 }

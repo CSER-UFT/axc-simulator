@@ -14,7 +14,7 @@
   "critPs": 4026,
   "luts": 137,
   "carry4": 19,
-  "ff": 89,
+  "ff": 100,
   "areaUm2": 6448.678800000001,
   "energyFj": 2668375.9004879994,
   "loops": [
@@ -49,7 +49,8 @@
    "pipelineOverhead": 1,
    "flatten": true,
    "uremLatency": 4,
-   "divAddrCycles": 1
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
   }
  }
 }

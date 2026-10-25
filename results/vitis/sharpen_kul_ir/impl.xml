@@ -71,7 +71,7 @@
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U7" BINDMODULE="sharpen_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U7" RTLNAME="sharpen_mul_8ns_10ns_17_1_1">
       <Resources LUT="49"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U7" SOURCE="kernel.cpp:278" URAM="0" VARIABLE="mul_ln278"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U7" SOURCE="kernel.cpp:280" URAM="0" VARIABLE="mul_ln280"/>
     </RtlModule>
     <RtlModule CELL="inst/urem_8ns_3ns_2_12_1_U3" BINDMODULE="sharpen_urem_8ns_3ns_2_12_1" DEPTH="1" TYPE="rtl" MODULENAME="urem_8ns_3ns_2_12_1" DISPNAME="urem_8ns_3ns_2_12_1_U3" RTLNAME="sharpen_urem_8ns_3ns_2_12_1">
       <Resources FF="39" LUT="31"/>
@@ -134,8 +134,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="tmp_reg_912_reg[4]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="752"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.157" DATAPATH_LOGIC_DELAY="2.634" DATAPATH_NET_DELAY="2.523" ENDPOINT_PIN="tmp_22_reg_954_reg[6]/D" LOGIC_LEVELS="6" MAX_FANOUT="9" SLACK="-0.132" STARTPOINT_PIN="add_ln278_reg_929_reg[3]/C">
-      <CELL NAME="add_ln278_reg_929_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="719"/>
+    <TPATH DATAPATH_DELAY="5.157" DATAPATH_LOGIC_DELAY="2.634" DATAPATH_NET_DELAY="2.523" ENDPOINT_PIN="tmp_22_reg_954_reg[6]/D" LOGIC_LEVELS="6" MAX_FANOUT="9" SLACK="-0.132" STARTPOINT_PIN="add_ln280_reg_929_reg[3]/C">
+      <CELL NAME="add_ln280_reg_929_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="719"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_16_cast_reg_959[1]_i_26" PRIMITIVE_TYPE="LUT.others.LUT3" LINE_NUMBER="10"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_16_cast_reg_959_reg[1]_i_19" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_22_reg_954_reg[6]_i_10" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
@@ -163,8 +163,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="tmp_reg_912_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="752"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.093" DATAPATH_LOGIC_DELAY="2.570" DATAPATH_NET_DELAY="2.523" ENDPOINT_PIN="tmp_22_reg_954_reg[5]/D" LOGIC_LEVELS="6" MAX_FANOUT="9" SLACK="-0.068" STARTPOINT_PIN="add_ln278_reg_929_reg[3]/C">
-      <CELL NAME="add_ln278_reg_929_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="719"/>
+    <TPATH DATAPATH_DELAY="5.093" DATAPATH_LOGIC_DELAY="2.570" DATAPATH_NET_DELAY="2.523" ENDPOINT_PIN="tmp_22_reg_954_reg[5]/D" LOGIC_LEVELS="6" MAX_FANOUT="9" SLACK="-0.068" STARTPOINT_PIN="add_ln280_reg_929_reg[3]/C">
+      <CELL NAME="add_ln280_reg_929_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="719"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_16_cast_reg_959[1]_i_26" PRIMITIVE_TYPE="LUT.others.LUT3" LINE_NUMBER="10"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_16_cast_reg_959_reg[1]_i_19" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_22_reg_954_reg[6]_i_10" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
@@ -184,7 +184,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/sharpen_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 11:40:16 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 20:48:09 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

@@ -132,7 +132,7 @@
     </TPATH>
     <TPATH DATAPATH_DELAY="5.168" DATAPATH_LOGIC_DELAY="2.523" DATAPATH_NET_DELAY="2.645" ENDPOINT_PIN="tmp_1_reg_1102_reg[4]/D" LOGIC_LEVELS="7" MAX_FANOUT="23" SLACK="-0.190" STARTPOINT_PIN="ap_CS_fsm_reg[0]_replica_1/C">
       <CELL NAME="ap_CS_fsm_reg[0]_replica_1" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="645"/>
-      <CELL NAME="flow_control_loop_pipe_U/select_ln22_1_reg_1132[4]_i_3" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/select_ln23_1_reg_1132[4]_i_3" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/tmp_1_reg_1102_reg[6]_i_34" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/tmp_1_reg_1102_reg[6]_i_13" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/tmp_1_reg_1102[2]_i_4" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
@@ -143,7 +143,7 @@
     </TPATH>
     <TPATH DATAPATH_DELAY="5.147" DATAPATH_LOGIC_DELAY="2.502" DATAPATH_NET_DELAY="2.645" ENDPOINT_PIN="tmp_1_reg_1102_reg[6]/D" LOGIC_LEVELS="7" MAX_FANOUT="23" SLACK="-0.169" STARTPOINT_PIN="ap_CS_fsm_reg[0]_replica_1/C">
       <CELL NAME="ap_CS_fsm_reg[0]_replica_1" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="645"/>
-      <CELL NAME="flow_control_loop_pipe_U/select_ln22_1_reg_1132[4]_i_3" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/select_ln23_1_reg_1132[4]_i_3" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/tmp_1_reg_1102_reg[6]_i_34" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/tmp_1_reg_1102_reg[6]_i_13" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/tmp_1_reg_1102[2]_i_4" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
@@ -172,7 +172,7 @@
     </TPATH>
     <TPATH DATAPATH_DELAY="5.073" DATAPATH_LOGIC_DELAY="2.428" DATAPATH_NET_DELAY="2.645" ENDPOINT_PIN="tmp_1_reg_1102_reg[5]/D" LOGIC_LEVELS="7" MAX_FANOUT="23" SLACK="-0.095" STARTPOINT_PIN="ap_CS_fsm_reg[0]_replica_1/C">
       <CELL NAME="ap_CS_fsm_reg[0]_replica_1" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="645"/>
-      <CELL NAME="flow_control_loop_pipe_U/select_ln22_1_reg_1132[4]_i_3" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
+      <CELL NAME="flow_control_loop_pipe_U/select_ln23_1_reg_1132[4]_i_3" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/tmp_1_reg_1102_reg[6]_i_34" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/tmp_1_reg_1102_reg[6]_i_13" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U4/tmp_1_reg_1102[2]_i_4" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
@@ -201,7 +201,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/gauss_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 11:00:01 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 20:18:03 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

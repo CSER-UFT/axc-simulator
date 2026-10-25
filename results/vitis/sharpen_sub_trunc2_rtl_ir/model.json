@@ -1,0 +1,62 @@
+{
+ "case": "sharpen_sub_trunc2_rtl_ir",
+ "kernel": "sharpen",
+ "kind": "ir",
+ "note": "subtrações com ADD16 TRUNC2, unidades em RTL (caixa preta)",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "sharpen",
+ "assign": {
+  "S1.3": "ADD16 TRUNC2",
+  "S1.5": "ADD16 TRUNC2",
+  "S1.7": "ADD16 TRUNC2",
+  "S1.9": "ADD16 TRUNC2"
+ },
+ "prediction": {
+  "cycles": 72217,
+  "timeNs": 361085,
+  "intervalNs": 10,
+  "critPs": 4558,
+  "luts": 535,
+  "carry4": 21,
+  "ff": 449,
+  "areaUm2": 6663.9680186567175,
+  "energyFj": 729742395.2456678,
+  "loops": [
+   {
+    "label": "rows_cols",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 36100,
+    "II": 2,
+    "iterLatency": 18,
+    "latency": 72217
+   }
+  ],
+  "addrLuts": 404,
+  "units": [
+   {
+    "unit": "×5 (1 soma)",
+    "count": 1,
+    "luts": 9,
+    "carry4": 3
+   },
+   {
+    "unit": "ADD16 TRUNC2",
+    "count": 4,
+    "luts": 34,
+    "carry4": 10
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
+  }
+ }
+}

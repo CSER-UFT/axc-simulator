@@ -1,0 +1,2331 @@
+
+****** Vitis HLS - High-Level Synthesis from C, C++ and OpenCL v2022.2 (64-bit)
+  **** SW Build 3670227 on Oct 13 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source /tools/Xilinx/Vitis_HLS/2022.2/scripts/vitis_hls/hls.tcl -notrace
+INFO: [HLS 200-10] Running '/tools/Xilinx/Vitis_HLS/2022.2/bin/unwrapped/lnx64.o/vitis_hls'
+INFO: [HLS 200-10] For user 'tiago' on host 'Avell' (Linux_x86_64 version 5.15.0-139-generic) on Sat Oct 24 17:09:32 -03 2026
+INFO: [HLS 200-10] On os Ubuntu 20.04.6 LTS
+INFO: [HLS 200-10] In directory '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network'
+Sourcing Tcl script 'run.tcl'
+INFO: [HLS 200-1510] Running: open_project -reset proj 
+INFO: [HLS 200-10] Creating and opening project '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj'.
+INFO: [HLS 200-1510] Running: set_top network 
+INFO: [HLS 200-1510] Running: add_files kernel.cpp -cflags -I/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network 
+INFO: [HLS 200-10] Adding design file 'kernel.cpp' to the project
+INFO: [HLS 200-1510] Running: add_files -tb tb.cpp -cflags -I/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network 
+INFO: [HLS 200-10] Adding test bench file 'tb.cpp' to the project
+INFO: [HLS 200-1510] Running: add_files -tb images.dat 
+INFO: [HLS 200-10] Adding test bench file 'images.dat' to the project
+INFO: [HLS 200-1510] Running: add_files -tb expected.dat 
+INFO: [HLS 200-10] Adding test bench file 'expected.dat' to the project
+INFO: [HLS 200-1510] Running: add_files -tb labels.dat 
+INFO: [HLS 200-10] Adding test bench file 'labels.dat' to the project
+INFO: [HLS 200-1510] Running: open_solution -reset solution1 -flow_target vivado 
+INFO: [HLS 200-10] Creating and opening solution '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1'.
+INFO: [HLS 200-10] Cleaning up the solution database.
+INFO: [HLS 200-1505] Using flow_target 'vivado'
+Resolution: For help on HLS 200-1505 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-1505.html
+INFO: [HLS 200-435] Setting 'open_solution -flow_target vivado' configuration: config_interface -m_axi_latency=0
+INFO: [HLS 200-1510] Running: set_part xc7a100tcsg324-1 
+INFO: [HLS 200-1611] Setting target device to 'xc7a100t-csg324-1'
+INFO: [HLS 200-1510] Running: create_clock -period 10 -name default 
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [HLS 200-1510] Running: config_op mul -impl fabric 
+INFO: [HLS 200-1445] Configure operator 'mul' with implementation style 'fabric'.
+INFO: [HLS 200-1510] Running: config_compile -pipeline_loops 0 
+INFO: [HLS 200-1510] Running: config_array_partition -throughput_driven off 
+INFO: [HLS 200-1510] Running: csim_design 
+Running Dispatch Server on port: 35881
+INFO: [SIM 211-2] *************** CSIM start ***************
+INFO: [SIM 211-4] CSIM will launch GCC as the compiler.
+   Compiling ../../../../tb.cpp in debug mode
+   Compiling ../../../../kernel.cpp in debug mode
+   Generating csim.exe
+AXC_MISMATCHES 0 OF 1000
+AXC_ACCURACY 72 OF 100
+INFO: [SIM 211-1] CSim done with 0 errors.
+INFO: [SIM 211-3] *************** CSIM finish ***************
+INFO: [HLS 200-111] Finished Command csim_design CPU user time: 452.54 seconds. CPU system time: 0.97 seconds. Elapsed time: 454.3 seconds; current allocated memory: 0.000 MB.
+INFO: [HLS 200-1510] Running: csynth_design 
+INFO: [HLS 200-111] Finished File checks and directory preparation: CPU user time: 0.01 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.01 seconds; current allocated memory: 748.152 MB.
+INFO: [HLS 200-10] Analyzing design file 'kernel.cpp' ... 
+INFO: [HLS 200-111] Finished Source Code Analysis and Preprocessing: CPU user time: 33.48 seconds. CPU system time: 1.35 seconds. Elapsed time: 34.89 seconds; current allocated memory: 751.133 MB.
+INFO: [HLS 200-777] Using interface defaults for 'Vivado' flow target.
+INFO: [HLS 214-131] Inlining function 'uc_ADD32_LOA6(ap_uint<32>, ap_uint<32>)' into 'fc1(ap_uint<8>*, ap_uint<8>*)' (kernel.cpp:2765:50)
+INFO: [HLS 214-131] Inlining function 'uc_ADD24_LOA5(ap_uint<24>, ap_uint<24>)' into 'fc2(ap_uint<8>*, ap_uint<8>*)' (kernel.cpp:2796:50)
+INFO: [HLS 214-131] Inlining function 'uc_ADD24_LOA5(ap_uint<24>, ap_uint<24>)' into 'fc3(ap_uint<8>*, ap_uint<8>*)' (kernel.cpp:2825:50)
+INFO: [HLS 214-241] Aggregating bram variable 'in' with compact=bit mode in 8-bits (kernel.cpp:2833:0)
+INFO: [HLS 200-111] Finished Compiling Optimization and Transform: CPU user time: 352.72 seconds. CPU system time: 1.22 seconds. Elapsed time: 354.29 seconds; current allocated memory: 751.320 MB.
+INFO: [HLS 200-111] Finished Checking Pragmas: CPU user time: 0 seconds. CPU system time: 0 seconds. Elapsed time: 0 seconds; current allocated memory: 751.320 MB.
+INFO: [HLS 200-10] Starting code transformations ...
+INFO: [HLS 200-111] Finished Standard Transforms: CPU user time: 200.14 seconds. CPU system time: 0.04 seconds. Elapsed time: 200.52 seconds; current allocated memory: 804.363 MB.
+INFO: [HLS 200-10] Checking synthesizability ...
+INFO: [HLS 200-111] Finished Checking Synthesizability: CPU user time: 230.23 seconds. CPU system time: 0.22 seconds. Elapsed time: 232.86 seconds; current allocated memory: 827.324 MB.
+INFO: [XFORM 203-401] Performing if-conversion on hyperblock to (kernel.cpp:1737:1) in function 'axc_requant'... converting 3 basic blocks.
+INFO: [XFORM 203-11] Balancing expressions in function 'u_MUL8_T6_A10c' (kernel.cpp:775:1)...17 expression(s) balanced.
+INFO: [XFORM 203-11] Balancing expressions in function 'u_MUL8_DRUM5' (kernel.cpp:377:1)...83 expression(s) balanced.
+INFO: [XFORM 203-11] Balancing expressions in function 'u_MUL8_DRUM3' (kernel.cpp:1156:1)...138 expression(s) balanced.
+INFO: [HLS 200-111] Finished Loop, function and other optimizations: CPU user time: 226.18 seconds. CPU system time: 0.11 seconds. Elapsed time: 227.13 seconds; current allocated memory: 884.320 MB.
+INFO: [XFORM 203-541] Flattening a loop nest 'pool2_h' (kernel.cpp:2709:20) in function 'pool2'.
+INFO: [XFORM 203-541] Flattening a loop nest 'pool2_c' (kernel.cpp:2707:20) in function 'pool2'.
+INFO: [XFORM 203-541] Flattening a loop nest 'pool1_h' (kernel.cpp:2064:20) in function 'pool1'.
+INFO: [XFORM 203-541] Flattening a loop nest 'pool1_c' (kernel.cpp:2062:20) in function 'pool1'.
+INFO: [XFORM 203-541] Flattening a loop nest 'flatten_r' (kernel.cpp:2731:22) in function 'flatten'.
+WARNING: [HLS 200-960] Cannot flatten loop 'fc3_o' (kernel.cpp:2810:16) in function 'fc3' the outer loop is not a perfect loop because there is nontrivial logic in the loop latch.
+Resolution: For help on HLS 200-960 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-960.html
+WARNING: [HLS 200-960] Cannot flatten loop 'fc2_o' (kernel.cpp:2781:16) in function 'fc2' the outer loop is not a perfect loop because there is nontrivial logic in the loop latch.
+Resolution: For help on HLS 200-960 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-960.html
+WARNING: [HLS 200-960] Cannot flatten loop 'fc1_o' (kernel.cpp:2750:16) in function 'fc1' the outer loop is not a perfect loop because there is nontrivial logic in the loop latch.
+Resolution: For help on HLS 200-960 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-960.html
+INFO: [XFORM 203-541] Flattening a loop nest 'conv2_h' (kernel.cpp:2092:20) in function 'conv2'.
+INFO: [XFORM 203-541] Flattening a loop nest 'conv2_f' (kernel.cpp:2090:20) in function 'conv2'.
+INFO: [XFORM 203-541] Flattening a loop nest 'conv1_h' (kernel.cpp:1747:20) in function 'conv1'.
+INFO: [XFORM 203-541] Flattening a loop nest 'conv1_f' (kernel.cpp:1745:20) in function 'conv1'.
+INFO: [HLS 200-472] Inferring partial write operation for 'y' (kernel.cpp:2723:36)
+INFO: [HLS 200-472] Inferring partial write operation for 'y' (kernel.cpp:2078:37)
+INFO: [HLS 200-472] Inferring partial write operation for 'y' (kernel.cpp:2736:28)
+INFO: [HLS 200-472] Inferring partial write operation for 'y' (kernel.cpp:2799:15)
+INFO: [HLS 200-472] Inferring partial write operation for 'y' (kernel.cpp:2768:15)
+INFO: [HLS 200-472] Inferring partial write operation for 'y' (kernel.cpp:2699:37)
+INFO: [HLS 200-472] Inferring partial write operation for 'y' (kernel.cpp:2054:37)
+INFO: [HLS 200-111] Finished Architecture Synthesis: CPU user time: 87.91 seconds. CPU system time: 0.07 seconds. Elapsed time: 88.7 seconds; current allocated memory: 1.083 GB.
+INFO: [HLS 200-10] Starting hardware synthesis ...
+INFO: [HLS 200-10] Synthesizing 'network' ...
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'u_MUL8_T4_A2c' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining function 'u_MUL8_T4_A2c'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 0, Final II = 1, Depth = 2, function 'u_MUL8_T4_A2c'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 1 seconds. CPU system time: 0.06 seconds. Elapsed time: 1.11 seconds; current allocated memory: 1.091 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.35 seconds. CPU system time: 0 seconds. Elapsed time: 0.36 seconds; current allocated memory: 1.091 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'u_ADD24_LOA7' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining function 'u_ADD24_LOA7'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 0, Final II = 1, Depth = 1, function 'u_ADD24_LOA7'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.87 seconds. CPU system time: 0 seconds. Elapsed time: 0.88 seconds; current allocated memory: 1.091 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.08 seconds. CPU system time: 0 seconds. Elapsed time: 0.08 seconds; current allocated memory: 1.091 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'axc_requant' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining function 'axc_requant'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 3, function 'axc_requant'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.21 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.21 seconds; current allocated memory: 1.091 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 1.091 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'conv1' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [HLS 200-1457] Automatically inferring inferring RAM_1WNR storage type for array 'y'. Use bind_storage pragma to override this type.
+INFO: [SCHED 204-61] Pipelining loop 'conv1_f_conv1_h_conv1_w'.
+WARNING: [HLS 200-882] User specified resource constraint cannot be honored The memory core ROM_2P_BRAM has insufficient ports to support accesses to array 'w_V_4' (II = 1)..
+Resolution: For help on HLS 200-882 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-882.html
+WARNING: [HLS 200-885] The II Violation in module 'conv1' (loop 'conv1_f_conv1_h_conv1_w'): Unable to schedule 'load' operation ('v1_11.V', kernel.cpp:1762) on array 'w_V_4' due to limited memory ports (II = 2). Please consider using a memory core with more ports or partitioning the array 'w_V_4'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv1' (loop 'conv1_f_conv1_h_conv1_w'): Unable to schedule 'load' operation ('v1_19.V', kernel.cpp:1770) on array 'w_V_4' due to limited memory ports (II = 3). Please consider using a memory core with more ports or partitioning the array 'w_V_4'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv1' (loop 'conv1_f_conv1_h_conv1_w'): Unable to schedule 'load' operation ('v1_26.V', kernel.cpp:1777) on array 'w_V_4' due to limited memory ports (II = 4). Please consider using a memory core with more ports or partitioning the array 'w_V_4'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv1' (loop 'conv1_f_conv1_h_conv1_w'): Unable to schedule 'load' operation ('w_V_4_load_144', kernel.cpp:1745) on array 'w_V_4' due to limited memory ports (II = 67). Please consider using a memory core with more ports or partitioning the array 'w_V_4'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv1' (loop 'conv1_f_conv1_h_conv1_w'): Unable to schedule 'load' operation ('v1_266.V', kernel.cpp:2017) on array 'w_V_4' due to limited memory ports (II = 98). Please consider using a memory core with more ports or partitioning the array 'w_V_4'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv1' (loop 'conv1_f_conv1_h_conv1_w'): Unable to schedule 'load' operation ('w_V_4_load_214', kernel.cpp:1745) on array 'w_V_4' due to limited memory ports (II = 106). Please consider using a memory core with more ports or partitioning the array 'w_V_4'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv1' (loop 'conv1_f_conv1_h_conv1_w'): Unable to schedule 'load' operation ('w_V_4_load_219', kernel.cpp:2038) on array 'w_V_4' due to limited memory ports (II = 110). Please consider using a memory core with more ports or partitioning the array 'w_V_4'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv1' (loop 'conv1_f_conv1_h_conv1_w'): Unable to schedule 'load' operation ('w_V_4_load_223', kernel.cpp:2045) on array 'w_V_4' due to limited memory ports (II = 112). Please consider using a memory core with more ports or partitioning the array 'w_V_4'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 113, Depth = 126, loop 'conv1_f_conv1_h_conv1_w'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 71.74 seconds. CPU system time: 0.01 seconds. Elapsed time: 71.82 seconds; current allocated memory: 1.120 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 2.74 seconds. CPU system time: 0.01 seconds. Elapsed time: 2.78 seconds; current allocated memory: 1.120 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'pool1' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [HLS 200-1457] Automatically inferring inferring RAM_1WNR storage type for array 'y'. Use bind_storage pragma to override this type.
+INFO: [HLS 200-1457] Automatically inferring inferring RAM_1WNR storage type for array 'x'. Use bind_storage pragma to override this type.
+INFO: [SCHED 204-61] Pipelining loop 'pool1_c_pool1_h_pool1_w'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 5, loop 'pool1_c_pool1_h_pool1_w'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 3.24 seconds. CPU system time: 0.01 seconds. Elapsed time: 3.25 seconds; current allocated memory: 1.120 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.11 seconds. CPU system time: 0 seconds. Elapsed time: 0.11 seconds; current allocated memory: 1.120 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'u_MUL8_DRUM5' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining function 'u_MUL8_DRUM5'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 0, Final II = 1, Depth = 3, function 'u_MUL8_DRUM5'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.47 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.51 seconds; current allocated memory: 1.120 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.62 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.63 seconds; current allocated memory: 1.120 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'conv2' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [HLS 200-1457] Automatically inferring inferring RAM_1WNR storage type for array 'y'. Use bind_storage pragma to override this type.
+INFO: [HLS 200-1457] Automatically inferring inferring RAM_1WNR storage type for array 'x'. Use bind_storage pragma to override this type.
+INFO: [SCHED 204-61] Pipelining loop 'conv2_f_conv2_h_conv2_w'.
+WARNING: [HLS 200-882] User specified resource constraint cannot be honored The memory core ROM_2P_BRAM has insufficient ports to support accesses to array 'w_V_3' (II = 1)..
+Resolution: For help on HLS 200-882 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-882.html
+WARNING: [HLS 200-885] The II Violation in module 'conv2' (loop 'conv2_f_conv2_h_conv2_w'): Unable to schedule 'load' operation ('v1_11.V', kernel.cpp:2107) on array 'w_V_3' due to limited memory ports (II = 2). Please consider using a memory core with more ports or partitioning the array 'w_V_3'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv2' (loop 'conv2_f_conv2_h_conv2_w'): Unable to schedule 'load' operation ('v1_19.V', kernel.cpp:2115) on array 'w_V_3' due to limited memory ports (II = 3). Please consider using a memory core with more ports or partitioning the array 'w_V_3'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv2' (loop 'conv2_f_conv2_h_conv2_w'): Unable to schedule 'load' operation ('v1_26.V', kernel.cpp:2122) on array 'w_V_3' due to limited memory ports (II = 4). Please consider using a memory core with more ports or partitioning the array 'w_V_3'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv2' (loop 'conv2_f_conv2_h_conv2_w'): Unable to schedule 'load' operation ('w_V_3_load_281', kernel.cpp:2090) on array 'w_V_3' due to limited memory ports (II = 130). Please consider using a memory core with more ports or partitioning the array 'w_V_3'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv2' (loop 'conv2_f_conv2_h_conv2_w'): Unable to schedule 'load' operation ('v1_515.V', kernel.cpp:2611) on array 'w_V_3' due to limited memory ports (II = 193). Please consider using a memory core with more ports or partitioning the array 'w_V_3'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv2' (loop 'conv2_f_conv2_h_conv2_w'): Unable to schedule 'load' operation ('w_V_3_load_423', kernel.cpp:2090) on array 'w_V_3' due to limited memory ports (II = 209). Please consider using a memory core with more ports or partitioning the array 'w_V_3'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv2' (loop 'conv2_f_conv2_h_conv2_w'): Unable to schedule 'load' operation ('v1_578.V', kernel.cpp:2674) on array 'w_V_3' due to limited memory ports (II = 217). Please consider using a memory core with more ports or partitioning the array 'w_V_3'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv2' (loop 'conv2_f_conv2_h_conv2_w'): Unable to schedule 'load' operation ('w_V_3_load_443', kernel.cpp:2090) on array 'w_V_3' due to limited memory ports (II = 221). Please consider using a memory core with more ports or partitioning the array 'w_V_3'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv2' (loop 'conv2_f_conv2_h_conv2_w'): Unable to schedule 'load' operation ('v1_593.V', kernel.cpp:2689) on array 'w_V_3' due to limited memory ports (II = 223). Please consider using a memory core with more ports or partitioning the array 'w_V_3'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+WARNING: [HLS 200-885] The II Violation in module 'conv2' (loop 'conv2_f_conv2_h_conv2_w'): Unable to schedule 'load' operation ('w_V_3_load_447', kernel.cpp:2090) on array 'w_V_3' due to limited memory ports (II = 224). Please consider using a memory core with more ports or partitioning the array 'w_V_3'.
+Resolution: For help on HLS 200-885 see www.xilinx.com/cgi-bin/docs/rdoc?v=2022.2;t=hls+guidance;d=200-885.html
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 225, Depth = 240, loop 'conv2_f_conv2_h_conv2_w'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 778.77 seconds. CPU system time: 0.12 seconds. Elapsed time: 786.25 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 4.82 seconds. CPU system time: 0.02 seconds. Elapsed time: 4.86 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'pool2' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [HLS 200-1457] Automatically inferring inferring RAM_1WNR storage type for array 'x'. Use bind_storage pragma to override this type.
+INFO: [SCHED 204-61] Pipelining loop 'pool2_c_pool2_h_pool2_w'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 5, loop 'pool2_c_pool2_h_pool2_w'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 4.02 seconds. CPU system time: 0.02 seconds. Elapsed time: 4.05 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.08 seconds. CPU system time: 0 seconds. Elapsed time: 0.09 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'flatten' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'flatten_r_flatten_w'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 3, loop 'flatten_r_flatten_w'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.15 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.15 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.03 seconds. CPU system time: 0 seconds. Elapsed time: 0.04 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'u_MUL8_T6_A10c' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining function 'u_MUL8_T6_A10c'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 0, Final II = 1, Depth = 1, function 'u_MUL8_T6_A10c'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.11 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.11 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.18 seconds. CPU system time: 0 seconds. Elapsed time: 0.17 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'u_ADD32_LOA6' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining function 'u_ADD32_LOA6'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 1, function 'u_ADD32_LOA6'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.43 seconds. CPU system time: 0 seconds. Elapsed time: 0.43 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.06 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'fc1_Pipeline_fc1_i' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'fc1_i'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 5, loop 'fc1_i'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.15 seconds. CPU system time: 0 seconds. Elapsed time: 0.15 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.16 seconds. CPU system time: 0 seconds. Elapsed time: 0.16 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'fc1' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.49 seconds. CPU system time: 0 seconds. Elapsed time: 0.49 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.23 seconds. CPU system time: 0 seconds. Elapsed time: 0.23 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'u_ADD24_LOA5' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining function 'u_ADD24_LOA5'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 1, function 'u_ADD24_LOA5'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.59 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.6 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.06 seconds. CPU system time: 0 seconds. Elapsed time: 0.06 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'fc2_Pipeline_fc2_i' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'fc2_i'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 5, loop 'fc2_i'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.13 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.15 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.16 seconds. CPU system time: 0 seconds. Elapsed time: 0.16 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'fc2' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.48 seconds. CPU system time: 0 seconds. Elapsed time: 0.48 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.23 seconds. CPU system time: 0 seconds. Elapsed time: 0.24 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'u_MUL8_DRUM3' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining function 'u_MUL8_DRUM3'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 0, Final II = 1, Depth = 2, function 'u_MUL8_DRUM3'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.7 seconds. CPU system time: 0 seconds. Elapsed time: 0.71 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.32 seconds. CPU system time: 0 seconds. Elapsed time: 0.33 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'fc3_Pipeline_fc3_i' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'fc3_i'.
+INFO: [HLS 200-1470] Pipelining result : Target II = 1, Final II = 1, Depth = 6, loop 'fc3_i'
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.71 seconds. CPU system time: 0 seconds. Elapsed time: 0.72 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.24 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.25 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'fc3' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.73 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.75 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 0.32 seconds. CPU system time: 0 seconds. Elapsed time: 0.32 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'network' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111] Finished Scheduling: CPU user time: 0.82 seconds. CPU system time: 0 seconds. Elapsed time: 0.83 seconds; current allocated memory: 1.186 GB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111] Finished Binding: CPU user time: 2.12 seconds. CPU system time: 0 seconds. Elapsed time: 2.13 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'u_MUL8_T4_A2c' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Finished creating RTL model for 'u_MUL8_T4_A2c'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 6.31 seconds. CPU system time: 0 seconds. Elapsed time: 6.32 seconds; current allocated memory: 1.186 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'u_ADD24_LOA7' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Finished creating RTL model for 'u_ADD24_LOA7'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 1.58 seconds. CPU system time: 0.01 seconds. Elapsed time: 1.6 seconds; current allocated memory: 1.188 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'axc_requant' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Generating core module 'mul_25ns_25s_50_1_1': 1 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'axc_requant'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.28 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.3 seconds; current allocated memory: 1.191 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'conv1' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'conv1' pipeline 'conv1_f_conv1_h_conv1_w' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Generating core module 'mul_3ns_8ns_10_1_1': 2 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'conv1'.
+INFO: [RTMG 210-279] Implementing memory 'network_conv1_w_V_4_ROM_2P_BRAM_1R' using block ROMs.
+INFO: [RTMG 210-279] Implementing memory 'network_conv1_b_V_4_ROM_AUTO_1R' using auto ROMs.
+INFO: [RTMG 210-279] Implementing memory 'network_conv1_m_V_4_ROM_AUTO_1R' using auto ROMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.66 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.67 seconds; current allocated memory: 1.210 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'pool1' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'pool1' pipeline 'pool1_c_pool1_h_pool1_w' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Finished creating RTL model for 'pool1'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 5.01 seconds. CPU system time: 0.08 seconds. Elapsed time: 5.1 seconds; current allocated memory: 1.253 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'u_MUL8_DRUM5' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Finished creating RTL model for 'u_MUL8_DRUM5'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.34 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.35 seconds; current allocated memory: 1.253 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'conv2' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'conv2' pipeline 'conv2_f_conv2_h_conv2_w' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Generating core module 'mul_5ns_9ns_13_1_1': 2 instance(s).
+INFO: [RTGEN 206-100] Finished creating RTL model for 'conv2'.
+INFO: [RTMG 210-279] Implementing memory 'network_conv2_w_V_3_ROM_2P_BRAM_1R' using block ROMs.
+INFO: [RTMG 210-279] Implementing memory 'network_conv2_b_V_3_ROM_AUTO_1R' using auto ROMs.
+INFO: [RTMG 210-279] Implementing memory 'network_conv2_m_V_3_ROM_AUTO_1R' using auto ROMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 3.7 seconds. CPU system time: 0.03 seconds. Elapsed time: 3.92 seconds; current allocated memory: 1.305 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'pool2' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'pool2' pipeline 'pool2_c_pool2_h_pool2_w' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Finished creating RTL model for 'pool2'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 10.47 seconds. CPU system time: 0.16 seconds. Elapsed time: 10.66 seconds; current allocated memory: 1.374 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'flatten' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'flatten' pipeline 'flatten_r_flatten_w' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Finished creating RTL model for 'flatten'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.36 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.38 seconds; current allocated memory: 1.377 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'u_MUL8_T6_A10c' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Finished creating RTL model for 'u_MUL8_T6_A10c'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.15 seconds. CPU system time: 0 seconds. Elapsed time: 0.15 seconds; current allocated memory: 1.391 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'u_ADD32_LOA6' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Finished creating RTL model for 'u_ADD32_LOA6'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.97 seconds. CPU system time: 0 seconds. Elapsed time: 0.98 seconds; current allocated memory: 1.394 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'fc1_Pipeline_fc1_i' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'fc1_Pipeline_fc1_i' pipeline 'fc1_i' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Finished creating RTL model for 'fc1_Pipeline_fc1_i'.
+INFO: [RTMG 210-279] Implementing memory 'network_fc1_Pipeline_fc1_i_w_V_2_ROM_2P_BRAM_1R' using block ROMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.36 seconds. CPU system time: 0.02 seconds. Elapsed time: 0.37 seconds; current allocated memory: 1.399 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'fc1' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Finished creating RTL model for 'fc1'.
+INFO: [RTMG 210-279] Implementing memory 'network_fc1_b_V_2_ROM_2P_BRAM_1R' using block ROMs.
+INFO: [RTMG 210-279] Implementing memory 'network_fc1_m_V_2_ROM_2P_BRAM_1R' using block ROMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.56 seconds. CPU system time: 0.01 seconds. Elapsed time: 0.94 seconds; current allocated memory: 1.402 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'u_ADD24_LOA5' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Finished creating RTL model for 'u_ADD24_LOA5'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 1.13 seconds. CPU system time: 0.01 seconds. Elapsed time: 1.13 seconds; current allocated memory: 1.404 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'fc2_Pipeline_fc2_i' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'fc2_Pipeline_fc2_i' pipeline 'fc2_i' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Finished creating RTL model for 'fc2_Pipeline_fc2_i'.
+INFO: [RTMG 210-279] Implementing memory 'network_fc2_Pipeline_fc2_i_w_V_1_ROM_2P_BRAM_1R' using block ROMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.33 seconds. CPU system time: 0 seconds. Elapsed time: 0.33 seconds; current allocated memory: 1.408 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'fc2' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Finished creating RTL model for 'fc2'.
+INFO: [RTMG 210-279] Implementing memory 'network_fc2_b_V_1_ROM_2P_BRAM_1R' using block ROMs.
+INFO: [RTMG 210-279] Implementing memory 'network_fc2_m_V_1_ROM_2P_BRAM_1R' using block ROMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.55 seconds. CPU system time: 0 seconds. Elapsed time: 0.55 seconds; current allocated memory: 1.411 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'u_MUL8_DRUM3' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Finished creating RTL model for 'u_MUL8_DRUM3'.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 1.24 seconds. CPU system time: 0.01 seconds. Elapsed time: 1.41 seconds; current allocated memory: 1.414 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'fc3_Pipeline_fc3_i' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-1030] Apply Unified Pipeline Control on module 'fc3_Pipeline_fc3_i' pipeline 'fc3_i' pipeline type 'loop pipeline'
+INFO: [RTGEN 206-100] Finished creating RTL model for 'fc3_Pipeline_fc3_i'.
+INFO: [RTMG 210-279] Implementing memory 'network_fc3_Pipeline_fc3_i_w_V_ROM_2P_BRAM_1R' using block ROMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 1.79 seconds. CPU system time: 0.01 seconds. Elapsed time: 1.8 seconds; current allocated memory: 1.419 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'fc3' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-100] Finished creating RTL model for 'fc3'.
+INFO: [RTMG 210-279] Implementing memory 'network_fc3_b_V_ROM_AUTO_1R' using auto ROMs.
+INFO: [RTMG 210-279] Implementing memory 'network_fc3_m_V_ROM_AUTO_1R' using auto ROMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 0.9 seconds. CPU system time: 0 seconds. Elapsed time: 1.35 seconds; current allocated memory: 1.426 GB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'network' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-500] Setting interface mode on port 'network/in_r' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'network/out_r' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on function 'network' to 'ap_ctrl_hs'.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'network'.
+INFO: [RTMG 210-278] Implementing memory 'network_t1_V_RAM_1WNR_AUTO_1R1W' using auto RAMs.
+INFO: [RTMG 210-278] Implementing memory 'network_t2_V_RAM_1WNR_AUTO_1R1W' using auto RAMs.
+INFO: [RTMG 210-278] Implementing memory 'network_t3_V_RAM_1WNR_AUTO_1R1W' using auto RAMs.
+INFO: [RTMG 210-278] Implementing memory 'network_t4_V_RAM_AUTO_1R1W' using auto RAMs.
+INFO: [RTMG 210-278] Implementing memory 'network_t6_V_RAM_AUTO_1R1W' using auto RAMs.
+INFO: [RTMG 210-278] Implementing memory 'network_t7_V_RAM_AUTO_1R1W' using auto RAMs.
+INFO: [HLS 200-111] Finished Creating RTL model: CPU user time: 1.15 seconds. CPU system time: 0.02 seconds. Elapsed time: 1.17 seconds; current allocated memory: 1.429 GB.
+INFO: [HLS 200-111] Finished Generating all RTL models: CPU user time: 12.81 seconds. CPU system time: 0.18 seconds. Elapsed time: 15.03 seconds; current allocated memory: 1.433 GB.
+INFO: [HLS 200-111] Finished Updating report files: CPU user time: 1.15 seconds. CPU system time: 0.02 seconds. Elapsed time: 1.38 seconds; current allocated memory: 1.445 GB.
+INFO: [VHDL 208-304] Generating VHDL RTL for network.
+INFO: [VLOG 209-307] Generating Verilog RTL for network.
+INFO: [HLS 200-790] **** Loop Constraint Status: All loop constraints were NOT satisfied.
+INFO: [HLS 200-789] **** Estimated Fmax: 104.45 MHz
+INFO: [HLS 200-111] Finished Command csynth_design CPU user time: 2061.34 seconds. CPU system time: 3.98 seconds. Elapsed time: 2081.32 seconds; current allocated memory: 732.344 MB.
+INFO: [HLS 200-1510] Running: export_design -flow impl -rtl verilog -format ip_catalog 
+INFO: [IMPL 213-8] Exporting RTL as a Vivado IP.
+
+****** Vivado v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 04:59:54 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source run_ippack.tcl -notrace
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/tools/Xilinx/Vivado/2022.2/data/ip'.
+INFO: [Common 17-206] Exiting Vivado at Sat Oct 24 17:52:12 2026...
+INFO: [IMPL 213-8] Starting RTL evaluation using Vivado ...
+
+****** Vivado v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 04:59:54 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source run_vivado.tcl
+# source ./settings.tcl
+## set top_module network
+## set language verilog
+## set family artix7
+## set device xc7a100t
+## set package -csg324
+## set speed -1
+## set clock ap_clk
+## set fsm_ext "off"
+## set add_io_buffers false ;
+# source -notrace ./extraction.tcl
+# set vivado_proj_name project
+# set vivado_proj_dir .
+# set target_device "${device}${package}${speed}"
+# set target_clk_period_ns "10.000"
+# set target_clk_freq_hz [expr {floor(1000 / $target_clk_period_ns) * 1000000}]
+# set ip_vlnv xilinx.com:hls:network:1.0
+# set ip_repo_path ../ip
+# set bd_design_name bd_0
+# set bd_inst_name hls_inst
+# set bd_props {}
+# set has_synth true
+# set synth_design_args {-directive sdx_optimization_effort_high}
+# set synth_dcp ""
+# set synth_props {}
+# set has_impl 1
+# set impl_props {}
+# set report_options [dict create]
+# dict set report_options report_level 2
+# dict set report_options report_max_paths 10
+# dict set report_options stdout_hls_reports 1
+# dict set report_options stdout_vivado_reports 0
+# dict set report_options hls_project proj
+# dict set report_options hls_solution solution1
+# dict set report_options has_synth $has_synth
+# dict set report_options has_impl $has_impl
+# dict set report_options vivado_reportbasename $top_module
+# dict set report_options vivado_reportdir ./report
+# dict set report_options hls_impl_dir ..
+# dict set report_options hls_reportdir ../report/$language
+# dict set report_options target_clk_period $target_clk_period_ns
+# dict set report_options target_device $target_device
+# dict set report_options language $language
+# dict set report_options clock_name $clock
+# dict set report_options error_if_impl_timing_fails false
+# dict set report_options bindmodules {network_mul_25ns_25s_50_1_1 network_mul_3ns_8ns_10_1_1 network_conv1_w_V_4_ROM_2P_BRAM_1R network_conv1_b_V_4_ROM_AUTO_1R network_conv1_m_V_4_ROM_AUTO_1R network_flow_control_loop_pipe_sequential_init network_mul_5ns_9ns_13_1_1 network_conv2_w_V_3_ROM_2P_BRAM_1R network_conv2_b_V_3_ROM_AUTO_1R network_conv2_m_V_3_ROM_AUTO_1R network_fc1_Pipeline_fc1_i_w_V_2_ROM_2P_BRAM_1R network_fc1_b_V_2_ROM_2P_BRAM_1R network_fc1_m_V_2_ROM_2P_BRAM_1R network_fc2_Pipeline_fc2_i_w_V_1_ROM_2P_BRAM_1R network_fc2_b_V_1_ROM_2P_BRAM_1R network_fc2_m_V_1_ROM_2P_BRAM_1R network_fc3_Pipeline_fc3_i_w_V_ROM_2P_BRAM_1R network_fc3_b_V_ROM_AUTO_1R network_fc3_m_V_ROM_AUTO_1R network_t1_V_RAM_1WNR_AUTO_1R1W network_t2_V_RAM_1WNR_AUTO_1R1W network_t3_V_RAM_1WNR_AUTO_1R1W network_t4_V_RAM_AUTO_1R1W network_t6_V_RAM_AUTO_1R1W network_t7_V_RAM_AUTO_1R1W}
+# dict set report_options max_module_depth 8
+# create_project $vivado_proj_name $vivado_proj_dir -part $target_device -force
+# set_property target_language $language [current_project]
+# if { ![file exists $ip_repo_path] } {
+#   error "Cannot find packaged HLS IP"
+# }
+# set_property ip_repo_paths [file normalize $ip_repo_path] [current_project]
+# update_ip_catalog
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/ip'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/tools/Xilinx/Vivado/2022.2/data/ip'.
+# create_bd_design $bd_design_name
+Wrote  : </home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.srcs/sources_1/bd/bd_0/bd_0.bd> 
+# set cell_inst [create_bd_cell -type ip -vlnv $ip_vlnv $bd_inst_name]
+# if { [llength $bd_props] } { 
+#   set_property -dict $bd_props $cell_inst 
+# }
+# make_bd_pins_external $cell_inst
+# make_bd_intf_pins_external $cell_inst
+# set bd_clk_ports [get_bd_ports -filter {TYPE==clk}]
+# if { [llength $bd_clk_ports] && $target_clk_freq_hz ne "" } { 
+#   set_property CONFIG.FREQ_HZ $target_clk_freq_hz $bd_clk_ports 
+# }
+# foreach bd_port [get_bd_intf_ports] {
+#   set_property name [regsub {_0$} [get_property name $bd_port] {}] $bd_port
+# }
+# foreach bd_port [get_bd_ports -filter {INTF!=TRUE}] {
+#   set_property name [regsub {_0$} [get_property name $bd_port] {}] $bd_port
+# }
+# set s_axi_addr_width_min 32
+WARNING: [BD 5-233] No interface ports matched 'get_bd_intf_ports -filter {MODE == "Slave" && VLNV =~ "xilinx.com:interface:aximm_rtl:*"}'
+# foreach bd_port [get_bd_intf_ports -filter {MODE == "Slave" && VLNV =~ "xilinx.com:interface:aximm_rtl:*"}] {
+#   set bd_port_addr_width [get_property CONFIG.ADDR_WIDTH $bd_port]
+#   if { $bd_port_addr_width < $s_axi_addr_width_min } {
+#     puts "INFO: Updating $bd_port CONFIG.ADDR_WIDTH to $s_axi_addr_width_min"
+#     set_property CONFIG.ADDR_WIDTH $s_axi_addr_width_min $bd_port
+#   }
+# }
+# set_msg_config -id {[BD 41-1265]} -severity {CRITICAL WARNING} -new_severity {INFO}
+# assign_bd_address
+Wrote  : </home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.srcs/sources_1/bd/bd_0/bd_0.bd> 
+Verilog Output written to : /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/synth/bd_0.v
+Verilog Output written to : /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/sim/bd_0.v
+Verilog Output written to : /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/hdl/bd_0_wrapper.v
+# set toprtl [make_wrapper -files [get_files ${bd_design_name}.bd] -top]
+# add_files -norecurse $toprtl
+# set top_inst_name [file root [file tail $toprtl]]
+# puts "Using BD top: $top_inst_name"
+Using BD top: bd_0_wrapper
+# set xdc_files [glob -nocomplain ./*.xdc]
+# if { [llength $xdc_files] } {
+#     add_files -fileset constrs_1 -norecurse $xdc_files
+# }
+# launch_runs synth_1 -scripts_only
+INFO: [BD 41-1662] The design 'bd_0.bd' is already validated. Therefore parameter propagation will not be re-run.
+Verilog Output written to : /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/synth/bd_0.v
+Verilog Output written to : /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/sim/bd_0.v
+Verilog Output written to : /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/hdl/bd_0_wrapper.v
+INFO: [BD 41-1029] Generation completed for the IP Integrator block hls_inst .
+Exporting to file /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/hw_handoff/bd_0.hwh
+Generated Hardware Definition File /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/synth/bd_0.hwdef
+INFO: [IP_Flow 19-6924] IPCACHE: Running cache check for IP inst: bd_0_hls_inst_0
+WARNING: [Vivado 12-7122] Auto Incremental Compile:: No reference checkpoint was found in run synth_1. Auto-incremental flow will not be run, the standard flow will be run instead.
+launch_runs: Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 2086.004 ; gain = 72.035 ; free physical = 5761 ; free virtual = 24956
+# foreach run [get_runs -filter {IS_SYNTHESIS == 1}] {
+#   reset_run [get_runs $run]
+# }
+# set_property XPM_LIBRARIES {XPM_MEMORY XPM_FIFO} [current_project]
+# hls_vivado_reports_setup $report_options
+TIMESTAMP: HLS-REPORT: initialize report directories: 2026-10-24 17:52:32 -03
+# if { $has_synth || $has_impl } {
+#   # synth properties setting
+#   set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value {-mode out_of_context} -objects [get_runs synth_1]
+#   set ip_inst [get_ips -quiet ${bd_design_name}*${bd_inst_name}*]
+#   if { ![llength $ip_inst] } {
+#       error "Cannot find HLS IP instance: ${bd_design_name}*${bd_inst_name}*"
+#   }
+#   set synth_run [get_runs -filter {IS_SYNTHESIS == 1} ${ip_inst}*]
+#   if { ![llength $synth_run] } {
+#       error "Cannot find synth run for HLS IP: ${ip_inst}*"
+#   }
+# 
+#   if { [llength $synth_design_args] } {
+#       set_property -name {STEPS.SYNTH_DESIGN.ARGS.MORE OPTIONS} -value $synth_design_args -objects $synth_run
+#   }
+# 
+#   if { [llength $synth_props] } {
+#     set_property -dict $synth_props $synth_run
+#   }
+# 
+#   # launch run synth
+#   launch_runs synth_1
+#   wait_on_run synth_1
+#   # synth reports
+#   hls_vivado_reports_synth synth_1 $report_options
+#   if { $synth_dcp ne "" } {
+#     file mkdir [file dirname $synth_dcp]
+#     set run_dcp [glob -nocomplain [get_property DIRECTORY $synth_run]/*.dcp]
+#     if { [llength $run_dcp] != 1 } { error "Cannot find single dcp file for run $synth_run" }
+#     file copy -force $run_dcp $synth_dcp
+#   }
+# }
+INFO: [IP_Flow 19-6924] IPCACHE: Running cache check for IP inst: bd_0_hls_inst_0
+WARNING: [Vivado 12-7122] Auto Incremental Compile:: No reference checkpoint was found in run synth_1. Auto-incremental flow will not be run, the standard flow will be run instead.
+[Sat Oct 24 17:52:32 2026] Launched bd_0_hls_inst_0_synth_1...
+Run output will be captured here: /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/bd_0_hls_inst_0_synth_1/runme.log
+[Sat Oct 24 17:52:32 2026] Launched synth_1...
+Run output will be captured here: /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/synth_1/runme.log
+[Sat Oct 24 17:52:32 2026] Waiting for synth_1 to finish...
+
+*** Running vivado
+    with args -log bd_0_wrapper.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source bd_0_wrapper.tcl
+
+
+****** Vivado v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 04:59:54 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source bd_0_wrapper.tcl -notrace
+INFO: Dispatch client connection id - 35881
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/ip'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/tools/Xilinx/Vivado/2022.2/data/ip'.
+Command: synth_design -top bd_0_wrapper -part xc7a100tcsg324-1 -mode out_of_context
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a100t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a100t'
+INFO: [Device 21-403] Loading part xc7a100tcsg324-1
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 4 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 255373
+INFO: [Synth 8-11241] undeclared symbol 'REGCCE', assumed default net type 'wire' [/tools/Xilinx/Vivado/2022.2/data/verilog/src/unimacro/BRAM_SINGLE_MACRO.v:2170]
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 2438.168 ; gain = 364.734 ; free physical = 6139 ; free virtual = 23418
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1911.547; parent = 1693.626; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3441.973; parent = 2442.141; children = 999.832
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'bd_0_wrapper' [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/hdl/bd_0_wrapper.v:12]
+INFO: [Synth 8-6157] synthesizing module 'bd_0' [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/synth/bd_0.v:12]
+INFO: [Synth 8-6157] synthesizing module 'bd_0_hls_inst_0' [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/synth_1/.Xil/Vivado-255350-Avell/realtime/bd_0_hls_inst_0_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'bd_0_hls_inst_0' (0#1) [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/synth_1/.Xil/Vivado-255350-Avell/realtime/bd_0_hls_inst_0_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'bd_0' (0#1) [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/synth/bd_0.v:12]
+INFO: [Synth 8-6155] done synthesizing module 'bd_0_wrapper' (0#1) [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/hdl/bd_0_wrapper.v:12]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 2509.105 ; gain = 435.672 ; free physical = 6223 ; free virtual = 23506
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1911.547; parent = 1693.626; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3508.941; parent = 2509.109; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 2526.918 ; gain = 453.484 ; free physical = 6223 ; free virtual = 23506
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1911.547; parent = 1693.626; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3526.754; parent = 2526.922; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 2526.918 ; gain = 453.484 ; free physical = 6223 ; free virtual = 23506
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1911.547; parent = 1693.626; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3526.754; parent = 2526.922; children = 999.832
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2526.918 ; gain = 0.000 ; free physical = 6221 ; free virtual = 23504
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/ip/bd_0_hls_inst_0/bd_0_hls_inst_0/bd_0_hls_inst_0_in_context.xdc] for cell 'bd_0_i/hls_inst'
+Finished Parsing XDC File [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/ip/bd_0_hls_inst_0/bd_0_hls_inst_0/bd_0_hls_inst_0_in_context.xdc] for cell 'bd_0_i/hls_inst'
+Parsing XDC File [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/network.xdc]
+Finished Parsing XDC File [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/network.xdc]
+Parsing XDC File [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/synth_1/dont_touch.xdc]
+Finished Parsing XDC File [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/synth_1/dont_touch.xdc]
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2599.855 ; gain = 0.000 ; free physical = 6103 ; free virtual = 23397
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2599.855 ; gain = 0.000 ; free physical = 6103 ; free virtual = 23397
+INFO: [Synth 8-11241] undeclared symbol 'REGCCE', assumed default net type 'wire' [/tools/Xilinx/Vivado/2022.2/data/verilog/src/unimacro/BRAM_SINGLE_MACRO.v:2170]
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6161 ; free virtual = 23457
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1911.547; parent = 1693.626; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7a100tcsg324-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6161 ; free virtual = 23457
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1911.547; parent = 1693.626; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+Applied set_property KEEP_HIERARCHY = SOFT for bd_0_i. (constraint file  auto generated constraint).
+Applied set_property KEEP_HIERARCHY = SOFT for bd_0_i/hls_inst. (constraint file  auto generated constraint).
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6161 ; free virtual = 23457
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1911.547; parent = 1693.626; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:09 ; elapsed = 00:00:10 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6161 ; free virtual = 23458
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1911.547; parent = 1693.626; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 240 (col length:80)
+BRAMs: 270 (col length: RAMB18 80 RAMB36 40)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-7080] Parallel synthesis criteria is not met
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:10 ; elapsed = 00:00:11 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6150 ; free virtual = 23450
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1911.547; parent = 1693.626; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6028 ; free virtual = 23328
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1992.779; parent = 1775.363; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6028 ; free virtual = 23328
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1993.025; parent = 1775.609; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6019 ; free virtual = 23319
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1993.451; parent = 1776.035; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:17 ; elapsed = 00:00:18 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6034 ; free virtual = 23336
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1993.614; parent = 1776.189; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:17 ; elapsed = 00:00:18 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6034 ; free virtual = 23336
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1993.614; parent = 1776.189; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6034 ; free virtual = 23336
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1993.692; parent = 1776.268; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6034 ; free virtual = 23336
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1993.708; parent = 1776.283; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6034 ; free virtual = 23336
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1993.708; parent = 1776.283; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6034 ; free virtual = 23336
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1993.724; parent = 1776.299; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++------+----------------+----------+
+|      |BlackBox name   |Instances |
++------+----------------+----------+
+|1     |bd_0_hls_inst_0 |         1|
++------+----------------+----------+
+
+Report Cell Usage: 
++------+--------------+------+
+|      |Cell          |Count |
++------+--------------+------+
+|1     |bd_0_hls_inst |     1|
++------+--------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6034 ; free virtual = 23336
+Synthesis current peak Physical Memory [PSS] (MB): peak = 1993.739; parent = 1776.314; children = 217.921
+Synthesis current peak Virtual Memory [VSS] (MB): peak = 3567.676; parent = 2567.844; children = 999.832
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 1 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:16 ; elapsed = 00:00:17 . Memory (MB): peak = 2599.855 ; gain = 453.484 ; free physical = 6093 ; free virtual = 23395
+Synthesis Optimization Complete : Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 2599.855 ; gain = 526.422 ; free physical = 6093 ; free virtual = 23395
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2599.855 ; gain = 0.000 ; free physical = 6086 ; free virtual = 23388
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2599.855 ; gain = 0.000 ; free physical = 6127 ; free virtual = 23429
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Synth Design complete, checksum: a5c3f1f9
+INFO: [Common 17-83] Releasing license: Synthesis
+23 Infos, 1 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:23 ; elapsed = 00:00:22 . Memory (MB): peak = 2599.855 ; gain = 850.586 ; free physical = 6327 ; free virtual = 23629
+INFO: [Common 17-1381] The checkpoint '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/synth_1/bd_0_wrapper.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file bd_0_wrapper_utilization_synth.rpt -pb bd_0_wrapper_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Sat Oct 24 17:56:40 2026...
+[Sat Oct 24 17:56:44 2026] synth_1 finished
+wait_on_runs: Time (s): cpu = 00:03:52 ; elapsed = 00:04:12 . Memory (MB): peak = 2086.004 ; gain = 0.000 ; free physical = 7706 ; free virtual = 25004
+TIMESTAMP: HLS-REPORT: synthesis open_run: 2026-10-24 17:56:44 -03
+INFO: HLS-REPORT: Opening synthesis design database: open_run synth_1
+Design is defaulting to impl run constrset: constrs_1
+Design is defaulting to synth run part: xc7a100tcsg324-1
+INFO: [Device 21-403] Loading part xc7a100tcsg324-1
+INFO: [Project 1-454] Reading design checkpoint '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.gen/sources_1/bd/bd_0/ip/bd_0_hls_inst_0/bd_0_hls_inst_0.dcp' for cell 'bd_0_i/hls_inst'
+Netlist sorting complete. Time (s): cpu = 00:00:00.1 ; elapsed = 00:00:00.1 . Memory (MB): peak = 2239.055 ; gain = 0.000 ; free physical = 7367 ; free virtual = 24838
+INFO: [Netlist 29-17] Analyzing 2003 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-479] Netlist was created with Vivado 2022.2
+INFO: [Project 1-570] Preparing netlist for logic optimization
+Parsing XDC File [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/network.xdc]
+Finished Parsing XDC File [/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/network.xdc]
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 2370.535 ; gain = 0.000 ; free physical = 7108 ; free virtual = 24730
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+open_run: Time (s): cpu = 00:00:07 ; elapsed = 00:00:06 . Memory (MB): peak = 2370.535 ; gain = 284.531 ; free physical = 7108 ; free virtual = 24731
+TIMESTAMP: HLS-REPORT: synthesis generate_reports_vivado: 2026-10-24 17:56:50 -03
+INFO: HLS-REPORT: Running report: report_utilization -file ./report/network_utilization_synth.rpt
+INFO: HLS-REPORT: Running report: report_utilization -hierarchical -hierarchical_depth 8 -file ./report/network_utilization_hierarchical_synth.rpt
+INFO: HLS-REPORT: Running report: report_timing_summary -file ./report/network_timing_synth.rpt
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: min_max.
+INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 8 CPUs
+WARNING: [Timing 38-242] The property HD.CLK_SRC of clock port "ap_clk" is not set. In out-of-context mode, this prevents timing estimation for clock delay/skew
+Resolution: Set the HD.CLK_SRC property of the out-of-context port to the location of the clock buffer instance in the top-level design
+report_timing_summary: Time (s): cpu = 00:00:17 ; elapsed = 00:00:09 . Memory (MB): peak = 2958.422 ; gain = 587.887 ; free physical = 6297 ; free virtual = 24289
+INFO: HLS-REPORT: Running report: report_timing -max_paths 10 -file ./report/network_timing_paths_synth.rpt
+INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: max.
+INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 8 CPUs
+INFO: [Timing 38-78] ReportTimingParams: -max_paths 10 -nworst 1 -delay_type max -sort_by slack.
+INFO: HLS-REPORT: Running report: report_design_analysis -file ./report/network_design_analysis_synth.rpt
+INFO: [Implflow 30-839]  
+INFO: HLS-REPORT: Running report: ::tclapp::xilinx::designutils::report_failfast -detailed_report synth -file ./report/network_failfast_synth.rpt
+ -I- design metrics completed in 1 seconds
+ -I- DONT_TOUCH metric completed in 0 seconds
+ -I- MARK_DEBUG metric completed in 0 seconds
+ -I- utilization metrics completed in 1 seconds
+ -I- control set metrics completed in 0 seconds
+ -I- methodology check metrics completed in 1 seconds
+ -I- average fanout metrics completed in 1 seconds (0 modules)
+ -I- non-FD high fanout nets completed in 1 seconds
+ -I- path budgeting metrics completed in 1 seconds
+#  +-----------------------------------------------------------------------------------------+
+#  | Design Summary                                                                          |
+#  | design_1                                                                                |
+#  | xc7a100tcsg324-1                                                                        |
+#  +-----------------------------------------------------------+-----------+--------+--------+
+#  | Criteria                                                  | Guideline | Actual | Status |
+#  +-----------------------------------------------------------+-----------+--------+--------+
+#  | LUT                                                       | 70%       | 30.66% | OK     |
+#  | FD                                                        | 50%       | 11.75% | OK     |
+#  | LUTRAM+SRL                                                | 25%       | 0.03%  | OK     |
+#  | MUXF7                                                     | 15%       | 0.15%  | OK     |
+#  | DSP                                                       | 80%       | 0.83%  | OK     |
+#  | RAMB/FIFO                                                 | 80%       | 25.19% | OK     |
+#  | DSP+RAMB+URAM (Avg)                                       | 70%       | 13.01% | OK     |
+#  | BUFGCE* + BUFGCTRL                                        | 24        | 0      | OK     |
+#  | DONT_TOUCH (cells/nets)                                   | 0         | 0      | OK     |
+#  | MARK_DEBUG (nets)                                         | 0         | 0      | OK     |
+#  | Control Sets                                              | 1189      | 862    | OK     |
+#  | Average Fanout for modules > 100k cells                   | 4         | 0      | OK     |
+#  | Non-FD high fanout nets > 10k loads                       | 0         | 0      | OK     |
+#  +-----------------------------------------------------------+-----------+--------+--------+
+#  | TIMING-6 (No common primary clock between related clocks) | 0         | 0      | OK     |
+#  | TIMING-7 (No common node between related clocks)          | 0         | 0      | OK     |
+#  | TIMING-8 (No common period between related clocks)        | 0         | 0      | OK     |
+#  | TIMING-14 (LUT on the clock tree)                         | 0         | 0      | OK     |
+#  | TIMING-35 (No common node in paths with the same clock)   | 0         | 0      | OK     |
+#  +-----------------------------------------------------------+-----------+--------+--------+
+#  | Number of paths above max LUT budgeting (0.575ns)         | 0         | 0      | OK     |
+#  | Number of paths above max Net budgeting (0.403ns)         | 0         | 0      | OK     |
+#  +-----------------------------------------------------------+-----------+--------+--------+
+ -I- Generated file /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/report/network_failfast_synth.rpt
+ -I- Number of criteria to review: 0
+ -I- This report should be run before placing the design and uses conservative guidelines beyond which runtime and timing closure will likely be more challenging
+ -I- report_failfast completed in 6 seconds
+TIMESTAMP: HLS-REPORT: synthesis gen_data_dict_vivado: 2026-10-24 17:57:06 -03
+TIMESTAMP: HLS-REPORT: synth extract_util_hier: 2026-10-24 17:57:06 -03
+TIMESTAMP: HLS-REPORT: synth get_cell_hier_data: 2026-10-24 17:57:06 -03
+TIMESTAMP: HLS-REPORT: synth get_timing_paths: 2026-10-24 17:57:06 -03
+TIMESTAMP: HLS-REPORT: synth process timing paths: 2026-10-24 17:57:06 -03
+TIMESTAMP: HLS-REPORT: synth get_all_vv_rpt_files: 2026-10-24 17:57:06 -03
+TIMESTAMP: HLS-REPORT: synthesis write_reports_vivado: 2026-10-24 17:57:06 -03
+HLS EXTRACTION: synth area_totals:  0 63400 126800 240 270 0 0
+HLS EXTRACTION: synth area_current: 0 19440 14897 2 68 0 5 0 0 0
+HLS EXTRACTION: synth resources_dict: AVAIL_LUT 63400 LUT 19440 AVAIL_FF 126800 FF 14897 AVAIL_DSP 240 DSP 2 AVAIL_BRAM 270 BRAM 68 AVAIL_URAM 0 URAM 0 LATCH 0 SRL 5 AVAIL_CLB 0 CLB 0
+INFO: HLS-REPORT: generated /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/report/vivado_syn.xml
+INFO: HLS-REPORT: generated /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/report/verilog/network_export.rpt
+
+
+Implementation tool: Xilinx Vivado v.2022.2
+Project:             proj
+Solution:            solution1
+Device target:       xc7a100t-csg324-1
+Report date:         Sat Oct 24 17:57:06 -03 2026
+
+#=== Post-Synthesis Resource usage ===
+SLICE:            0
+LUT:          19440
+FF:           14897
+DSP:              2
+BRAM:            68
+URAM:             0
+LATCH:            0
+SRL:              5
+CLB:              0
+
+#=== Final timing ===
+CP required:                     10.000
+CP achieved post-synthesis:      10.172
+Timing not met
+
+TIMESTAMP: HLS-REPORT: synthesis end: 2026-10-24 17:57:06 -03
+# if { $has_impl } {
+#   # launch run impl
+#   if { [llength $impl_props] } {
+#     set_property -dict $impl_props [get_runs impl_1]
+#   }
+#   launch_runs impl_1
+#   wait_on_run impl_1
+#   # impl reports
+#   hls_vivado_reports_impl impl_1 $report_options
+# }
+INFO: [Timing 38-480] Writing timing data to binary archive.
+WARNING: [Common 17-210] 'write_hwdef' is deprecated.
+[Sat Oct 24 17:57:08 2026] Launched impl_1...
+Run output will be captured here: /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/impl_1/runme.log
+[Sat Oct 24 17:57:08 2026] Waiting for impl_1 to finish...
+
+*** Running vivado
+    with args -log bd_0_wrapper.vdi -applog -m64 -product Vivado -messageDb vivado.pb -mode batch -source bd_0_wrapper.tcl -notrace
+
+
+****** Vivado v2022.2 (64-bit)
+  **** SW Build 3671981 on Fri Oct 14 04:59:54 MDT 2022
+  **** IP Build 3669848 on Fri Oct 14 08:30:02 MDT 2022
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+
+source bd_0_wrapper.tcl -notrace
+INFO: Dispatch client connection id - 35881
+Command: open_checkpoint /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/impl_1/bd_0_wrapper.dcp
+INFO: [Device 21-403] Loading part xc7a100tcsg324-1
+Netlist sorting complete. Time (s): cpu = 00:00:00.1 ; elapsed = 00:00:00.1 . Memory (MB): peak = 2091.199 ; gain = 0.000 ; free physical = 4786 ; free virtual = 23002
+INFO: [Netlist 29-17] Analyzing 2003 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-479] Netlist was created with Vivado 2022.2
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Timing 38-478] Restoring timing data from binary archive.
+INFO: [Timing 38-479] Binary timing data restore complete.
+INFO: [Project 1-856] Restoring constraints from binary archive.
+INFO: [Project 1-853] Binary constraint restore complete.
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 2762.398 ; gain = 0.000 ; free physical = 4229 ; free virtual = 22441
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+INFO: [Project 1-604] Checkpoint was created with Vivado v2022.2 (64-bit) build 3671981
+OpenCheckpoint Checksum | Checksum: eddcafc4
+----- Checksum: PlaceDB: 00000000 ShapeSum: eddcafc4 RouteDB: 00000000 
+open_checkpoint: Time (s): cpu = 00:00:15 ; elapsed = 00:00:15 . Memory (MB): peak = 2762.398 ; gain = 1114.176 ; free physical = 4229 ; free virtual = 22441
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/ip'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/tools/Xilinx/Vivado/2022.2/data/ip'.
+Command: opt_design
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a100t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a100t'
+Running DRC as a precondition to command opt_design
+
+Starting DRC Task
+INFO: [DRC 23-27] Running DRC with 8 threads
+INFO: [Project 1-461] DRC finished with 0 Errors
+INFO: [Project 1-462] Please refer to the DRC report (report_drc) for more information.
+
+Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.57 . Memory (MB): peak = 2876.992 ; gain = 103.688 ; free physical = 4209 ; free virtual = 22421
+
+Starting Cache Timing Information Task
+Ending Cache Timing Information Task | Checksum: 1cdfa62fe
+
+Time (s): cpu = 00:00:00.03 ; elapsed = 00:00:00.03 . Memory (MB): peak = 2876.992 ; gain = 0.000 ; free physical = 4209 ; free virtual = 22420
+
+Starting Logic Optimization Task
+
+Phase 1 Retarget
+INFO: [Opt 31-1287] Pulled Inverter bd_0_i/hls_inst/inst/grp_conv1_fu_104/flow_control_loop_pipe_sequential_init_U/q0[14]_i_2 into driver instance bd_0_i/hls_inst/inst/grp_conv1_fu_104/flow_control_loop_pipe_sequential_init_U/q0[14]_i_3, which resulted in an inversion of 24 pins
+INFO: [Opt 31-1287] Pulled Inverter bd_0_i/hls_inst/inst/grp_conv2_fu_124/flow_control_loop_pipe_sequential_init_U/sub_ln2579_reg_18703[1]_i_1 into driver instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/flow_control_loop_pipe_sequential_init_U/sub_ln2579_reg_18703[9]_i_2, which resulted in an inversion of 5 pins
+INFO: [Opt 31-1287] Pulled Inverter bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2226_reg_19961[7]_i_2 into driver instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2226_reg_19961[7]_i_10, which resulted in an inversion of 2 pins
+INFO: [Opt 31-1287] Pulled Inverter bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2226_reg_19961[9]_i_3 into driver instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2226_reg_19961[9]_i_5, which resulted in an inversion of 2 pins
+INFO: [Opt 31-1287] Pulled Inverter bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2351_reg_20824[7]_i_2 into driver instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2351_reg_20824[7]_i_10, which resulted in an inversion of 2 pins
+INFO: [Opt 31-1287] Pulled Inverter bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2460_reg_21572[7]_i_2 into driver instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2460_reg_21572[7]_i_9, which resulted in an inversion of 2 pins
+INFO: [Opt 31-1287] Pulled Inverter bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2463_reg_21581[7]_i_2 into driver instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2463_reg_21581[7]_i_10, which resulted in an inversion of 3 pins
+INFO: [Opt 31-1287] Pulled Inverter bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2467_reg_21646[7]_i_2 into driver instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/sub_ln2467_reg_21646[7]_i_10, which resulted in an inversion of 3 pins
+INFO: [Opt 31-1287] Pulled Inverter bd_0_i/hls_inst/inst/grp_flatten_fu_142/flow_control_loop_pipe_sequential_init_U/select_ln2731_1_reg_251[6]_i_1 into driver instance bd_0_i/hls_inst/inst/grp_flatten_fu_142/flow_control_loop_pipe_sequential_init_U/indvar_flatten_fu_52[8]_i_3, which resulted in an inversion of 4 pins
+INFO: [Opt 31-1287] Pulled Inverter bd_0_i/hls_inst/inst/grp_pool2_fu_136/flow_control_loop_pipe_sequential_init_U/icmp_ln2709_reg_809[0]_i_1 into driver instance bd_0_i/hls_inst/inst/grp_pool2_fu_136/flow_control_loop_pipe_sequential_init_U/indvar_flatten_fu_78[4]_i_2, which resulted in an inversion of 28 pins
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+INFO: [Opt 31-49] Retargeted 0 cell(s).
+Phase 1 Retarget | Checksum: d489d53e
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:00.77 . Memory (MB): peak = 3108.941 ; gain = 24.012 ; free physical = 4024 ; free virtual = 22241
+INFO: [Opt 31-389] Phase Retarget created 0 cells and removed 10 cells
+
+Phase 2 Constant propagation
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Phase 2 Constant propagation | Checksum: 8f186bcf
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:01 . Memory (MB): peak = 3108.941 ; gain = 24.012 ; free physical = 4024 ; free virtual = 22241
+INFO: [Opt 31-389] Phase Constant propagation created 9 cells and removed 17 cells
+
+Phase 3 Sweep
+Phase 3 Sweep | Checksum: 7c74d133
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:01 . Memory (MB): peak = 3108.941 ; gain = 24.012 ; free physical = 4024 ; free virtual = 22241
+INFO: [Opt 31-389] Phase Sweep created 0 cells and removed 0 cells
+
+Phase 4 BUFG optimization
+Phase 4 BUFG optimization | Checksum: 7c74d133
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:01 . Memory (MB): peak = 3140.957 ; gain = 56.027 ; free physical = 4024 ; free virtual = 22241
+INFO: [Opt 31-662] Phase BUFG optimization created 0 cells of which 0 are BUFGs and removed 0 cells.
+
+Phase 5 Shift Register Optimization
+INFO: [Opt 31-1064] SRL Remap converted 0 SRLs to 0 registers and converted 0 registers of register chains to 0 SRLs
+Phase 5 Shift Register Optimization | Checksum: 7c74d133
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:01 . Memory (MB): peak = 3140.957 ; gain = 56.027 ; free physical = 4024 ; free virtual = 22241
+INFO: [Opt 31-389] Phase Shift Register Optimization created 0 cells and removed 0 cells
+
+Phase 6 Post Processing Netlist
+Phase 6 Post Processing Netlist | Checksum: 7c74d133
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:02 . Memory (MB): peak = 3140.957 ; gain = 56.027 ; free physical = 4024 ; free virtual = 22241
+INFO: [Opt 31-389] Phase Post Processing Netlist created 0 cells and removed 0 cells
+Opt_design Change Summary
+=========================
+
+
+-------------------------------------------------------------------------------------------------------------------------
+|  Phase                        |  #Cells created  |  #Cells Removed  |  #Constrained objects preventing optimizations  |
+-------------------------------------------------------------------------------------------------------------------------
+|  Retarget                     |               0  |              10  |                                              0  |
+|  Constant propagation         |               9  |              17  |                                              0  |
+|  Sweep                        |               0  |               0  |                                              0  |
+|  BUFG optimization            |               0  |               0  |                                              0  |
+|  Shift Register Optimization  |               0  |               0  |                                              0  |
+|  Post Processing Netlist      |               0  |               0  |                                              0  |
+-------------------------------------------------------------------------------------------------------------------------
+
+
+
+Starting Connectivity Check Task
+
+Time (s): cpu = 00:00:00.04 ; elapsed = 00:00:00.04 . Memory (MB): peak = 3140.957 ; gain = 0.000 ; free physical = 4024 ; free virtual = 22241
+Ending Logic Optimization Task | Checksum: 12b316288
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:02 . Memory (MB): peak = 3140.957 ; gain = 56.027 ; free physical = 4024 ; free virtual = 22241
+
+Starting Power Optimization Task
+INFO: [Pwropt 34-132] Skipping clock gating for clocks with a period < 2.00 ns.
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+Running Vector-less Activity Propagation...
+INFO: [Pwropt 34-9] Applying IDT optimizations ...
+INFO: [Pwropt 34-10] Applying ODC optimizations ...
+
+Finished Running Vector-less Activity Propagation
+
+
+Starting PowerOpt Patch Enables Task
+INFO: [Pwropt 34-162] WRITE_MODE attribute of 0 BRAM(s) out of a total of 41 has been updated to save power. Run report_power_opt to get a complete listing of the BRAMs updated.
+INFO: [Pwropt 34-201] Structural ODC has moved 0 WE to EN ports
+Number of BRAM Ports augmented: 20 newly gated: 0 Total Ports: 82
+Number of Flops added for Enable Generation: 9
+
+Ending PowerOpt Patch Enables Task | Checksum: bee87e61
+
+Time (s): cpu = 00:00:00.19 ; elapsed = 00:00:00.16 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3992 ; free virtual = 22218
+Ending Power Optimization Task | Checksum: bee87e61
+
+Time (s): cpu = 00:00:12 ; elapsed = 00:00:06 . Memory (MB): peak = 3531.551 ; gain = 390.594 ; free physical = 4023 ; free virtual = 22248
+
+Starting Final Cleanup Task
+
+Starting Logic Optimization Task
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+Ending Logic Optimization Task | Checksum: 10e30891d
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:01 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 4037 ; free virtual = 22262
+Ending Final Cleanup Task | Checksum: 10e30891d
+
+Time (s): cpu = 00:00:05 ; elapsed = 00:00:03 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 4037 ; free virtual = 22262
+
+Starting Netlist Obfuscation Task
+Netlist sorting complete. Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 4037 ; free virtual = 22262
+Ending Netlist Obfuscation Task | Checksum: 10e30891d
+
+Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.01 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 4037 ; free virtual = 22262
+INFO: [Common 17-83] Releasing license: Implementation
+46 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+opt_design completed successfully
+opt_design: Time (s): cpu = 00:00:24 ; elapsed = 00:00:14 . Memory (MB): peak = 3531.551 ; gain = 761.215 ; free physical = 4037 ; free virtual = 22262
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+INFO: [Timing 38-480] Writing timing data to binary archive.
+INFO: [Common 17-1381] The checkpoint '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/impl_1/bd_0_wrapper_opt.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_drc -file bd_0_wrapper_drc_opted.rpt -pb bd_0_wrapper_drc_opted.pb -rpx bd_0_wrapper_drc_opted.rpx
+Command: report_drc -file bd_0_wrapper_drc_opted.rpt -pb bd_0_wrapper_drc_opted.pb -rpx bd_0_wrapper_drc_opted.rpx
+INFO: [IP_Flow 19-1839] IP Catalog is up to date.
+INFO: [DRC 23-27] Running DRC with 8 threads
+INFO: [Vivado_Tcl 2-168] The results of DRC are in file /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/impl_1/bd_0_wrapper_drc_opted.rpt.
+report_drc completed successfully
+Command: place_design
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a100t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a100t'
+INFO: [DRC 23-27] Running DRC with 8 threads
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
+INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
+Running DRC as a precondition to command place_design
+INFO: [DRC 23-27] Running DRC with 8 threads
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
+INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
+
+Starting Placer Task
+INFO: [Place 30-611] Multithreading enabled for place_design using a maximum of 8 CPUs
+
+Phase 1 Placer Initialization
+
+Phase 1.1 Placer Initialization Netlist Sorting
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3948 ; free virtual = 22182
+Phase 1.1 Placer Initialization Netlist Sorting | Checksum: 16dddd1b
+
+Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.03 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3948 ; free virtual = 22182
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3948 ; free virtual = 22182
+
+Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device
+Phase 1.2 IO Placement/ Clock Placement/ Build Placer Device | Checksum: 6cc91b4a
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:00.94 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3940 ; free virtual = 22178
+
+Phase 1.3 Build Placer Netlist Model
+Phase 1.3 Build Placer Netlist Model | Checksum: 13928c858
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:05 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3909 ; free virtual = 22156
+
+Phase 1.4 Constrain Clocks/Macros
+Phase 1.4 Constrain Clocks/Macros | Checksum: 13928c858
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:05 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3909 ; free virtual = 22156
+Phase 1 Placer Initialization | Checksum: 13928c858
+
+Time (s): cpu = 00:00:13 ; elapsed = 00:00:05 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3909 ; free virtual = 22157
+
+Phase 2 Global Placement
+
+Phase 2.1 Floorplanning
+Phase 2.1 Floorplanning | Checksum: 1106faa1d
+
+Time (s): cpu = 00:00:19 ; elapsed = 00:00:06 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3912 ; free virtual = 22110
+
+Phase 2.2 Update Timing before SLR Path Opt
+Phase 2.2 Update Timing before SLR Path Opt | Checksum: 7ad63ef1
+
+Time (s): cpu = 00:00:23 ; elapsed = 00:00:08 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3908 ; free virtual = 22106
+
+Phase 2.3 Post-Processing in Floorplanning
+Phase 2.3 Post-Processing in Floorplanning | Checksum: 7ad63ef1
+
+Time (s): cpu = 00:00:23 ; elapsed = 00:00:08 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3908 ; free virtual = 22106
+
+Phase 2.4 Global Placement Core
+
+Phase 2.4.1 UpdateTiming Before Physical Synthesis
+Phase 2.4.1 UpdateTiming Before Physical Synthesis | Checksum: ff6ab499
+
+Time (s): cpu = 00:01:11 ; elapsed = 00:00:22 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3882 ; free virtual = 22082
+
+Phase 2.4.2 Physical Synthesis In Placer
+INFO: [Physopt 32-1035] Found 266 LUTNM shape to break, 792 LUT instances to create LUTNM shape
+INFO: [Physopt 32-1044] Break lutnm for timing: one critical 185, two critical 81, total 266, new lutff created 0
+INFO: [Physopt 32-1138] End 1 Pass. Optimized 620 nets or LUTs. Breaked 266 LUTs, combined 354 existing LUTs and moved 0 existing LUT
+INFO: [Physopt 32-65] No nets found for high-fanout optimization.
+INFO: [Physopt 32-232] Optimized 0 net. Created 0 new instance.
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-456] No candidate cells for DSP register optimization found in the design.
+INFO: [Physopt 32-775] End 2 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-1123] No candidate cells found for Shift Register to Pipeline optimization
+INFO: [Physopt 32-775] End 2 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-677] No candidate cells for Shift Register optimization found in the design
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-526] No candidate cells for BRAM register optimization found in the design
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-846] No candidate cells for URAM register optimization found in the design
+INFO: [Physopt 32-775] End 2 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+INFO: [Physopt 32-949] No candidate nets found for dynamic/static region interface net replication
+INFO: [Physopt 32-775] End 1 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3852 ; free virtual = 22062
+
+Summary of Physical Synthesis Optimizations
+============================================
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+|  Optimization                                     |  Added Cells  |  Removed Cells  |  Optimized Cells/Nets  |  Dont Touch  |  Iterations  |  Elapsed   |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+|  LUT Combining                                    |          266  |            354  |                   620  |           0  |           1  |  00:00:01  |
+|  Retime                                           |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Very High Fanout                                 |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  DSP Register                                     |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Shift Register to Pipeline                       |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Shift Register                                   |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  BRAM Register                                    |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  URAM Register                                    |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Dynamic/Static Region Interface Net Replication  |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Total                                            |          266  |            354  |                   620  |           0  |           9  |  00:00:01  |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Phase 2.4.2 Physical Synthesis In Placer | Checksum: 160234c67
+
+Time (s): cpu = 00:01:17 ; elapsed = 00:00:25 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3830 ; free virtual = 22040
+Phase 2.4 Global Placement Core | Checksum: fc519b48
+
+Time (s): cpu = 00:01:20 ; elapsed = 00:00:26 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3829 ; free virtual = 22040
+Phase 2 Global Placement | Checksum: fc519b48
+
+Time (s): cpu = 00:01:20 ; elapsed = 00:00:26 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3837 ; free virtual = 22047
+
+Phase 3 Detail Placement
+
+Phase 3.1 Commit Multi Column Macros
+Phase 3.1 Commit Multi Column Macros | Checksum: 175b42a3f
+
+Time (s): cpu = 00:01:25 ; elapsed = 00:00:27 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3829 ; free virtual = 22039
+
+Phase 3.2 Commit Most Macros & LUTRAMs
+Phase 3.2 Commit Most Macros & LUTRAMs | Checksum: 18f3ec980
+
+Time (s): cpu = 00:01:35 ; elapsed = 00:00:30 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3818 ; free virtual = 22030
+
+Phase 3.3 Area Swap Optimization
+Phase 3.3 Area Swap Optimization | Checksum: 210441bf7
+
+Time (s): cpu = 00:01:36 ; elapsed = 00:00:30 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3818 ; free virtual = 22030
+
+Phase 3.4 Pipeline Register Optimization
+Phase 3.4 Pipeline Register Optimization | Checksum: 164013d05
+
+Time (s): cpu = 00:01:36 ; elapsed = 00:00:30 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3818 ; free virtual = 22030
+
+Phase 3.5 Fast Optimization
+Phase 3.5 Fast Optimization | Checksum: 1dc4aef1d
+
+Time (s): cpu = 00:01:50 ; elapsed = 00:00:34 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3825 ; free virtual = 22037
+
+Phase 3.6 Small Shape Detail Placement
+Phase 3.6 Small Shape Detail Placement | Checksum: 1efcd0322
+
+Time (s): cpu = 00:01:59 ; elapsed = 00:00:43 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3805 ; free virtual = 22016
+
+Phase 3.7 Re-assign LUT pins
+Phase 3.7 Re-assign LUT pins | Checksum: 1c1bdf509
+
+Time (s): cpu = 00:02:01 ; elapsed = 00:00:44 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3797 ; free virtual = 22024
+
+Phase 3.8 Pipeline Register Optimization
+Phase 3.8 Pipeline Register Optimization | Checksum: 1215a2d6e
+
+Time (s): cpu = 00:02:01 ; elapsed = 00:00:44 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3797 ; free virtual = 22024
+
+Phase 3.9 Fast Optimization
+Phase 3.9 Fast Optimization | Checksum: 1b715672b
+
+Time (s): cpu = 00:02:21 ; elapsed = 00:00:52 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3777 ; free virtual = 22005
+Phase 3 Detail Placement | Checksum: 1b715672b
+
+Time (s): cpu = 00:02:22 ; elapsed = 00:00:52 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3777 ; free virtual = 22005
+
+Phase 4 Post Placement Optimization and Clean-Up
+
+Phase 4.1 Post Commit Optimization
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+
+Phase 4.1.1 Post Placement Optimization
+Post Placement Optimization Initialization | Checksum: 1c241cdc0
+
+Phase 4.1.1.1 BUFG Insertion
+
+Starting Physical Synthesis Task
+
+Phase 1 Physical Synthesis Initialization
+INFO: [Physopt 32-721] Multithreading enabled for phys_opt_design using a maximum of 8 CPUs
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-1.032 | TNS=-164.476 |
+Phase 1 Physical Synthesis Initialization | Checksum: 205cd061f
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:00.7 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3804 ; free virtual = 22031
+INFO: [Place 46-56] BUFG insertion identified 0 candidate nets. Inserted BUFG: 0, Replicated BUFG Driver: 0, Skipped due to Placement/Routing Conflicts: 0, Skipped due to Timing Degradation: 0, Skipped due to Illegal Netlist: 0.
+Ending Physical Synthesis Task | Checksum: 23f759e5e
+
+Time (s): cpu = 00:00:03 ; elapsed = 00:00:00.87 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3803 ; free virtual = 22031
+Phase 4.1.1.1 BUFG Insertion | Checksum: 1c241cdc0
+
+Time (s): cpu = 00:02:39 ; elapsed = 00:00:57 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3803 ; free virtual = 22031
+
+Phase 4.1.1.2 Post Placement Timing Optimization
+INFO: [Place 30-746] Post Placement Timing Summary WNS=-0.090. For the most accurate timing information please run report_timing.
+Phase 4.1.1.2 Post Placement Timing Optimization | Checksum: 184d7811d
+
+Time (s): cpu = 00:03:14 ; elapsed = 00:01:30 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3767 ; free virtual = 22003
+
+Time (s): cpu = 00:03:14 ; elapsed = 00:01:30 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3767 ; free virtual = 22003
+Phase 4.1 Post Commit Optimization | Checksum: 184d7811d
+
+Time (s): cpu = 00:03:14 ; elapsed = 00:01:30 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3767 ; free virtual = 22003
+
+Phase 4.2 Post Placement Cleanup
+Phase 4.2 Post Placement Cleanup | Checksum: 184d7811d
+
+Time (s): cpu = 00:03:15 ; elapsed = 00:01:30 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3766 ; free virtual = 22003
+
+Phase 4.3 Placer Reporting
+
+Phase 4.3.1 Print Estimated Congestion
+INFO: [Place 30-612] Post-Placement Estimated Congestion 
+ ____________________________________________________
+|           | Global Congestion | Short Congestion  |
+| Direction | Region Size       | Region Size       |
+|___________|___________________|___________________|
+|      North|                2x2|                8x8|
+|___________|___________________|___________________|
+|      South|                1x1|                2x2|
+|___________|___________________|___________________|
+|       East|                2x2|                4x4|
+|___________|___________________|___________________|
+|       West|                1x1|                4x4|
+|___________|___________________|___________________|
+
+Phase 4.3.1 Print Estimated Congestion | Checksum: 184d7811d
+
+Time (s): cpu = 00:03:15 ; elapsed = 00:01:31 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3766 ; free virtual = 22003
+Phase 4.3 Placer Reporting | Checksum: 184d7811d
+
+Time (s): cpu = 00:03:15 ; elapsed = 00:01:31 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3766 ; free virtual = 22003
+
+Phase 4.4 Final Placement Cleanup
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3766 ; free virtual = 22003
+
+Time (s): cpu = 00:03:15 ; elapsed = 00:01:31 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3766 ; free virtual = 22003
+Phase 4 Post Placement Optimization and Clean-Up | Checksum: 16bf26b13
+
+Time (s): cpu = 00:03:15 ; elapsed = 00:01:31 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3766 ; free virtual = 22003
+Ending Placer Task | Checksum: 11dc97ef3
+
+Time (s): cpu = 00:03:15 ; elapsed = 00:01:31 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3766 ; free virtual = 22003
+INFO: [Common 17-83] Releasing license: Implementation
+86 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+place_design completed successfully
+place_design: Time (s): cpu = 00:03:18 ; elapsed = 00:01:32 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3812 ; free virtual = 22049
+INFO: [Timing 38-480] Writing timing data to binary archive.
+Writing XDEF routing.
+Writing XDEF routing logical nets.
+Writing XDEF routing special nets.
+Write XDEF Complete: Time (s): cpu = 00:00:04 ; elapsed = 00:00:02 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3766 ; free virtual = 22046
+INFO: [Common 17-1381] The checkpoint '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/impl_1/bd_0_wrapper_placed.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_io -file bd_0_wrapper_io_placed.rpt
+report_io: Time (s): cpu = 00:00:00.1 ; elapsed = 00:00:00.16 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3786 ; free virtual = 22033
+INFO: [runtcl-4] Executing : report_utilization -file bd_0_wrapper_utilization_placed.rpt -pb bd_0_wrapper_utilization_placed.pb
+INFO: [runtcl-4] Executing : report_control_sets -verbose -file bd_0_wrapper_control_sets_placed.rpt
+report_control_sets: Time (s): cpu = 00:00:00.11 ; elapsed = 00:00:00.19 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3794 ; free virtual = 22044
+Command: phys_opt_design
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a100t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a100t'
+
+Starting Initial Update Timing Task
+WARNING: [Timing 38-242] The property HD.CLK_SRC of clock port "ap_clk" is not set. In out-of-context mode, this prevents timing estimation for clock delay/skew
+Resolution: Set the HD.CLK_SRC property of the out-of-context port to the location of the clock buffer instance in the top-level design
+
+Time (s): cpu = 00:00:11 ; elapsed = 00:00:03 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3754 ; free virtual = 22016
+INFO: [Vivado_Tcl 4-1435] PhysOpt_Tcl_Interface Runtime Before Starting Physical Synthesis Task | CPU: 11.17s |  WALL: 3.05s
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3754 ; free virtual = 22016
+
+Starting Physical Synthesis Task
+
+Phase 1 Physical Synthesis Initialization
+INFO: [Physopt 32-721] Multithreading enabled for phys_opt_design using a maximum of 8 CPUs
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.424 | TNS=-14.522 |
+Phase 1 Physical Synthesis Initialization | Checksum: 284c76af0
+
+Time (s): cpu = 00:00:05 ; elapsed = 00:00:02 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3755 ; free virtual = 22002
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.424 | TNS=-14.522 |
+
+Phase 2 DSP Register Optimization
+INFO: [Physopt 32-456] No candidate cells for DSP register optimization found in the design.
+INFO: [Physopt 32-775] End 2 Pass. Optimized 0 net or cell. Created 0 new cell, deleted 0 existing cell and moved 0 existing cell
+Phase 2 DSP Register Optimization | Checksum: 284c76af0
+
+Time (s): cpu = 00:00:05 ; elapsed = 00:00:02 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3755 ; free virtual = 22002
+
+Phase 3 Critical Path Optimization
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.424 | TNS=-14.522 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_285_V_reg_24152[17].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_285_V_reg_24152_reg[17]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_285_V_reg_24152[17]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.291 | TNS=-14.112 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_315_V_reg_24270[17].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_315_V_reg_24270_reg[17]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_315_V_reg_24270[17]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.278 | TNS=-13.893 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_108_V_reg_23352[17].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_108_V_reg_23352_reg[17]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_108_V_reg_23352[17]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.276 | TNS=-13.703 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_571_V_reg_25688[15]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_6_reg_5487[5].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_6_reg_5487_reg[5]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_6_reg_5487[5]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.255 | TNS=-11.566 |
+INFO: [Physopt 32-81] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104_ap_start_reg. Replicated 3 times.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104_ap_start_reg. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.254 | TNS=-11.602 |
+INFO: [Physopt 32-81] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage0. Replicated 4 times.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.245 | TNS=-10.756 |
+INFO: [Physopt 32-81] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_enable_reg_pp0_iter0_reg_reg_rep_n_0. Replicated 1 times.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_enable_reg_pp0_iter0_reg_reg_rep_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.243 | TNS=-10.574 |
+INFO: [Physopt 32-81] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_enable_reg_pp0_iter0_reg_reg_rep_n_0. Replicated 1 times.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_enable_reg_pp0_iter0_reg_reg_rep_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.241 | TNS=-10.394 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_enable_reg_pp0_iter0_reg_reg_rep_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930_reg[15]_i_2_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[15]_i_5_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-81] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[5]_6. Replicated 1 times.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[5]_6. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.232 | TNS=-3.542 |
+INFO: [Physopt 32-81] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124_ap_start_reg_reg_rep__0_n_0. Replicated 2 times.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124_ap_start_reg_reg_rep__0_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.223 | TNS=-3.289 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[5]_6. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_11_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_40_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_140_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_140
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_140_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.197 | TNS=-2.875 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_9_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 17 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_35_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.196 | TNS=-2.833 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_510_V_reg_25335[22].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_510_V_reg_25335_reg[22]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_510_V_reg_25335[22]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.192 | TNS=-2.815 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_300_V_reg_12930_reg[22]_0[22].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_300_V_reg_12930_reg[22]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_300_V_reg_12930_reg[22]_0[22]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.191 | TNS=-2.768 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_298_V_reg_12925[22].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_298_V_reg_12925_reg[22]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_298_V_reg_12925[22]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.191 | TNS=-2.649 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_34_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_124_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_124
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_124_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.178 | TNS=-2.581 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_510_V_reg_25335[22]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_70_reg_6703[0].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_70_reg_6703_reg[0]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_70_reg_6703[0]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.177 | TNS=-2.074 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_33_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_33
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_33_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.148 | TNS=-1.945 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/grp_u_MUL8_T4_A2c_fu_3478/zext_ln798_1_fu_1706_p1__0[2]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104_ap_start_reg_repN_1. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 15 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/grp_u_MUL8_T4_A2c_fu_3478/n209_reg_2196[0]_i_2_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.140 | TNS=-1.797 |
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 11 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_33_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.133 | TNS=-1.783 |
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 12 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_10_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.116 | TNS=-1.749 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/b_V_4_load_reg_9487_pp0_iter1_reg_reg[14]_0[8]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/add_ln326_2_fu_868_p2_carry__0_i_44_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/add_ln326_2_fu_868_p2_carry__0_i_148_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-710] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/add_ln326_2_fu_868_p2_carry__0_i_148_n_0. Critical path length was reduced through logic transformation on cell bd_0_i/hls_inst/inst/grp_conv1_fu_104/add_ln326_2_fu_868_p2_carry__0_i_148_comp.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/add_ln326_2_fu_868_p2_carry__0_i_392_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.110 | TNS=-1.719 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_219_V_reg_23844[16].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_219_V_reg_23844_reg[16]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_219_V_reg_23844[16]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.101 | TNS=-1.609 |
+INFO: [Physopt 32-710] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_9_n_0. Critical path length was reduced through logic transformation on cell bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_9_comp.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_35_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.099 | TNS=-1.580 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/w_V_3_U/w_V_3_q1[7]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-81] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage0_repN. Replicated 2 times.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage0_repN. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.097 | TNS=-1.603 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124_ap_start_reg_reg_rep__0_n_0_repN.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124_ap_start_reg_reg_rep__0_replica
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124_ap_start_reg_reg_rep__0_n_0_repN. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.095 | TNS=-1.537 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/grp_u_MUL8_T4_A2c_fu_3478/zext_ln798_1_fu_1706_p1__0[4]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/grp_u_MUL8_T4_A2c_fu_3478/n219_reg_2217[0]_i_3_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv1_fu_104/grp_u_MUL8_T4_A2c_fu_3478/n219_reg_2217[0]_i_3
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/grp_u_MUL8_T4_A2c_fu_3478/n219_reg_2217[0]_i_3_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.091 | TNS=-1.442 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_298_V_reg_12925[21].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_298_V_reg_12925_reg[21]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_298_V_reg_12925[21]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.087 | TNS=-1.351 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_252_V_reg_24019[19].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_252_V_reg_24019_reg[19]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_252_V_reg_24019[19]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.087 | TNS=-1.333 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/t2_V_U/ram0_reg_1[0]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage6.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[6]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage6. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.084 | TNS=-1.320 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_507_V_reg_25278[19].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_507_V_reg_25278_reg[19]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_507_V_reg_25278[19]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.084 | TNS=-1.236 |
+INFO: [Physopt 32-81] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage0_repN_4. Replicated 2 times.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage0_repN_4. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.077 | TNS=-1.212 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_10_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 18 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_38_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.076 | TNS=-1.211 |
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 11 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_33_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.075 | TNS=-1.195 |
+INFO: [Physopt 32-571] Net bd_0_i/hls_inst/inst/grp_conv2_fu_124_ap_start_reg_reg_rep__0_n_0_repN was not replicated.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124_ap_start_reg_reg_rep__0_n_0_repN. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 24 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/w_V_3_U/q0_reg_i_95_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.075 | TNS=-1.158 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage28.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[28]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage28. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.074 | TNS=-1.100 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/grp_u_MUL8_T4_A2c_fu_3478/zext_ln798_fu_1688_p1__0[3]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/grp_u_MUL8_T4_A2c_fu_3478/n212_reg_2207[0]_i_2_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv1_fu_104/grp_u_MUL8_T4_A2c_fu_3478/n212_reg_2207[0]_i_2
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/grp_u_MUL8_T4_A2c_fu_3478/n212_reg_2207[0]_i_2_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.074 | TNS=-1.026 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/t2_V_U/ram0_reg_1[0]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage10.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[10]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage10. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.067 | TNS=-1.008 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_125_V_reg_12062[5].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_125_V_reg_12062_reg[5]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/v1_125_V_reg_12062[5]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.065 | TNS=-0.941 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/select_ln2092_reg_18694_reg_n_0_[2].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/select_ln2092_reg_18694_reg[2]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/select_ln2092_reg_18694_reg_n_0_[2]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.064 | TNS=-0.919 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_252_V_reg_24019[19]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_enable_reg_pp0_iter0_reg_reg_rep_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[19]_i_11_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[5]_5. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_13_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 23 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_51_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.060 | TNS=-0.911 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_14_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_53_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_164_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_condition_1892. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_592_V_reg_22950[7]_i_2_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_592_V_reg_22950[7]_i_2
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_592_V_reg_22950[7]_i_2_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.060 | TNS=-0.870 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_571_V_reg_25688[15]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[15]_i_10_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[11]_i_2_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[11]_i_7_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[5]_i_9_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry_i_36_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry_i_120_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry_i_120
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry_i_120_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.059 | TNS=-0.858 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_126_V_reg_23480[20].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_126_V_reg_23480_reg[20]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_126_V_reg_23480[20]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.057 | TNS=-0.799 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_541_V_reg_25528[14].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_541_V_reg_25528_reg[14]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_541_V_reg_25528[14]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.057 | TNS=-0.742 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/w_V_3_U/w_V_3_q1[7]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124_ap_start_reg_reg_rep__0_n_0_repN. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/w_V_3_U/q0_reg_i_102_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 23 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/w_V_3_U/q0_reg_i_472_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.057 | TNS=-0.685 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage144.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[144]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage144. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.056 | TNS=-0.642 |
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.056 | TNS=-0.642 |
+Phase 3 Critical Path Optimization | Checksum: 290785fde
+
+Time (s): cpu = 00:00:50 ; elapsed = 00:00:14 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3757 ; free virtual = 22004
+
+Phase 4 Critical Path Optimization
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.056 | TNS=-0.642 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/t2_V_U/ram0_reg_1[0]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage44.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[44]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage44. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.055 | TNS=-0.638 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_571_V_reg_25688[15]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_2_reg_5411[1].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_2_reg_5411_reg[1]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_2_reg_5411[1]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.053 | TNS=-0.636 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_enable_reg_pp0_iter0_reg_reg_rep_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930_reg[15]_i_2_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930_reg[15]_i_4_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[15]_i_10_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-710] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[15]_i_10_n_0. Critical path length was reduced through logic transformation on cell bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[15]_i_10_comp.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[11]_i_2_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.052 | TNS=-0.642 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage14.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[14]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage14. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.051 | TNS=-0.630 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_219_V_reg_23844[4].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_219_V_reg_23844_reg[4]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_219_V_reg_23844[4]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.050 | TNS=-0.579 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[15]_i_5_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[5]_6. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_10_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_38_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_134_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_134
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_134_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.049 | TNS=-0.575 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/w_V_3_U/w_V_3_q1[7]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-81] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/empty_204_reg_18739[1]. Replicated 3 times.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/empty_204_reg_18739[1]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.046 | TNS=-0.547 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_reg_5373[9]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_135_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/sext_ln2110_fu_12128_p1[14]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry_i_326_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 12 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry_i_517_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.045 | TNS=-0.545 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage16.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[16]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage16. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.044 | TNS=-0.543 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_2_reg_5411[3].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_2_reg_5411_reg[3]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_phi_reg_pp0_iter0_rhs_V_2_reg_5411[3]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.043 | TNS=-0.539 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/t2_V_U/ram0_reg_1[0]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage26.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[26]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage26. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.042 | TNS=-0.535 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/w_V_4_U/DOBDO[0]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/empty_441_reg_9403_reg[3]_rep__0_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv1_fu_104/empty_441_reg_9403_reg[3]_rep__0
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/empty_441_reg_9403_reg[3]_rep__0_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.041 | TNS=-0.534 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/ap_CS_fsm_pp0_stage90.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv1_fu_104/ap_CS_fsm_reg[90]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv1_fu_104/ap_CS_fsm_pp0_stage90. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.040 | TNS=-0.493 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_316_V_reg_24289[4].  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_316_V_reg_24289_reg[4]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_316_V_reg_24289[4]. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.040 | TNS=-0.453 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_571_V_reg_25688[15]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_enable_reg_pp0_iter0_reg_reg_rep_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[15]_i_5_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[5]_6. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_9_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_34_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_123_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_123
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_123_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.039 | TNS=-0.443 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_252_V_reg_24019[19]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/v1_300_V_reg_12930[19]_i_11_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[5]_5. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_13_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_51_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_162_n_0.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_162
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/add_ln326_2_fu_868_p2_carry__0_i_162_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.039 | TNS=-0.439 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage32.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[32]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage32. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.039 | TNS=-0.437 |
+INFO: [Physopt 32-663] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage4.  Re-placed instance bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_reg[4]
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage4. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.038 | TNS=-0.417 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/w_V_3_U/w_V_3_q1[7]. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124_ap_start_reg_reg_rep__0_n_0_repN. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/w_V_3_U/q0_reg_i_97_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/w_V_3_U/q0_reg_i_454_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 24 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/w_V_3_U/q0_reg_i_1601_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.037 | TNS=-0.379 |
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ap_CS_fsm_pp0_stage14. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ram0_reg_i_34_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ram0_reg_i_61_n_5. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ram0_reg_i_86_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-702] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ram0_reg_i_147_n_0. Optimizations did not improve timing on the net.
+INFO: [Physopt 32-608] Optimized 1 net.  Swapped 26 pins.
+INFO: [Physopt 32-735] Processed net bd_0_i/hls_inst/inst/grp_conv2_fu_124/ram0_reg_i_305_n_0. Optimization improves timing on the net.
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.036 | TNS=-0.378 |
+INFO: [Physopt 32-619] Estimated Timing Summary | WNS=-0.036 | TNS=-0.378 |
+Phase 4 Critical Path Optimization | Checksum: 164c2ca6f
+
+Time (s): cpu = 00:01:11 ; elapsed = 00:00:19 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3752 ; free virtual = 21999
+Netlist sorting complete. Time (s): cpu = 00:00:00.14 ; elapsed = 00:00:00.14 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3752 ; free virtual = 21999
+INFO: [Physopt 32-603] Post Physical Optimization Timing Summary | WNS=-0.036 | TNS=-0.378 |
+
+Summary of Physical Synthesis Optimizations
+============================================
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+|  Optimization   |  WNS Gain (ns)  |  TNS Gain (ns)  |  Added Cells  |  Removed Cells  |  Optimized Cells/Nets  |  Dont Touch  |  Iterations  |  Elapsed   |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+|  DSP Register   |          0.000  |          0.000  |            0  |              0  |                     0  |           0  |           1  |  00:00:00  |
+|  Critical Path  |          0.388  |         14.144  |           19  |              0  |                    67  |           0  |           2  |  00:00:17  |
+|  Total          |          0.388  |         14.144  |           19  |              0  |                    67  |           0  |           3  |  00:00:17  |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3752 ; free virtual = 21999
+Ending Physical Synthesis Task | Checksum: 148983798
+
+Time (s): cpu = 00:01:12 ; elapsed = 00:00:19 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3752 ; free virtual = 22000
+INFO: [Common 17-83] Releasing license: Implementation
+383 Infos, 1 Warnings, 0 Critical Warnings and 0 Errors encountered.
+phys_opt_design completed successfully
+phys_opt_design: Time (s): cpu = 00:01:22 ; elapsed = 00:00:22 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3772 ; free virtual = 22020
+INFO: [Timing 38-480] Writing timing data to binary archive.
+Writing XDEF routing.
+Writing XDEF routing logical nets.
+Writing XDEF routing special nets.
+Write XDEF Complete: Time (s): cpu = 00:00:04 ; elapsed = 00:00:02 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3742 ; free virtual = 22032
+INFO: [Common 17-1381] The checkpoint '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/impl_1/bd_0_wrapper_physopt.dcp' has been generated.
+Command: route_design
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a100t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a100t'
+INFO: [DRC 23-27] Running DRC with 8 threads
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
+INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
+Running DRC as a precondition to command route_design
+INFO: [DRC 23-27] Running DRC with 8 threads
+INFO: [Vivado_Tcl 4-198] DRC finished with 0 Errors
+INFO: [Vivado_Tcl 4-199] Please refer to the DRC report (report_drc) for more information.
+
+
+Starting Routing Task
+INFO: [Route 35-254] Multithreading enabled for route_design using a maximum of 8 CPUs
+
+Phase 1 Build RT Design
+Checksum: PlaceDB: 7357e4d7 ConstDB: 0 ShapeSum: a8750bdb RouteDB: 0
+WARNING: [Route 35-197] Clock port "ap_clk" does not have an associated HD.CLK_SRC. Without this constraint, timing analysis may not be accurate and upstream checks cannot be done to ensure correct clock placement.
+WARNING: [Route 35-198] Port "ap_rst" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "ap_rst". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "ap_ctrl_start" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "ap_ctrl_start". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q0[1]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q0[1]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q1[1]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q1[1]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q0[2]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q0[2]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q1[0]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q1[0]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q1[2]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q1[2]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q1[4]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q1[4]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q0[7]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q0[7]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q1[6]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q1[6]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q1[7]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q1[7]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q0[0]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q0[0]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q0[6]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q0[6]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q0[4]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q0[4]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q1[5]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q1[5]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q0[5]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q0[5]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q0[3]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q0[3]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "in_r_q1[3]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "in_r_q1[3]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+Post Restoration Checksum: NetGraph: 3070becf NumContArr: 53f52e5c Constraints: 0 Timing: 0
+Phase 1 Build RT Design | Checksum: 8465ed2b
+
+Time (s): cpu = 00:00:33 ; elapsed = 00:00:21 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3637 ; free virtual = 21899
+
+Phase 2 Router Initialization
+
+Phase 2.1 Fix Topology Constraints
+Phase 2.1 Fix Topology Constraints | Checksum: 8465ed2b
+
+Time (s): cpu = 00:00:34 ; elapsed = 00:00:21 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3605 ; free virtual = 21867
+
+Phase 2.2 Pre Route Cleanup
+Phase 2.2 Pre Route Cleanup | Checksum: 8465ed2b
+
+Time (s): cpu = 00:00:34 ; elapsed = 00:00:21 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3605 ; free virtual = 21867
+ Number of Nodes with overlaps = 0
+
+Phase 2.3 Update Timing
+Phase 2.3 Update Timing | Checksum: 1540d734f
+
+Time (s): cpu = 00:00:45 ; elapsed = 00:00:25 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3586 ; free virtual = 21848
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=0.080  | TNS=0.000  | WHS=0.090  | THS=0.000  |
+
+
+Router Utilization Summary
+  Global Vertical Routing Utilization    = 0 %
+  Global Horizontal Routing Utilization  = 0 %
+  Routable Net Status*
+  *Does not include unroutable nets such as driverless and loadless.
+  Run report_route_status for detailed report.
+  Number of Failed Nets               = 34764
+    (Failed Nets is the sum of unrouted and partially routed nets)
+  Number of Unrouted Nets             = 34764
+  Number of Partially Routed Nets     = 0
+  Number of Node Overlaps             = 0
+
+Phase 2 Router Initialization | Checksum: cc0d90c0
+
+Time (s): cpu = 00:00:54 ; elapsed = 00:00:27 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3566 ; free virtual = 21829
+
+Phase 3 Initial Routing
+
+Phase 3.1 Global Routing
+Phase 3.1 Global Routing | Checksum: cc0d90c0
+
+Time (s): cpu = 00:00:54 ; elapsed = 00:00:27 . Memory (MB): peak = 3531.551 ; gain = 0.000 ; free physical = 3566 ; free virtual = 21829
+Phase 3 Initial Routing | Checksum: 20ed07c9c
+
+Time (s): cpu = 00:01:17 ; elapsed = 00:00:31 . Memory (MB): peak = 3543.676 ; gain = 12.125 ; free physical = 3544 ; free virtual = 21807
+
+Phase 4 Rip-up And Reroute
+
+Phase 4.1 Global Iteration 0
+ Number of Nodes with overlaps = 12217
+ Number of Nodes with overlaps = 4064
+ Number of Nodes with overlaps = 1786
+ Number of Nodes with overlaps = 761
+ Number of Nodes with overlaps = 248
+ Number of Nodes with overlaps = 112
+ Number of Nodes with overlaps = 40
+ Number of Nodes with overlaps = 10
+ Number of Nodes with overlaps = 4
+ Number of Nodes with overlaps = 2
+ Number of Nodes with overlaps = 1
+ Number of Nodes with overlaps = 1
+ Number of Nodes with overlaps = 0
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=-1.118 | TNS=-543.673| WHS=N/A    | THS=N/A    |
+
+Phase 4.1 Global Iteration 0 | Checksum: 17ef4180a
+
+Time (s): cpu = 00:03:36 ; elapsed = 00:02:00 . Memory (MB): peak = 3546.676 ; gain = 15.125 ; free physical = 3523 ; free virtual = 21797
+
+Phase 4.2 Global Iteration 1
+ Number of Nodes with overlaps = 1514
+ Number of Nodes with overlaps = 1044
+ Number of Nodes with overlaps = 613
+ Number of Nodes with overlaps = 322
+ Number of Nodes with overlaps = 170
+ Number of Nodes with overlaps = 76
+ Number of Nodes with overlaps = 34
+ Number of Nodes with overlaps = 18
+ Number of Nodes with overlaps = 7
+ Number of Nodes with overlaps = 7
+ Number of Nodes with overlaps = 2
+ Number of Nodes with overlaps = 2
+ Number of Nodes with overlaps = 1
+ Number of Nodes with overlaps = 0
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=-1.151 | TNS=-460.311| WHS=N/A    | THS=N/A    |
+
+Phase 4.2 Global Iteration 1 | Checksum: 1ff433fa6
+
+Time (s): cpu = 00:04:59 ; elapsed = 00:02:34 . Memory (MB): peak = 3546.676 ; gain = 15.125 ; free physical = 3506 ; free virtual = 21781
+Phase 4 Rip-up And Reroute | Checksum: 1ff433fa6
+
+Time (s): cpu = 00:04:59 ; elapsed = 00:02:34 . Memory (MB): peak = 3546.676 ; gain = 15.125 ; free physical = 3506 ; free virtual = 21781
+
+Phase 5 Delay and Skew Optimization
+
+Phase 5.1 Delay CleanUp
+
+Phase 5.1.1 Update Timing
+Phase 5.1.1 Update Timing | Checksum: 2ab294127
+
+Time (s): cpu = 00:05:03 ; elapsed = 00:02:35 . Memory (MB): peak = 3546.676 ; gain = 15.125 ; free physical = 3506 ; free virtual = 21781
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=-1.118 | TNS=-543.673| WHS=N/A    | THS=N/A    |
+
+ Number of Nodes with overlaps = 0
+Phase 5.1 Delay CleanUp | Checksum: df2f103a
+
+Time (s): cpu = 00:05:07 ; elapsed = 00:02:36 . Memory (MB): peak = 3632.676 ; gain = 101.125 ; free physical = 3503 ; free virtual = 21772
+
+Phase 5.2 Clock Skew Optimization
+Phase 5.2 Clock Skew Optimization | Checksum: df2f103a
+
+Time (s): cpu = 00:05:07 ; elapsed = 00:02:36 . Memory (MB): peak = 3632.676 ; gain = 101.125 ; free physical = 3503 ; free virtual = 21772
+Phase 5 Delay and Skew Optimization | Checksum: df2f103a
+
+Time (s): cpu = 00:05:07 ; elapsed = 00:02:37 . Memory (MB): peak = 3632.676 ; gain = 101.125 ; free physical = 3503 ; free virtual = 21772
+
+Phase 6 Post Hold Fix
+
+Phase 6.1 Hold Fix Iter
+
+Phase 6.1.1 Update Timing
+Phase 6.1.1 Update Timing | Checksum: 129f379e4
+
+Time (s): cpu = 00:05:11 ; elapsed = 00:02:38 . Memory (MB): peak = 3632.676 ; gain = 101.125 ; free physical = 3503 ; free virtual = 21771
+INFO: [Route 35-416] Intermediate Timing Summary | WNS=-1.075 | TNS=-552.144| WHS=0.097  | THS=0.000  |
+
+Phase 6.1 Hold Fix Iter | Checksum: 129f379e4
+
+Time (s): cpu = 00:05:11 ; elapsed = 00:02:38 . Memory (MB): peak = 3632.676 ; gain = 101.125 ; free physical = 3503 ; free virtual = 21771
+Phase 6 Post Hold Fix | Checksum: 129f379e4
+
+Time (s): cpu = 00:05:11 ; elapsed = 00:02:38 . Memory (MB): peak = 3632.676 ; gain = 101.125 ; free physical = 3503 ; free virtual = 21771
+
+Phase 7 Route finalize
+
+Router Utilization Summary
+  Global Vertical Routing Utilization    = 11.2096 %
+  Global Horizontal Routing Utilization  = 14.6272 %
+  Routable Net Status*
+  *Does not include unroutable nets such as driverless and loadless.
+  Run report_route_status for detailed report.
+  Number of Failed Nets               = 0
+    (Failed Nets is the sum of unrouted and partially routed nets)
+  Number of Unrouted Nets             = 0
+  Number of Partially Routed Nets     = 0
+  Number of Node Overlaps             = 0
+
+Congestion Report
+North Dir 1x1 Area, Max Cong = 87.3874%, Congestion bounded by tiles (Lower Left Tile -> Upper Right Tile):
+   INT_L_X36Y72 -> INT_L_X36Y72
+South Dir 1x1 Area, Max Cong = 93.6937%, Congestion bounded by tiles (Lower Left Tile -> Upper Right Tile):
+   INT_R_X37Y104 -> INT_R_X37Y104
+   INT_L_X40Y98 -> INT_L_X40Y98
+   INT_L_X36Y89 -> INT_L_X36Y89
+East Dir 2x2 Area, Max Cong = 89.3382%, Congestion bounded by tiles (Lower Left Tile -> Upper Right Tile):
+   INT_L_X40Y78 -> INT_R_X41Y79
+   INT_L_X38Y66 -> INT_R_X39Y67
+West Dir 1x1 Area, Max Cong = 94.1176%, Congestion bounded by tiles (Lower Left Tile -> Upper Right Tile):
+   INT_R_X41Y116 -> INT_R_X41Y116
+   INT_R_X43Y115 -> INT_R_X43Y115
+   INT_R_X43Y113 -> INT_R_X43Y113
+   INT_L_X32Y88 -> INT_L_X32Y88
+   INT_L_X30Y80 -> INT_L_X30Y80
+
+------------------------------
+Reporting congestion hotspots
+------------------------------
+Direction: North
+----------------
+Congested clusters found at Level 0
+Effective congestion level: 0 Aspect Ratio: 1 Sparse Ratio: 1
+Direction: South
+----------------
+Congested clusters found at Level 0
+Effective congestion level: 0 Aspect Ratio: 1 Sparse Ratio: 1
+Direction: East
+----------------
+Congested clusters found at Level 0
+Effective congestion level: 2 Aspect Ratio: 0.6 Sparse Ratio: 0.5
+Direction: West
+----------------
+Congested clusters found at Level 0
+Effective congestion level: 1 Aspect Ratio: 0.5 Sparse Ratio: 0.5
+
+Phase 7 Route finalize | Checksum: 174e0f772
+
+Time (s): cpu = 00:05:11 ; elapsed = 00:02:38 . Memory (MB): peak = 3632.676 ; gain = 101.125 ; free physical = 3501 ; free virtual = 21769
+
+Phase 8 Verifying routed nets
+
+ Verification completed successfully
+Phase 8 Verifying routed nets | Checksum: 174e0f772
+
+Time (s): cpu = 00:05:11 ; elapsed = 00:02:38 . Memory (MB): peak = 3632.676 ; gain = 101.125 ; free physical = 3501 ; free virtual = 21769
+
+Phase 9 Depositing Routes
+Phase 9 Depositing Routes | Checksum: 1613674a0
+
+Time (s): cpu = 00:05:14 ; elapsed = 00:02:40 . Memory (MB): peak = 3648.684 ; gain = 117.133 ; free physical = 3500 ; free virtual = 21769
+
+Phase 10 Post Router Timing
+INFO: [Route 35-57] Estimated Timing Summary | WNS=-1.075 | TNS=-552.144| WHS=0.097  | THS=0.000  |
+
+WARNING: [Route 35-328] Router estimated timing not met.
+Resolution: For a complete and accurate timing signoff, report_timing_summary must be run after route_design. Alternatively, route_design can be run with the -timing_summary option to enable a complete timing signoff at the end of route_design.
+Phase 10 Post Router Timing | Checksum: 1613674a0
+
+Time (s): cpu = 00:05:17 ; elapsed = 00:02:41 . Memory (MB): peak = 3648.684 ; gain = 117.133 ; free physical = 3500 ; free virtual = 21769
+INFO: [Route 35-16] Router Completed Successfully
+
+Time (s): cpu = 00:05:18 ; elapsed = 00:02:41 . Memory (MB): peak = 3648.684 ; gain = 117.133 ; free physical = 3584 ; free virtual = 21853
+
+Routing Is Done.
+INFO: [Common 17-83] Releasing license: Implementation
+401 Infos, 21 Warnings, 0 Critical Warnings and 0 Errors encountered.
+route_design completed successfully
+route_design: Time (s): cpu = 00:05:21 ; elapsed = 00:02:43 . Memory (MB): peak = 3648.684 ; gain = 117.133 ; free physical = 3584 ; free virtual = 21853
+INFO: [Timing 38-480] Writing timing data to binary archive.
+Writing XDEF routing.
+Writing XDEF routing logical nets.
+Writing XDEF routing special nets.
+Write XDEF Complete: Time (s): cpu = 00:00:05 ; elapsed = 00:00:02 . Memory (MB): peak = 3648.684 ; gain = 0.000 ; free physical = 3532 ; free virtual = 21847
+INFO: [Common 17-1381] The checkpoint '/home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/impl_1/bd_0_wrapper_routed.dcp' has been generated.
+write_checkpoint: Time (s): cpu = 00:00:13 ; elapsed = 00:00:05 . Memory (MB): peak = 3656.688 ; gain = 8.004 ; free physical = 3533 ; free virtual = 21816
+INFO: [runtcl-4] Executing : report_drc -file bd_0_wrapper_drc_routed.rpt -pb bd_0_wrapper_drc_routed.pb -rpx bd_0_wrapper_drc_routed.rpx
+Command: report_drc -file bd_0_wrapper_drc_routed.rpt -pb bd_0_wrapper_drc_routed.pb -rpx bd_0_wrapper_drc_routed.rpx
+INFO: [IP_Flow 19-1839] IP Catalog is up to date.
+INFO: [DRC 23-27] Running DRC with 8 threads
+INFO: [Vivado_Tcl 2-168] The results of DRC are in file /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/impl_1/bd_0_wrapper_drc_routed.rpt.
+report_drc completed successfully
+INFO: [runtcl-4] Executing : report_methodology -file bd_0_wrapper_methodology_drc_routed.rpt -pb bd_0_wrapper_methodology_drc_routed.pb -rpx bd_0_wrapper_methodology_drc_routed.rpx
+Command: report_methodology -file bd_0_wrapper_methodology_drc_routed.rpt -pb bd_0_wrapper_methodology_drc_routed.pb -rpx bd_0_wrapper_methodology_drc_routed.rpx
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+WARNING: [Timing 38-242] The property HD.CLK_SRC of clock port "ap_clk" is not set. In out-of-context mode, this prevents timing estimation for clock delay/skew
+Resolution: Set the HD.CLK_SRC property of the out-of-context port to the location of the clock buffer instance in the top-level design
+INFO: [DRC 23-133] Running Methodology with 8 threads
+INFO: [Vivado_Tcl 2-1520] The results of Report Methodology are in file /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/project.runs/impl_1/bd_0_wrapper_methodology_drc_routed.rpt.
+report_methodology completed successfully
+report_methodology: Time (s): cpu = 00:00:21 ; elapsed = 00:00:06 . Memory (MB): peak = 3664.691 ; gain = 0.000 ; free physical = 3549 ; free virtual = 21833
+INFO: [runtcl-4] Executing : report_power -file bd_0_wrapper_power_routed.rpt -pb bd_0_wrapper_power_summary_routed.pb -rpx bd_0_wrapper_power_routed.rpx
+Command: report_power -file bd_0_wrapper_power_routed.rpt -pb bd_0_wrapper_power_summary_routed.pb -rpx bd_0_wrapper_power_routed.rpx
+INFO: [Timing 38-35] Done setting XDC timing constraints.
+Running Vector-less Activity Propagation...
+
+Finished Running Vector-less Activity Propagation
+413 Infos, 22 Warnings, 0 Critical Warnings and 0 Errors encountered.
+report_power completed successfully
+report_power: Time (s): cpu = 00:00:24 ; elapsed = 00:00:08 . Memory (MB): peak = 3720.734 ; gain = 56.043 ; free physical = 3522 ; free virtual = 21819
+INFO: [runtcl-4] Executing : report_route_status -file bd_0_wrapper_route_status.rpt -pb bd_0_wrapper_route_status.pb
+INFO: [runtcl-4] Executing : report_timing_summary -max_paths 10 -report_unconstrained -file bd_0_wrapper_timing_summary_routed.rpt -pb bd_0_wrapper_timing_summary_routed.pb -rpx bd_0_wrapper_timing_summary_routed.rpx -warn_on_violation 
+INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: min_max.
+INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 8 CPUs
+CRITICAL WARNING: [Timing 38-282] The design failed to meet the timing requirements. Please see the timing summary report for details on the timing violations.
+INFO: [runtcl-4] Executing : report_incremental_reuse -file bd_0_wrapper_incremental_reuse_routed.rpt
+INFO: [Vivado_Tcl 4-1062] Incremental flow is disabled. No incremental reuse Info to report.
+INFO: [runtcl-4] Executing : report_clock_utilization -file bd_0_wrapper_clock_utilization_routed.rpt
+INFO: [runtcl-4] Executing : report_bus_skew -warn_on_violation -file bd_0_wrapper_bus_skew_routed.rpt -pb bd_0_wrapper_bus_skew_routed.pb -rpx bd_0_wrapper_bus_skew_routed.rpx
+INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: min_max.
+INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 8 CPUs
+INFO: [Common 17-206] Exiting Vivado at Sat Oct 24 18:02:55 2026...
+[Sat Oct 24 18:03:01 2026] impl_1 finished
+wait_on_runs: Time (s): cpu = 00:00:01 ; elapsed = 00:05:53 . Memory (MB): peak = 3259.203 ; gain = 0.000 ; free physical = 5905 ; free virtual = 24219
+TIMESTAMP: HLS-REPORT: implementation open_run: 2026-10-24 18:03:01 -03
+INFO: HLS-REPORT: Opening implementation design database: open_run impl_1
+Netlist sorting complete. Time (s): cpu = 00:00:00.11 ; elapsed = 00:00:00.1 . Memory (MB): peak = 3259.203 ; gain = 0.000 ; free physical = 5873 ; free virtual = 24186
+INFO: [Netlist 29-17] Analyzing 2002 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-479] Netlist was created with Vivado 2022.2
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Timing 38-478] Restoring timing data from binary archive.
+INFO: [Timing 38-479] Binary timing data restore complete.
+INFO: [Project 1-856] Restoring constraints from binary archive.
+INFO: [Project 1-853] Binary constraint restore complete.
+Reading XDEF placement.
+Reading placer database...
+Reading XDEF routing.
+Read XDEF Files: Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 3417.156 ; gain = 38.070 ; free physical = 5640 ; free virtual = 23954
+Restored from archive | CPU: 2.420000 secs | Memory: 41.838181 MB |
+Finished XDEF File Restore: Time (s): cpu = 00:00:02 ; elapsed = 00:00:02 . Memory (MB): peak = 3417.156 ; gain = 38.070 ; free physical = 5640 ; free virtual = 23954
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.01 . Memory (MB): peak = 3417.156 ; gain = 0.000 ; free physical = 5640 ; free virtual = 23954
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+open_run: Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 3417.156 ; gain = 157.953 ; free physical = 5640 ; free virtual = 23954
+TIMESTAMP: HLS-REPORT: implementation generate_reports_vivado: 2026-10-24 18:03:06 -03
+INFO: HLS-REPORT: Running report: report_utilization -file ./report/network_utilization_routed.rpt
+INFO: HLS-REPORT: Running report: report_utilization -hierarchical -hierarchical_depth 8 -file ./report/network_utilization_hierarchical_routed.rpt
+INFO: HLS-REPORT: Running report: report_timing_summary -file ./report/network_timing_routed.rpt
+INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: min_max.
+INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 8 CPUs
+WARNING: [Timing 38-242] The property HD.CLK_SRC of clock port "ap_clk" is not set. In out-of-context mode, this prevents timing estimation for clock delay/skew
+Resolution: Set the HD.CLK_SRC property of the out-of-context port to the location of the clock buffer instance in the top-level design
+INFO: HLS-REPORT: Running report: report_route_status -file ./report/network_status_routed.rpt
+INFO: HLS-REPORT: Running report: report_timing -max_paths 10 -file ./report/network_timing_paths_routed.rpt
+INFO: [Timing 38-91] UpdateTimingParams: Speed grade: -1, Delay Type: max.
+INFO: [Timing 38-191] Multithreading enabled for timing update using a maximum of 8 CPUs
+INFO: [Timing 38-78] ReportTimingParams: -max_paths 10 -nworst 1 -delay_type max -sort_by slack.
+INFO: HLS-REPORT: Running report: report_design_analysis -file ./report/network_design_analysis_routed.rpt
+INFO: HLS-REPORT: Running report: ::tclapp::xilinx::designutils::report_failfast -detailed_report impl -file ./report/network_failfast_routed.rpt
+ -I- design metrics completed in 1 seconds
+ -I- DONT_TOUCH metric completed in 0 seconds
+ -I- MARK_DEBUG metric completed in 0 seconds
+ -I- utilization metrics completed in 1 seconds
+ -I- control set metrics completed in 0 seconds
+ -I- methodology check metrics completed in 2 seconds
+ -I- average fanout metrics completed in 1 seconds (0 modules)
+ -I- non-FD high fanout nets completed in 1 seconds
+ -I- path budgeting metrics completed in 2 seconds
+#  +-----------------------------------------------------------------------------------------+
+#  | Design Summary                                                                          |
+#  | impl_1                                                                                  |
+#  | xc7a100tcsg324-1                                                                        |
+#  +-----------------------------------------------------------+-----------+--------+--------+
+#  | Criteria                                                  | Guideline | Actual | Status |
+#  +-----------------------------------------------------------+-----------+--------+--------+
+#  | LUT                                                       | 70%       | 30.49% | OK     |
+#  | FD                                                        | 50%       | 11.77% | OK     |
+#  | LUTRAM+SRL                                                | 25%       | 0.03%  | OK     |
+#  | MUXF7                                                     | 15%       | 0.15%  | OK     |
+#  | DSP                                                       | 80%       | 0.83%  | OK     |
+#  | RAMB/FIFO                                                 | 80%       | 25.19% | OK     |
+#  | DSP+RAMB+URAM (Avg)                                       | 70%       | 13.01% | OK     |
+#  | BUFGCE* + BUFGCTRL                                        | 24        | 0      | OK     |
+#  | DONT_TOUCH (cells/nets)                                   | 0         | 0      | OK     |
+#  | MARK_DEBUG (nets)                                         | 0         | 0      | OK     |
+#  | Control Sets                                              | 1189      | 862    | OK     |
+#  | Average Fanout for modules > 100k cells                   | 4         | 0      | OK     |
+#  | Non-FD high fanout nets > 10k loads                       | 0         | 0      | OK     |
+#  +-----------------------------------------------------------+-----------+--------+--------+
+#  | TIMING-6 (No common primary clock between related clocks) | 0         | 0      | OK     |
+#  | TIMING-7 (No common node between related clocks)          | 0         | 0      | OK     |
+#  | TIMING-8 (No common period between related clocks)        | 0         | 0      | OK     |
+#  | TIMING-14 (LUT on the clock tree)                         | 0         | 0      | OK     |
+#  | TIMING-35 (No common node in paths with the same clock)   | 0         | 0      | OK     |
+#  +-----------------------------------------------------------+-----------+--------+--------+
+#  | Number of paths above max LUT budgeting (0.575ns)         | 0         | 0      | OK     |
+#  | Number of paths above max Net budgeting (0.403ns)         | 0         | 0      | OK     |
+#  +-----------------------------------------------------------+-----------+--------+--------+
+ -I- Generated file /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/report/network_failfast_routed.rpt
+ -I- Number of criteria to review: 0
+ -I- This report should be run before placing the design and uses conservative guidelines beyond which runtime and timing closure will likely be more challenging
+ -I- report_failfast completed in 8 seconds
+TIMESTAMP: HLS-REPORT: implementation gen_data_dict_vivado: 2026-10-24 18:03:21 -03
+TIMESTAMP: HLS-REPORT: impl extract_util_hier: 2026-10-24 18:03:21 -03
+TIMESTAMP: HLS-REPORT: impl get_cell_hier_data: 2026-10-24 18:03:21 -03
+TIMESTAMP: HLS-REPORT: impl get_timing_paths: 2026-10-24 18:03:21 -03
+TIMESTAMP: HLS-REPORT: impl process timing paths: 2026-10-24 18:03:21 -03
+TIMESTAMP: HLS-REPORT: impl get_all_vv_rpt_files: 2026-10-24 18:03:21 -03
+TIMESTAMP: HLS-REPORT: implementation write_reports_vivado: 2026-10-24 18:03:21 -03
+HLS EXTRACTION: impl area_totals:  15850 63400 126800 240 270 0 0
+HLS EXTRACTION: impl area_current: 7205 19333 14919 2 68 0 5 0 0 0
+HLS EXTRACTION: impl resources_dict: AVAIL_SLICE 15850 SLICE 7205 AVAIL_LUT 63400 LUT 19333 AVAIL_FF 126800 FF 14919 AVAIL_DSP 240 DSP 2 AVAIL_BRAM 270 BRAM 68 AVAIL_URAM 0 URAM 0 LATCH 0 SRL 5 AVAIL_CLB 0 CLB 0
+INFO: HLS-REPORT: generated /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/verilog/report/vivado_impl.xml
+INFO: HLS-REPORT: generated /home/tiago/axc-simulator/build/fds/lenet5-cifar10_aprox/network/proj/solution1/impl/report/verilog/network_export.rpt
+
+
+Implementation tool: Xilinx Vivado v.2022.2
+Project:             proj
+Solution:            solution1
+Device target:       xc7a100t-csg324-1
+Report date:         Sat Oct 24 18:03:21 -03 2026
+
+#=== Post-Implementation Resource usage ===
+SLICE:         7205
+LUT:          19333
+FF:           14919
+DSP:              2
+BRAM:            68
+URAM:             0
+LATCH:            0
+SRL:              5
+CLB:              0
+
+#=== Final timing ===
+CP required:                     10.000
+CP achieved post-synthesis:      10.172
+CP achieved post-implementation: 11.074
+Timing not met
+
+TIMESTAMP: HLS-REPORT: implementation end: 2026-10-24 18:03:21 -03
+INFO: HLS-REPORT: impl run complete: worst setup slack (WNS)=-1.074057, worst hold slack (WHS)=0.097518, total pulse width slack(TPWS)=0.000000, number of unrouted nets=0
+Vivado implementation timing failed: WNS (-1.074057) is less than 0
+# hls_vivado_reports_finalize $report_options
+TIMESTAMP: HLS-REPORT: all reports complete: 2026-10-24 18:03:21 -03
+INFO: [Common 17-206] Exiting Vivado at Sat Oct 24 18:03:21 2026...
+INFO: [HLS 200-802] Generated output file proj/solution1/impl/export.zip
+INFO: [HLS 200-111] Finished Command export_design CPU user time: 347.21 seconds. CPU system time: 23.06 seconds. Elapsed time: 686.11 seconds; current allocated memory: 16.039 MB.
+INFO: [HLS 200-112] Total CPU user time: 2863.99 seconds. Total CPU system time: 28.54 seconds. Total elapsed time: 3235.3 seconds; peak allocated memory: 1.461 GB.
+INFO: [Common 17-206] Exiting vitis_hls at Sat Oct 24 18:03:27 2026...

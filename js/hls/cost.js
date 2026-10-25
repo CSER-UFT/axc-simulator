@@ -245,7 +245,8 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
     };
     area.total = area.units + area.cells + area.mux + area.registers + area.control;
     const fpga = {
-        luts: sum(unitList, (u) => u.luts) + sum(cellList, (c) => c.luts) + sum(muxes, (m) => m.luts) + sum(control, (c) => c.luts) + (addr?.luts ?? 0) + srlLuts,
+        // addrScale e controlScale: 1 nos kernels; o fluxo das redes usa a calibração das camadas medidas (nngen.js).
+        luts: Math.round(sum(unitList, (u) => u.luts) + sum(cellList, (c) => c.luts) + sum(muxes, (m) => m.luts) + (model.controlScale ?? 1) * sum(control, (c) => c.luts) + (model.addrScale ?? 1) * (addr?.luts ?? 0) + srlLuts),
         carry4: sum(unitList, (u) => u.carry4) + sum(cellList, (c) => c.carry4) + sum(control, (c) => c.carry4),
         // Mais os registradores de controle de cada laço mantido (contador, estado e o sinal de saída): 11 FF por laço,
         // calibrado no Vivado com as camadas das redes (results/nn-vitis; erro de FF das camadas de 35% para 13%, o dos

@@ -1,0 +1,43 @@
+{
+ "id": "minilenet-mnist_exata_10ns_flatten",
+ "note": "MiniLenet, camada flatten",
+ "clockNs": 10,
+ "part": "xc7a100tcsg324-1",
+ "top": "flatten",
+ "delays": "fpga",
+ "assign": {},
+ "prediction": {
+  "cycles": 296,
+  "timeNs": 2960,
+  "intervalNs": 10,
+  "critPs": 812,
+  "luts": 68,
+  "carry4": 4,
+  "ff": 48,
+  "areaUm2": 1241.2064,
+  "energyFj": 682213.230688,
+  "loops": [
+   {
+    "label": "flatten_r_flatten_w",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 294,
+    "II": 1,
+    "iterLatency": 2,
+    "latency": 296
+   }
+  ],
+  "addrLuts": 36,
+  "units": [],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
+  }
+ }
+}

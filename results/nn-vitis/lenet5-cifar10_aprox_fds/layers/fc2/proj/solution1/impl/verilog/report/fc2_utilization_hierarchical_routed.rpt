@@ -1,0 +1,44 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Sat Oct 24 17:36:13 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 6 -file ./report/fc2_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+-------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|                      Instance                      |                           Module                           | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| bd_0_wrapper                                       |                                                      (top) |        298 |        297 |       0 |    1 | 182 |      4 |      2 |          2 |
+|   bd_0_i                                           |                                                       bd_0 |        298 |        297 |       0 |    1 | 182 |      4 |      2 |          2 |
+|     hls_inst                                       |                                            bd_0_hls_inst_0 |        298 |        297 |       0 |    1 | 182 |      4 |      2 |          2 |
+|       inst                                         |                                        bd_0_hls_inst_0_fc2 |        298 |        297 |       0 |    1 | 182 |      4 |      2 |          2 |
+|         (inst)                                     |                                        bd_0_hls_inst_0_fc2 |        169 |        169 |       0 |    0 |  98 |      0 |      0 |          0 |
+|         b_V_U                                      |                     bd_0_hls_inst_0_fc2_b_V_ROM_2P_BRAM_1R |          2 |          2 |       0 |    0 |   2 |      0 |      1 |          0 |
+|         grp_axc_requant_fu_273                     |                            bd_0_hls_inst_0_fc2_axc_requant |         13 |         13 |       0 |    0 |   2 |      0 |      0 |          2 |
+|           (grp_axc_requant_fu_273)                 |                            bd_0_hls_inst_0_fc2_axc_requant |         12 |         12 |       0 |    0 |   2 |      0 |      0 |          0 |
+|           mul_25ns_23s_48_1_1_U5                   |                    bd_0_hls_inst_0_fc2_mul_25ns_23s_48_1_1 |          1 |          1 |       0 |    0 |   0 |      0 |      0 |          2 |
+|         grp_fc2_Pipeline_fc2_i_fu_263              |                     bd_0_hls_inst_0_fc2_fc2_Pipeline_fc2_i |        113 |        112 |       0 |    1 |  78 |      4 |      0 |          0 |
+|           (grp_fc2_Pipeline_fc2_i_fu_263)          |                     bd_0_hls_inst_0_fc2_fc2_Pipeline_fc2_i |         78 |         77 |       0 |    1 |  76 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U | bd_0_hls_inst_0_fc2_flow_control_loop_pipe_sequential_init |         14 |         14 |       0 |    0 |   2 |      0 |      0 |          0 |
+|           tmp_2_u_ADD24_LOA5_bb_fu_130             |                            bd_0_hls_inst_0_u_ADD24_LOA5_bb |         16 |         16 |       0 |    0 |   0 |      0 |      0 |          0 |
+|             u                                      |                                 bd_0_hls_inst_0_add24_loa5 |         16 |         16 |       0 |    0 |   0 |      0 |      0 |          0 |
+|           w_V_U                                    |  bd_0_hls_inst_0_fc2_fc2_Pipeline_fc2_i_w_V_ROM_2P_BRAM_1R |          6 |          6 |       0 |    0 |   0 |      4 |      0 |          0 |
+|         m_V_U                                      |                     bd_0_hls_inst_0_fc2_m_V_ROM_2P_BRAM_1R |          1 |          1 |       0 |    0 |   2 |      0 |      1 |          0 |
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

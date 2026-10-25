@@ -1,10 +1,10 @@
 {
  "sequentialIterResidual": 5,
  "pipelineOverheadVitis": -1,
- "lutScale": 0.9866863905325444,
- "ffScale": 1.0504774897680764,
- "cycleRatio": 1.0000415403148757,
- "periodScale": 1.127918529557874,
+ "lutScale": 1.0016129032258065,
+ "ffScale": 1.020964360587002,
+ "cycleRatio": 1.0000553878534437,
+ "periodScale": 1.1450571286636861,
  "model": {
   "memLatency": 1,
   "loopOverhead": 1,
@@ -12,12 +12,13 @@
   "pipelineOverhead": 1,
   "flatten": true,
   "uremLatency": 4,
-  "divAddrCycles": 1
+  "divAddrCycles": 1,
+  "ffPerLoop": 11
  },
  "samples": {
   "sequentialLoops": 8,
-  "pipelinedLoops": 57,
-  "cases": 59,
-  "impl": 59
+  "pipelinedLoops": 59,
+  "cases": 61,
+  "impl": 61
  }
 }

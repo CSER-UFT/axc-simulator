@@ -6,21 +6,21 @@
   </RunData>
   <TimingReport>
     <TargetClockPeriod>5.000</TargetClockPeriod>
-    <AchievedClockPeriod>5.517</AchievedClockPeriod>
+    <AchievedClockPeriod>5.754</AchievedClockPeriod>
     <CLOCK_NAME>ap_clk</CLOCK_NAME>
-    <CP_FINAL>5.517</CP_FINAL>
-    <CP_ROUTE>5.517</CP_ROUTE>
+    <CP_FINAL>5.754</CP_FINAL>
+    <CP_ROUTE>5.754</CP_ROUTE>
     <CP_SYNTH>6.152</CP_SYNTH>
     <CP_TARGET>5.000</CP_TARGET>
-    <SLACK_FINAL>-0.517</SLACK_FINAL>
-    <SLACK_ROUTE>-0.517</SLACK_ROUTE>
+    <SLACK_FINAL>-0.754</SLACK_FINAL>
+    <SLACK_ROUTE>-0.754</SLACK_ROUTE>
     <SLACK_SYNTH>-1.152</SLACK_SYNTH>
     <TIMING_MET>FALSE</TIMING_MET>
-    <TNS_FINAL>-4.128</TNS_FINAL>
-    <TNS_ROUTE>-4.128</TNS_ROUTE>
+    <TNS_FINAL>-10.963</TNS_FINAL>
+    <TNS_ROUTE>-10.963</TNS_ROUTE>
     <TNS_SYNTH>-24.827</TNS_SYNTH>
-    <WNS_FINAL>-0.517</WNS_FINAL>
-    <WNS_ROUTE>-0.517</WNS_ROUTE>
+    <WNS_FINAL>-0.754</WNS_FINAL>
+    <WNS_ROUTE>-0.754</WNS_ROUTE>
     <WNS_SYNTH>-1.152</WNS_SYNTH>
   </TimingReport>
   <AreaReport>
@@ -28,9 +28,9 @@
       <BRAM>0</BRAM>
       <CLB>0</CLB>
       <DSP>0</DSP>
-      <FF>607</FF>
+      <FF>588</FF>
       <LATCH>0</LATCH>
-      <LUT>727</LUT>
+      <LUT>759</LUT>
       <SLICE>292</SLICE>
       <SRL>44</SRL>
       <URAM>0</URAM>
@@ -47,15 +47,21 @@
   </AreaReport>
   <RtlModules>
     <RtlModule CELL="inst" DEPTH="0" IS_TOP="1" TYPE="function" MODULENAME="sobel" DISPNAME="inst" RTLNAME="sobel">
-      <SubModules count="6">flow_control_loop_pipe_U mul_8ns_10ns_17_1_1_U5 mul_8ns_10ns_17_1_1_U6 mul_8ns_10ns_17_1_1_U8 mul_8ns_10ns_17_1_1_U9 urem_8ns_3ns_2_12_1_U7</SubModules>
-      <Resources FF="607" LUT="727"/>
-      <LocalResources FF="567" LUT="431"/>
+      <SubModules count="8">flow_control_loop_pipe_U grp_u_ADD16_LOA4_fu_376 grp_u_ADD16_LOA4_fu_382 mul_8ns_10ns_17_1_1_U5 mul_8ns_10ns_17_1_1_U6 mul_8ns_10ns_17_1_1_U8 mul_8ns_10ns_17_1_1_U9 urem_8ns_3ns_2_12_1_U7</SubModules>
+      <Resources FF="588" LUT="759"/>
+      <LocalResources FF="547" LUT="447"/>
     </RtlModule>
     <RtlModule CELL="inst/flow_control_loop_pipe_U" BINDMODULE="sobel_flow_control_loop_pipe" DEPTH="1" TYPE="rtl" MODULENAME="flow_control_loop_pipe" DISPNAME="flow_control_loop_pipe_U" RTLNAME="sobel_flow_control_loop_pipe">
-      <Resources FF="1" LUT="108"/>
+      <Resources FF="2" LUT="106"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_u_ADD16_LOA4_fu_376" DEPTH="1" TYPE="function" MODULENAME="u_ADD16_LOA4" DISPNAME="grp_u_ADD16_LOA4_fu_376" RTLNAME="sobel_u_ADD16_LOA4">
+      <Resources LUT="9"/>
+    </RtlModule>
+    <RtlModule CELL="inst/grp_u_ADD16_LOA4_fu_382" DEPTH="1" TYPE="function" MODULENAME="u_ADD16_LOA4" DISPNAME="grp_u_ADD16_LOA4_fu_382" RTLNAME="sobel_u_ADD16_LOA4">
+      <Resources LUT="10"/>
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U5" BINDMODULE="sobel_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U5" RTLNAME="sobel_mul_8ns_10ns_17_1_1">
-      <Resources LUT="10"/>
+      <Resources LUT="12"/>
       <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U5" SOURCE="" URAM="0" VARIABLE="mul2"/>
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U6" BINDMODULE="sobel_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U6" RTLNAME="sobel_mul_8ns_10ns_17_1_1">
@@ -68,7 +74,7 @@
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U9" BINDMODULE="sobel_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U9" RTLNAME="sobel_mul_8ns_10ns_17_1_1">
       <Resources LUT="49"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U9" SOURCE="kernel.cpp:80" URAM="0" VARIABLE="mul_ln80"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U9" SOURCE="kernel.cpp:82" URAM="0" VARIABLE="mul_ln82"/>
     </RtlModule>
     <RtlModule CELL="inst/urem_8ns_3ns_2_12_1_U7" BINDMODULE="sobel_urem_8ns_3ns_2_12_1" DEPTH="1" TYPE="rtl" MODULENAME="urem_8ns_3ns_2_12_1" DISPNAME="urem_8ns_3ns_2_12_1_U7" RTLNAME="sobel_urem_8ns_3ns_2_12_1">
       <Resources FF="39" LUT="31"/>
@@ -76,109 +82,99 @@
     </RtlModule>
   </RtlModules>
   <TimingPaths>
-    <TPATH DATAPATH_DELAY="5.495" DATAPATH_LOGIC_DELAY="3.084" DATAPATH_NET_DELAY="2.411" ENDPOINT_PIN="tmp_reg_1131_reg[4]/D" LOGIC_LEVELS="7" MAX_FANOUT="21" SLACK="-0.517" STARTPOINT_PIN="t1_fu_110_reg[6]/C">
-      <CELL NAME="t1_fu_110_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="860"/>
-      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="19"/>
+    <TPATH DATAPATH_DELAY="5.779" DATAPATH_LOGIC_DELAY="2.874" DATAPATH_NET_DELAY="2.905" ENDPOINT_PIN="tmp_reg_1179_reg[4]/D" LOGIC_LEVELS="6" MAX_FANOUT="28" SLACK="-0.754" STARTPOINT_PIN="flow_control_loop_pipe_U/ap_loop_init_reg_replica/C">
+      <CELL NAME="flow_control_loop_pipe_U/ap_loop_init_reg_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
+      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="flow_control_loop_pipe_U/dout__73_carry__0_i_9" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_3" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_7" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="tmp_reg_1131_reg[4]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="910"/>
+      <CELL NAME="tmp_reg_1179_reg[4]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="981"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.474" DATAPATH_LOGIC_DELAY="3.063" DATAPATH_NET_DELAY="2.411" ENDPOINT_PIN="tmp_reg_1131_reg[6]/D" LOGIC_LEVELS="7" MAX_FANOUT="21" SLACK="-0.496" STARTPOINT_PIN="t1_fu_110_reg[6]/C">
-      <CELL NAME="t1_fu_110_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="860"/>
-      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="19"/>
+    <TPATH DATAPATH_DELAY="5.771" DATAPATH_LOGIC_DELAY="2.866" DATAPATH_NET_DELAY="2.905" ENDPOINT_PIN="tmp_reg_1179_reg[6]/D" LOGIC_LEVELS="6" MAX_FANOUT="28" SLACK="-0.746" STARTPOINT_PIN="flow_control_loop_pipe_U/ap_loop_init_reg_replica/C">
+      <CELL NAME="flow_control_loop_pipe_U/ap_loop_init_reg_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
+      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="flow_control_loop_pipe_U/dout__73_carry__0_i_9" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_3" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_7" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="tmp_reg_1131_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="910"/>
+      <CELL NAME="tmp_reg_1179_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="981"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.400" DATAPATH_LOGIC_DELAY="2.989" DATAPATH_NET_DELAY="2.411" ENDPOINT_PIN="tmp_reg_1131_reg[5]/D" LOGIC_LEVELS="7" MAX_FANOUT="21" SLACK="-0.422" STARTPOINT_PIN="t1_fu_110_reg[6]/C">
-      <CELL NAME="t1_fu_110_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="860"/>
-      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="19"/>
+    <TPATH DATAPATH_DELAY="5.695" DATAPATH_LOGIC_DELAY="2.790" DATAPATH_NET_DELAY="2.905" ENDPOINT_PIN="tmp_reg_1179_reg[5]/D" LOGIC_LEVELS="6" MAX_FANOUT="28" SLACK="-0.670" STARTPOINT_PIN="flow_control_loop_pipe_U/ap_loop_init_reg_replica/C">
+      <CELL NAME="flow_control_loop_pipe_U/ap_loop_init_reg_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
+      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="flow_control_loop_pipe_U/dout__73_carry__0_i_9" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_3" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_7" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="tmp_reg_1131_reg[5]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="910"/>
+      <CELL NAME="tmp_reg_1179_reg[5]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="981"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.384" DATAPATH_LOGIC_DELAY="2.973" DATAPATH_NET_DELAY="2.411" ENDPOINT_PIN="tmp_reg_1131_reg[3]/D" LOGIC_LEVELS="7" MAX_FANOUT="21" SLACK="-0.406" STARTPOINT_PIN="t1_fu_110_reg[6]/C">
-      <CELL NAME="t1_fu_110_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="860"/>
-      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="19"/>
+    <TPATH DATAPATH_DELAY="5.675" DATAPATH_LOGIC_DELAY="2.770" DATAPATH_NET_DELAY="2.905" ENDPOINT_PIN="tmp_reg_1179_reg[3]/D" LOGIC_LEVELS="6" MAX_FANOUT="28" SLACK="-0.650" STARTPOINT_PIN="flow_control_loop_pipe_U/ap_loop_init_reg_replica/C">
+      <CELL NAME="flow_control_loop_pipe_U/ap_loop_init_reg_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
+      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="flow_control_loop_pipe_U/dout__73_carry__0_i_9" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_3" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_7" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="tmp_reg_1131_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="910"/>
+      <CELL NAME="tmp_reg_1179_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="981"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.341" DATAPATH_LOGIC_DELAY="3.057" DATAPATH_NET_DELAY="2.284" ENDPOINT_PIN="tmp_10_reg_1176_reg[4]/D" LOGIC_LEVELS="6" MAX_FANOUT="14" SLACK="-0.363" STARTPOINT_PIN="indvars_iv_next1307_reg_1125_reg[6]/C">
-      <CELL NAME="indvars_iv_next1307_reg_1125_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="903"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_9__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_3__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_7__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="tmp_10_reg_1176_reg[4]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="952"/>
+    <TPATH DATAPATH_DELAY="5.609" DATAPATH_LOGIC_DELAY="2.719" DATAPATH_NET_DELAY="2.890" ENDPOINT_PIN="tmp_14_reg_1241_reg[4]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-0.584" STARTPOINT_PIN="add_ln82_reg_1219_reg[6]/C">
+      <CELL NAME="add_ln82_reg_1219_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1052"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241[2]_i_3" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[2]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[6]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="tmp_14_reg_1241_reg[4]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.320" DATAPATH_LOGIC_DELAY="3.036" DATAPATH_NET_DELAY="2.284" ENDPOINT_PIN="tmp_10_reg_1176_reg[6]/D" LOGIC_LEVELS="6" MAX_FANOUT="14" SLACK="-0.342" STARTPOINT_PIN="indvars_iv_next1307_reg_1125_reg[6]/C">
-      <CELL NAME="indvars_iv_next1307_reg_1125_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="903"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_9__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_3__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_7__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="tmp_10_reg_1176_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="952"/>
+    <TPATH DATAPATH_DELAY="5.601" DATAPATH_LOGIC_DELAY="2.711" DATAPATH_NET_DELAY="2.890" ENDPOINT_PIN="tmp_14_reg_1241_reg[6]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-0.576" STARTPOINT_PIN="add_ln82_reg_1219_reg[6]/C">
+      <CELL NAME="add_ln82_reg_1219_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1052"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241[2]_i_3" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[2]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[6]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="tmp_14_reg_1241_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1064"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.251" DATAPATH_LOGIC_DELAY="2.840" DATAPATH_NET_DELAY="2.411" ENDPOINT_PIN="tmp_reg_1131_reg[2]/D" LOGIC_LEVELS="6" MAX_FANOUT="21" SLACK="-0.273" STARTPOINT_PIN="t1_fu_110_reg[6]/C">
-      <CELL NAME="t1_fu_110_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="860"/>
-      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="19"/>
+    <TPATH DATAPATH_DELAY="5.546" DATAPATH_LOGIC_DELAY="2.641" DATAPATH_NET_DELAY="2.905" ENDPOINT_PIN="tmp_reg_1179_reg[2]/D" LOGIC_LEVELS="5" MAX_FANOUT="28" SLACK="-0.521" STARTPOINT_PIN="flow_control_loop_pipe_U/ap_loop_init_reg_replica/C">
+      <CELL NAME="flow_control_loop_pipe_U/ap_loop_init_reg_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
+      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="flow_control_loop_pipe_U/dout__73_carry__0_i_9" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_3" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_7" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="tmp_reg_1131_reg[2]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="910"/>
+      <CELL NAME="tmp_reg_1179_reg[2]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="981"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.246" DATAPATH_LOGIC_DELAY="2.962" DATAPATH_NET_DELAY="2.284" ENDPOINT_PIN="tmp_10_reg_1176_reg[5]/D" LOGIC_LEVELS="6" MAX_FANOUT="14" SLACK="-0.268" STARTPOINT_PIN="indvars_iv_next1307_reg_1125_reg[6]/C">
-      <CELL NAME="indvars_iv_next1307_reg_1125_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="903"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_9__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_3__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_7__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="tmp_10_reg_1176_reg[5]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="952"/>
+    <TPATH DATAPATH_DELAY="5.525" DATAPATH_LOGIC_DELAY="2.635" DATAPATH_NET_DELAY="2.890" ENDPOINT_PIN="tmp_14_reg_1241_reg[5]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-0.500" STARTPOINT_PIN="add_ln82_reg_1219_reg[6]/C">
+      <CELL NAME="add_ln82_reg_1219_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1052"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241[2]_i_3" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[2]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[6]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="tmp_14_reg_1241_reg[5]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.230" DATAPATH_LOGIC_DELAY="2.946" DATAPATH_NET_DELAY="2.284" ENDPOINT_PIN="tmp_10_reg_1176_reg[3]/D" LOGIC_LEVELS="6" MAX_FANOUT="14" SLACK="-0.252" STARTPOINT_PIN="indvars_iv_next1307_reg_1125_reg[6]/C">
-      <CELL NAME="indvars_iv_next1307_reg_1125_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="903"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_9__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_3__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0_i_7__0" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="tmp_10_reg_1176_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="952"/>
+    <TPATH DATAPATH_DELAY="5.512" DATAPATH_LOGIC_DELAY="2.579" DATAPATH_NET_DELAY="2.933" ENDPOINT_PIN="tmp_12_reg_1236_reg[4]/D" LOGIC_LEVELS="5" MAX_FANOUT="14" SLACK="-0.487" STARTPOINT_PIN="indvars_iv_next1810_mid1_reg_1207_reg[6]/C">
+      <CELL NAME="indvars_iv_next1810_mid1_reg_1207_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1054"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U8/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U8/dout__73_carry__0_i_9__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U8/dout__73_carry__0_i_2__1" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="67"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U8/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U8/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
+      <CELL NAME="tmp_12_reg_1236_reg[4]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1093"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.191" DATAPATH_LOGIC_DELAY="2.780" DATAPATH_NET_DELAY="2.411" ENDPOINT_PIN="tmp_reg_1131_reg[1]/D" LOGIC_LEVELS="6" MAX_FANOUT="21" SLACK="-0.213" STARTPOINT_PIN="t1_fu_110_reg[6]/C">
-      <CELL NAME="t1_fu_110_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="860"/>
-      <CELL NAME="flow_control_loop_pipe_U/dout__50_carry_i_4" PRIMITIVE_TYPE="LUT.others.LUT4" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__50_carry" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="flow_control_loop_pipe_U/dout__73_carry__0_i_9" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_3" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0_i_7" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
-      <CELL NAME="mul_8ns_10ns_17_1_1_U5/dout__73_carry__0" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
-      <CELL NAME="tmp_reg_1131_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="910"/>
+    <TPATH DATAPATH_DELAY="5.505" DATAPATH_LOGIC_DELAY="2.615" DATAPATH_NET_DELAY="2.890" ENDPOINT_PIN="tmp_14_reg_1241_reg[3]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-0.480" STARTPOINT_PIN="add_ln82_reg_1219_reg[6]/C">
+      <CELL NAME="add_ln82_reg_1219_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1052"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241[2]_i_3" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[2]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="mul_8ns_10ns_17_1_1_U9/tmp_14_reg_1241_reg[6]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
+      <CELL NAME="tmp_14_reg_1241_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
     </TPATH>
   </TimingPaths>
   <VivadoReportFiles>
@@ -191,7 +187,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/sobel_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 14:47:33 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 21:04:40 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

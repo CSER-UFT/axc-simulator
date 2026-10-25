@@ -68,7 +68,7 @@
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U7" BINDMODULE="gauss_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U7" RTLNAME="gauss_mul_8ns_10ns_17_1_1">
       <Resources LUT="49"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U7" SOURCE="kernel.cpp:716" URAM="0" VARIABLE="mul_ln716"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U7" SOURCE="kernel.cpp:718" URAM="0" VARIABLE="mul_ln718"/>
     </RtlModule>
     <RtlModule CELL="inst/mux_32_8_1_1_U11" BINDMODULE="gauss_mux_32_8_1_1" DEPTH="1" TYPE="rtl" MODULENAME="mux_32_8_1_1" DISPNAME="mux_32_8_1_1_U11" RTLNAME="gauss_mux_32_8_1_1">
       <Resources LUT="6"/>
@@ -79,8 +79,8 @@
     </RtlModule>
   </RtlModules>
   <TimingPaths>
-    <TPATH DATAPATH_DELAY="5.717" DATAPATH_LOGIC_DELAY="2.944" DATAPATH_NET_DELAY="2.773" ENDPOINT_PIN="tmp_21_reg_5395_reg[6]/D" LOGIC_LEVELS="6" MAX_FANOUT="13" SLACK="-0.739" STARTPOINT_PIN="add_ln716_reg_5384_reg[6]/C">
-      <CELL NAME="add_ln716_reg_5384_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1807"/>
+    <TPATH DATAPATH_DELAY="5.717" DATAPATH_LOGIC_DELAY="2.944" DATAPATH_NET_DELAY="2.773" ENDPOINT_PIN="tmp_21_reg_5395_reg[6]/D" LOGIC_LEVELS="6" MAX_FANOUT="13" SLACK="-0.739" STARTPOINT_PIN="add_ln718_reg_5384_reg[6]/C">
+      <CELL NAME="add_ln718_reg_5384_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1807"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_21_reg_5395_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_21_reg_5395_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_21_reg_5395_reg[6]_i_9" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
@@ -89,8 +89,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_21_reg_5395_reg[6]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_21_reg_5395_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1638"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.657" DATAPATH_LOGIC_DELAY="2.884" DATAPATH_NET_DELAY="2.773" ENDPOINT_PIN="tmp_21_reg_5395_reg[5]/D" LOGIC_LEVELS="6" MAX_FANOUT="13" SLACK="-0.679" STARTPOINT_PIN="add_ln716_reg_5384_reg[6]/C">
-      <CELL NAME="add_ln716_reg_5384_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1807"/>
+    <TPATH DATAPATH_DELAY="5.657" DATAPATH_LOGIC_DELAY="2.884" DATAPATH_NET_DELAY="2.773" ENDPOINT_PIN="tmp_21_reg_5395_reg[5]/D" LOGIC_LEVELS="6" MAX_FANOUT="13" SLACK="-0.679" STARTPOINT_PIN="add_ln718_reg_5384_reg[6]/C">
+      <CELL NAME="add_ln718_reg_5384_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1807"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_21_reg_5395_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_21_reg_5395_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_21_reg_5395_reg[6]_i_9" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
@@ -119,8 +119,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U3/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="tmp_4_reg_5326_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1643"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.527" DATAPATH_LOGIC_DELAY="2.596" DATAPATH_NET_DELAY="2.931" ENDPOINT_PIN="tmp_21_reg_5395_reg[4]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-0.549" STARTPOINT_PIN="add_ln716_reg_5384_reg[6]/C">
-      <CELL NAME="add_ln716_reg_5384_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1807"/>
+    <TPATH DATAPATH_DELAY="5.527" DATAPATH_LOGIC_DELAY="2.596" DATAPATH_NET_DELAY="2.931" ENDPOINT_PIN="tmp_21_reg_5395_reg[4]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-0.549" STARTPOINT_PIN="add_ln718_reg_5384_reg[6]/C">
+      <CELL NAME="add_ln718_reg_5384_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1807"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_21_reg_5395_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_21_reg_5395_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_21_reg_5395[2]_i_4" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
@@ -187,7 +187,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/gauss_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 14:30:24 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 21:27:17 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

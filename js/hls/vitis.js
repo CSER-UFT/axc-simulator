@@ -343,8 +343,15 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
                 const x = val(a[0]), y = val(a[1]);
                 const signedArgs = a.some((z) => (z.c !== undefined ? z.c < 0 : byId.get(z.n).range[0] < 0));
                 if (!signedArgs) { set(`${T}(${f}(ap_uint<${N}>(${x}), ap_uint<${N}>(${y})))`); return; }
-                const ab = (z) => `ap_uint<${N}>(${z} < 0 ? ap_int<${N + 1}>(-${z}) : ap_int<${N + 1}>(${z}))`;
-                set(`((${x} < 0) != (${y} < 0)) ? ${T}(-ap_int<${W + 1}>(${f}(${ab(x)}, ${ab(y)}))) : ${T}(${f}(${ab(x)}, ${ab(y)}))`);
+                // Uma chamada só e o sinal no resultado: com a chamada nos dois ramos de um ?:, o Vitis transforma
+                // a seleção em desvio e lê de novo a tabela de pesos em cada ramo (3 leituras por produto na BRAM,
+                // II 38 em vez de 13 na conv1 da MiniLenet, rodada do fim de semana).
+                const neg = a.map((z) => (z.c !== undefined ? z.c < 0 : byId.get(z.n).range[0] < 0));
+                const ab = (z, i) => (neg[i] ? `ap_uint<${N}>(${z} < 0 ? ap_int<${N + 1}>(-${z}) : ap_int<${N + 1}>(${z}))` : `ap_uint<${N}>(${z})`);
+                const sg = [x, y].filter((z, i) => neg[i]).map((z) => `(${z} < 0)`).join(' != ');
+                const p = `${vName(n.id)}_p`;
+                lines.push(`${ind(d)}ap_uint<${W}> ${p} = ${f}(${ab(x, 0)}, ${ab(y, 1)});`);
+                set(`${sg} ? ${T}(-ap_int<${W + 1}>(${p})) : ${T}(${p})`);
                 return;
             }
             case 'shl': set(`${T}(${T}(${val(a[0])}) << ${a[1].c})`); return;

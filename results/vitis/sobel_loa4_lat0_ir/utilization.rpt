@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
-| Date         : Sun Oct 18 14:45:18 2026
+| Date         : Sat Oct 24 21:01:24 2026
 | Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
 | Command      : report_utilization -file bd_0_hls_inst_0_utilization_synth.rpt -pb bd_0_hls_inst_0_utilization_synth.pb
 | Design       : bd_0_hls_inst_0
@@ -31,13 +31,13 @@ Table of Contents
 +----------------------------+------+-------+------------+-----------+-------+
 |          Site Type         | Used | Fixed | Prohibited | Available | Util% |
 +----------------------------+------+-------+------------+-----------+-------+
-| Slice LUTs*                |  751 |     0 |          0 |     63400 |  1.18 |
-|   LUT as Logic             |  681 |     0 |          0 |     63400 |  1.07 |
+| Slice LUTs*                |  796 |     0 |          0 |     63400 |  1.26 |
+|   LUT as Logic             |  726 |     0 |          0 |     63400 |  1.15 |
 |   LUT as Memory            |   70 |     0 |          0 |     19000 |  0.37 |
 |     LUT as Distributed RAM |    0 |     0 |            |           |       |
 |     LUT as Shift Register  |   70 |     0 |            |           |       |
-| Slice Registers            |  605 |     0 |          0 |    126800 |  0.48 |
-|   Register as Flip Flop    |  605 |     0 |          0 |    126800 |  0.48 |
+| Slice Registers            |  583 |     0 |          0 |    126800 |  0.46 |
+|   Register as Flip Flop    |  583 |     0 |          0 |    126800 |  0.46 |
 |   Register as Latch        |    0 |     0 |          0 |    126800 |  0.00 |
 | F7 Muxes                   |    0 |     0 |          0 |     31700 |  0.00 |
 | F8 Muxes                   |    0 |     0 |          0 |     15850 |  0.00 |
@@ -61,7 +61,7 @@ Warning! LUT value is adjusted to account for LUT combining.
 | 0     |          Yes |           - |          Set |
 | 0     |          Yes |           - |        Reset |
 | 0     |          Yes |         Set |            - |
-| 605   |          Yes |       Reset |            - |
+| 583   |          Yes |       Reset |            - |
 +-------+--------------+-------------+--------------+
 
 
@@ -150,15 +150,15 @@ Warning! LUT value is adjusted to account for LUT combining.
 +----------+------+---------------------+
 | Ref Name | Used | Functional Category |
 +----------+------+---------------------+
-| FDRE     |  605 |        Flop & Latch |
-| LUT5     |  230 |                 LUT |
-| LUT2     |  165 |                 LUT |
-| LUT4     |  153 |                 LUT |
-| LUT6     |  151 |                 LUT |
-| LUT3     |  117 |                 LUT |
-| CARRY4   |  114 |          CarryLogic |
+| FDRE     |  583 |        Flop & Latch |
+| LUT5     |  232 |                 LUT |
+| LUT6     |  203 |                 LUT |
+| LUT4     |  186 |                 LUT |
+| LUT2     |  127 |                 LUT |
+| LUT3     |  123 |                 LUT |
+| CARRY4   |  115 |          CarryLogic |
 | SRL16E   |   70 |  Distributed Memory |
-| LUT1     |   25 |                 LUT |
+| LUT1     |   21 |                 LUT |
 +----------+------+---------------------+
 
 

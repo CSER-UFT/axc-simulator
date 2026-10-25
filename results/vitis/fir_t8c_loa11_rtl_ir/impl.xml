@@ -102,7 +102,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/fir_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 19:44:52 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 21:44:42 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

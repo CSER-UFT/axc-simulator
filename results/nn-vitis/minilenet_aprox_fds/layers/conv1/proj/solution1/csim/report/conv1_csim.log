@@ -1,0 +1,10 @@
+INFO: [SIM 2] *************** CSIM start ***************
+INFO: [SIM 4] CSIM will launch GCC as the compiler.
+   Compiling ../../../../tb.cpp in debug mode
+   Compiling ../../../../kernel.cpp in debug mode
+   Compiling ../../../../u_ADD24_LOA11_bb.cpp in debug mode
+   Compiling ../../../../u_MUL8_T6_A10c_bb.cpp in debug mode
+   Generating csim.exe
+AXC_MISMATCHES 0 OF 2352
+INFO: [SIM 1] CSim done with 0 errors.
+INFO: [SIM 3] *************** CSIM finish ***************

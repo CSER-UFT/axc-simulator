@@ -1,0 +1,65 @@
+{
+ "case": "sobel_sub_trunc3_rtl_ir",
+ "kernel": "sobel",
+ "kind": "ir",
+ "note": "somas e subtrações com ADD16 TRUNC3, unidades em RTL (caixa preta)",
+ "clockNs": 5,
+ "part": "xc7a100tcsg324-1",
+ "top": "sobel",
+ "assign": {
+  "S1.3": "ADD16 TRUNC3",
+  "S1.5": "ADD16 TRUNC3",
+  "S1.7": "ADD16 TRUNC3",
+  "S1.10": "ADD16 TRUNC3",
+  "S1.12": "ADD16 TRUNC3",
+  "S1.15": "ADD16 TRUNC3",
+  "S1.16": "ADD16 TRUNC3",
+  "S1.17": "ADD16 TRUNC3",
+  "S1.20": "ADD16 TRUNC3",
+  "S1.21": "ADD16 TRUNC3",
+  "S1.23": "ADD16 TRUNC3",
+  "S1.26": "ADD16 TRUNC3",
+  "S1.28": "ADD16 TRUNC3"
+ },
+ "prediction": {
+  "cycles": 72218,
+  "timeNs": 361090,
+  "intervalNs": 10,
+  "critPs": 4453,
+  "luts": 665,
+  "carry4": 37,
+  "ff": 538,
+  "areaUm2": 11615.446137096775,
+  "energyFj": 1287721201.643173,
+  "loops": [
+   {
+    "label": "rows_cols",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 36100,
+    "II": 2,
+    "iterLatency": 19,
+    "latency": 72218
+   }
+  ],
+  "addrLuts": 442,
+  "units": [
+   {
+    "unit": "ADD16 TRUNC3",
+    "count": 13,
+    "luts": 87,
+    "carry4": 27
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
+  }
+ }
+}

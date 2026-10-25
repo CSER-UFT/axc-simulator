@@ -27,10 +27,10 @@
   "intervalNs": 10,
   "critPs": 4991,
   "luts": 632,
-  "carry4": 30,
-  "ff": 586,
-  "areaUm2": 11643.105935797246,
-  "energyFj": 1380397637.9442823,
+  "carry4": 29,
+  "ff": 608,
+  "areaUm2": 11227.732014671232,
+  "energyFj": 1357911338.5665884,
   "loops": [
    {
     "label": "rows_cols",
@@ -45,24 +45,6 @@
   "addrLuts": 464,
   "units": [
    {
-    "unit": "MUL8 T4 +C",
-    "count": 1,
-    "luts": 17,
-    "carry4": 2
-   },
-   {
-    "unit": "MUL8 T8",
-    "count": 1,
-    "luts": 2,
-    "carry4": 1
-   },
-   {
-    "unit": "MUL8 T8 +C",
-    "count": 3,
-    "luts": 27,
-    "carry4": 3
-   },
-   {
     "unit": "ADD16 TRUNC7",
     "count": 1,
     "luts": 6,
@@ -72,7 +54,7 @@
     "unit": "ADD16 TRUNC8",
     "count": 1,
     "luts": 5,
-    "carry4": 2
+    "carry4": 1
    },
    {
     "unit": "ADD16 LOA5",
@@ -109,6 +91,24 @@
     "count": 1,
     "luts": 8,
     "carry4": 2
+   },
+   {
+    "unit": "MUL8 T4 +C",
+    "count": 1,
+    "luts": 17,
+    "carry4": 2
+   },
+   {
+    "unit": "MUL8 T8",
+    "count": 1,
+    "luts": 2,
+    "carry4": 1
+   },
+   {
+    "unit": "MUL8 T8 +C",
+    "count": 3,
+    "luts": 27,
+    "carry4": 3
    }
   ],
   "model": {
@@ -118,7 +118,8 @@
    "pipelineOverhead": 1,
    "flatten": true,
    "uremLatency": 4,
-   "divAddrCycles": 1
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
   }
  }
 }

@@ -1,0 +1,435 @@
+{
+ "model": "lenet5-cifar10",
+ "objective": "area",
+ "heuristic": "sensitivity",
+ "maxDrop": 1,
+ "dirs": [
+  {
+   "pipe": "pixel",
+   "ii": 1,
+   "par": 1,
+   "part": false
+  },
+  {
+   "pipe": "pixel",
+   "ii": 1,
+   "par": 1,
+   "part": false
+  },
+  {
+   "pipe": "input",
+   "ii": 1,
+   "par": 1,
+   "part": false
+  },
+  {
+   "pipe": "input",
+   "ii": 1,
+   "par": 1,
+   "part": false
+  },
+  {
+   "pipe": "input",
+   "ii": 1,
+   "par": 1,
+   "part": false
+  }
+ ],
+ "prepMs": 7275,
+ "maxWrong": 320,
+ "workers": 7,
+ "sample": 1000,
+ "repaired": 0,
+ "exact": {
+  "cost": 702557.8156000001,
+  "wrongVal": 310,
+  "accVal": 0.69,
+  "accTest": 0.6930000000000001
+ },
+ "best": {
+  "assign": [
+   {
+    "mul": "MUL8 T4 A2c",
+    "add": "ADD32 LOA7"
+   },
+   {
+    "mul": "MUL8 DRUM5",
+    "add": "ADD32 LOA7"
+   },
+   {
+    "mul": "MUL8 T6 A10c",
+    "add": "ADD32 LOA6"
+   },
+   {
+    "mul": "MUL8 T6 A10c",
+    "add": "ADD32 LOA5"
+   },
+   {
+    "mul": "MUL8 DRUM3",
+    "add": "ADD32 LOA5"
+   }
+  ],
+  "cost": 635394.4156000002,
+  "wrongVal": 318,
+  "accVal": 0.6819999999999999,
+  "saving": 0.09559839561764871,
+  "accTest": 0.6719999999999999
+ },
+ "evals": 143,
+ "images": 120902,
+ "points": 143,
+ "trace": [
+  {
+   "site": 1,
+   "kind": "add",
+   "unit": "ADD32 LOA5",
+   "saving": 36410.24999999988,
+   "extra": 0,
+   "cost": 666147.5656000001
+  },
+  {
+   "site": 0,
+   "kind": "add",
+   "unit": "ADD32 LOA7",
+   "saving": 18542.859999999986,
+   "extra": 0,
+   "cost": 647604.7056000002
+  },
+  {
+   "site": 1,
+   "kind": "add",
+   "unit": "ADD32 LOA7",
+   "saving": 36597.74999999988,
+   "extra": 2,
+   "cost": 647417.2056000002
+  },
+  {
+   "site": 3,
+   "kind": "mul",
+   "unit": "MUL8 T6 A10c",
+   "saving": 2262.1699999999983,
+   "extra": 0,
+   "cost": 645155.0356000001
+  },
+  {
+   "site": 1,
+   "kind": "mul",
+   "unit": "MUL8 DRUM5",
+   "saving": 2189.5999999999767,
+   "extra": 0,
+   "cost": 642965.4356000002
+  },
+  {
+   "site": 2,
+   "kind": "mul",
+   "unit": "MUL8 T2 A14c",
+   "saving": 1954.37000000001,
+   "extra": 0,
+   "cost": 641011.0656000001
+  },
+  {
+   "site": 0,
+   "kind": "mul",
+   "unit": "MUL8 T4 A2c",
+   "saving": 1411.3440000000119,
+   "extra": 0,
+   "cost": 640000.1056000001
+  },
+  {
+   "site": 4,
+   "kind": "mul",
+   "unit": "MUL8 MITCHELL",
+   "saving": 1204.9000000000015,
+   "extra": 0,
+   "cost": 638795.2056000002
+  },
+  {
+   "site": 2,
+   "kind": "mul",
+   "unit": "MUL8 T6 A10c",
+   "saving": 2262.170000000013,
+   "extra": 1,
+   "cost": 638487.4056000002
+  },
+  {
+   "site": 2,
+   "kind": "add",
+   "unit": "ADD32 LOA6",
+   "saving": 628.1000000000058,
+   "extra": 0,
+   "cost": 637859.3056000001
+  },
+  {
+   "site": 4,
+   "kind": "add",
+   "unit": "ADD32 LOA2",
+   "saving": 565.5400000000009,
+   "extra": 0,
+   "cost": 637293.7656
+  },
+  {
+   "site": 3,
+   "kind": "add",
+   "unit": "ADD32 SEG L16 P16",
+   "saving": 482.95999999999185,
+   "extra": 0,
+   "cost": 636810.8056000001
+  },
+  {
+   "site": 4,
+   "kind": "mul",
+   "unit": "MUL8 DRUM4",
+   "saving": 1402.5899999999965,
+   "extra": 3,
+   "cost": 636613.1156000001
+  },
+  {
+   "site": 4,
+   "kind": "mul",
+   "unit": "MUL8 DRUM3",
+   "saving": 1727.9099999999962,
+   "extra": 4,
+   "cost": 636287.7956000003
+  },
+  {
+   "site": 4,
+   "kind": "add",
+   "unit": "ADD32 LOA5",
+   "saving": 970.9400000000023,
+   "extra": 3,
+   "cost": 635882.3956000002
+  },
+  {
+   "site": 3,
+   "kind": "add",
+   "unit": "ADD32 LOA2",
+   "saving": 565.5399999999936,
+   "extra": 3,
+   "cost": 635799.8156000003
+  },
+  {
+   "site": 3,
+   "kind": "add",
+   "unit": "ADD32 LOA5",
+   "saving": 970.9400000000023,
+   "extra": 6,
+   "cost": 635394.4156000002
+  }
+ ],
+ "ms": 109786,
+ "phaseMs": {
+  "sens": 31331
+ },
+ "front": [
+  {
+   "assign": [
+    {
+     "mul": "MUL8 T4 A2c",
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": "MUL8 DRUM5",
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": "MUL8 T6 A10c",
+     "add": "ADD32 LOA6"
+    },
+    {
+     "mul": "MUL8 T6 A10c",
+     "add": "ADD32 LOA5"
+    },
+    {
+     "mul": "MUL8 DRUM3",
+     "add": "ADD32 LOA5"
+    }
+   ],
+   "cost": 635394.4156000002,
+   "wrong": 318,
+   "feasible": true,
+   "full": true,
+   "err": 318,
+   "accVal": 0.6819999999999999
+  },
+  {
+   "assign": [
+    {
+     "mul": "MUL8 T4 A2c",
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": "MUL8 DRUM5",
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": "MUL8 T6 A10c",
+     "add": "ADD32 LOA6"
+    },
+    {
+     "mul": "MUL8 T6 A10c",
+     "add": "ADD32 SEG L16 P16"
+    },
+    {
+     "mul": "MUL8 DRUM3",
+     "add": "ADD32 LOA2"
+    }
+   ],
+   "cost": 636287.7956000003,
+   "wrong": 317,
+   "feasible": true,
+   "full": true,
+   "err": 317,
+   "accVal": 0.683
+  },
+  {
+   "assign": [
+    {
+     "mul": "MUL8 T4 A2c",
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": "MUL8 DRUM5",
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": "MUL8 T6 A10c",
+     "add": "ADD32 LOA6"
+    },
+    {
+     "mul": "MUL8 T6 A10c",
+     "add": "ADD32 SEG L16 P16"
+    },
+    {
+     "mul": "MUL8 DRUM4",
+     "add": "ADD32 LOA2"
+    }
+   ],
+   "cost": 636613.1156000001,
+   "wrong": 315,
+   "feasible": true,
+   "full": true,
+   "err": 315,
+   "accVal": 0.685
+  },
+  {
+   "assign": [
+    {
+     "mul": "MUL8 T4 A2c",
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": "MUL8 DRUM5",
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": "MUL8 T2 A14c",
+     "add": null
+    },
+    {
+     "mul": "MUL8 T6 A10c",
+     "add": null
+    },
+    {
+     "mul": "MUL8 MITCHELL",
+     "add": null
+    }
+   ],
+   "cost": 638795.2056000002,
+   "wrong": 306,
+   "feasible": true,
+   "full": true,
+   "err": 306,
+   "accVal": 0.694
+  },
+  {
+   "assign": [
+    {
+     "mul": null,
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": "MUL8 DRUM5",
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": null,
+     "add": null
+    },
+    {
+     "mul": "MUL8 T6 A10c",
+     "add": null
+    },
+    {
+     "mul": null,
+     "add": null
+    }
+   ],
+   "cost": 642965.4356000002,
+   "wrong": 303,
+   "feasible": true,
+   "full": true,
+   "err": 303,
+   "accVal": 0.6970000000000001
+  },
+  {
+   "assign": [
+    {
+     "mul": null,
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": null,
+     "add": "ADD32 LOA7"
+    },
+    {
+     "mul": null,
+     "add": null
+    },
+    {
+     "mul": "MUL8 T6 A10c",
+     "add": null
+    },
+    {
+     "mul": null,
+     "add": null
+    }
+   ],
+   "cost": 645155.0356000001,
+   "wrong": 299,
+   "feasible": true,
+   "full": true,
+   "err": 299,
+   "accVal": 0.7010000000000001
+  },
+  {
+   "assign": [
+    {
+     "mul": null,
+     "add": null
+    },
+    {
+     "mul": null,
+     "add": null
+    },
+    {
+     "mul": null,
+     "add": null
+    },
+    {
+     "mul": "MUL8 T6 A10c",
+     "add": null
+    },
+    {
+     "mul": null,
+     "add": null
+    }
+   ],
+   "cost": 700295.6455999999,
+   "wrong": 298,
+   "feasible": true,
+   "full": true,
+   "err": 298,
+   "accVal": 0.702
+  }
+ ]
+}

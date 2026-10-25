@@ -68,7 +68,7 @@
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U7" BINDMODULE="gauss_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U7" RTLNAME="gauss_mul_8ns_10ns_17_1_1">
       <Resources LUT="49"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U7" SOURCE="kernel.cpp:12" URAM="0" VARIABLE="mul_ln12"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U7" SOURCE="kernel.cpp:14" URAM="0" VARIABLE="mul_ln14"/>
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_6ns_13_1_1_U10" BINDMODULE="gauss_mul_8ns_6ns_13_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_6ns_13_1_1" DISPNAME="mul_8ns_6ns_13_1_1_U10" RTLNAME="gauss_mul_8ns_6ns_13_1_1">
       <Resources LUT="18"/>
@@ -141,8 +141,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/tmp_1_reg_1202_reg[6]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_1_reg_1202_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="963"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.160" DATAPATH_LOGIC_DELAY="2.858" DATAPATH_NET_DELAY="2.302" ENDPOINT_PIN="tmp_13_reg_1219_reg[4]/D" LOGIC_LEVELS="6" MAX_FANOUT="5" SLACK="-0.182" STARTPOINT_PIN="add_ln12_reg_1197_reg[6]_replica/C">
-      <CELL NAME="add_ln12_reg_1197_reg[6]_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="939"/>
+    <TPATH DATAPATH_DELAY="5.160" DATAPATH_LOGIC_DELAY="2.858" DATAPATH_NET_DELAY="2.302" ENDPOINT_PIN="tmp_13_reg_1219_reg[4]/D" LOGIC_LEVELS="6" MAX_FANOUT="5" SLACK="-0.182" STARTPOINT_PIN="add_ln14_reg_1197_reg[6]_replica/C">
+      <CELL NAME="add_ln14_reg_1197_reg[6]_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="939"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_13_reg_1219_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_13_reg_1219_reg[6]_i_13" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_13_reg_1219[2]_i_3" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="19"/>
@@ -151,8 +151,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_13_reg_1219_reg[6]_i_2" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_13_reg_1219_reg[4]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="68"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.139" DATAPATH_LOGIC_DELAY="2.837" DATAPATH_NET_DELAY="2.302" ENDPOINT_PIN="tmp_13_reg_1219_reg[6]/D" LOGIC_LEVELS="6" MAX_FANOUT="5" SLACK="-0.161" STARTPOINT_PIN="add_ln12_reg_1197_reg[6]_replica/C">
-      <CELL NAME="add_ln12_reg_1197_reg[6]_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="939"/>
+    <TPATH DATAPATH_DELAY="5.139" DATAPATH_LOGIC_DELAY="2.837" DATAPATH_NET_DELAY="2.302" ENDPOINT_PIN="tmp_13_reg_1219_reg[6]/D" LOGIC_LEVELS="6" MAX_FANOUT="5" SLACK="-0.161" STARTPOINT_PIN="add_ln14_reg_1197_reg[6]_replica/C">
+      <CELL NAME="add_ln14_reg_1197_reg[6]_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="939"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_13_reg_1219_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_13_reg_1219_reg[6]_i_13" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U7/tmp_13_reg_1219[2]_i_3" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="19"/>
@@ -199,7 +199,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/gauss_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 11:00:08 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 20:18:13 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

@@ -44,9 +44,9 @@
   "critPs": 4999,
   "luts": 845,
   "carry4": 39,
-  "ff": 610,
-  "areaUm2": 27854.120618860725,
-  "energyFj": 67520534.81434317,
+  "ff": 621,
+  "areaUm2": 27666.483003612495,
+  "energyFj": 67013331.45569884,
   "loops": [
    {
     "label": "samples",
@@ -59,6 +59,24 @@
   ],
   "addrLuts": 522,
   "units": [
+   {
+    "unit": "ADD16 TRUNC7",
+    "count": 5,
+    "luts": 27,
+    "carry4": 9
+   },
+   {
+    "unit": "ADD16 TRUNC6",
+    "count": 6,
+    "luts": 47,
+    "carry4": 14
+   },
+   {
+    "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
+    "count": 4,
+    "luts": 24,
+    "carry4": 8
+   },
    {
     "unit": "MUL8 T8 +C",
     "count": 6,
@@ -78,28 +96,10 @@
     "carry4": 0
    },
    {
-    "unit": "ADD16 TRUNC7",
-    "count": 5,
-    "luts": 27,
-    "carry4": 9
-   },
-   {
-    "unit": "ADD16 TRUNC6",
-    "count": 6,
-    "luts": 47,
-    "carry4": 14
-   },
-   {
     "unit": "MUL8 T10 +C",
     "count": 1,
     "luts": 0,
     "carry4": 0
-   },
-   {
-    "unit": "ADD32 (ADD16 TRUNC7 + ADD16 exato)",
-    "count": 4,
-    "luts": 24,
-    "carry4": 8
    }
   ],
   "model": {
@@ -109,7 +109,8 @@
    "pipelineOverhead": 1,
    "flatten": true,
    "uremLatency": 4,
-   "divAddrCycles": 1
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
   }
  }
 }

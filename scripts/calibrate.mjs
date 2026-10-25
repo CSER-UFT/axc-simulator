@@ -36,7 +36,11 @@ const partsOf = (r) => {
 function nnRows() {
     const rows = [];
     const dir = join(ROOT, 'results/nn-vitis');
-    for (const round of readdirSync(dir).filter((d) => existsSync(join(dir, d, 'network/model.json')))) {
+    // --rounds <regex>: as rodadas usadas (padrão: as do fim de semana, com os pesos em BRAM, sem as aproximadas, que
+    // tinham a leitura repetida dos pesos corrigida depois).
+    const ri = argv.indexOf('--rounds');
+    const want = new RegExp(ri >= 0 ? argv[ri + 1] : '^(?!.*aprox).*_fds$');
+    for (const round of readdirSync(dir).filter((d) => want.test(d) && existsSync(join(dir, d, 'network/model.json')))) {
         const m = JSON.parse(readFileSync(join(dir, round, 'network/model.json'), 'utf8'));
         const entry = reg.models.find((x) => x.id === m.model);
         const net = decodeNet(JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8')));
@@ -44,7 +48,7 @@ function nnRows() {
         const cost = cm.network(m.units);
         const r3 = /_r3$/.test(round);
         for (const l of cost.layers) {
-            if (!r3 && l.type === 'pad') continue; // bordas: o gerador mudou na rodada 3
+            if (!r3 && !/_fds$/.test(round) && l.type === 'pad') continue; // bordas: o gerador mudou na rodada 3
             if (round === 'minilenet_part_r3' && l.type === 'conv') continue; // fatores de partição mudaram depois
             const x = join(dir, round, 'layers', l.name, 'proj/solution1/impl/report/verilog/export_impl.xml');
             if (!existsSync(x)) continue;
@@ -93,6 +97,25 @@ for (const [name, rows] of [['kernels', kernels], ['redes', nn], ['todos', all]]
     if (!rows.length) continue;
     const before = (t) => (r) => r.model[t];
     console.log(`${name.padEnd(8)} LUT ${(100 * mre(rows, before('lut'), 'lut')).toFixed(1)}% -> ${(100 * mre(rows, (r) => predict(r, LK, [], cl), 'lut')).toFixed(1)}%   FF ${(100 * mre(rows, before('ff'), 'ff')).toFixed(1)}% -> ${(100 * mre(rows, (r) => predict(r, FK, FX, cf), 'ff')).toFixed(1)}%`);
+}
+if (argv.includes('--nn')) {
+    // Só as camadas das redes: um fator por parcela, com validação cruzada.
+    const K2 = ['units', 'cells', 'mux', 'control', 'addr', 'srl'];
+    const a = fit(nn, K2, 'lut'), b = fit(nn, FK, 'ff', FX);
+    console.log('redes: LUT =', K2.map((k, i) => `${a[i].toFixed(3)} ${k}`).join(' + '), ' FF =', [...FK, 'laços'].map((k, i) => `${b[i].toFixed(3)} ${k}`).join(' + '));
+    let el = 0, ef = 0;
+    nn.forEach((r, i) => { const rest = nn.filter((_, j) => j !== i); el += Math.abs(predict(r, K2, [], fit(rest, K2, 'lut')) - r.measured.lut) / r.measured.lut; ef += Math.abs(predict(r, FK, FX, fit(rest, FK, 'ff', FX)) - r.measured.ff) / r.measured.ff; });
+    console.log(`redes: LUT ${(100 * mre(nn, (r) => r.model.lut, 'lut')).toFixed(1)}% -> ${(100 * mre(nn, (r) => predict(r, K2, [], a), 'lut')).toFixed(1)}% (um de fora ${(100 * el / nn.length).toFixed(1)}%), FF ${(100 * mre(nn, (r) => r.model.ff, 'ff')).toFixed(1)}% -> ${(100 * mre(nn, (r) => predict(r, FK, FX, b), 'ff')).toFixed(1)}% (um de fora ${(100 * ef / nn.length).toFixed(1)}%)`);
+}
+if (argv.includes('--nnaddr')) {
+    // Redes: fatores só no endereço e no controle (o resto do modelo fica), grade com validação cruzada.
+    const f = (a, k) => (r) => r.model.lut - (1 - a) * r.parts.addr - (1 - k) * r.parts.control;
+    const best = (rows) => { let b = null; for (let a = 0; a <= 1.5; a += 0.05) for (let k = 0; k <= 1.5; k += 0.05) { const e = mre(rows, f(a, k), 'lut'); if (!b || e < b.e) b = { a, k, e }; } return b; };
+    const b = best(nn);
+    let el = 0;
+    nn.forEach((r, i) => { const x = best(nn.filter((_, j) => j !== i)); el += Math.abs(f(x.a, x.k)(r) - r.measured.lut) / r.measured.lut; });
+    console.log(`redes: endereço x${b.a.toFixed(2)}, controle x${b.k.toFixed(2)}: LUT ${(100 * mre(nn, (r) => r.model.lut, 'lut')).toFixed(1)}% -> ${(100 * b.e).toFixed(1)}% (um de fora ${(100 * el / nn.length).toFixed(1)}%)`);
+    if (argv.includes('--rows')) for (const r of nn) console.log(r.id.padEnd(34), r.measured.lut, r.model.lut, Math.round(f(b.a, b.k)(r)));
 }
 if (argv.includes('--loo')) {
     let el = 0, ef = 0;

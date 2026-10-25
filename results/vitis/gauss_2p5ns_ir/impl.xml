@@ -53,39 +53,39 @@
     </RtlModule>
     <RtlModule CELL="inst/add_14ns_14ns_14_2_1_U16" BINDMODULE="gauss_add_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_14ns_14ns_14_2_1" DISPNAME="add_14ns_14ns_14_2_1_U16" RTLNAME="gauss_add_14ns_14ns_14_2_1">
       <Resources FF="16" LUT="23"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U16" SOURCE="kernel.cpp:16" URAM="0" VARIABLE="add_ln16"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U16" SOURCE="kernel.cpp:18" URAM="0" VARIABLE="add_ln18"/>
     </RtlModule>
     <RtlModule CELL="inst/add_14ns_14ns_14_2_1_U17" BINDMODULE="gauss_add_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_14ns_14ns_14_2_1" DISPNAME="add_14ns_14ns_14_2_1_U17" RTLNAME="gauss_add_14ns_14ns_14_2_1">
       <Resources FF="9" LUT="25"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U17" SOURCE="kernel.cpp:24" URAM="0" VARIABLE="add_ln24"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U17" SOURCE="kernel.cpp:26" URAM="0" VARIABLE="add_ln26"/>
     </RtlModule>
     <RtlModule CELL="inst/add_14ns_14ns_14_2_1_U18" BINDMODULE="gauss_add_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_14ns_14ns_14_2_1" DISPNAME="add_14ns_14ns_14_2_1_U18" RTLNAME="gauss_add_14ns_14ns_14_2_1">
       <Resources FF="9" LUT="25"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U18" SOURCE="kernel.cpp:33" URAM="0" VARIABLE="add_ln33"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U18" SOURCE="kernel.cpp:35" URAM="0" VARIABLE="add_ln35"/>
     </RtlModule>
     <RtlModule CELL="inst/add_14ns_14ns_14_2_1_U19" BINDMODULE="gauss_add_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_14ns_14ns_14_2_1" DISPNAME="add_14ns_14ns_14_2_1_U19" RTLNAME="gauss_add_14ns_14ns_14_2_1">
       <Resources FF="3" LUT="4"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U19" SOURCE="kernel.cpp:18" URAM="0" VARIABLE="add_ln18_1"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U19" SOURCE="kernel.cpp:20" URAM="0" VARIABLE="add_ln20_1"/>
     </RtlModule>
     <RtlModule CELL="inst/add_14ns_14ns_14_2_1_U20" BINDMODULE="gauss_add_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_14ns_14ns_14_2_1" DISPNAME="add_14ns_14ns_14_2_1_U20" RTLNAME="gauss_add_14ns_14ns_14_2_1">
       <Resources FF="2" LUT="4"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U20" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U20" SOURCE="kernel.cpp:29" URAM="0" VARIABLE="add_ln29"/>
     </RtlModule>
     <RtlModule CELL="inst/add_14ns_14ns_14_2_1_U21" BINDMODULE="gauss_add_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_14ns_14ns_14_2_1" DISPNAME="add_14ns_14ns_14_2_1_U21" RTLNAME="gauss_add_14ns_14ns_14_2_1">
       <Resources FF="8" LUT="2"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U21" SOURCE="kernel.cpp:36" URAM="0" VARIABLE="add_ln36"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U21" SOURCE="kernel.cpp:38" URAM="0" VARIABLE="add_ln38"/>
     </RtlModule>
     <RtlModule CELL="inst/add_14ns_14ns_14_2_1_U22" BINDMODULE="gauss_add_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_14ns_14ns_14_2_1" DISPNAME="add_14ns_14ns_14_2_1_U22" RTLNAME="gauss_add_14ns_14ns_14_2_1">
       <Resources FF="3" LUT="4"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U22" SOURCE="kernel.cpp:21" URAM="0" VARIABLE="add_ln21_1"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U22" SOURCE="kernel.cpp:23" URAM="0" VARIABLE="add_ln23_1"/>
     </RtlModule>
     <RtlModule CELL="inst/add_14ns_14ns_14_2_1_U23" BINDMODULE="gauss_add_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_14ns_14ns_14_2_1" DISPNAME="add_14ns_14ns_14_2_1_U23" RTLNAME="gauss_add_14ns_14ns_14_2_1">
       <Resources FF="8" LUT="2"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U23" SOURCE="kernel.cpp:30" URAM="0" VARIABLE="add_ln30"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U23" SOURCE="kernel.cpp:32" URAM="0" VARIABLE="add_ln32"/>
     </RtlModule>
     <RtlModule CELL="inst/add_14ns_14ns_14_2_1_U24" BINDMODULE="gauss_add_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_14ns_14ns_14_2_1" DISPNAME="add_14ns_14ns_14_2_1_U24" RTLNAME="gauss_add_14ns_14ns_14_2_1">
       <Resources FF="2" LUT="4"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U24" SOURCE="kernel.cpp:39" URAM="0" VARIABLE="add_ln39"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_14ns_14ns_14_2_1_U24" SOURCE="kernel.cpp:41" URAM="0" VARIABLE="add_ln41"/>
     </RtlModule>
     <RtlModule CELL="inst/add_14ns_14ns_14_2_1_U37" BINDMODULE="gauss_add_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_14ns_14ns_14_2_1" DISPNAME="add_14ns_14ns_14_2_1_U37" RTLNAME="gauss_add_14ns_14ns_14_2_1">
       <Resources FF="20" LUT="17"/>
@@ -113,11 +113,11 @@
     </RtlModule>
     <RtlModule CELL="inst/add_16ns_16ns_16_2_1_U4" BINDMODULE="gauss_add_16ns_16ns_16_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_16ns_16ns_16_2_1" DISPNAME="add_16ns_16ns_16_2_1_U4" RTLNAME="gauss_add_16ns_16ns_16_2_1">
       <Resources FF="17" LUT="1"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_16ns_16ns_16_2_1_U4" SOURCE="kernel.cpp:12" URAM="0" VARIABLE="add_ln12_1"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_16ns_16ns_16_2_1_U4" SOURCE="kernel.cpp:14" URAM="0" VARIABLE="add_ln14_1"/>
     </RtlModule>
     <RtlModule CELL="inst/add_16ns_16ns_16_2_1_U43" BINDMODULE="gauss_add_16ns_16ns_16_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_16ns_16ns_16_2_1" DISPNAME="add_16ns_16ns_16_2_1_U43" RTLNAME="gauss_add_16ns_16ns_16_2_1">
       <Resources FF="17" LUT="3"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_16ns_16ns_16_2_1_U43" SOURCE="kernel.cpp:45" URAM="0" VARIABLE="add_ln45"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_16ns_16ns_16_2_1_U43" SOURCE="kernel.cpp:47" URAM="0" VARIABLE="add_ln47"/>
     </RtlModule>
     <RtlModule CELL="inst/add_16ns_16ns_16_2_1_U44" BINDMODULE="gauss_add_16ns_16ns_16_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_16ns_16ns_16_2_1" DISPNAME="add_16ns_16ns_16_2_1_U44" RTLNAME="gauss_add_16ns_16ns_16_2_1">
       <Resources FF="23" LUT="13"/>
@@ -129,7 +129,7 @@
     </RtlModule>
     <RtlModule CELL="inst/add_8ns_8ns_8_2_1_U15" BINDMODULE="gauss_add_8ns_8ns_8_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_8ns_8ns_8_2_1" DISPNAME="add_8ns_8ns_8_2_1_U15" RTLNAME="gauss_add_8ns_8ns_8_2_1">
       <Resources FF="9" LUT="8"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_8ns_8ns_8_2_1_U15" SOURCE="kernel.cpp:21" URAM="0" VARIABLE="add_ln21"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_8ns_8ns_8_2_1_U15" SOURCE="kernel.cpp:23" URAM="0" VARIABLE="add_ln23"/>
     </RtlModule>
     <RtlModule CELL="inst/add_8ns_8ns_8_2_1_U2" BINDMODULE="gauss_add_8ns_8ns_8_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_8ns_8ns_8_2_1" DISPNAME="add_8ns_8ns_8_2_1_U2" RTLNAME="gauss_add_8ns_8ns_8_2_1">
       <Resources FF="5" LUT="5"/>
@@ -141,11 +141,11 @@
     </RtlModule>
     <RtlModule CELL="inst/add_8ns_8ns_8_2_1_U6" BINDMODULE="gauss_add_8ns_8ns_8_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_8ns_8ns_8_2_1" DISPNAME="add_8ns_8ns_8_2_1_U6" RTLNAME="gauss_add_8ns_8ns_8_2_1">
       <Resources FF="9" LUT="16"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_8ns_8ns_8_2_1_U6" SOURCE="kernel.cpp:12" URAM="0" VARIABLE="add_ln12"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_8ns_8ns_8_2_1_U6" SOURCE="kernel.cpp:14" URAM="0" VARIABLE="add_ln14"/>
     </RtlModule>
     <RtlModule CELL="inst/add_8ns_8ns_8_2_1_U7" BINDMODULE="gauss_add_8ns_8ns_8_2_1" DEPTH="1" TYPE="resource" MODULENAME="add_8ns_8ns_8_2_1" DISPNAME="add_8ns_8ns_8_2_1_U7" RTLNAME="gauss_add_8ns_8ns_8_2_1">
       <Resources FF="9" LUT="5"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_8ns_8ns_8_2_1_U7" SOURCE="kernel.cpp:18" URAM="0" VARIABLE="add_ln18"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="add" PRAGMA="" RTLNAME="add_8ns_8ns_8_2_1_U7" SOURCE="kernel.cpp:20" URAM="0" VARIABLE="add_ln20"/>
     </RtlModule>
     <RtlModule CELL="inst/flow_control_loop_pipe_U" BINDMODULE="gauss_flow_control_loop_pipe" DEPTH="1" TYPE="rtl" MODULENAME="flow_control_loop_pipe" DISPNAME="flow_control_loop_pipe_U" RTLNAME="gauss_flow_control_loop_pipe">
       <Resources FF="1" LUT="67"/>
@@ -156,7 +156,7 @@
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U11" BINDMODULE="gauss_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U11" RTLNAME="gauss_mul_8ns_10ns_17_1_1">
       <Resources LUT="50"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U11" SOURCE="kernel.cpp:12" URAM="0" VARIABLE="mul_ln12"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U11" SOURCE="kernel.cpp:14" URAM="0" VARIABLE="mul_ln14"/>
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U3" BINDMODULE="gauss_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U3" RTLNAME="gauss_mul_8ns_10ns_17_1_1">
       <Resources LUT="40"/>
@@ -188,19 +188,19 @@
     </RtlModule>
     <RtlModule CELL="inst/sub_14ns_14ns_14_2_1_U12" BINDMODULE="gauss_sub_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="sub_14ns_14ns_14_2_1" DISPNAME="sub_14ns_14ns_14_2_1_U12" RTLNAME="gauss_sub_14ns_14ns_14_2_1">
       <Resources FF="13" LUT="12"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op sub" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="sub" PRAGMA="" RTLNAME="sub_14ns_14ns_14_2_1_U12" SOURCE="kernel.cpp:16" URAM="0" VARIABLE="sub_ln16"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op sub" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="sub" PRAGMA="" RTLNAME="sub_14ns_14ns_14_2_1_U12" SOURCE="kernel.cpp:18" URAM="0" VARIABLE="sub_ln18"/>
     </RtlModule>
     <RtlModule CELL="inst/sub_14ns_14ns_14_2_1_U13" BINDMODULE="gauss_sub_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="sub_14ns_14ns_14_2_1" DISPNAME="sub_14ns_14ns_14_2_1_U13" RTLNAME="gauss_sub_14ns_14ns_14_2_1">
       <Resources FF="13" LUT="12"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op sub" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="sub" PRAGMA="" RTLNAME="sub_14ns_14ns_14_2_1_U13" SOURCE="kernel.cpp:24" URAM="0" VARIABLE="sub_ln24"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op sub" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="sub" PRAGMA="" RTLNAME="sub_14ns_14ns_14_2_1_U13" SOURCE="kernel.cpp:26" URAM="0" VARIABLE="sub_ln26"/>
     </RtlModule>
     <RtlModule CELL="inst/sub_14ns_14ns_14_2_1_U14" BINDMODULE="gauss_sub_14ns_14ns_14_2_1" DEPTH="1" TYPE="resource" MODULENAME="sub_14ns_14ns_14_2_1" DISPNAME="sub_14ns_14ns_14_2_1_U14" RTLNAME="gauss_sub_14ns_14ns_14_2_1">
       <Resources FF="13" LUT="13"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op sub" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="sub" PRAGMA="" RTLNAME="sub_14ns_14ns_14_2_1_U14" SOURCE="kernel.cpp:33" URAM="0" VARIABLE="sub_ln33"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op sub" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="sub" PRAGMA="" RTLNAME="sub_14ns_14ns_14_2_1_U14" SOURCE="kernel.cpp:35" URAM="0" VARIABLE="sub_ln35"/>
     </RtlModule>
     <RtlModule CELL="inst/sub_16ns_16ns_16_2_1_U35" BINDMODULE="gauss_sub_16ns_16ns_16_2_1" DEPTH="1" TYPE="resource" MODULENAME="sub_16ns_16ns_16_2_1" DISPNAME="sub_16ns_16ns_16_2_1_U35" RTLNAME="gauss_sub_16ns_16ns_16_2_1">
       <Resources FF="16" LUT="16"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op sub" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="sub" PRAGMA="" RTLNAME="sub_16ns_16ns_16_2_1_U35" SOURCE="kernel.cpp:45" URAM="0" VARIABLE="sub_ln45"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op sub" DSP="0" ID="" IMPL="fabric" LATENCY="1" LOOP="rows_cols" OPTYPE="sub" PRAGMA="" RTLNAME="sub_16ns_16ns_16_2_1_U35" SOURCE="kernel.cpp:47" URAM="0" VARIABLE="sub_ln47"/>
     </RtlModule>
     <RtlModule CELL="inst/urem_8ns_3ns_2_12_1_U9" BINDMODULE="gauss_urem_8ns_3ns_2_12_1" DEPTH="1" TYPE="rtl" MODULENAME="urem_8ns_3ns_2_12_1" DISPNAME="urem_8ns_3ns_2_12_1_U9" RTLNAME="gauss_urem_8ns_3ns_2_12_1">
       <Resources FF="39" LUT="36"/>
@@ -228,8 +228,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U3/tmp_reg_1142_reg[6]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_reg_1142_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1491"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.510" DATAPATH_LOGIC_DELAY="2.746" DATAPATH_NET_DELAY="2.764" ENDPOINT_PIN="tmp_13_reg_1216_reg[6]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-3.032" STARTPOINT_PIN="add_ln12_reg_1188_reg[6]/C">
-      <CELL NAME="add_ln12_reg_1188_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1399"/>
+    <TPATH DATAPATH_DELAY="5.510" DATAPATH_LOGIC_DELAY="2.746" DATAPATH_NET_DELAY="2.764" ENDPOINT_PIN="tmp_13_reg_1216_reg[6]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-3.032" STARTPOINT_PIN="add_ln14_reg_1188_reg[6]/C">
+      <CELL NAME="add_ln14_reg_1188_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1399"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_8_cast_reg_1221_reg[0]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_13_reg_1216_reg[6]_i_13" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_13_reg_1216[6]_i_5" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
@@ -257,8 +257,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U3/tmp_reg_1142_reg[6]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_reg_1142_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1491"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.451" DATAPATH_LOGIC_DELAY="2.687" DATAPATH_NET_DELAY="2.764" ENDPOINT_PIN="tmp_8_cast_reg_1221_reg[5]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-2.973" STARTPOINT_PIN="add_ln12_reg_1188_reg[6]/C">
-      <CELL NAME="add_ln12_reg_1188_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1399"/>
+    <TPATH DATAPATH_DELAY="5.451" DATAPATH_LOGIC_DELAY="2.687" DATAPATH_NET_DELAY="2.764" ENDPOINT_PIN="tmp_8_cast_reg_1221_reg[5]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-2.973" STARTPOINT_PIN="add_ln14_reg_1188_reg[6]/C">
+      <CELL NAME="add_ln14_reg_1188_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1399"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_8_cast_reg_1221_reg[0]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_13_reg_1216_reg[6]_i_13" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_13_reg_1216[6]_i_5" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
@@ -266,8 +266,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_13_reg_1216_reg[6]_i_2" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_8_cast_reg_1221_reg[5]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="9"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.328" DATAPATH_LOGIC_DELAY="2.564" DATAPATH_NET_DELAY="2.764" ENDPOINT_PIN="tmp_8_cast_reg_1221_reg[4]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-2.850" STARTPOINT_PIN="add_ln12_reg_1188_reg[6]/C">
-      <CELL NAME="add_ln12_reg_1188_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1399"/>
+    <TPATH DATAPATH_DELAY="5.328" DATAPATH_LOGIC_DELAY="2.564" DATAPATH_NET_DELAY="2.764" ENDPOINT_PIN="tmp_8_cast_reg_1221_reg[4]/D" LOGIC_LEVELS="5" MAX_FANOUT="13" SLACK="-2.850" STARTPOINT_PIN="add_ln14_reg_1188_reg[6]/C">
+      <CELL NAME="add_ln14_reg_1188_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1399"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_8_cast_reg_1221_reg[0]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_13_reg_1216_reg[6]_i_13" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_13_reg_1216[6]_i_5" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
@@ -293,8 +293,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U3/tmp_reg_1142_reg[2]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_reg_1142_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1491"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.190" DATAPATH_LOGIC_DELAY="2.826" DATAPATH_NET_DELAY="2.364" ENDPOINT_PIN="tmp_8_cast_reg_1221_reg[3]/D" LOGIC_LEVELS="6" MAX_FANOUT="13" SLACK="-2.712" STARTPOINT_PIN="add_ln12_reg_1188_reg[6]/C">
-      <CELL NAME="add_ln12_reg_1188_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1399"/>
+    <TPATH DATAPATH_DELAY="5.190" DATAPATH_LOGIC_DELAY="2.826" DATAPATH_NET_DELAY="2.364" ENDPOINT_PIN="tmp_8_cast_reg_1221_reg[3]/D" LOGIC_LEVELS="6" MAX_FANOUT="13" SLACK="-2.712" STARTPOINT_PIN="add_ln14_reg_1188_reg[6]/C">
+      <CELL NAME="add_ln14_reg_1188_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1399"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_8_cast_reg_1221_reg[0]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_13_reg_1216_reg[6]_i_13" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U11/tmp_8_cast_reg_1221[0]_i_21" PRIMITIVE_TYPE="LUT.others.LUT3" LINE_NUMBER="10"/>
@@ -314,7 +314,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/gauss_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 11:28:16 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 20:38:28 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

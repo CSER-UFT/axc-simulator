@@ -71,3 +71,24 @@ relatórios ficam guardados (csynth.xml, export_impl.xml, utilização hierárqu
   como na rodada 3. A partir daqui as tabelas de pesos sem partição vão para BRAM (BIND_STORAGE rom_2p bram).
 * As duas maxpool saíram com II 1 (o modelo dá II 2, limitado pela memória) e metade dos ciclos.
 * O FF do modelo nesta tabela ainda é o anterior à calibração do controle dos laços (11 FF por laço).
+
+## Rodada do fim de semana (pastas *_fds, busca_*.json)
+
+Lote `scripts/fim-de-semana.sh`: MiniLenet exata, aproximada e com partição; LeNet 5 CIFAR 10 exata e aproximada;
+pesos sem partição em BRAM. Todas as csims sem diferenças (MiniLenet 99 acertos em 100; LeNet 5 73 e 72).
+
+* Latência das exatas e da partição: 0% a 1% (redes e camadas sozinhas).
+* As aproximadas saíram com o II das convoluções triplicado (conv1 13 para 38, conv2 38 para 113; na LeNet 5, 38
+  para 113 e 75 para 225): o produto aproximado com sinal era chamado nos dois ramos de um `?:`, o Vitis transformou
+  a seleção em desvio e passou a ler a tabela de pesos (agora em BRAM, 2 portas) três vezes por produto. A
+  exportação passou a chamar a unidade uma vez e aplicar o sinal no resultado; a rodada 5 (`scripts/rodada-aprox.sh`)
+  mede de novo. Os LUT e FF das aproximadas desta rodada também têm as unidades duplicadas e ficaram fora da
+  calibração.
+* LUT das exatas: o modelo ficava 44% a 63% acima, depois que os pesos foram para a BRAM. Calibração (fluxo das
+  redes, `VITIS_NN` em `js/axc/nngen.js`): multiplicador exato uint8 por int8 com 64 LUTs (o núcleo do Vitis), requant
+  com 45 LUTs, endereço x0,5 e controle x0,6 (ajuste nas 26 camadas, erro de LUT de 55% para 15%, igual em validação
+  cruzada), e endereço por dimensão quando as dimensões internas são potência de 2 (`partitionLogic`). Redes inteiras
+  depois disso: MiniLenet exata 15% acima, LeNet 5 exata 7% acima, MiniLenet com partição 15% abaixo.
+* As maxpool têm II 1 dentro da rede (II 2 sozinhas, como no modelo): na rede, o vetor entre as camadas é local e o
+  Vitis o implementa com mais portas.
+* Kernels de imagem (results/vitis, 61 casos): latência 0,6%, LUT 14,6%, FF 21,1%, sem mudança no modelo.

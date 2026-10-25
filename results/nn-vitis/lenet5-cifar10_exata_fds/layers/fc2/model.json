@@ -1,0 +1,63 @@
+{
+ "id": "lenet5-cifar10_exata_10ns_fc2",
+ "note": "LeNet 5, camada fc2, unidades exatas",
+ "clockNs": 10,
+ "part": "xc7a100tcsg324-1",
+ "top": "fc2",
+ "delays": "fpga",
+ "assign": {},
+ "prediction": {
+  "cycles": 10668,
+  "timeNs": 106680,
+  "intervalNs": 10,
+  "critPs": 8253,
+  "luts": 271,
+  "carry4": 60,
+  "ff": 136,
+  "areaUm2": 66139.6988,
+  "energyFj": 132489236.53492801,
+  "loops": [
+   {
+    "label": "fc2_o",
+    "mode": "sequential",
+    "trip": 84,
+    "II": null,
+    "iterLatency": 127,
+    "latency": 10668
+   },
+   {
+    "label": "fc2_i",
+    "mode": "pipelined",
+    "trip": 120,
+    "II": 1,
+    "iterLatency": 2,
+    "latency": 122
+   }
+  ],
+  "addrLuts": 28,
+  "units": [
+   {
+    "unit": "ADD24 exato",
+    "count": 2,
+    "luts": 48,
+    "carry4": 14
+   },
+   {
+    "unit": "MUL8 exato",
+    "count": 1,
+    "luts": 89,
+    "carry4": 10
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
+  }
+ }
+}

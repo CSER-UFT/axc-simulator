@@ -15,11 +15,11 @@
   "timeNs": 1295,
   "intervalNs": 5,
   "critPs": 3800,
-  "luts": 37,
+  "luts": 36,
   "carry4": 4,
-  "ff": 73,
-  "areaUm2": 2583.7316,
-  "energyFj": 1497213.654939,
+  "ff": 84,
+  "areaUm2": 2568.0878500000003,
+  "energyFj": 1497213.6227258751,
   "loops": [
    {
     "label": "acc",
@@ -33,15 +33,15 @@
   "addrLuts": 0,
   "units": [
    {
-    "unit": "MUL8 T14 +C",
+    "unit": "ADD32 (ADD16 TRUNC13 + ADD16 exato)",
     "count": 1,
-    "luts": 1,
+    "luts": 3,
     "carry4": 0
    },
    {
-    "unit": "ADD32 (ADD16 TRUNC13 + ADD16 exato)",
+    "unit": "MUL8 T14 +C",
     "count": 1,
-    "luts": 4,
+    "luts": 1,
     "carry4": 0
    }
   ],
@@ -52,7 +52,8 @@
    "pipelineOverhead": 1,
    "flatten": true,
    "uremLatency": 4,
-   "divAddrCycles": 1
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
   }
  }
 }

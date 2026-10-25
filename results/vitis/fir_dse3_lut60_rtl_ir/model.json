@@ -41,9 +41,9 @@
   "critPs": 4952,
   "luts": 795,
   "carry4": 50,
-  "ff": 562,
-  "areaUm2": 22423.565572106843,
-  "energyFj": 49892831.67758908,
+  "ff": 573,
+  "areaUm2": 22056.59460937498,
+  "energyFj": 49253017.60002235,
   "loops": [
    {
     "label": "samples",
@@ -69,34 +69,10 @@
     "carry4": 3
    },
    {
-    "unit": "×29 (2 somas)",
-    "count": 1,
-    "luts": 18,
-    "carry4": 6
-   },
-   {
-    "unit": "MUL8 T6 A10c",
-    "count": 4,
-    "luts": 5,
-    "carry4": 0
-   },
-   {
-    "unit": "MUL8 T16",
-    "count": 1,
-    "luts": 0,
-    "carry4": 0
-   },
-   {
     "unit": "ADD16 TRUNC7",
     "count": 6,
     "luts": 36,
     "carry4": 12
-   },
-   {
-    "unit": "MUL8 T10 +C",
-    "count": 1,
-    "luts": 3,
-    "carry4": 0
    },
    {
     "unit": "ADD16 TRUNC5",
@@ -105,10 +81,10 @@
     "carry4": 9
    },
    {
-    "unit": "MUL8 T8 +C",
-    "count": 4,
-    "luts": 31,
-    "carry4": 3
+    "unit": "×29 (2 somas)",
+    "count": 1,
+    "luts": 18,
+    "carry4": 6
    },
    {
     "unit": "ADD16 TRUNC6",
@@ -129,6 +105,30 @@
     "carry4": 4
    },
    {
+    "unit": "MUL8 T6 A10c",
+    "count": 4,
+    "luts": 5,
+    "carry4": 0
+   },
+   {
+    "unit": "MUL8 T16",
+    "count": 1,
+    "luts": 0,
+    "carry4": 0
+   },
+   {
+    "unit": "MUL8 T10 +C",
+    "count": 1,
+    "luts": 3,
+    "carry4": 0
+   },
+   {
+    "unit": "MUL8 T8 +C",
+    "count": 4,
+    "luts": 31,
+    "carry4": 3
+   },
+   {
     "unit": "MUL8 T6",
     "count": 1,
     "luts": 3,
@@ -142,7 +142,8 @@
    "pipelineOverhead": 1,
    "flatten": true,
    "uremLatency": 4,
-   "divAddrCycles": 1
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
   }
  }
 }

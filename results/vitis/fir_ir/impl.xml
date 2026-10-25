@@ -82,8 +82,8 @@
       <CELL NAME="mul_8ns_6ns_13_1_1_U18/ret_V_10_reg_5497_reg[12]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="ret_V_10_reg_5497_reg[11]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1505"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="4.266" DATAPATH_LOGIC_DELAY="0.903" DATAPATH_NET_DELAY="3.363" ENDPOINT_PIN="v1_11_V_reg_5414_pp0_iter4_reg_reg[1]_srl2/D" LOGIC_LEVELS="2" MAX_FANOUT="128" SLACK="0.598" STARTPOINT_PIN="trunc_ln14_reg_4015_pp0_iter2_reg_reg[1]/C">
-      <CELL NAME="trunc_ln14_reg_4015_pp0_iter2_reg_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="583"/>
+    <TPATH DATAPATH_DELAY="4.266" DATAPATH_LOGIC_DELAY="0.903" DATAPATH_NET_DELAY="3.363" ENDPOINT_PIN="v1_11_V_reg_5414_pp0_iter4_reg_reg[1]_srl2/D" LOGIC_LEVELS="2" MAX_FANOUT="128" SLACK="0.598" STARTPOINT_PIN="trunc_ln16_reg_4015_pp0_iter2_reg_reg[1]/C">
+      <CELL NAME="trunc_ln16_reg_4015_pp0_iter2_reg_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="583"/>
       <CELL NAME="v1_0_V_reg_5390[1]_i_4" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="86"/>
       <CELL NAME="v1_11_V_reg_5414_pp0_iter4_reg_reg[1]_srl2_i_1" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="96"/>
       <CELL NAME="v1_11_V_reg_5414_pp0_iter4_reg_reg[1]_srl2" PRIMITIVE_TYPE="DMEM.srl.SRL16E" LINE_NUMBER="1525"/>
@@ -95,8 +95,8 @@
       <CELL NAME="flow_control_loop_pipe_U/lshr_ln4_reg_4050[3]_i_1" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="67"/>
       <CELL NAME="lshr_ln4_reg_4050_reg[3]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1441"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="4.145" DATAPATH_LOGIC_DELAY="0.903" DATAPATH_NET_DELAY="3.242" ENDPOINT_PIN="v1_8_V_reg_5408_pp0_iter5_reg_reg[3]_srl3/D" LOGIC_LEVELS="2" MAX_FANOUT="128" SLACK="0.732" STARTPOINT_PIN="trunc_ln14_reg_4015_pp0_iter2_reg_reg[1]/C">
-      <CELL NAME="trunc_ln14_reg_4015_pp0_iter2_reg_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="583"/>
+    <TPATH DATAPATH_DELAY="4.145" DATAPATH_LOGIC_DELAY="0.903" DATAPATH_NET_DELAY="3.242" ENDPOINT_PIN="v1_8_V_reg_5408_pp0_iter5_reg_reg[3]_srl3/D" LOGIC_LEVELS="2" MAX_FANOUT="128" SLACK="0.732" STARTPOINT_PIN="trunc_ln16_reg_4015_pp0_iter2_reg_reg[1]/C">
+      <CELL NAME="trunc_ln16_reg_4015_pp0_iter2_reg_reg[1]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="583"/>
       <CELL NAME="v1_32_V_reg_5452[3]_i_4" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="86"/>
       <CELL NAME="v1_8_V_reg_5408_pp0_iter5_reg_reg[3]_srl3_i_1" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="96"/>
       <CELL NAME="v1_8_V_reg_5408_pp0_iter5_reg_reg[3]_srl3" PRIMITIVE_TYPE="DMEM.srl.SRL16E" LINE_NUMBER="1555"/>
@@ -112,7 +112,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/fir_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 11:15:55 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 20:28:17 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

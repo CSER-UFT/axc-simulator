@@ -68,7 +68,7 @@
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U24" BINDMODULE="gauss_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U24" RTLNAME="gauss_mul_8ns_10ns_17_1_1">
       <Resources LUT="49"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U24" SOURCE="kernel.cpp:670" URAM="0" VARIABLE="mul_ln670"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U24" SOURCE="kernel.cpp:672" URAM="0" VARIABLE="mul_ln672"/>
     </RtlModule>
     <RtlModule CELL="inst/urem_8ns_3ns_2_12_1_U22" BINDMODULE="gauss_urem_8ns_3ns_2_12_1" DEPTH="1" TYPE="rtl" MODULENAME="urem_8ns_3ns_2_12_1" DISPNAME="urem_8ns_3ns_2_12_1_U22" RTLNAME="gauss_urem_8ns_3ns_2_12_1">
       <Resources FF="39" LUT="31"/>
@@ -106,8 +106,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U20/tmp_reg_1097_reg[6]_i_1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_reg_1097_reg[5]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1003"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.396" DATAPATH_LOGIC_DELAY="2.794" DATAPATH_NET_DELAY="2.602" ENDPOINT_PIN="tmp_105_reg_1166_reg[6]/D" LOGIC_LEVELS="5" MAX_FANOUT="5" SLACK="-0.371" STARTPOINT_PIN="add_ln670_reg_1155_reg[6]_replica/C">
-      <CELL NAME="add_ln670_reg_1155_reg[6]_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1021"/>
+    <TPATH DATAPATH_DELAY="5.396" DATAPATH_LOGIC_DELAY="2.794" DATAPATH_NET_DELAY="2.602" ENDPOINT_PIN="tmp_105_reg_1166_reg[6]/D" LOGIC_LEVELS="5" MAX_FANOUT="5" SLACK="-0.371" STARTPOINT_PIN="add_ln672_reg_1155_reg[6]_replica/C">
+      <CELL NAME="add_ln672_reg_1155_reg[6]_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1021"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U24/tmp_105_reg_1166_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U24/tmp_105_reg_1166_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U24/tmp_105_reg_1166_reg[6]_i_9" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
@@ -143,8 +143,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U23/tmp_103_reg_1150_reg[6]_i_2" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_103_reg_1150_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1086"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.307" DATAPATH_LOGIC_DELAY="2.735" DATAPATH_NET_DELAY="2.572" ENDPOINT_PIN="tmp_105_reg_1166_reg[4]/D" LOGIC_LEVELS="5" MAX_FANOUT="5" SLACK="-0.282" STARTPOINT_PIN="add_ln670_reg_1155_reg[6]_replica/C">
-      <CELL NAME="add_ln670_reg_1155_reg[6]_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1021"/>
+    <TPATH DATAPATH_DELAY="5.307" DATAPATH_LOGIC_DELAY="2.735" DATAPATH_NET_DELAY="2.572" ENDPOINT_PIN="tmp_105_reg_1166_reg[4]/D" LOGIC_LEVELS="5" MAX_FANOUT="5" SLACK="-0.282" STARTPOINT_PIN="add_ln672_reg_1155_reg[6]_replica/C">
+      <CELL NAME="add_ln672_reg_1155_reg[6]_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1021"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U24/tmp_105_reg_1166_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U24/tmp_105_reg_1166_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U24/tmp_105_reg_1166[2]_i_3" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="19"/>
@@ -181,7 +181,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/gauss_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 14:29:53 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 21:15:07 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

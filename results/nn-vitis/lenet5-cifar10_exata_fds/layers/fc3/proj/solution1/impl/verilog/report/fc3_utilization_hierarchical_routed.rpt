@@ -1,0 +1,43 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Sat Oct 24 17:09:24 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 6 -file ./report/fc3_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+-------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|                      Instance                      |                           Module                           | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| bd_0_wrapper                                       |                                                      (top) |        179 |        179 |       0 |    0 | 127 |      0 |      1 |          2 |
+|   bd_0_i                                           |                                                       bd_0 |        179 |        179 |       0 |    0 | 127 |      0 |      1 |          2 |
+|     hls_inst                                       |                                            bd_0_hls_inst_0 |        179 |        179 |       0 |    0 | 127 |      0 |      1 |          2 |
+|       inst                                         |                                        bd_0_hls_inst_0_fc3 |        179 |        179 |       0 |    0 | 127 |      0 |      1 |          2 |
+|         (inst)                                     |                                        bd_0_hls_inst_0_fc3 |         11 |         11 |       0 |    0 |  36 |      0 |      0 |          0 |
+|         b_V_U                                      |                        bd_0_hls_inst_0_fc3_b_V_ROM_AUTO_1R |          9 |          9 |       0 |    0 |  12 |      0 |      0 |          0 |
+|         grp_axc_requant_fu_127                     |                            bd_0_hls_inst_0_fc3_axc_requant |         24 |         24 |       0 |    0 |  13 |      0 |      0 |          2 |
+|           (grp_axc_requant_fu_127)                 |                            bd_0_hls_inst_0_fc3_axc_requant |         14 |         14 |       0 |    0 |  13 |      0 |      0 |          0 |
+|           mul_23ns_23s_46_1_1_U7                   |                    bd_0_hls_inst_0_fc3_mul_23ns_23s_46_1_1 |         10 |         10 |       0 |    0 |   0 |      0 |      0 |          2 |
+|         grp_fc3_Pipeline_fc3_i_fu_117              |                     bd_0_hls_inst_0_fc3_fc3_Pipeline_fc3_i |        132 |        132 |       0 |    0 |  61 |      0 |      1 |          0 |
+|           (grp_fc3_Pipeline_fc3_i_fu_117)          |                     bd_0_hls_inst_0_fc3_fc3_Pipeline_fc3_i |         52 |         52 |       0 |    0 |  59 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U | bd_0_hls_inst_0_fc3_flow_control_loop_pipe_sequential_init |         13 |         13 |       0 |    0 |   2 |      0 |      0 |          0 |
+|           mul_8s_8ns_16_1_1_U1                     |                      bd_0_hls_inst_0_fc3_mul_8s_8ns_16_1_1 |         52 |         52 |       0 |    0 |   0 |      0 |      0 |          0 |
+|           w_V_U                                    |  bd_0_hls_inst_0_fc3_fc3_Pipeline_fc3_i_w_V_ROM_2P_BRAM_1R |         26 |         26 |       0 |    0 |   0 |      0 |      1 |          0 |
+|         m_V_U                                      |                        bd_0_hls_inst_0_fc3_m_V_ROM_AUTO_1R |          3 |          3 |       0 |    0 |   5 |      0 |      0 |          0 |
++----------------------------------------------------+------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

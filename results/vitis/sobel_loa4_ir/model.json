@@ -9,20 +9,28 @@
  "assign": {
   "S1.3": "ADD16 LOA4",
   "S1.5": "ADD16 LOA4",
+  "S1.7": "ADD16 LOA4",
+  "S1.10": "ADD16 LOA4",
+  "S1.12": "ADD16 LOA4",
   "S1.15": "ADD16 LOA4",
   "S1.16": "ADD16 LOA4",
+  "S1.17": "ADD16 LOA4",
+  "S1.20": "ADD16 LOA4",
+  "S1.21": "ADD16 LOA4",
+  "S1.23": "ADD16 LOA4",
+  "S1.26": "ADD16 LOA4",
   "S1.28": "ADD16 LOA4"
  },
  "prediction": {
   "cycles": 72218,
   "timeNs": 361090,
   "intervalNs": 10,
-  "critPs": 4930,
-  "luts": 728,
-  "carry4": 35,
-  "ff": 516,
-  "areaUm2": 12815.99403996004,
-  "energyFj": 1297462541.3727987,
+  "critPs": 4775,
+  "luts": 688,
+  "carry4": 36,
+  "ff": 549,
+  "areaUm2": 11829.328276923075,
+  "energyFj": 1335776136.8000028,
   "loops": [
    {
     "label": "rows_cols",
@@ -37,16 +45,10 @@
   "addrLuts": 442,
   "units": [
    {
-    "unit": "ADD16 exato",
-    "count": 8,
-    "luts": 62,
-    "carry4": 19
-   },
-   {
     "unit": "ADD16 LOA4",
-    "count": 3,
-    "luts": 24,
-    "carry4": 6
+    "count": 13,
+    "luts": 110,
+    "carry4": 26
    }
   ],
   "model": {
@@ -56,7 +58,8 @@
    "pipelineOverhead": 1,
    "flatten": true,
    "uremLatency": 4,
-   "divAddrCycles": 1
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
   }
  }
 }

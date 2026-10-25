@@ -23,6 +23,7 @@
  * (lib.adderFor). A reescala é uma peça exata (data/hls-cells.json).
  */
 import { synthesize } from '../hls/index.js';
+import { MODEL } from '../hls/sched.js';
 import { parse } from '../hls/lang.js';
 import { elaborate } from '../hls/elab.js';
 
@@ -479,10 +480,32 @@ function designOf(src, ports) {
  * @param {object} net rede decodificada
  * @param {{synth, cells, fpga?, target?, flow?, clockNs?, ports?, dirs?}} o
  */
+/**
+ * LUTs que o Vitis 2022.2 gasta nas operações exatas das redes, medidas no Vivado (rodada do fim de semana,
+ * relatório hierárquico das camadas): o multiplicador uint8 por int8 é o núcleo do próprio Vitis (64 LUTs,
+ * mul_8ns_8s_16), não a netlist exata da biblioteca (89), e o requant fica entre 12 e 56 LUTs além dos DSP48 (a
+ * célula caracterizada sozinha tem 74). Só os LUTs mudam; área e energia ASIC continuam as do sky130.
+ */
+export const VITIS_NN = { mul8Luts: 64, requantLuts: 45, addrScale: 0.5, controlScale: 0.6 };
+// addrScale e controlScale: ajuste de dois fatores nas 26 camadas medidas (node scripts/calibrate.mjs --nnaddr),
+// erro médio de LUT de 55% para 15%, também em validação cruzada; o Vitis reduz os endereços afins destes laços a
+// contadores e compartilha os contadores dos laços achatados.
+const nnFpga = (fpga) => {
+    const k = 'MUL8 nativo'; // o produto exato da biblioteca no FPGA: a * b sintetizado pelo Vivado (lib.js)
+    if (!fpga?.units?.[k]) return fpga ?? null;
+    return { ...fpga, units: { ...fpga.units, [k]: { ...fpga.units[k], luts: VITIS_NN.mul8Luts } } };
+};
+const nnCells = (cells) => {
+    const rq = cells?.cells?.requant;
+    if (!rq) return cells;
+    const fix = (v) => Object.fromEntries(Object.entries(v).map(([k, x]) => [k, { ...x, luts: VITIS_NN.requantLuts }]));
+    return { ...cells, cells: { ...cells.cells, requant: Object.fromEntries(Object.entries(rq).map(([w, v]) => [w, fix(v)])) } };
+};
+
 export function costModel(net, o) {
     const kernels = networkKernels(net, o.dirs);
     const ports = o.ports ?? 2, clockNs = o.clockNs ?? 10;
-    const base = { synth: o.synth, cells: o.cells, fpga: o.fpga ?? null, target: o.target ?? 'asic', flow: o.flow ?? 'delay', clockNs, ports, wide: true };
+    const base = { synth: o.synth, cells: nnCells(o.cells), fpga: nnFpga(o.fpga), model: { ...MODEL, addrScale: VITIS_NN.addrScale, controlScale: VITIS_NN.controlScale }, target: o.target ?? 'asic', flow: o.flow ?? 'delay', clockNs, ports, wide: true };
     const cache = new Map();
     /** Custo de um kernel com as unidades (null: exata). */
     const kernel = (k, mul = null, add = null) => {

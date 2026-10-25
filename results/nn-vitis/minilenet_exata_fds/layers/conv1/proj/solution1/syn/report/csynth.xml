@@ -1,0 +1,654 @@
+<profile>
+    <ReportVersion>
+        <Version>2022.2</Version>
+    </ReportVersion>
+    <UserAssignments>
+        <unit>ns</unit>
+        <ProductFamily>artix7</ProductFamily>
+        <Part>xc7a100t-csg324-1</Part>
+        <TopModelName>conv1</TopModelName>
+        <TargetClockPeriod>10.00</TargetClockPeriod>
+        <ClockUncertainty>2.70</ClockUncertainty>
+        <FlowTarget>vivado</FlowTarget>
+    </UserAssignments>
+    <PerformanceEstimates>
+        <PipelineType>no</PipelineType>
+        <SummaryOfTimingAnalysis>
+            <unit>ns</unit>
+            <EstimatedClockPeriod>7.114</EstimatedClockPeriod>
+        </SummaryOfTimingAnalysis>
+        <SummaryOfOverallLatency>
+            <unit>clock cycles</unit>
+            <Best-caseLatency>30596</Best-caseLatency>
+            <Average-caseLatency>30596</Average-caseLatency>
+            <Worst-caseLatency>30596</Worst-caseLatency>
+            <Best-caseRealTimeLatency>0.306 ms</Best-caseRealTimeLatency>
+            <Average-caseRealTimeLatency>0.306 ms</Average-caseRealTimeLatency>
+            <Worst-caseRealTimeLatency>0.306 ms</Worst-caseRealTimeLatency>
+            <Interval-min>30597</Interval-min>
+            <Interval-max>30597</Interval-max>
+        </SummaryOfOverallLatency>
+        <SummaryOfLoopLatency>
+            <conv1_f_conv1_h_conv1_w>
+                <Slack>7.30</Slack>
+                <TripCount>2352</TripCount>
+                <Latency>30594</Latency>
+                <AbsoluteTimeLatency>305940</AbsoluteTimeLatency>
+                <PipelineII>13</PipelineII>
+                <PipelineDepth>22</PipelineDepth>
+                <InstanceList/>
+            </conv1_f_conv1_h_conv1_w>
+        </SummaryOfLoopLatency>
+    </PerformanceEstimates>
+    <AreaEstimates>
+        <Resources>
+            <BRAM_18K>1</BRAM_18K>
+            <DSP>1</DSP>
+            <FF>962</FF>
+            <LUT>3587</LUT>
+            <URAM>0</URAM>
+        </Resources>
+        <AvailableResources>
+            <BRAM_18K>270</BRAM_18K>
+            <DSP>240</DSP>
+            <FF>126800</FF>
+            <LUT>63400</LUT>
+            <URAM>0</URAM>
+        </AvailableResources>
+    </AreaEstimates>
+    <InterfaceSummary>
+        <RtlPorts>
+            <name>ap_clk</name>
+            <Object>conv1</Object>
+            <Type>return value</Type>
+            <Scope/>
+            <IOProtocol>ap_ctrl_hs</IOProtocol>
+            <IOConfig/>
+            <Dir>in</Dir>
+            <Bits>1</Bits>
+            <Attribute>control</Attribute>
+        </RtlPorts>
+        <RtlPorts>
+            <name>ap_rst</name>
+            <Object>conv1</Object>
+            <Type>return value</Type>
+            <Scope/>
+            <IOProtocol>ap_ctrl_hs</IOProtocol>
+            <IOConfig/>
+            <Dir>in</Dir>
+            <Bits>1</Bits>
+            <Attribute>control</Attribute>
+        </RtlPorts>
+        <RtlPorts>
+            <name>ap_start</name>
+            <Object>conv1</Object>
+            <Type>return value</Type>
+            <Scope/>
+            <IOProtocol>ap_ctrl_hs</IOProtocol>
+            <IOConfig/>
+            <Dir>in</Dir>
+            <Bits>1</Bits>
+            <Attribute>control</Attribute>
+        </RtlPorts>
+        <RtlPorts>
+            <name>ap_done</name>
+            <Object>conv1</Object>
+            <Type>return value</Type>
+            <Scope/>
+            <IOProtocol>ap_ctrl_hs</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>1</Bits>
+            <Attribute>control</Attribute>
+        </RtlPorts>
+        <RtlPorts>
+            <name>ap_idle</name>
+            <Object>conv1</Object>
+            <Type>return value</Type>
+            <Scope/>
+            <IOProtocol>ap_ctrl_hs</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>1</Bits>
+            <Attribute>control</Attribute>
+        </RtlPorts>
+        <RtlPorts>
+            <name>ap_ready</name>
+            <Object>conv1</Object>
+            <Type>return value</Type>
+            <Scope/>
+            <IOProtocol>ap_ctrl_hs</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>1</Bits>
+            <Attribute>control</Attribute>
+        </RtlPorts>
+        <RtlPorts>
+            <name>x_address0</name>
+            <Object>x</Object>
+            <Type>array</Type>
+            <Scope/>
+            <IOProtocol>ap_memory</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>10</Bits>
+            <Attribute>address</Attribute>
+            <CType>int</CType>
+        </RtlPorts>
+        <RtlPorts>
+            <name>x_ce0</name>
+            <Object>x</Object>
+            <Type>array</Type>
+            <Scope/>
+            <IOProtocol>ap_memory</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>1</Bits>
+            <Attribute>control</Attribute>
+            <CType>int</CType>
+        </RtlPorts>
+        <RtlPorts>
+            <name>x_q0</name>
+            <Object>x</Object>
+            <Type>array</Type>
+            <Scope/>
+            <IOProtocol>ap_memory</IOProtocol>
+            <IOConfig/>
+            <Dir>in</Dir>
+            <Bits>8</Bits>
+            <Attribute>data</Attribute>
+            <CType>int</CType>
+        </RtlPorts>
+        <RtlPorts>
+            <name>x_address1</name>
+            <Object>x</Object>
+            <Type>array</Type>
+            <Scope/>
+            <IOProtocol>ap_memory</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>10</Bits>
+            <Attribute>address</Attribute>
+            <CType>int</CType>
+        </RtlPorts>
+        <RtlPorts>
+            <name>x_ce1</name>
+            <Object>x</Object>
+            <Type>array</Type>
+            <Scope/>
+            <IOProtocol>ap_memory</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>1</Bits>
+            <Attribute>control</Attribute>
+            <CType>int</CType>
+        </RtlPorts>
+        <RtlPorts>
+            <name>x_q1</name>
+            <Object>x</Object>
+            <Type>array</Type>
+            <Scope/>
+            <IOProtocol>ap_memory</IOProtocol>
+            <IOConfig/>
+            <Dir>in</Dir>
+            <Bits>8</Bits>
+            <Attribute>data</Attribute>
+            <CType>int</CType>
+        </RtlPorts>
+        <RtlPorts>
+            <name>y_address0</name>
+            <Object>y</Object>
+            <Type>array</Type>
+            <Scope/>
+            <IOProtocol>ap_memory</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>12</Bits>
+            <Attribute>address</Attribute>
+            <CType>int</CType>
+        </RtlPorts>
+        <RtlPorts>
+            <name>y_ce0</name>
+            <Object>y</Object>
+            <Type>array</Type>
+            <Scope/>
+            <IOProtocol>ap_memory</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>1</Bits>
+            <Attribute>control</Attribute>
+            <CType>int</CType>
+        </RtlPorts>
+        <RtlPorts>
+            <name>y_we0</name>
+            <Object>y</Object>
+            <Type>array</Type>
+            <Scope/>
+            <IOProtocol>ap_memory</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>1</Bits>
+            <Attribute>control</Attribute>
+            <CType>int</CType>
+        </RtlPorts>
+        <RtlPorts>
+            <name>y_d0</name>
+            <Object>y</Object>
+            <Type>array</Type>
+            <Scope/>
+            <IOProtocol>ap_memory</IOProtocol>
+            <IOConfig/>
+            <Dir>out</Dir>
+            <Bits>8</Bits>
+            <Attribute>data</Attribute>
+            <CType>int</CType>
+        </RtlPorts>
+    </InterfaceSummary>
+    <RTLDesignHierarchy>
+        <TopModule MAX_DEPTH="3">
+            <ModuleName>conv1</ModuleName>
+            <InstancesList>
+                <Instance>
+                    <InstName>grp_axc_requant_fu_611</InstName>
+                    <ModuleName>axc_requant</ModuleName>
+                    <IsCompInst>true</IsCompInst>
+                    <ID>611</ID>
+                    <BindInstances>mul_24ns_21s_45_1_1_U1 ret_V_fu_72_p2</BindInstances>
+                </Instance>
+            </InstancesList>
+            <BindInstances>empty_fu_1336_p2 empty_11_fu_1345_p2 add_ln27_25_fu_684_p2 add_ln27_fu_696_p2 p_mid144_fu_1369_p2 mul_2ns_6ns_7_1_1_U5 add_ln27_1_fu_846_p2 add_ln27_2_fu_890_p2 add_ln27_3_fu_900_p2 add_ln27_4_fu_971_p2 add_ln27_5_fu_981_p2 add_ln27_6_fu_1041_p2 add_ln27_7_fu_1051_p2 add_ln27_8_fu_1123_p2 add_ln27_9_fu_1133_p2 add_ln27_10_fu_1244_p2 add_ln27_11_fu_1254_p2 add_ln27_12_fu_1390_p2 add_ln27_13_fu_1400_p2 add_ln27_14_fu_1570_p2 add_ln27_15_fu_1580_p2 add_ln27_16_fu_1652_p2 add_ln27_17_fu_1662_p2 add_ln27_18_fu_1747_p2 add_ln27_19_fu_1757_p2 add_ln27_20_fu_1829_p2 add_ln27_21_fu_1839_p2 add_ln27_22_fu_1937_p2 add_ln27_23_fu_1947_p2 add_ln27_24_fu_2016_p2 indvars_iv_next3331_dup_fu_773_p2 indvars_iv_next3331_mid1_fu_910_p2 indvars_iv_next333166_fu_915_p2 p_mid1_fu_1143_p2 empty_13_fu_1148_p2 p_mid15_fu_1420_p2 empty_14_fu_1425_p2 p_mid17_fu_1444_p2 empty_15_fu_1449_p2 p_mid19_fu_1468_p2 mul_8ns_8s_16_1_1_U6 add_ln36_fu_808_p2 mul_8ns_8s_16_1_1_U7 ret_V_2_fu_1067_p2 add_ln40_fu_856_p2 mul_8ns_8s_16_1_1_U8 add_ln43_fu_873_p2 mul_8ns_8s_16_1_1_U9 ret_V_5_fu_1197_p2 ret_V_6_fu_1210_p2 add_ln48_fu_946_p2 mul_8ns_8s_16_1_1_U10 mul_8ns_8s_16_1_1_U11 ret_V_9_fu_1292_p2 mul_8ns_8s_16_1_1_U12 mul_8ns_8s_16_1_1_U13 ret_V_12_fu_1510_p2 ret_V_13_fu_1523_p2 ret_V_14_fu_1536_p2 mul_8ns_8s_16_1_1_U14 mul_8ns_8s_16_1_1_U15 ret_V_17_fu_1618_p2 mul_8ns_8s_16_1_1_U16 mul_8ns_8s_16_1_1_U17 ret_V_20_fu_1700_p2 ret_V_21_fu_1713_p2 mul_8ns_8s_16_1_1_U18 mul_8ns_8s_16_1_1_U19 ret_V_24_fu_1795_p2 mul_8ns_8s_16_1_1_U20 mul_8ns_8s_16_1_1_U21 ret_V_27_fu_1877_p2 ret_V_28_fu_1890_p2 ret_V_29_fu_1903_p2 ret_V_30_fu_1974_p2 mul_8ns_8s_16_1_1_U22 mul_8ns_8s_16_1_1_U23 ret_V_33_fu_1986_p2 mul_8ns_8s_16_1_1_U24 mul_8ns_8s_16_1_1_U25 ret_V_36_fu_2032_p2 ret_V_37_fu_2045_p2 mul_8ns_8s_16_1_1_U26 mul_8ns_8s_16_1_1_U27 ret_V_40_fu_2102_p2 mul_8ns_8s_16_1_1_U28 mul_8ns_8s_16_1_1_U29 ret_V_43_fu_2170_p2 ret_V_44_fu_2183_p2 ret_V_45_fu_2196_p2 mul_8ns_8s_16_1_1_U30 v1_100_V_fu_2267_p2 add_ln29_fu_734_p2 w_V_U</BindInstances>
+        </TopModule>
+    </RTLDesignHierarchy>
+    <ModuleInformation>
+        <Module>
+            <Name>axc_requant</Name>
+            <PerformanceEstimates>
+                <SummaryOfTimingAnalysis>
+                    <TargetClockPeriod>10.00</TargetClockPeriod>
+                    <ClockUncertainty>2.70</ClockUncertainty>
+                    <TargetInitiationInterval>1</TargetInitiationInterval>
+                    <EstimatedClockPeriod>6.698</EstimatedClockPeriod>
+                </SummaryOfTimingAnalysis>
+                <SummaryOfOverallLatency>
+                    <Best-caseLatency>1</Best-caseLatency>
+                    <Average-caseLatency>1</Average-caseLatency>
+                    <Worst-caseLatency>1</Worst-caseLatency>
+                    <Best-caseRealTimeLatency>10.000 ns</Best-caseRealTimeLatency>
+                    <Average-caseRealTimeLatency>10.000 ns</Average-caseRealTimeLatency>
+                    <Worst-caseRealTimeLatency>10.000 ns</Worst-caseRealTimeLatency>
+                    <PipelineInitiationInterval>1</PipelineInitiationInterval>
+                    <PipelineDepth>2</PipelineDepth>
+                    <PipelineType>yes</PipelineType>
+                </SummaryOfOverallLatency>
+            </PerformanceEstimates>
+            <AreaEstimates>
+                <Resources>
+                    <DSP>1</DSP>
+                    <AVAIL_DSP>240</AVAIL_DSP>
+                    <UTIL_DSP>~0</UTIL_DSP>
+                    <FF>45</FF>
+                    <AVAIL_FF>126800</AVAIL_FF>
+                    <UTIL_FF>~0</UTIL_FF>
+                    <LUT>98</LUT>
+                    <AVAIL_LUT>63400</AVAIL_LUT>
+                    <UTIL_LUT>~0</UTIL_LUT>
+                    <BRAM_18K>0</BRAM_18K>
+                    <AVAIL_BRAM>270</AVAIL_BRAM>
+                    <UTIL_BRAM>0</UTIL_BRAM>
+                    <URAM>0</URAM>
+                    <AVAIL_URAM>0</AVAIL_URAM>
+                    <UTIL_URAM>0</UTIL_URAM>
+                </Resources>
+            </AreaEstimates>
+            <BindNodes>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="1" ID="" IMPL="dsp" LATENCY="0" LOOP="" OPTYPE="mul" PRAGMA="yes" RTLNAME="mul_24ns_21s_45_1_1_U1" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_49"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_fu_72_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V"/>
+            </BindNodes>
+        </Module>
+        <Module>
+            <Name>conv1</Name>
+            <Loops>
+                <conv1_f_conv1_h_conv1_w/>
+            </Loops>
+            <PerformanceEstimates>
+                <SummaryOfTimingAnalysis>
+                    <TargetClockPeriod>10.00</TargetClockPeriod>
+                    <ClockUncertainty>2.70</ClockUncertainty>
+                    <EstimatedClockPeriod>7.114</EstimatedClockPeriod>
+                </SummaryOfTimingAnalysis>
+                <SummaryOfOverallLatency>
+                    <Best-caseLatency>30596</Best-caseLatency>
+                    <Average-caseLatency>30596</Average-caseLatency>
+                    <Worst-caseLatency>30596</Worst-caseLatency>
+                    <Best-caseRealTimeLatency>0.306 ms</Best-caseRealTimeLatency>
+                    <Average-caseRealTimeLatency>0.306 ms</Average-caseRealTimeLatency>
+                    <Worst-caseRealTimeLatency>0.306 ms</Worst-caseRealTimeLatency>
+                    <PipelineInitiationInterval>30597</PipelineInitiationInterval>
+                    <PipelineType>no</PipelineType>
+                </SummaryOfOverallLatency>
+                <SummaryOfLoopLatency>
+                    <conv1_f_conv1_h_conv1_w>
+                        <Name>conv1_f_conv1_h_conv1_w</Name>
+                        <Slack>7.30</Slack>
+                        <TripCount>2352</TripCount>
+                        <Latency>30594</Latency>
+                        <AbsoluteTimeLatency>0.306 ms</AbsoluteTimeLatency>
+                        <PipelineII>13</PipelineII>
+                        <PipelineDepth>22</PipelineDepth>
+                        <PipelineType>yes</PipelineType>
+                        <InstanceList>
+                            <Instance>grp_axc_requant_fu_611</Instance>
+                        </InstanceList>
+                    </conv1_f_conv1_h_conv1_w>
+                </SummaryOfLoopLatency>
+            </PerformanceEstimates>
+            <AreaEstimates>
+                <Resources>
+                    <BRAM_18K>1</BRAM_18K>
+                    <AVAIL_BRAM>270</AVAIL_BRAM>
+                    <UTIL_BRAM>~0</UTIL_BRAM>
+                    <DSP>1</DSP>
+                    <AVAIL_DSP>240</AVAIL_DSP>
+                    <UTIL_DSP>~0</UTIL_DSP>
+                    <FF>962</FF>
+                    <AVAIL_FF>126800</AVAIL_FF>
+                    <UTIL_FF>~0</UTIL_FF>
+                    <LUT>3587</LUT>
+                    <AVAIL_LUT>63400</AVAIL_LUT>
+                    <UTIL_LUT>5</UTIL_LUT>
+                    <URAM>0</URAM>
+                    <AVAIL_URAM>0</AVAIL_URAM>
+                    <UTIL_URAM>0</UTIL_URAM>
+                </Resources>
+            </AreaEstimates>
+            <BindNodes>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op sub" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="sub" PRAGMA="" RTLNAME="empty_fu_1336_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="empty"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="empty_11_fu_1345_p2" SOURCE="kernel.cpp:29" URAM="0" VARIABLE="empty_11"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_25_fu_684_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_25"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_fu_696_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op sub" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="sub" PRAGMA="" RTLNAME="p_mid144_fu_1369_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="p_mid144"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_2ns_6ns_7_1_1_U5" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="mul_ln27"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_1_fu_846_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_1"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_2_fu_890_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_2"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_3_fu_900_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_3"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_4_fu_971_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_4"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_5_fu_981_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_5"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_6_fu_1041_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_6"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_7_fu_1051_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_7"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_8_fu_1123_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_8"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_9_fu_1133_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_9"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_10_fu_1244_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_10"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_11_fu_1254_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_11"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_12_fu_1390_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_12"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_13_fu_1400_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_13"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_14_fu_1570_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_14"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_15_fu_1580_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_15"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_16_fu_1652_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_16"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_17_fu_1662_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_17"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_18_fu_1747_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_18"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_19_fu_1757_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_19"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_20_fu_1829_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_20"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_21_fu_1839_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_21"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_22_fu_1937_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_22"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_23_fu_1947_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_23"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln27_24_fu_2016_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="add_ln27_24"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="indvars_iv_next3331_dup_fu_773_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="indvars_iv_next3331_dup"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="indvars_iv_next3331_mid1_fu_910_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="indvars_iv_next3331_mid1"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="indvars_iv_next333166_fu_915_p2" SOURCE="" URAM="0" VARIABLE="indvars_iv_next333166"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="p_mid1_fu_1143_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="p_mid1"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="empty_13_fu_1148_p2" SOURCE="" URAM="0" VARIABLE="empty_13"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="p_mid15_fu_1420_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="p_mid15"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="empty_14_fu_1425_p2" SOURCE="" URAM="0" VARIABLE="empty_14"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="p_mid17_fu_1444_p2" SOURCE="kernel.cpp:27" URAM="0" VARIABLE="p_mid17"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="empty_15_fu_1449_p2" SOURCE="" URAM="0" VARIABLE="empty_15"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="p_mid19_fu_1468_p2" SOURCE="kernel.cpp:29" URAM="0" VARIABLE="p_mid19"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U6" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln36_fu_808_p2" SOURCE="kernel.cpp:36" URAM="0" VARIABLE="add_ln36"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U7" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_1"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_2_fu_1067_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_2"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln40_fu_856_p2" SOURCE="kernel.cpp:40" URAM="0" VARIABLE="add_ln40"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U8" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_3"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln43_fu_873_p2" SOURCE="kernel.cpp:43" URAM="0" VARIABLE="add_ln43"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U9" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_4"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_5_fu_1197_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_5"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_6_fu_1210_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_6"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln48_fu_946_p2" SOURCE="kernel.cpp:48" URAM="0" VARIABLE="add_ln48"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U10" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_7"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U11" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_8"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_9_fu_1292_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_9"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U12" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_10"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U13" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_11"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_12_fu_1510_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_12"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_13_fu_1523_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_13"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_14_fu_1536_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_14"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U14" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_15"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U15" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_16"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_17_fu_1618_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_17"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U16" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_18"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U17" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_19"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_20_fu_1700_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_20"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_21_fu_1713_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_21"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U18" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_22"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U19" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_23"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_24_fu_1795_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_24"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U20" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_25"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U21" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_26"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_27_fu_1877_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_27"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_28_fu_1890_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_28"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_29_fu_1903_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_29"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_30_fu_1974_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_30"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U22" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_31"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U23" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_32"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_33_fu_1986_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_33"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U24" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_34"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U25" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_35"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_36_fu_2032_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_36"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_37_fu_2045_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_37"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U26" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_38"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U27" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_39"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_40_fu_2102_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_40"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U28" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_41"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U29" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_42"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_43_fu_2170_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_43"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_44_fu_2183_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_44"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="ret_V_45_fu_2196_p2" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1495" URAM="0" VARIABLE="ret_V_45"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_8s_16_1_1_U30" SOURCE="/tools/Xilinx/Vitis_HLS/2022.2/common/technology/autopilot/ap_int_base.h:1494" URAM="0" VARIABLE="ret_V_46"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="v1_100_V_fu_2267_p2" SOURCE="kernel.cpp:133" URAM="0" VARIABLE="v1_100_V"/>
+                <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op add" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="conv1_f_conv1_h_conv1_w" OPTYPE="add" PRAGMA="" RTLNAME="add_ln29_fu_734_p2" SOURCE="kernel.cpp:29" URAM="0" VARIABLE="add_ln29"/>
+                <BindNode BINDTYPE="storage" BRAM="1" BUNDLEDNAME="" DISPNAME="bind_storage rom_2p" DSP="0" ID="" IMPL="bram" LATENCY="1" LOOP="" OPTYPE="rom_2p" PRAGMA="pragma" RTLNAME="w_V_U" SOURCE="kernel.cpp:26" URAM="0" VARIABLE="w_V"/>
+            </BindNodes>
+        </Module>
+    </ModuleInformation>
+    <FIFOInformation/>
+    <UserConfigCommands>
+        <config_op>
+            <ENTRY impl="fabric" op="mul"/>
+        </config_op>
+        <config_array_partition throughput_driven="off"/>
+        <config_compile pipeline_loops="0"/>
+    </UserConfigCommands>
+    <Args>
+        <Arg ArgName="x" index="0" direction="in" srcType="ap_uint&lt;8&gt;*" srcSize="8">
+            <hwRefs>
+                <hwRef type="port" interface="x_address0" name="x_address0" usage="address" direction="out"/>
+                <hwRef type="port" interface="x_ce0" name="x_ce0" usage="control" direction="out"/>
+                <hwRef type="port" interface="x_q0" name="x_q0" usage="data" direction="in"/>
+                <hwRef type="port" interface="x_address1" name="x_address1" usage="address" direction="out"/>
+                <hwRef type="port" interface="x_ce1" name="x_ce1" usage="control" direction="out"/>
+                <hwRef type="port" interface="x_q1" name="x_q1" usage="data" direction="in"/>
+            </hwRefs>
+        </Arg>
+        <Arg ArgName="y" index="1" direction="out" srcType="ap_uint&lt;8&gt;*" srcSize="8">
+            <hwRefs>
+                <hwRef type="port" interface="y_address0" name="y_address0" usage="address" direction="out"/>
+                <hwRef type="port" interface="y_ce0" name="y_ce0" usage="control" direction="out"/>
+                <hwRef type="port" interface="y_we0" name="y_we0" usage="control" direction="out"/>
+                <hwRef type="port" interface="y_d0" name="y_d0" usage="data" direction="out"/>
+            </hwRefs>
+        </Arg>
+    </Args>
+    <Interfaces>
+        <Interface InterfaceName="ap_clk" type="clock" busTypeName="clock" mode="slave">
+            <busParams>
+                <busParam busParamName="ASSOCIATED_RESET">ap_rst</busParam>
+            </busParams>
+            <portMaps>
+                <portMap portMapName="ap_clk">CLK</portMap>
+            </portMaps>
+            <ports>
+                <port>ap_clk</port>
+            </ports>
+        </Interface>
+        <Interface InterfaceName="ap_rst" type="reset" busTypeName="reset" mode="slave">
+            <busParams>
+                <busParam busParamName="POLARITY">ACTIVE_HIGH</busParam>
+            </busParams>
+            <portMaps>
+                <portMap portMapName="ap_rst">RST</portMap>
+            </portMaps>
+            <ports>
+                <port>ap_rst</port>
+            </ports>
+        </Interface>
+        <Interface InterfaceName="ap_ctrl" type="ap_ctrl" busTypeName="acc_handshake" mode="slave">
+            <portMaps>
+                <portMap portMapName="ap_start">start</portMap>
+                <portMap portMapName="ap_done">done</portMap>
+                <portMap portMapName="ap_idle">idle</portMap>
+                <portMap portMapName="ap_ready">ready</portMap>
+            </portMaps>
+            <ports>
+                <port>ap_done</port>
+                <port>ap_idle</port>
+                <port>ap_ready</port>
+                <port>ap_start</port>
+            </ports>
+        </Interface>
+        <Interface InterfaceName="x_address0" type="data" busTypeName="data" protocol="ap_memory" mode="master" dataWidth="10">
+            <portMaps>
+                <portMap portMapName="x_address0">DATA</portMap>
+            </portMaps>
+            <ports>
+                <port>x_address0</port>
+            </ports>
+            <constraints>
+                <constraint constraint_type="pragma interface" mode="ap_memory" register_option="0" argName="x"/>
+            </constraints>
+        </Interface>
+        <Interface InterfaceName="x_q0" type="data" busTypeName="data" protocol="ap_memory" mode="slave" dataWidth="8">
+            <portMaps>
+                <portMap portMapName="x_q0">DATA</portMap>
+            </portMaps>
+            <ports>
+                <port>x_q0</port>
+            </ports>
+            <constraints>
+                <constraint constraint_type="pragma interface" mode="ap_memory" register_option="0" argName="x"/>
+            </constraints>
+        </Interface>
+        <Interface InterfaceName="x_address1" type="data" busTypeName="data" protocol="ap_memory" mode="master" dataWidth="10">
+            <portMaps>
+                <portMap portMapName="x_address1">DATA</portMap>
+            </portMaps>
+            <ports>
+                <port>x_address1</port>
+            </ports>
+            <constraints>
+                <constraint constraint_type="pragma interface" mode="ap_memory" register_option="0" argName="x"/>
+            </constraints>
+        </Interface>
+        <Interface InterfaceName="x_q1" type="data" busTypeName="data" protocol="ap_memory" mode="slave" dataWidth="8">
+            <portMaps>
+                <portMap portMapName="x_q1">DATA</portMap>
+            </portMaps>
+            <ports>
+                <port>x_q1</port>
+            </ports>
+            <constraints>
+                <constraint constraint_type="pragma interface" mode="ap_memory" register_option="0" argName="x"/>
+            </constraints>
+        </Interface>
+        <Interface InterfaceName="y_address0" type="data" busTypeName="data" protocol="ap_memory" mode="master" dataWidth="12">
+            <portMaps>
+                <portMap portMapName="y_address0">DATA</portMap>
+            </portMaps>
+            <ports>
+                <port>y_address0</port>
+            </ports>
+            <constraints>
+                <constraint constraint_type="pragma interface" mode="ap_memory" register_option="0" argName="y"/>
+            </constraints>
+        </Interface>
+        <Interface InterfaceName="y_d0" type="data" busTypeName="data" protocol="ap_memory" mode="master" dataWidth="8">
+            <portMaps>
+                <portMap portMapName="y_d0">DATA</portMap>
+            </portMaps>
+            <ports>
+                <port>y_d0</port>
+            </ports>
+            <constraints>
+                <constraint constraint_type="pragma interface" mode="ap_memory" register_option="0" argName="y"/>
+            </constraints>
+        </Interface>
+    </Interfaces>
+    <ReportHWInterface>
+        <section name="HW Interfaces" level="0">
+            <item name="AP_MEMORY">
+                <table isCollapsed="0">
+                    <keys size="2">Interface, Bitwidth</keys>
+                    <column name="x_address0">10, , </column>
+                    <column name="x_address1">10, , </column>
+                    <column name="x_q0">8, , </column>
+                    <column name="x_q1">8, , </column>
+                    <column name="y_address0">12, , </column>
+                    <column name="y_d0">8, , </column>
+                </table>
+            </item>
+            <item name="TOP LEVEL CONTROL">
+                <table isCollapsed="0">
+                    <keys size="3">Interface, Type, Ports</keys>
+                    <column name="ap_clk">clock, ap_clk, </column>
+                    <column name="ap_rst">reset, ap_rst, </column>
+                    <column name="ap_ctrl">ap_ctrl_hs, ap_done ap_idle ap_ready ap_start, </column>
+                </table>
+            </item>
+        </section>
+    </ReportHWInterface>
+    <ReportSWInterface>
+        <section name="SW I/O Information" level="0">
+            <item name="Top Function Arguments">
+                <table isCollapsed="1">
+                    <keys size="3">Argument, Direction, Datatype</keys>
+                    <column name="x">in, ap_uint&lt;8&gt;*</column>
+                    <column name="y">out, ap_uint&lt;8&gt;*</column>
+                </table>
+            </item>
+            <item name="SW-to-HW Mapping">
+                <table isCollapsed="1">
+                    <keys size="4">Argument, HW Interface, HW Type, HW Usage</keys>
+                    <column name="x">x_address0, port, offset, </column>
+                    <column name="x">x_ce0, port, , </column>
+                    <column name="x">x_q0, port, , </column>
+                    <column name="x">x_address1, port, offset, </column>
+                    <column name="x">x_ce1, port, , </column>
+                    <column name="x">x_q1, port, , </column>
+                    <column name="y">y_address0, port, offset, </column>
+                    <column name="y">y_ce0, port, , </column>
+                    <column name="y">y_we0, port, , </column>
+                    <column name="y">y_d0, port, , </column>
+                </table>
+            </item>
+        </section>
+    </ReportSWInterface>
+    <PragmaReport>
+        <Pragma type="inline" location="kernel.cpp:12" status="valid" parentFunction="axc_requant" variable="" isDirective="0" options="off"/>
+        <Pragma type="bind_op" location="kernel.cpp:14" status="valid" parentFunction="axc_requant" variable="p" isDirective="0" options="variable=p op=mul impl=dsp"/>
+        <Pragma type="interface" location="kernel.cpp:21" status="valid" parentFunction="conv1" variable="x" isDirective="0" options="mode=ap_memory port=x storage_type=ram_t2p"/>
+        <Pragma type="interface" location="kernel.cpp:22" status="valid" parentFunction="conv1" variable="y" isDirective="0" options="mode=ap_memory port=y storage_type=ram_t2p"/>
+        <Pragma type="bind_storage" location="kernel.cpp:26" status="valid" parentFunction="conv1" variable="w" isDirective="0" options="variable=w type=rom_2p impl=bram"/>
+        <Pragma type="pipeline" location="kernel.cpp:28" status="valid" parentFunction="conv1" variable="" isDirective="0" options="off"/>
+        <Pragma type="pipeline" location="kernel.cpp:30" status="valid" parentFunction="conv1" variable="" isDirective="0" options="off"/>
+        <Pragma type="pipeline" location="kernel.cpp:32" status="valid" parentFunction="conv1" variable="" isDirective="0" options="II=1"/>
+    </PragmaReport>
+</profile>
+

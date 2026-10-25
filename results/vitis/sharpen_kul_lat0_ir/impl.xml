@@ -60,7 +60,7 @@
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U5" BINDMODULE="sharpen_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U5" RTLNAME="sharpen_mul_8ns_10ns_17_1_1">
       <Resources LUT="48"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U5" SOURCE="kernel.cpp:279" URAM="0" VARIABLE="mul_ln279"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U5" SOURCE="kernel.cpp:281" URAM="0" VARIABLE="mul_ln281"/>
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U6" BINDMODULE="sharpen_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U6" RTLNAME="sharpen_mul_8ns_10ns_17_1_1">
       <Resources LUT="45"/>
@@ -163,8 +163,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U6/dout__73_carry__1" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="67"/>
       <CELL NAME="tmp_reg_918_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="807"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.192" DATAPATH_LOGIC_DELAY="2.828" DATAPATH_NET_DELAY="2.364" ENDPOINT_PIN="tmp_22_reg_908_reg[6]/D" LOGIC_LEVELS="5" MAX_FANOUT="5" SLACK="-0.167" STARTPOINT_PIN="add_ln279_reg_892_reg[6]_replica/C">
-      <CELL NAME="add_ln279_reg_892_reg[6]_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="783"/>
+    <TPATH DATAPATH_DELAY="5.192" DATAPATH_LOGIC_DELAY="2.828" DATAPATH_NET_DELAY="2.364" ENDPOINT_PIN="tmp_22_reg_908_reg[6]/D" LOGIC_LEVELS="5" MAX_FANOUT="5" SLACK="-0.167" STARTPOINT_PIN="add_ln281_reg_892_reg[6]_replica/C">
+      <CELL NAME="add_ln281_reg_892_reg[6]_replica" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="783"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/tmp_22_reg_908_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/tmp_22_reg_908_reg[6]_i_13" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U5/tmp_22_reg_908[6]_i_4" PRIMITIVE_TYPE="LUT.others.LUT5" LINE_NUMBER="19"/>
@@ -183,7 +183,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/sharpen_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 14:43:38 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 21:05:13 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

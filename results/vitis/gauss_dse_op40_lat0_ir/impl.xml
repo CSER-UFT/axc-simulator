@@ -68,7 +68,7 @@
     </RtlModule>
     <RtlModule CELL="inst/mul_8ns_10ns_17_1_1_U21" BINDMODULE="gauss_mul_8ns_10ns_17_1_1" DEPTH="1" TYPE="resource" MODULENAME="mul_8ns_10ns_17_1_1" DISPNAME="mul_8ns_10ns_17_1_1_U21" RTLNAME="gauss_mul_8ns_10ns_17_1_1">
       <Resources LUT="49"/>
-      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U21" SOURCE="kernel.cpp:724" URAM="0" VARIABLE="mul_ln724"/>
+      <BindNode BINDTYPE="op" BRAM="0" BUNDLEDNAME="" DISPNAME="bind_op mul" DSP="0" ID="" IMPL="fabric" LATENCY="0" LOOP="rows_cols" OPTYPE="mul" PRAGMA="" RTLNAME="mul_8ns_10ns_17_1_1_U21" SOURCE="kernel.cpp:726" URAM="0" VARIABLE="mul_ln726"/>
     </RtlModule>
     <RtlModule CELL="inst/urem_8ns_3ns_2_12_1_U19" BINDMODULE="gauss_urem_8ns_3ns_2_12_1" DEPTH="1" TYPE="rtl" MODULENAME="urem_8ns_3ns_2_12_1" DISPNAME="urem_8ns_3ns_2_12_1_U19" RTLNAME="gauss_urem_8ns_3ns_2_12_1">
       <Resources FF="39" LUT="31"/>
@@ -157,8 +157,8 @@
       <CELL NAME="mul_8ns_10ns_17_1_1_U20/tmp_70_reg_1137_reg[6]_i_2" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="tmp_70_reg_1137_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1179"/>
     </TPATH>
-    <TPATH DATAPATH_DELAY="5.061" DATAPATH_LOGIC_DELAY="2.574" DATAPATH_NET_DELAY="2.487" ENDPOINT_PIN="tmp_72_reg_1153_reg[6]/D" LOGIC_LEVELS="4" MAX_FANOUT="13" SLACK="-0.036" STARTPOINT_PIN="add_ln724_reg_1142_reg[6]/C">
-      <CELL NAME="add_ln724_reg_1142_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1086"/>
+    <TPATH DATAPATH_DELAY="5.061" DATAPATH_LOGIC_DELAY="2.574" DATAPATH_NET_DELAY="2.487" ENDPOINT_PIN="tmp_72_reg_1153_reg[6]/D" LOGIC_LEVELS="4" MAX_FANOUT="13" SLACK="-0.036" STARTPOINT_PIN="add_ln726_reg_1142_reg[6]/C">
+      <CELL NAME="add_ln726_reg_1142_reg[6]" PRIMITIVE_TYPE="FLOP_LATCH.flop.FDRE" LINE_NUMBER="1086"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U21/tmp_72_reg_1153_reg[2]_i_20" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U21/tmp_72_reg_1153_reg[6]_i_12" PRIMITIVE_TYPE="CARRY.others.CARRY4" LINE_NUMBER="19"/>
       <CELL NAME="mul_8ns_10ns_17_1_1_U21/tmp_72_reg_1153[6]_i_4" PRIMITIVE_TYPE="LUT.others.LUT6" LINE_NUMBER="19"/>
@@ -186,7 +186,7 @@
     <ReportFile TYPE="utilization_hierarchical" PATH="verilog/report/gauss_utilization_hierarchical_routed.rpt"/>
   </VivadoReportFiles>
   <GeneralInfo NAME="General Information">
-    <item NAME="Date" VALUE="Sun Oct 18 14:34:30 -03 2026"/>
+    <item NAME="Date" VALUE="Sat Oct 24 21:10:32 -03 2026"/>
     <item NAME="Version" VALUE="2022.2 (Build 3670227 on Oct 13 2022)"/>
     <item NAME="Project" VALUE="proj"/>
     <item NAME="Solution" VALUE="solution1 (Vivado IP Flow Target)"/>

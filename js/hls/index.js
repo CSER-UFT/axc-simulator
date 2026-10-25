@@ -44,6 +44,25 @@ export function partitionLogic(design, model = MODEL) {
         const stride = dims.map((_, k) => dims.slice(k + 1).reduce((a, b) => a * b, 1));
         const size = dims.reduce((a, b) => a * b, 1) / (flat0 ? flat0.factor : 1);
         const aw = bitsFor([0, Math.max(1, size - 1)]);
+        // Dimensões internas potência de 2: o endereço é a concatenação dos índices de cada dimensão, e as somas
+        // (base e deslocamentos) têm a largura da dimensão, não a do endereço inteiro (rodada do fim de semana: a
+        // conv1 da MiniLenet, x[32][32] com 24 deslocamentos, tem cerca de 100 LUTs de endereço no Vivado; o modelo
+        // com somas de 10 bits dava 492).
+        if (piped && dims.length > 1 && !flat0 && dims.slice(1).every((x) => pow2(x)) && !n.idx.some((a, k) => byDim.has(k) && !pow2(byDim.get(k).factor) && Object.keys(a.t).some((v) => a.t[v] !== 0))) {
+            n.idx.forEach((a, k) => {
+                const F = byDim.get(k)?.factor ?? 1;
+                const vars = Object.keys(a.t).filter((v) => a.t[v] !== 0);
+                if (!vars.length) return;
+                const w = bitsFor([0, Math.max(1, dims[k] - 1)]);
+                let t = 0;
+                const kk = [];
+                for (const v of vars) { t += digits(Math.abs(Math.floor(a.t[v] / F))) || 0; kk.push(`${v}*${Math.floor(a.t[v] / F)}`); }
+                const bk = `${arr.name}:d${k}:${kk.join('+')}`;
+                bases.set(bk, { array: arr.name, w, adders: Math.max(0, t - 1) });
+                const o = Math.floor(a.c / F);
+                if (o) offsets.add(`${bk}+${o}#${w}`);
+            });
+        } else {
         let terms = 0, off = 0;
         const key = [];
         n.idx.forEach((a, k) => {
@@ -59,6 +78,7 @@ export function partitionLogic(design, model = MODEL) {
         const bk = `${arr.name}:${key.join('+')}`;
         bases.set(bk, { array: arr.name, w: aw, adders: Math.max(0, terms - 1) });
         if (off) offsets.add(`${bk}+${off}#${aw}`);
+        }
         }
         if (!n.bank || n.bank.exact || n.bank.banks <= 1) continue;
         // Bancos escolhidos em tempo de execução: só as dimensões em que o banco depende das variáveis dos laços.

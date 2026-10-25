@@ -1,6 +1,6 @@
 {
  "part": "xc7a100tcsg324-1",
- "collected": "2026-10-19T10:40:08.935Z",
+ "collected": "2026-10-25T01:05:42.774Z",
  "rows": [
   {
    "case": "gauss_src",
@@ -15,7 +15,7 @@
     "critPs": 4026,
     "luts": 752,
     "carry4": 70,
-    "ff": 632,
+    "ff": 654,
     "areaUm2": 18061.69663766234,
     "energyFj": 2062376610.090901,
     "loops": [
@@ -57,7 +57,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -85,6 +86,48 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 84,
+      "ff": 3,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 185,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_6ns_13_1_1",
+      "count": 4,
+      "lut": 72,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_7ns_14_1_1",
+      "count": 1,
+      "lut": 19,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 32,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 731,
     "ff": 618,
     "dsp": 0,
@@ -92,39 +135,7 @@
     "bram": 0,
     "achievedNs": 5.348,
     "timingMet": "FALSE",
-    "carry4": 138,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 84,
-      "ff": 3
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 185,
-      "ff": 0
-     },
-     {
-      "module": "mul_8ns_6ns_13_1_1",
-      "count": 4,
-      "lut": 72,
-      "ff": 0
-     },
-     {
-      "module": "mul_8ns_7ns_14_1_1",
-      "count": 1,
-      "lut": 19,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 32,
-      "ff": 39
-     }
-    ]
+    "carry4": 138
    },
    "modelFirst": {
     "cycles": 73340,
@@ -188,7 +199,7 @@
     "critPs": 4026,
     "luts": 752,
     "carry4": 70,
-    "ff": 632,
+    "ff": 654,
     "areaUm2": 18061.69663766234,
     "energyFj": 2062376610.090901,
     "loops": [
@@ -230,7 +241,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -258,6 +270,48 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 44,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 196,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_6ns_13_1_1",
+      "count": 4,
+      "lut": 72,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_7ns_14_1_1",
+      "count": 1,
+      "lut": 19,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 32,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 729,
     "ff": 590,
     "dsp": 0,
@@ -265,39 +319,7 @@
     "bram": 0,
     "achievedNs": 5.375,
     "timingMet": "FALSE",
-    "carry4": 141,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 44,
-      "ff": 1
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 196,
-      "ff": 0
-     },
-     {
-      "module": "mul_8ns_6ns_13_1_1",
-      "count": 4,
-      "lut": 72,
-      "ff": 0
-     },
-     {
-      "module": "mul_8ns_7ns_14_1_1",
-      "count": 1,
-      "lut": 19,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 32,
-      "ff": 39
-     }
-    ]
+    "carry4": 141
    },
    "modelFirst": {
     "cycles": 73340,
@@ -361,7 +383,7 @@
     "critPs": 4774,
     "luts": 683,
     "carry4": 43,
-    "ff": 516,
+    "ff": 538,
     "areaUm2": 12462.336467532468,
     "energyFj": 1326381406.2080796,
     "loops": [
@@ -391,7 +413,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -419,6 +442,32 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 90,
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 164,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 655,
     "ff": 565,
     "dsp": 0,
@@ -426,27 +475,7 @@
     "bram": 0,
     "achievedNs": 5.791,
     "timingMet": "FALSE",
-    "carry4": 118,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 90,
-      "ff": 2
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 164,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 31,
-      "ff": 39
-     }
-    ]
+    "carry4": 118
    },
    "modelFirst": {
     "cycles": 73150,
@@ -504,7 +533,7 @@
     "critPs": 4774,
     "luts": 683,
     "carry4": 43,
-    "ff": 516,
+    "ff": 538,
     "areaUm2": 12462.336467532468,
     "energyFj": 1326381406.2080796,
     "loops": [
@@ -534,7 +563,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -562,34 +592,40 @@
     ]
    },
    "impl": {
-    "lut": 674,
-    "ff": 567,
-    "dsp": 0,
-    "slice": 263,
-    "bram": 0,
-    "achievedNs": 5.89,
-    "timingMet": "FALSE",
-    "carry4": 118,
     "modules": [
      {
       "module": "flow_control_loop_pipe",
       "count": 1,
-      "lut": 90,
-      "ff": 1
+      "lut": 91,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
-      "lut": 168,
-      "ff": 0
+      "lut": 169,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
-    ]
+    ],
+    "lut": 675,
+    "ff": 568,
+    "dsp": 0,
+    "slice": 270,
+    "bram": 0,
+    "achievedNs": 5.533,
+    "timingMet": "FALSE",
+    "carry4": 118
    },
    "modelFirst": {
     "cycles": 73150,
@@ -647,7 +683,7 @@
     "critPs": 4619,
     "luts": 543,
     "carry4": 24,
-    "ff": 427,
+    "ff": 449,
     "areaUm2": 7034.948048701299,
     "energyFj": 746677485.108962,
     "loops": [
@@ -683,7 +719,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -711,6 +748,32 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 40,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 193,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 32,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 493,
     "ff": 431,
     "dsp": 0,
@@ -718,27 +781,7 @@
     "bram": 0,
     "achievedNs": 5.793,
     "timingMet": "FALSE",
-    "carry4": 94,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 40,
-      "ff": 1
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 193,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 32,
-      "ff": 39
-     }
-    ]
+    "carry4": 94
    },
    "modelFirst": {
     "cycles": 72960,
@@ -802,7 +845,7 @@
     "critPs": 4619,
     "luts": 543,
     "carry4": 24,
-    "ff": 427,
+    "ff": 449,
     "areaUm2": 7034.948048701299,
     "energyFj": 746677485.108962,
     "loops": [
@@ -838,7 +881,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -866,6 +910,32 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 38,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 197,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 32,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 496,
     "ff": 468,
     "dsp": 0,
@@ -873,27 +943,7 @@
     "bram": 0,
     "achievedNs": 5.307,
     "timingMet": "FALSE",
-    "carry4": 94,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 38,
-      "ff": 1
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 197,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 32,
-      "ff": 39
-     }
-    ]
+    "carry4": 94
    },
    "modelFirst": {
     "cycles": 72960,
@@ -957,7 +1007,7 @@
     "critPs": 4026,
     "luts": 1024,
     "carry4": 114,
-    "ff": 582,
+    "ff": 593,
     "areaUm2": 36969.23397402598,
     "energyFj": 79320569.61886753,
     "loops": [
@@ -1034,7 +1084,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -1062,6 +1113,32 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 105,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_6ns_13_1_1",
+      "count": 2,
+      "lut": 52,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mux_164_8_1_1",
+      "count": 16,
+      "lut": 304,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 1108,
     "ff": 946,
     "dsp": 0,
@@ -1069,27 +1146,7 @@
     "bram": 0,
     "achievedNs": 4.488,
     "timingMet": "TRUE",
-    "carry4": 125,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 105,
-      "ff": 1
-     },
-     {
-      "module": "mul_8ns_6ns_13_1_1",
-      "count": 2,
-      "lut": 52,
-      "ff": 0
-     },
-     {
-      "module": "mux_164_8_1_1",
-      "count": 16,
-      "lut": 304,
-      "ff": 0
-     }
-    ]
+    "carry4": 125
    },
    "modelFirst": {
     "cycles": 1018,
@@ -1151,7 +1208,7 @@
     "critPs": 4026,
     "luts": 1024,
     "carry4": 114,
-    "ff": 582,
+    "ff": 593,
     "areaUm2": 36969.23397402598,
     "energyFj": 79320569.61886753,
     "loops": [
@@ -1228,7 +1285,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -1256,6 +1314,24 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 108,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_6ns_13_1_1",
+      "count": 2,
+      "lut": 56,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 940,
     "ff": 857,
     "dsp": 0,
@@ -1263,21 +1339,7 @@
     "bram": 0,
     "achievedNs": 4.61,
     "timingMet": "TRUE",
-    "carry4": 107,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 108,
-      "ff": 1
-     },
-     {
-      "module": "mul_8ns_6ns_13_1_1",
-      "count": 2,
-      "lut": 56,
-      "ff": 0
-     }
-    ]
+    "carry4": 107
    },
    "modelFirst": {
     "cycles": 1018,
@@ -1339,7 +1401,7 @@
     "critPs": 4026,
     "luts": 137,
     "carry4": 19,
-    "ff": 89,
+    "ff": 100,
     "areaUm2": 6448.678800000001,
     "energyFj": 2668375.9004879994,
     "loops": [
@@ -1374,7 +1436,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -1402,6 +1465,24 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 18,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_8ns_16_1_1",
+      "count": 1,
+      "lut": 75,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 111,
     "ff": 76,
     "dsp": 0,
@@ -1409,21 +1490,7 @@
     "bram": 0,
     "achievedNs": 5.761,
     "timingMet": "FALSE",
-    "carry4": 18,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 18,
-      "ff": 1
-     },
-     {
-      "module": "mul_8ns_8ns_16_1_1",
-      "count": 1,
-      "lut": 75,
-      "ff": 0
-     }
-    ]
+    "carry4": 18
    },
    "modelFirst": {
     "cycles": 259,
@@ -1479,7 +1546,7 @@
     "critPs": 4026,
     "luts": 137,
     "carry4": 19,
-    "ff": 89,
+    "ff": 100,
     "areaUm2": 6448.678800000001,
     "energyFj": 2668375.9004879994,
     "loops": [
@@ -1514,7 +1581,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -1542,6 +1610,24 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 18,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_8ns_16_1_1",
+      "count": 1,
+      "lut": 75,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 111,
     "ff": 74,
     "dsp": 0,
@@ -1549,21 +1635,7 @@
     "bram": 0,
     "achievedNs": 5.723,
     "timingMet": "FALSE",
-    "carry4": 18,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 18,
-      "ff": 1
-     },
-     {
-      "module": "mul_8ns_8ns_16_1_1",
-      "count": 1,
-      "lut": 75,
-      "ff": 0
-     }
-    ]
+    "carry4": 18
    },
    "modelFirst": {
     "cycles": 259,
@@ -1619,7 +1691,7 @@
     "critPs": 4026,
     "luts": 457,
     "carry4": 70,
-    "ff": 305,
+    "ff": 327,
     "areaUm2": 14658.432637662338,
     "energyFj": 2786557257.9859066,
     "loops": [
@@ -1661,7 +1733,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -1689,34 +1762,40 @@
     ]
    },
    "impl": {
-    "lut": 398,
-    "ff": 424,
-    "dsp": 0,
-    "slice": 181,
-    "bram": 0,
-    "achievedNs": 4.541,
-    "timingMet": "TRUE",
-    "carry4": 93,
     "modules": [
      {
       "module": "flow_control_loop_pipe",
       "count": 1,
-      "lut": 75,
-      "ff": 1
+      "lut": 74,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_6ns_13_1_1",
       "count": 4,
       "lut": 84,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_7ns_14_1_1",
       "count": 1,
       "lut": 17,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      }
-    ]
+    ],
+    "lut": 397,
+    "ff": 424,
+    "dsp": 0,
+    "slice": 170,
+    "bram": 0,
+    "achievedNs": 4.499,
+    "timingMet": "TRUE",
+    "carry4": 93
    },
    "modelFirst": {
     "cycles": 181070,
@@ -1780,7 +1859,7 @@
     "critPs": 2945,
     "luts": 250,
     "carry4": 23,
-    "ff": 101,
+    "ff": 145,
     "areaUm2": 6341.011193912338,
     "energyFj": 23734743955.57616,
     "loops": [
@@ -1839,7 +1918,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -1891,6 +1971,48 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "K_V_ROM_AUTO_1R",
+      "count": 1,
+      "lut": 2,
+      "ff": 4,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 1,
+      "lut": 35,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_6ns_14_1_1",
+      "count": 1,
+      "lut": 32,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mux_32_8_1_1",
+      "count": 1,
+      "lut": 8,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_seq_1",
+      "count": 1,
+      "lut": 15,
+      "ff": 43,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 177,
     "ff": 281,
     "dsp": 0,
@@ -1898,39 +2020,7 @@
     "bram": 0,
     "achievedNs": 5.391,
     "timingMet": "FALSE",
-    "carry4": 35,
-    "modules": [
-     {
-      "module": "K_V_ROM_AUTO_1R",
-      "count": 1,
-      "lut": 2,
-      "ff": 4
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 1,
-      "lut": 35,
-      "ff": 0
-     },
-     {
-      "module": "mul_8ns_6ns_14_1_1",
-      "count": 1,
-      "lut": 32,
-      "ff": 0
-     },
-     {
-      "module": "mux_32_8_1_1",
-      "count": 1,
-      "lut": 8,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_seq_1",
-      "count": 1,
-      "lut": 15,
-      "ff": 43
-     }
-    ]
+    "carry4": 35
    },
    "modelFirst": {
     "cycles": 1155390,
@@ -2010,7 +2100,7 @@
     "critPs": 2945,
     "luts": 162,
     "carry4": 23,
-    "ff": 59,
+    "ff": 103,
     "areaUm2": 6300.972793912338,
     "energyFj": 13567767010.809994,
     "loops": [
@@ -2069,7 +2159,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -2121,6 +2212,24 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "K_V_ROM_AUTO_1R",
+      "count": 1,
+      "lut": 2,
+      "ff": 4,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_6ns_14_1_1",
+      "count": 1,
+      "lut": 32,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 117,
     "ff": 196,
     "dsp": 0,
@@ -2128,21 +2237,7 @@
     "bram": 0,
     "achievedNs": 4.544,
     "timingMet": "TRUE",
-    "carry4": 24,
-    "modules": [
-     {
-      "module": "K_V_ROM_AUTO_1R",
-      "count": 1,
-      "lut": 2,
-      "ff": 4
-     },
-     {
-      "module": "mul_8ns_6ns_14_1_1",
-      "count": 1,
-      "lut": 32,
-      "ff": 0
-     }
-    ]
+    "carry4": 24
    },
    "modelFirst": {
     "cycles": 1155390,
@@ -2222,7 +2317,7 @@
     "critPs": 2419,
     "luts": 792,
     "carry4": 70,
-    "ff": 784,
+    "ff": 806,
     "areaUm2": 24708.07103766234,
     "energyFj": 3399299225.983206,
     "loops": [
@@ -2264,7 +2359,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -2292,6 +2388,96 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "add_14ns_14ns_14_2_1",
+      "count": 12,
+      "lut": 128,
+      "ff": 120,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "add_15ns_15ns_15_2_1",
+      "count": 3,
+      "lut": 36,
+      "ff": 56,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "add_16ns_16ns_16_2_1",
+      "count": 4,
+      "lut": 32,
+      "ff": 73,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "add_8ns_8ns_8_2_1",
+      "count": 5,
+      "lut": 35,
+      "ff": 37,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 67,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 190,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_6ns_13_1_1",
+      "count": 4,
+      "lut": 72,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_7ns_14_1_1",
+      "count": 1,
+      "lut": 19,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "sub_14ns_14ns_14_2_1",
+      "count": 3,
+      "lut": 37,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "sub_16ns_16ns_16_2_1",
+      "count": 1,
+      "lut": 16,
+      "ff": 16,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 36,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 903,
     "ff": 926,
     "dsp": 0,
@@ -2299,75 +2485,7 @@
     "bram": 0,
     "achievedNs": 5.584,
     "timingMet": "FALSE",
-    "carry4": 123,
-    "modules": [
-     {
-      "module": "add_14ns_14ns_14_2_1",
-      "count": 12,
-      "lut": 128,
-      "ff": 120
-     },
-     {
-      "module": "add_15ns_15ns_15_2_1",
-      "count": 3,
-      "lut": 36,
-      "ff": 56
-     },
-     {
-      "module": "add_16ns_16ns_16_2_1",
-      "count": 4,
-      "lut": 32,
-      "ff": 73
-     },
-     {
-      "module": "add_8ns_8ns_8_2_1",
-      "count": 5,
-      "lut": 35,
-      "ff": 37
-     },
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 67,
-      "ff": 1
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 190,
-      "ff": 0
-     },
-     {
-      "module": "mul_8ns_6ns_13_1_1",
-      "count": 4,
-      "lut": 72,
-      "ff": 0
-     },
-     {
-      "module": "mul_8ns_7ns_14_1_1",
-      "count": 1,
-      "lut": 19,
-      "ff": 0
-     },
-     {
-      "module": "sub_14ns_14ns_14_2_1",
-      "count": 3,
-      "lut": 37,
-      "ff": 39
-     },
-     {
-      "module": "sub_16ns_16ns_16_2_1",
-      "count": 1,
-      "lut": 16,
-      "ff": 16
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 36,
-      "ff": 39
-     }
-    ]
+    "carry4": 123
    },
    "modelFirst": {
     "cycles": 74480,
@@ -2431,7 +2549,7 @@
     "critPs": 8847,
     "luts": 713,
     "carry4": 70,
-    "ff": 518,
+    "ff": 540,
     "areaUm2": 14918.682237662337,
     "energyFj": 1430233642.7380831,
     "loops": [
@@ -2473,7 +2591,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -2501,6 +2620,48 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 79,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 170,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_6ns_13_1_1",
+      "count": 4,
+      "lut": 72,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_7ns_14_1_1",
+      "count": 1,
+      "lut": 19,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 32,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 700,
     "ff": 480,
     "dsp": 0,
@@ -2508,39 +2669,7 @@
     "bram": 0,
     "achievedNs": 7.469,
     "timingMet": "TRUE",
-    "carry4": 135,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 79,
-      "ff": 1
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 170,
-      "ff": 0
-     },
-     {
-      "module": "mul_8ns_6ns_13_1_1",
-      "count": 4,
-      "lut": 72,
-      "ff": 0
-     },
-     {
-      "module": "mul_8ns_7ns_14_1_1",
-      "count": 1,
-      "lut": 19,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 32,
-      "ff": 39
-     }
-    ]
+    "carry4": 135
    },
    "modelFirst": {
     "cycles": 72960,
@@ -2604,7 +2733,7 @@
     "critPs": 4026,
     "luts": 877,
     "carry4": 51,
-    "ff": 635,
+    "ff": 657,
     "areaUm2": 19398.232844924907,
     "energyFj": 2283328680.9438143,
     "loops": [
@@ -2640,7 +2769,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -2668,6 +2798,40 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 87,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_DRUM6",
+      "count": 3,
+      "lut": 260,
+      "ff": 159,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 180,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 886,
     "ff": 845,
     "dsp": 0,
@@ -2675,33 +2839,7 @@
     "bram": 0,
     "achievedNs": 5.666,
     "timingMet": "FALSE",
-    "carry4": 147,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 87,
-      "ff": 1
-     },
-     {
-      "module": "u_MUL8_DRUM6",
-      "count": 3,
-      "lut": 260,
-      "ff": 159
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 180,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 31,
-      "ff": 39
-     }
-    ]
+    "carry4": 147
    },
    "modelFirst": {
     "cycles": 73340,
@@ -2765,7 +2903,7 @@
     "critPs": 4216,
     "luts": 718,
     "carry4": 28,
-    "ff": 635,
+    "ff": 657,
     "areaUm2": 14325.837064847301,
     "energyFj": 2047056270.1270032,
     "loops": [
@@ -2801,7 +2939,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -2829,6 +2968,48 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 76,
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_LOA6",
+      "count": 4,
+      "lut": 258,
+      "ff": 173,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_T8_C",
+      "count": 3,
+      "lut": 79,
+      "ff": 100,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 181,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 917,
     "ff": 901,
     "dsp": 0,
@@ -2836,39 +3017,7 @@
     "bram": 0,
     "achievedNs": 5.522,
     "timingMet": "FALSE",
-    "carry4": 141,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 76,
-      "ff": 2
-     },
-     {
-      "module": "u_ADD16_LOA6",
-      "count": 4,
-      "lut": 258,
-      "ff": 173
-     },
-     {
-      "module": "u_MUL8_T8_C",
-      "count": 3,
-      "lut": 79,
-      "ff": 100
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 181,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 31,
-      "ff": 39
-     }
-    ]
+    "carry4": 141
    },
    "modelFirst": {
     "cycles": 73150,
@@ -2929,12 +3078,12 @@
     "cycles": 72218,
     "timeNs": 361090,
     "intervalNs": 10,
-    "critPs": 4930,
-    "luts": 676,
-    "carry4": 37,
-    "ff": 516,
-    "areaUm2": 11799.615578421579,
-    "energyFj": 1297462620.0348663,
+    "critPs": 4775,
+    "luts": 688,
+    "carry4": 36,
+    "ff": 549,
+    "areaUm2": 11829.328276923075,
+    "energyFj": 1335776136.8000028,
     "loops": [
      {
       "label": "rows_cols",
@@ -2950,15 +3099,9 @@
     "units": [
      {
       "unit": "ADD16 LOA4",
-      "count": 5,
-      "luts": 36,
-      "carry4": 8
-     },
-     {
-      "unit": "ADD16 exato",
-      "count": 8,
-      "luts": 62,
-      "carry4": 19
+      "count": 13,
+      "luts": 110,
+      "carry4": 26
      }
     ],
     "model": {
@@ -2968,7 +3111,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -2977,59 +3121,67 @@
    },
    "hls": {
     "estClockNs": 7.049,
-    "latencyBest": 72224,
-    "latencyWorst": 72224,
-    "intervalMin": 72225,
-    "lut": 2400,
-    "ff": 1807,
+    "latencyBest": 72230,
+    "latencyWorst": 72230,
+    "intervalMin": 72231,
+    "lut": 2887,
+    "ff": 2138,
     "dsp": 0,
     "bram": 0,
     "loops": [
      {
       "name": "rows_cols",
       "trip": 36100,
-      "latency": 72222,
+      "latency": 72228,
       "iterLatency": null,
       "II": 2,
-      "depth": 25
+      "depth": 31
      }
     ]
    },
    "impl": {
-    "lut": 758,
-    "ff": 776,
-    "dsp": 0,
-    "slice": 324,
-    "bram": 0,
-    "achievedNs": 5.74,
-    "timingMet": "FALSE",
-    "carry4": 117,
     "modules": [
      {
       "module": "flow_control_loop_pipe",
       "count": 1,
-      "lut": 93,
-      "ff": 3
+      "lut": 106,
+      "ff": 3,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_LOA4",
-      "count": 3,
-      "lut": 121,
-      "ff": 89
+      "count": 7,
+      "lut": 247,
+      "ff": 190,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
-      "lut": 164,
-      "ff": 0
+      "lut": 158,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
-    ]
+    ],
+    "lut": 810,
+    "ff": 826,
+    "dsp": 0,
+    "slice": 347,
+    "bram": 0,
+    "achievedNs": 5.555,
+    "timingMet": "FALSE",
+    "carry4": 117
    },
    "modelFirst": {
     "cycles": 73150,
@@ -3093,7 +3245,7 @@
     "critPs": 4766,
     "luts": 556,
     "carry4": 23,
-    "ff": 455,
+    "ff": 477,
     "areaUm2": 7570.6441887776355,
     "energyFj": 855383648.2704881,
     "loops": [
@@ -3129,7 +3281,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -3157,6 +3310,40 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 49,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_KUL",
+      "count": 1,
+      "lut": 46,
+      "ff": 20,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 189,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 590,
     "ff": 487,
     "dsp": 0,
@@ -3164,33 +3351,7 @@
     "bram": 0,
     "achievedNs": 5.38,
     "timingMet": "FALSE",
-    "carry4": 101,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 49,
-      "ff": 1
-     },
-     {
-      "module": "u_MUL8_KUL",
-      "count": 1,
-      "lut": 46,
-      "ff": 20
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 189,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 31,
-      "ff": 39
-     }
-    ]
+    "carry4": 101
    },
    "modelFirst": {
     "cycles": 72960,
@@ -3254,7 +3415,7 @@
     "critPs": 4523,
     "luts": 978,
     "carry4": 12,
-    "ff": 733,
+    "ff": 744,
     "areaUm2": 43879.27185105105,
     "energyFj": 115026528.18886663,
     "loops": [
@@ -3295,7 +3456,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -3323,39 +3485,47 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 115,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_LOA11",
+      "count": 14,
+      "lut": 82,
+      "ff": 130,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD32_ADD16_LOA11_ADD16_exato",
+      "count": 4,
+      "lut": 47,
+      "ff": 61,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_T8_C",
+      "count": 14,
+      "lut": 199,
+      "ff": 211,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 1255,
     "ff": 806,
     "dsp": 0,
     "slice": 410,
     "bram": 0,
     "achievedNs": 4.447,
-    "timingMet": "TRUE",
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 115,
-      "ff": 1
-     },
-     {
-      "module": "u_ADD16_LOA11",
-      "count": 14,
-      "lut": 82,
-      "ff": 130
-     },
-     {
-      "module": "u_ADD32_ADD16_LOA11_ADD16_exato",
-      "count": 4,
-      "lut": 47,
-      "ff": 61
-     },
-     {
-      "module": "u_MUL8_T8_C",
-      "count": 14,
-      "lut": 199,
-      "ff": 211
-     }
-    ]
+    "timingMet": "TRUE"
    },
    "modelFirst": {
     "cycles": 1015,
@@ -3417,7 +3587,7 @@
     "critPs": 4983,
     "luts": 124,
     "carry4": 12,
-    "ff": 89,
+    "ff": 100,
     "areaUm2": 6219.7088,
     "energyFj": 2618197.55638,
     "loops": [
@@ -3452,7 +3622,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -3480,6 +3651,24 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 18,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_T4",
+      "count": 1,
+      "lut": 120,
+      "ff": 102,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 167,
     "ff": 169,
     "dsp": 0,
@@ -3487,21 +3676,7 @@
     "bram": 0,
     "achievedNs": 3.343,
     "timingMet": "TRUE",
-    "carry4": 28,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 18,
-      "ff": 1
-     },
-     {
-      "module": "u_MUL8_T4",
-      "count": 1,
-      "lut": 120,
-      "ff": 102
-     }
-    ]
+    "carry4": 28
    },
    "modelFirst": {
     "cycles": 259,
@@ -3557,7 +3732,7 @@
     "critPs": 4874,
     "luts": 689,
     "carry4": 24,
-    "ff": 624,
+    "ff": 646,
     "areaUm2": 12837.91579414155,
     "energyFj": 1871869414.0687313,
     "loops": [
@@ -3629,7 +3804,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -3657,6 +3833,80 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 76,
+      "ff": 3,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_LOA10",
+      "count": 1,
+      "lut": 32,
+      "ff": 16,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_LOA7",
+      "count": 1,
+      "lut": 15,
+      "ff": 15,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_LOA8",
+      "count": 2,
+      "lut": 75,
+      "ff": 67,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_LOA9",
+      "count": 1,
+      "lut": 27,
+      "ff": 16,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_T6_A4c",
+      "count": 1,
+      "lut": 4,
+      "ff": 6,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_T8_C",
+      "count": 2,
+      "lut": 51,
+      "ff": 76,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 183,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 774,
     "ff": 788,
     "dsp": 0,
@@ -3664,63 +3914,7 @@
     "bram": 0,
     "achievedNs": 5.73,
     "timingMet": "FALSE",
-    "carry4": 123,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 76,
-      "ff": 3
-     },
-     {
-      "module": "u_ADD16_LOA10",
-      "count": 1,
-      "lut": 32,
-      "ff": 16
-     },
-     {
-      "module": "u_ADD16_LOA7",
-      "count": 1,
-      "lut": 15,
-      "ff": 15
-     },
-     {
-      "module": "u_ADD16_LOA8",
-      "count": 2,
-      "lut": 75,
-      "ff": 67
-     },
-     {
-      "module": "u_ADD16_LOA9",
-      "count": 1,
-      "lut": 27,
-      "ff": 16
-     },
-     {
-      "module": "u_MUL8_T6_A4c",
-      "count": 1,
-      "lut": 4,
-      "ff": 6
-     },
-     {
-      "module": "u_MUL8_T8_C",
-      "count": 2,
-      "lut": 51,
-      "ff": 76
-     },
-     {
-      "module": "mul_8ns_10ns_17_1_1",
-      "count": 4,
-      "lut": 183,
-      "ff": 0
-     },
-     {
-      "module": "urem_8ns_3ns_2_12_1",
-      "count": 1,
-      "lut": 31,
-      "ff": 39
-     }
-    ]
+    "carry4": 123
    },
    "modelFirst": {
     "cycles": 72960,
@@ -3820,7 +4014,7 @@
     "critPs": 4980,
     "luts": 1046,
     "carry4": 30,
-    "ff": 626,
+    "ff": 637,
     "areaUm2": 30723.510617724176,
     "energyFj": 72950859.54523367,
     "loops": [
@@ -3927,7 +4121,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -3955,6 +4150,104 @@
     ]
    },
    "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 98,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_LOA10",
+      "count": 2,
+      "lut": 10,
+      "ff": 13,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_LOA8",
+      "count": 6,
+      "lut": 132,
+      "ff": 141,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_LOA9",
+      "count": 5,
+      "lut": 64,
+      "ff": 74,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD32_ADD16_LOA10_ADD16_exato",
+      "count": 1,
+      "lut": 21,
+      "ff": 25,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD32_ADD16_LOA8_ADD16_exato",
+      "count": 2,
+      "lut": 60,
+      "ff": 96,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_DRUM2",
+      "count": 1,
+      "lut": 17,
+      "ff": 27,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_DRUM3_C",
+      "count": 1,
+      "lut": 27,
+      "ff": 40,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_DRUM3",
+      "count": 1,
+      "lut": 22,
+      "ff": 40,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_DRUM4",
+      "count": 2,
+      "lut": 94,
+      "ff": 101,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_T6_A10c",
+      "count": 4,
+      "lut": 53,
+      "ff": 6,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_MUL8_T8_C",
+      "count": 3,
+      "lut": 27,
+      "ff": 62,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
     "lut": 1399,
     "ff": 1026,
     "dsp": 0,
@@ -3962,81 +4255,7 @@
     "bram": 0,
     "achievedNs": 4.265,
     "timingMet": "TRUE",
-    "carry4": 53,
-    "modules": [
-     {
-      "module": "flow_control_loop_pipe",
-      "count": 1,
-      "lut": 98,
-      "ff": 1
-     },
-     {
-      "module": "u_ADD16_LOA10",
-      "count": 2,
-      "lut": 10,
-      "ff": 13
-     },
-     {
-      "module": "u_ADD16_LOA8",
-      "count": 6,
-      "lut": 132,
-      "ff": 141
-     },
-     {
-      "module": "u_ADD16_LOA9",
-      "count": 5,
-      "lut": 64,
-      "ff": 74
-     },
-     {
-      "module": "u_ADD32_ADD16_LOA10_ADD16_exato",
-      "count": 1,
-      "lut": 21,
-      "ff": 25
-     },
-     {
-      "module": "u_ADD32_ADD16_LOA8_ADD16_exato",
-      "count": 2,
-      "lut": 60,
-      "ff": 96
-     },
-     {
-      "module": "u_MUL8_DRUM2",
-      "count": 1,
-      "lut": 17,
-      "ff": 27
-     },
-     {
-      "module": "u_MUL8_DRUM3_C",
-      "count": 1,
-      "lut": 27,
-      "ff": 40
-     },
-     {
-      "module": "u_MUL8_DRUM3",
-      "count": 1,
-      "lut": 22,
-      "ff": 40
-     },
-     {
-      "module": "u_MUL8_DRUM4",
-      "count": 2,
-      "lut": 94,
-      "ff": 101
-     },
-     {
-      "module": "u_MUL8_T6_A10c",
-      "count": 4,
-      "lut": 53,
-      "ff": 6
-     },
-     {
-      "module": "u_MUL8_T8_C",
-      "count": 3,
-      "lut": 27,
-      "ff": 62
-     }
-    ]
+    "carry4": 53
    },
    "modelFirst": {
     "cycles": 1015,
@@ -4164,7 +4383,7 @@
     "critPs": 4952,
     "luts": 674,
     "carry4": 29,
-    "ff": 616,
+    "ff": 638,
     "areaUm2": 13236.943785258625,
     "energyFj": 1820878794.4921343,
     "loops": [
@@ -4242,7 +4461,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -4275,25 +4495,33 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 86,
-      "ff": 2
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_T8_C",
       "count": 3,
       "lut": 78,
-      "ff": 101
+      "ff": 101,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 184,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 861,
@@ -4407,7 +4635,7 @@
     "critPs": 4999,
     "luts": 845,
     "carry4": 39,
-    "ff": 610,
+    "ff": 621,
     "areaUm2": 27666.483003612495,
     "energyFj": 67013331.45569884,
     "loops": [
@@ -4472,7 +4700,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -4505,37 +4734,49 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 108,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_T6_A10c",
       "count": 6,
       "lut": 54,
-      "ff": 20
+      "ff": 20,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_T6_A2c",
       "count": 1,
       "lut": 6,
-      "ff": 8
+      "ff": 8,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_T8_C",
       "count": 6,
       "lut": 52,
-      "ff": 116
+      "ff": 116,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD32_ADD16_TRUNC7_ADD16_exato",
       "count": 2,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_TRUNC7",
       "count": 2,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      }
     ],
     "lut": 987,
@@ -4636,7 +4877,7 @@
     "critPs": 4026,
     "luts": 877,
     "carry4": 51,
-    "ff": 635,
+    "ff": 657,
     "areaUm2": 19398.232844924907,
     "energyFj": 2283328680.9438143,
     "loops": [
@@ -4672,7 +4913,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -4705,19 +4947,25 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 43,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 195,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 856,
@@ -4789,7 +5037,7 @@
     "critPs": 4216,
     "luts": 718,
     "carry4": 28,
-    "ff": 635,
+    "ff": 657,
     "areaUm2": 14325.837064847301,
     "energyFj": 2047056270.1270032,
     "loops": [
@@ -4825,7 +5073,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -4858,19 +5107,25 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 77,
-      "ff": 2
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 186,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 789,
@@ -4939,12 +5194,12 @@
     "cycles": 72218,
     "timeNs": 361090,
     "intervalNs": 10,
-    "critPs": 4930,
-    "luts": 676,
-    "carry4": 37,
-    "ff": 516,
-    "areaUm2": 11799.615578421579,
-    "energyFj": 1297462620.0348663,
+    "critPs": 4775,
+    "luts": 688,
+    "carry4": 36,
+    "ff": 549,
+    "areaUm2": 11829.328276923075,
+    "energyFj": 1335776136.8000028,
     "loops": [
      {
       "label": "rows_cols",
@@ -4960,15 +5215,9 @@
     "units": [
      {
       "unit": "ADD16 LOA4",
-      "count": 5,
-      "luts": 36,
-      "carry4": 8
-     },
-     {
-      "unit": "ADD16 exato",
-      "count": 8,
-      "luts": 62,
-      "carry4": 19
+      "count": 13,
+      "luts": 110,
+      "carry4": 26
      }
     ],
     "model": {
@@ -4978,7 +5227,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -4987,21 +5237,21 @@
    },
    "hls": {
     "estClockNs": 7.049,
-    "latencyBest": 72220,
-    "latencyWorst": 72220,
-    "intervalMin": 72221,
-    "lut": 2247,
-    "ff": 1390,
+    "latencyBest": 72222,
+    "latencyWorst": 72222,
+    "intervalMin": 72223,
+    "lut": 2632,
+    "ff": 1401,
     "dsp": 0,
     "bram": 0,
     "loops": [
      {
       "name": "rows_cols",
       "trip": 36100,
-      "latency": 72218,
+      "latency": 72220,
       "iterLatency": null,
       "II": 2,
-      "depth": 21
+      "depth": 23
      }
     ]
    },
@@ -5010,30 +5260,44 @@
      {
       "module": "flow_control_loop_pipe",
       "count": 1,
-      "lut": 108,
-      "ff": 1
+      "lut": 106,
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_LOA4",
+      "count": 2,
+      "lut": 19,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
-      "lut": 157,
-      "ff": 0
+      "lut": 159,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
-    "lut": 727,
-    "ff": 607,
+    "lut": 759,
+    "ff": 588,
     "dsp": 0,
     "slice": 292,
     "bram": 0,
-    "achievedNs": 5.517,
+    "achievedNs": 5.754,
     "timingMet": "FALSE",
-    "carry4": 114
+    "carry4": 115
    },
    "modelFirst": {
     "cycles": 72217,
@@ -5095,7 +5359,7 @@
     "critPs": 4766,
     "luts": 556,
     "carry4": 23,
-    "ff": 455,
+    "ff": 477,
     "areaUm2": 7570.6441887776355,
     "energyFj": 855383648.2704881,
     "loops": [
@@ -5131,7 +5395,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -5164,19 +5429,25 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 45,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 183,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 526,
@@ -5248,7 +5519,7 @@
     "critPs": 4523,
     "luts": 978,
     "carry4": 12,
-    "ff": 733,
+    "ff": 744,
     "areaUm2": 43879.27185105105,
     "energyFj": 115026528.18886663,
     "loops": [
@@ -5289,7 +5560,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -5322,7 +5594,9 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 108,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 632,
@@ -5398,7 +5672,7 @@
     "critPs": 4983,
     "luts": 124,
     "carry4": 12,
-    "ff": 89,
+    "ff": 100,
     "areaUm2": 6219.7088,
     "energyFj": 2618197.55638,
     "loops": [
@@ -5433,7 +5707,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -5466,7 +5741,9 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 18,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 174,
@@ -5537,7 +5814,7 @@
     "critPs": 4874,
     "luts": 689,
     "carry4": 24,
-    "ff": 624,
+    "ff": 646,
     "areaUm2": 12837.91579414155,
     "energyFj": 1871869414.0687313,
     "loops": [
@@ -5609,7 +5886,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -5642,25 +5920,33 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 77,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 183,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_T6_A4c",
       "count": 1,
       "lut": 2,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 727,
@@ -5768,7 +6054,7 @@
     "critPs": 4980,
     "luts": 1046,
     "carry4": 30,
-    "ff": 626,
+    "ff": 637,
     "areaUm2": 30723.510617724176,
     "energyFj": 72950859.54523367,
     "loops": [
@@ -5875,7 +6161,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -5908,7 +6195,9 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 98,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 806,
@@ -6051,7 +6340,7 @@
     "critPs": 4952,
     "luts": 674,
     "carry4": 29,
-    "ff": 616,
+    "ff": 638,
     "areaUm2": 13236.943785258625,
     "energyFj": 1820878794.4921343,
     "loops": [
@@ -6129,7 +6418,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -6162,19 +6452,25 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 77,
-      "ff": 2
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 185,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 826,
@@ -6288,7 +6584,7 @@
     "critPs": 4999,
     "luts": 845,
     "carry4": 39,
-    "ff": 610,
+    "ff": 621,
     "areaUm2": 27666.483003612495,
     "energyFj": 67013331.45569884,
     "loops": [
@@ -6353,7 +6649,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -6386,19 +6683,25 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 108,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD32_ADD16_TRUNC7_ADD16_exato",
       "count": 2,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_TRUNC7",
       "count": 2,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      }
     ],
     "lut": 934,
@@ -6499,7 +6802,7 @@
     "critPs": 4026,
     "luts": 877,
     "carry4": 51,
-    "ff": 635,
+    "ff": 657,
     "areaUm2": 19398.232844924907,
     "energyFj": 2283328680.9438143,
     "loops": [
@@ -6535,7 +6838,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -6568,19 +6872,25 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 50,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 201,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 1000,
@@ -6652,7 +6962,7 @@
     "critPs": 4216,
     "luts": 718,
     "carry4": 28,
-    "ff": 635,
+    "ff": 657,
     "areaUm2": 14325.837064847301,
     "energyFj": 2047056270.1270032,
     "loops": [
@@ -6688,7 +6998,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -6721,19 +7032,25 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 89,
-      "ff": 2
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 168,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 867,
@@ -6802,12 +7119,12 @@
     "cycles": 72218,
     "timeNs": 361090,
     "intervalNs": 10,
-    "critPs": 4930,
-    "luts": 676,
-    "carry4": 37,
-    "ff": 516,
-    "areaUm2": 11799.615578421579,
-    "energyFj": 1297462620.0348663,
+    "critPs": 4775,
+    "luts": 688,
+    "carry4": 36,
+    "ff": 549,
+    "areaUm2": 11829.328276923075,
+    "energyFj": 1335776136.8000028,
     "loops": [
      {
       "label": "rows_cols",
@@ -6823,15 +7140,9 @@
     "units": [
      {
       "unit": "ADD16 LOA4",
-      "count": 5,
-      "luts": 36,
-      "carry4": 8
-     },
-     {
-      "unit": "ADD16 exato",
-      "count": 8,
-      "luts": 62,
-      "carry4": 19
+      "count": 13,
+      "luts": 110,
+      "carry4": 26
      }
     ],
     "model": {
@@ -6841,7 +7152,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -6850,21 +7162,21 @@
    },
    "hls": {
     "estClockNs": 7.049,
-    "latencyBest": 72220,
-    "latencyWorst": 72220,
-    "intervalMin": 72221,
-    "lut": 2305,
-    "ff": 1508,
+    "latencyBest": 72222,
+    "latencyWorst": 72222,
+    "intervalMin": 72223,
+    "lut": 3219,
+    "ff": 2210,
     "dsp": 0,
     "bram": 0,
     "loops": [
      {
       "name": "rows_cols",
       "trip": 36100,
-      "latency": 72218,
+      "latency": 72220,
       "iterLatency": null,
       "II": 2,
-      "depth": 21
+      "depth": 23
      }
     ]
    },
@@ -6873,30 +7185,36 @@
      {
       "module": "flow_control_loop_pipe",
       "count": 1,
-      "lut": 91,
-      "ff": 2
+      "lut": 107,
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
-      "lut": 169,
-      "ff": 0
+      "lut": 157,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
-    "lut": 692,
-    "ff": 613,
+    "lut": 739,
+    "ff": 688,
     "dsp": 0,
-    "slice": 284,
+    "slice": 311,
     "bram": 0,
-    "achievedNs": 5.416,
+    "achievedNs": 5.611,
     "timingMet": "FALSE",
-    "carry4": 112
+    "carry4": 115
    },
    "modelFirst": {
     "cycles": 72217,
@@ -6958,7 +7276,7 @@
     "critPs": 4766,
     "luts": 556,
     "carry4": 23,
-    "ff": 455,
+    "ff": 477,
     "areaUm2": 7570.6441887776355,
     "energyFj": 855383648.2704881,
     "loops": [
@@ -6994,7 +7312,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -7027,19 +7346,25 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 44,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 183,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 531,
@@ -7111,7 +7436,7 @@
     "critPs": 4523,
     "luts": 978,
     "carry4": 12,
-    "ff": 733,
+    "ff": 744,
     "areaUm2": 43879.27185105105,
     "energyFj": 115026528.18886663,
     "loops": [
@@ -7152,7 +7477,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -7185,13 +7511,17 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 109,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mux_164_8_1_1",
       "count": 15,
       "lut": 165,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 686,
@@ -7267,7 +7597,7 @@
     "critPs": 4983,
     "luts": 124,
     "carry4": 12,
-    "ff": 89,
+    "ff": 100,
     "areaUm2": 6219.7088,
     "energyFj": 2618197.55638,
     "loops": [
@@ -7302,7 +7632,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -7335,7 +7666,9 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 18,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 166,
@@ -7406,7 +7739,7 @@
     "critPs": 4874,
     "luts": 689,
     "carry4": 24,
-    "ff": 624,
+    "ff": 646,
     "areaUm2": 12837.91579414155,
     "energyFj": 1871869414.0687313,
     "loops": [
@@ -7478,7 +7811,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -7511,25 +7845,33 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 90,
-      "ff": 2
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 169,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mux_32_8_1_1",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 727,
@@ -7637,7 +7979,7 @@
     "critPs": 4980,
     "luts": 1046,
     "carry4": 30,
-    "ff": 626,
+    "ff": 637,
     "areaUm2": 30723.510617724176,
     "energyFj": 72950859.54523367,
     "loops": [
@@ -7744,7 +8086,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -7777,13 +8120,17 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 98,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mux_164_8_1_1",
       "count": 14,
       "lut": 231,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 1063,
@@ -7926,7 +8273,7 @@
     "critPs": 4952,
     "luts": 674,
     "carry4": 29,
-    "ff": 616,
+    "ff": 638,
     "areaUm2": 13236.943785258625,
     "energyFj": 1820878794.4921343,
     "loops": [
@@ -8004,7 +8351,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -8037,25 +8385,33 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 102,
-      "ff": 2
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 158,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mux_32_8_1_1",
       "count": 2,
       "lut": 12,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 815,
@@ -8169,7 +8525,7 @@
     "critPs": 4999,
     "luts": 845,
     "carry4": 39,
-    "ff": 610,
+    "ff": 621,
     "areaUm2": 27666.483003612495,
     "energyFj": 67013331.45569884,
     "loops": [
@@ -8234,7 +8590,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -8267,13 +8624,17 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 108,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mux_164_8_1_1",
       "count": 16,
       "lut": 208,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 1025,
@@ -8374,7 +8735,7 @@
     "critPs": 4026,
     "luts": 877,
     "carry4": 51,
-    "ff": 635,
+    "ff": 657,
     "areaUm2": 19398.232844924907,
     "energyFj": 2283328680.9438143,
     "loops": [
@@ -8410,7 +8771,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -8443,27 +8805,33 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 43,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
-      "lut": 200,
-      "ff": 0
+      "lut": 199,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
-    "lut": 806,
-    "ff": 583,
+    "lut": 807,
+    "ff": 585,
     "dsp": 0,
-    "slice": 295,
+    "slice": 300,
     "bram": 0,
-    "achievedNs": 7.028,
+    "achievedNs": 7.228,
     "timingMet": "FALSE",
     "carry4": 120
    },
@@ -8527,7 +8895,7 @@
     "critPs": 4216,
     "luts": 718,
     "carry4": 28,
-    "ff": 635,
+    "ff": 657,
     "areaUm2": 14325.837064847301,
     "energyFj": 2047056270.1270032,
     "loops": [
@@ -8563,7 +8931,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -8596,43 +8965,57 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 89,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_LOA6_bb",
       "count": 4,
       "lut": 28,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_loa6",
       "count": 4,
       "lut": 28,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_MUL8_T8_C_bb",
       "count": 1,
       "lut": 23,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_t8_c",
       "count": 1,
       "lut": 23,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 165,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 32,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 638,
@@ -8701,12 +9084,12 @@
     "cycles": 72218,
     "timeNs": 361090,
     "intervalNs": 10,
-    "critPs": 4930,
-    "luts": 676,
-    "carry4": 37,
-    "ff": 516,
-    "areaUm2": 11799.615578421579,
-    "energyFj": 1297462620.0348663,
+    "critPs": 4775,
+    "luts": 688,
+    "carry4": 36,
+    "ff": 549,
+    "areaUm2": 11829.328276923075,
+    "energyFj": 1335776136.8000028,
     "loops": [
      {
       "label": "rows_cols",
@@ -8722,15 +9105,9 @@
     "units": [
      {
       "unit": "ADD16 LOA4",
-      "count": 5,
-      "luts": 36,
-      "carry4": 8
-     },
-     {
-      "unit": "ADD16 exato",
-      "count": 8,
-      "luts": 62,
-      "carry4": 19
+      "count": 13,
+      "luts": 110,
+      "carry4": 26
      }
     ],
     "model": {
@@ -8740,7 +9117,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -8749,21 +9127,21 @@
    },
    "hls": {
     "estClockNs": 7.049,
-    "latencyBest": 72220,
-    "latencyWorst": 72220,
-    "intervalMin": 72221,
-    "lut": 1986,
-    "ff": 1396,
+    "latencyBest": 72222,
+    "latencyWorst": 72222,
+    "intervalMin": 72223,
+    "lut": 2023,
+    "ff": 1469,
     "dsp": 0,
     "bram": 0,
     "loops": [
      {
       "name": "rows_cols",
       "trip": 36100,
-      "latency": 72218,
+      "latency": 72220,
       "iterLatency": null,
       "II": 2,
-      "depth": 21
+      "depth": 23
      }
     ]
    },
@@ -8772,42 +9150,52 @@
      {
       "module": "flow_control_loop_pipe",
       "count": 1,
-      "lut": 89,
-      "ff": 2
+      "lut": 90,
+      "ff": 3,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_LOA4_bb",
-      "count": 3,
-      "lut": 34,
-      "ff": 0
+      "count": 6,
+      "lut": 75,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_loa4",
-      "count": 3,
-      "lut": 34,
-      "ff": 0
+      "count": 6,
+      "lut": 75,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
-      "lut": 167,
-      "ff": 0
+      "lut": 179,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
-    "lut": 667,
-    "ff": 609,
+    "lut": 702,
+    "ff": 627,
     "dsp": 0,
-    "slice": 262,
+    "slice": 290,
     "bram": 0,
-    "achievedNs": 5.702,
+    "achievedNs": 5.533,
     "timingMet": "FALSE",
-    "carry4": 112
+    "carry4": 105
    },
    "modelFirst": {
     "cycles": 72218,
@@ -8869,7 +9257,7 @@
     "critPs": 4766,
     "luts": 556,
     "carry4": 23,
-    "ff": 455,
+    "ff": 477,
     "areaUm2": 7570.6441887776355,
     "energyFj": 855383648.2704881,
     "loops": [
@@ -8905,7 +9293,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -8938,31 +9327,41 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 43,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 194,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_KUL_bb",
       "count": 1,
       "lut": 13,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_kul",
       "count": 1,
       "lut": 13,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 32,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 497,
@@ -9034,7 +9433,7 @@
     "critPs": 4523,
     "luts": 978,
     "carry4": 12,
-    "ff": 733,
+    "ff": 744,
     "areaUm2": 43879.27185105105,
     "energyFj": 115026528.18886663,
     "loops": [
@@ -9075,7 +9474,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -9108,7 +9508,9 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 107,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 665,
@@ -9185,7 +9587,7 @@
     "critPs": 4983,
     "luts": 124,
     "carry4": 12,
-    "ff": 89,
+    "ff": 100,
     "areaUm2": 6219.7088,
     "energyFj": 2618197.55638,
     "loops": [
@@ -9220,7 +9622,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -9253,19 +9656,25 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 17,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_T4_bb",
       "count": 1,
       "lut": 70,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_t4",
       "count": 1,
       "lut": 70,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      }
     ],
     "lut": 116,
@@ -9336,7 +9745,7 @@
     "critPs": 4874,
     "luts": 689,
     "carry4": 24,
-    "ff": 624,
+    "ff": 646,
     "areaUm2": 12837.91579414155,
     "energyFj": 1871869414.0687313,
     "loops": [
@@ -9408,7 +9817,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -9441,111 +9851,145 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 89,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_LOA8_bb",
       "count": 2,
       "lut": 11,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_loa8",
       "count": 2,
       "lut": 11,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_MUL8_T8_C_bb",
       "count": 1,
-      "lut": 24,
-      "ff": 0
+      "lut": 22,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_t8_c",
       "count": 1,
-      "lut": 24,
-      "ff": 0
+      "lut": 22,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
-      "lut": 165,
-      "ff": 0
+      "lut": 166,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_T6_A4c_bb",
       "count": 1,
       "lut": 2,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_t6_a4c",
       "count": 1,
       "lut": 2,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_LOA9_bb",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_loa9",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_LOA7_bb",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_loa7",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC7_bb",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc7",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC8_bb",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc8",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
-      "lut": 31,
-      "ff": 39
+      "lut": 32,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 631,
-    "ff": 603,
+    "ff": 607,
     "dsp": 0,
-    "slice": 276,
+    "slice": 262,
     "bram": 0,
-    "achievedNs": 5.632,
+    "achievedNs": 5.972,
     "timingMet": "FALSE",
     "carry4": 109
    },
@@ -9645,7 +10089,7 @@
     "critPs": 4980,
     "luts": 1046,
     "carry4": 30,
-    "ff": 626,
+    "ff": 637,
     "areaUm2": 30723.510617724176,
     "energyFj": 72950859.54523367,
     "loops": [
@@ -9752,7 +10196,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -9785,43 +10230,57 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 107,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_LOA8_bb",
       "count": 6,
       "lut": 32,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_loa8",
       "count": 6,
       "lut": 32,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_LOA9_bb",
       "count": 3,
       "lut": 14,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_loa9",
       "count": 3,
       "lut": 14,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_LOA10_bb",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_loa10",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      }
     ],
     "lut": 729,
@@ -9964,7 +10423,7 @@
     "critPs": 4952,
     "luts": 674,
     "carry4": 29,
-    "ff": 616,
+    "ff": 638,
     "areaUm2": 13236.943785258625,
     "energyFj": 1820878794.4921343,
     "loops": [
@@ -10042,7 +10501,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -10075,127 +10535,169 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 89,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_T8_C_bb",
       "count": 1,
       "lut": 23,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_t8_c",
       "count": 1,
       "lut": 23,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 166,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_TRUNC7_bb",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc7",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC5_bb",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc5",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC6_bb",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc6",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC1_bb",
       "count": 1,
       "lut": 7,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc1",
       "count": 1,
       "lut": 7,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC2_bb",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc2",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC4_bb",
       "count": 1,
       "lut": 7,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc4",
       "count": 1,
       "lut": 7,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC8_bb",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc8",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC3_bb",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc3",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 650,
@@ -10309,7 +10811,7 @@
     "critPs": 4999,
     "luts": 845,
     "carry4": 39,
-    "ff": 610,
+    "ff": 621,
     "areaUm2": 27666.483003612495,
     "energyFj": 67013331.45569884,
     "loops": [
@@ -10374,7 +10876,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -10407,31 +10910,41 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 107,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_TRUNC7_bb",
       "count": 9,
       "lut": 42,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc7",
       "count": 9,
       "lut": 42,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC6_bb",
       "count": 6,
       "lut": 37,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc6",
       "count": 6,
       "lut": 37,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      }
     ],
     "lut": 666,
@@ -10520,6 +11033,348 @@
    }
   },
   {
+   "case": "sobel_sub_trunc3_rtl_ir",
+   "kernel": "sobel",
+   "kind": "ir",
+   "note": "somas e subtrações com ADD16 TRUNC3, unidades em RTL (caixa preta)",
+   "clockNs": 5,
+   "model": {
+    "cycles": 72218,
+    "timeNs": 361090,
+    "intervalNs": 10,
+    "critPs": 4453,
+    "luts": 665,
+    "carry4": 37,
+    "ff": 538,
+    "areaUm2": 11615.446137096775,
+    "energyFj": 1287721201.643173,
+    "loops": [
+     {
+      "label": "rows_cols",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 36100,
+      "II": 2,
+      "iterLatency": 19,
+      "latency": 72218
+     }
+    ],
+    "addrLuts": 442,
+    "units": [
+     {
+      "unit": "ADD16 TRUNC3",
+      "count": 13,
+      "luts": 87,
+      "carry4": 27
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72222,
+    "latencyWorst": 72222,
+    "intervalMin": 72223,
+    "lut": 2023,
+    "ff": 1469,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72220,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 23
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 91,
+      "ff": 2,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_TRUNC3_bb",
+      "count": 6,
+      "lut": 79,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "add16_trunc3",
+      "count": 6,
+      "lut": 79,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 173,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
+    "lut": 674,
+    "ff": 592,
+    "dsp": 0,
+    "slice": 262,
+    "bram": 0,
+    "achievedNs": 5.551,
+    "timingMet": "FALSE",
+    "carry4": 105
+   },
+   "modelFirst": {
+    "cycles": 72218,
+    "timeNs": 361090,
+    "intervalNs": 10,
+    "critPs": 4453,
+    "luts": 665,
+    "carry4": 37,
+    "ff": 538,
+    "areaUm2": 11615.446137096775,
+    "energyFj": 1287721201.643173,
+    "loops": [
+     {
+      "label": "rows_cols",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 36100,
+      "II": 2,
+      "iterLatency": 19,
+      "latency": 72218
+     }
+    ],
+    "addrLuts": 442,
+    "units": [
+     {
+      "unit": "ADD16 TRUNC3",
+      "count": 13,
+      "luts": 87,
+      "carry4": 27
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
+    }
+   }
+  },
+  {
+   "case": "sharpen_sub_trunc2_rtl_ir",
+   "kernel": "sharpen",
+   "kind": "ir",
+   "note": "subtrações com ADD16 TRUNC2, unidades em RTL (caixa preta)",
+   "clockNs": 5,
+   "model": {
+    "cycles": 72217,
+    "timeNs": 361085,
+    "intervalNs": 10,
+    "critPs": 4558,
+    "luts": 535,
+    "carry4": 21,
+    "ff": 449,
+    "areaUm2": 6663.9680186567175,
+    "energyFj": 729742395.2456678,
+    "loops": [
+     {
+      "label": "rows_cols",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 36100,
+      "II": 2,
+      "iterLatency": 18,
+      "latency": 72217
+     }
+    ],
+    "addrLuts": 404,
+    "units": [
+     {
+      "unit": "×5 (1 soma)",
+      "count": 1,
+      "luts": 9,
+      "carry4": 3
+     },
+     {
+      "unit": "ADD16 TRUNC2",
+      "count": 4,
+      "luts": 34,
+      "carry4": 10
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
+    }
+   },
+   "csim": {
+    "mismatches": 0,
+    "total": 36100
+   },
+   "hls": {
+    "estClockNs": 7.049,
+    "latencyBest": 72220,
+    "latencyWorst": 72220,
+    "intervalMin": 72221,
+    "lut": 1716,
+    "ff": 1134,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "rows_cols",
+      "trip": 36100,
+      "latency": 72218,
+      "iterLatency": null,
+      "II": 2,
+      "depth": 21
+     }
+    ]
+   },
+   "impl": {
+    "modules": [
+     {
+      "module": "flow_control_loop_pipe",
+      "count": 1,
+      "lut": 43,
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "u_ADD16_TRUNC2_bb",
+      "count": 2,
+      "lut": 18,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "add16_trunc2",
+      "count": 2,
+      "lut": 18,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
+     },
+     {
+      "module": "mul_8ns_10ns_17_1_1",
+      "count": 4,
+      "lut": 200,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
+     },
+     {
+      "module": "urem_8ns_3ns_2_12_1",
+      "count": 1,
+      "lut": 31,
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
+     }
+    ],
+    "lut": 551,
+    "ff": 486,
+    "dsp": 0,
+    "slice": 223,
+    "bram": 0,
+    "achievedNs": 5.346,
+    "timingMet": "FALSE",
+    "carry4": 94
+   },
+   "modelFirst": {
+    "cycles": 72217,
+    "timeNs": 361085,
+    "intervalNs": 10,
+    "critPs": 4558,
+    "luts": 535,
+    "carry4": 21,
+    "ff": 449,
+    "areaUm2": 6663.9680186567175,
+    "energyFj": 729742395.2456678,
+    "loops": [
+     {
+      "label": "rows_cols",
+      "mode": "pipelined",
+      "flattened": true,
+      "trip": 36100,
+      "II": 2,
+      "iterLatency": 18,
+      "latency": 72217
+     }
+    ],
+    "addrLuts": 404,
+    "units": [
+     {
+      "unit": "×5 (1 soma)",
+      "count": 1,
+      "luts": 9,
+      "carry4": 3
+     },
+     {
+      "unit": "ADD16 TRUNC2",
+      "count": 4,
+      "luts": 34,
+      "carry4": 10
+     }
+    ],
+    "model": {
+     "memLatency": 1,
+     "loopOverhead": 1,
+     "subloopOverhead": 2,
+     "pipelineOverhead": 1,
+     "flatten": true,
+     "uremLatency": 4,
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
+    }
+   }
+  },
+  {
    "case": "gauss_dse3_lut40_rtl_ir",
    "kernel": "gauss",
    "kind": "ir",
@@ -10532,7 +11387,7 @@
     "critPs": 4991,
     "luts": 632,
     "carry4": 29,
-    "ff": 586,
+    "ff": 608,
     "areaUm2": 11227.732014671232,
     "energyFj": 1357911338.5665884,
     "loops": [
@@ -10622,7 +11477,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -10655,147 +11511,193 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 89,
-      "ff": 2
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_T8_C_bb",
       "count": 1,
       "lut": 23,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_t8_c",
       "count": 1,
       "lut": 23,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
-      "lut": 166,
-      "ff": 0
+      "lut": 165,
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_TRUNC4_bb",
       "count": 1,
       "lut": 7,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc4",
       "count": 1,
       "lut": 7,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC2_bb",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc2",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC6_bb",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc6",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_MUL8_T4_C_bb",
       "count": 1,
       "lut": 19,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_t4_c",
       "count": 1,
       "lut": 19,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC3_bb",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc3",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC7_bb",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc7",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC8_bb",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc8",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC5_bb",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc5",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_LOA5_bb",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_loa5",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 40
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
-    "lut": 661,
-    "ff": 631,
+    "lut": 658,
+    "ff": 620,
     "dsp": 0,
-    "slice": 262,
+    "slice": 265,
     "bram": 0,
-    "achievedNs": 5.664,
+    "achievedNs": 5.764,
     "timingMet": "FALSE",
     "carry4": 121
    },
@@ -10913,7 +11815,7 @@
     "critPs": 4999,
     "luts": 620,
     "carry4": 27,
-    "ff": 599,
+    "ff": 621,
     "areaUm2": 11152.404169819045,
     "energyFj": 1396306663.7795744,
     "loops": [
@@ -11015,7 +11917,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -11048,151 +11951,201 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 105,
-      "ff": 3
+      "ff": 3,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul_8ns_10ns_17_1_1",
       "count": 4,
       "lut": 159,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_MUL8_T4_C_bb",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_t4_c",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC9_bb",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc9",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC2_bb",
       "count": 1,
       "lut": 4,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc2",
       "count": 1,
       "lut": 4,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_MUL8_T8_C_bb",
       "count": 1,
       "lut": 4,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_t8_c",
       "count": 1,
       "lut": 4,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC6_bb",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc6",
       "count": 1,
       "lut": 6,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC3_bb",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc3",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC7_bb",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc7",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC8_bb",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc8",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC5_bb",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc5",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC4_bb",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc4",
       "count": 1,
       "lut": 5,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_MUL8_T6_bb",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "mul8_t6",
       "count": 1,
       "lut": 8,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "urem_8ns_3ns_2_12_1",
       "count": 1,
       "lut": 31,
-      "ff": 39
+      "ff": 39,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 621,
@@ -11330,7 +12283,7 @@
     "critPs": 4952,
     "luts": 795,
     "carry4": 50,
-    "ff": 562,
+    "ff": 573,
     "areaUm2": 22056.59460937498,
     "energyFj": 49253017.60002235,
     "loops": [
@@ -11431,7 +12384,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -11464,49 +12418,65 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 107,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_TRUNC6_bb",
       "count": 3,
       "lut": 14,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc6",
       "count": 3,
       "lut": 14,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "u_ADD16_TRUNC7_bb",
       "count": 7,
       "lut": 36,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc7",
       "count": 7,
       "lut": 36,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      },
      {
       "module": "mul_8ns_6ns_13_1_1",
       "count": 1,
       "lut": 26,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "u_ADD16_TRUNC5_bb",
       "count": 4,
       "lut": 23,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 1
      },
      {
       "module": "add16_trunc5",
       "count": 4,
       "lut": 23,
-      "ff": 0
+      "ff": 0,
+      "dsp": 0,
+      "depth": 2
      }
     ],
     "lut": 716,
@@ -11643,7 +12613,7 @@
     "critPs": 3800,
     "luts": 36,
     "carry4": 4,
-    "ff": 73,
+    "ff": 84,
     "areaUm2": 2568.0878500000003,
     "energyFj": 1497213.6227258751,
     "loops": [
@@ -11678,7 +12648,8 @@
      "pipelineOverhead": 1,
      "flatten": true,
      "uremLatency": 4,
-     "divAddrCycles": 1
+     "divAddrCycles": 1,
+     "ffPerLoop": 11
     }
    },
    "csim": {
@@ -11711,7 +12682,9 @@
       "module": "flow_control_loop_pipe",
       "count": 1,
       "lut": 18,
-      "ff": 1
+      "ff": 1,
+      "dsp": 0,
+      "depth": 1
      }
     ],
     "lut": 34,
@@ -11769,5 +12742,5 @@
    }
   }
  ],
- "compared": "2026-10-20T18:14:41.060Z"
+ "compared": "2026-10-25T12:09:58.176Z"
 }

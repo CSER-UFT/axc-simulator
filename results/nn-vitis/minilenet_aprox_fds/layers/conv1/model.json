@@ -1,0 +1,101 @@
+{
+ "id": "minilenet-mnist_aprox_10ns_conv1",
+ "note": "MiniLenet, camada conv1, conv1: MUL8 T6 A10c + ADD32 LOA11",
+ "clockNs": 10,
+ "part": "xc7a100tcsg324-1",
+ "top": "conv1",
+ "delays": "fpga",
+ "assign": {
+  "S1.2": "MUL8 T6 A10c",
+  "S1.5": "MUL8 T6 A10c",
+  "S1.9": "MUL8 T6 A10c",
+  "S1.12": "MUL8 T6 A10c",
+  "S1.14": "ADD24 LOA11",
+  "S1.17": "MUL8 T6 A10c",
+  "S1.20": "MUL8 T6 A10c",
+  "S1.24": "MUL8 T6 A10c",
+  "S1.27": "MUL8 T6 A10c",
+  "S1.29": "ADD24 LOA11",
+  "S1.30": "ADD24 LOA11",
+  "S1.33": "MUL8 T6 A10c",
+  "S1.36": "MUL8 T6 A10c",
+  "S1.40": "MUL8 T6 A10c",
+  "S1.43": "MUL8 T6 A10c",
+  "S1.45": "ADD24 LOA11",
+  "S1.48": "MUL8 T6 A10c",
+  "S1.51": "MUL8 T6 A10c",
+  "S1.55": "MUL8 T6 A10c",
+  "S1.58": "MUL8 T6 A10c",
+  "S1.60": "ADD24 LOA11",
+  "S1.61": "ADD24 LOA11",
+  "S1.62": "ADD24 LOA11",
+  "S1.65": "MUL8 T6 A10c",
+  "S1.68": "MUL8 T6 A10c",
+  "S1.72": "MUL8 T6 A10c",
+  "S1.75": "MUL8 T6 A10c",
+  "S1.77": "ADD24 LOA11",
+  "S1.80": "MUL8 T6 A10c",
+  "S1.83": "MUL8 T6 A10c",
+  "S1.87": "MUL8 T6 A10c",
+  "S1.90": "MUL8 T6 A10c",
+  "S1.92": "ADD24 LOA11",
+  "S1.93": "ADD24 LOA11",
+  "S1.96": "MUL8 T6 A10c",
+  "S1.97": "ADD24 LOA11",
+  "S1.98": "ADD24 LOA11",
+  "S1.100": "ADD24 LOA11"
+ },
+ "prediction": {
+  "cycles": 30579,
+  "timeNs": 305790,
+  "intervalNs": 130,
+  "critPs": 8636,
+  "luts": 1421,
+  "carry4": 150,
+  "ff": 959,
+  "areaUm2": 113034.58080000001,
+  "energyFj": 2614540843.1814837,
+  "loops": [
+   {
+    "label": "conv1_f_conv1_h_conv1_w",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 2352,
+    "II": 13,
+    "iterLatency": 15,
+    "latency": 30579
+   }
+  ],
+  "addrLuts": 492,
+  "units": [
+   {
+    "unit": "ADD16 exato",
+    "count": 12,
+    "luts": 192,
+    "carry4": 60
+   },
+   {
+    "unit": "ADD24 LOA11",
+    "count": 13,
+    "luts": 312,
+    "carry4": 52
+   },
+   {
+    "unit": "MUL8 T6 A10c",
+    "count": 2,
+    "luts": 98,
+    "carry4": 0
+   }
+  ],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
+  }
+ }
+}

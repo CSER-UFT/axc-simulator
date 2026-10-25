@@ -44,7 +44,7 @@
   "critPs": 4980,
   "luts": 1046,
   "carry4": 30,
-  "ff": 626,
+  "ff": 637,
   "areaUm2": 30723.510617724176,
   "energyFj": 72950859.54523367,
   "loops": [
@@ -59,6 +59,48 @@
   ],
   "addrLuts": 522,
   "units": [
+   {
+    "unit": "ADD16 LOA15",
+    "count": 1,
+    "luts": 8,
+    "carry4": 0
+   },
+   {
+    "unit": "ADD16 LOA10",
+    "count": 1,
+    "luts": 8,
+    "carry4": 1
+   },
+   {
+    "unit": "ADD16 LOA9",
+    "count": 5,
+    "luts": 63,
+    "carry4": 7
+   },
+   {
+    "unit": "ADD16 LOA8",
+    "count": 4,
+    "luts": 50,
+    "carry4": 9
+   },
+   {
+    "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
+    "count": 2,
+    "luts": 25,
+    "carry4": 4
+   },
+   {
+    "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
+    "count": 1,
+    "luts": 10,
+    "carry4": 1
+   },
+   {
+    "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
+    "count": 1,
+    "luts": 8,
+    "carry4": 0
+   },
    {
     "unit": "MUL8 DRUM4",
     "count": 2,
@@ -90,57 +132,15 @@
     "carry4": 0
    },
    {
-    "unit": "ADD16 LOA15",
-    "count": 1,
-    "luts": 8,
-    "carry4": 0
-   },
-   {
     "unit": "MUL8 DRUM3 +C",
     "count": 1,
     "luts": 36,
     "carry4": 0
    },
    {
-    "unit": "ADD16 LOA10",
-    "count": 1,
-    "luts": 8,
-    "carry4": 1
-   },
-   {
-    "unit": "ADD16 LOA9",
-    "count": 5,
-    "luts": 63,
-    "carry4": 7
-   },
-   {
-    "unit": "ADD16 LOA8",
-    "count": 4,
-    "luts": 50,
-    "carry4": 9
-   },
-   {
-    "unit": "ADD32 (ADD16 LOA8 + ADD16 exato)",
-    "count": 2,
-    "luts": 25,
-    "carry4": 4
-   },
-   {
     "unit": "MUL8 DRUM3",
     "count": 1,
     "luts": 36,
-    "carry4": 0
-   },
-   {
-    "unit": "ADD32 (ADD16 LOA10 + ADD16 exato)",
-    "count": 1,
-    "luts": 10,
-    "carry4": 1
-   },
-   {
-    "unit": "ADD32 (ADD16 LOA15 + ADD16 exato)",
-    "count": 1,
-    "luts": 8,
     "carry4": 0
    }
   ],
@@ -151,7 +151,8 @@
    "pipelineOverhead": 1,
    "flatten": true,
    "uremLatency": 4,
-   "divAddrCycles": 1
+   "divAddrCycles": 1,
+   "ffPerLoop": 11
   }
  }
 }

@@ -1,0 +1,35 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Sat Oct 24 17:13:16 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 5 -file ./report/pool1_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++----------------------------------+----------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|             Instance             |                    Module                    | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++----------------------------------+----------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| bd_0_wrapper                     |                                        (top) |        190 |        190 |       0 |    0 | 149 |      0 |      0 |          0 |
+|   bd_0_i                         |                                         bd_0 |        190 |        190 |       0 |    0 | 149 |      0 |      0 |          0 |
+|     hls_inst                     |                              bd_0_hls_inst_0 |        190 |        190 |       0 |    0 | 149 |      0 |      0 |          0 |
+|       (hls_inst)                 |                              bd_0_hls_inst_0 |          0 |          0 |       0 |    0 |   0 |      0 |      0 |          0 |
+|       inst                       |                        bd_0_hls_inst_0_pool1 |        190 |        190 |       0 |    0 | 149 |      0 |      0 |          0 |
+|         (inst)                   |                        bd_0_hls_inst_0_pool1 |        153 |        153 |       0 |    0 | 148 |      0 |      0 |          0 |
+|         flow_control_loop_pipe_U | bd_0_hls_inst_0_pool1_flow_control_loop_pipe |         37 |         37 |       0 |    0 |   1 |      0 |      0 |          0 |
++----------------------------------+----------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

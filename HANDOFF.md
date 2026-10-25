@@ -32,14 +32,20 @@ Resumo para continuar o trabalho numa conversa nova. Estado do repositório no c
 
 Ruído da validação: desvio padrão de sqrt(p(1-p)/n), 0,3 p.p. no MNIST e 1,4 p.p. no CIFAR 10 com 1000 imagens.
 
-## Calibração pendente (dados do lote do fim de semana, `scripts/fim-de-semana.sh`)
+## Calibração (estado depois do lote do fim de semana)
 
-* Resultado do usuário: `~/Downloads/fds_resultados.tar.gz` (redes exata/aprox/part e os 59 kernels de imagem).
-* `node scripts/vitis.mjs calibdata` gera `build/calib/kernels.json`; `node scripts/calibrate.mjs` ajusta (NNLS,
-  `--loo`). Aplicado até agora só `MODEL.ffPerLoop = 11`. O ajuste linear global de LUT piorou os kernels
-  (14,8% → 18,9%) por causa da variância de ROM e requant; refazer com os pesos em BRAM.
-* Termos a ajustar: LUT de endereço/controle, chamada de laço outlined (cerca de 4 ciclos por chamada nas densas),
-  LUT de cola do requant (cerca de 300), custo das unidades aproximadas como caixa preta; II 1 das maxpool.
+* Feito: `MODEL.ffPerLoop = 11`; no fluxo das redes, `VITIS_NN` em `js/axc/nngen.js` (produto exato uint8 x int8 com
+  64 LUTs, requant 45 LUTs, endereço x0,5, controle x0,6) e endereço por dimensão com dimensões internas potência de 2
+  (`partitionLogic`). Camadas exatas: LUT de 55% para 15% (validação cruzada 15%). Redes exatas: MiniLenet +15%,
+  LeNet 5 +7%, MiniLenet com partição -15%. Kernels de imagem sem mudança (LUT 14,6%, FF 21,1%).
+* Ferramentas: `node scripts/vitis.mjs calibdata`, `node scripts/calibrate.mjs [--nn] [--nnaddr] [--loo] [--rows]
+  [--rounds regex]`.
+* Pendente: rodada 5 (`scripts/rodada-aprox.sh`), as redes aproximadas com a chamada única da unidade (a chamada nos
+  dois ramos do sinal triplicava o II e duplicava as unidades). Com ela, calibrar o custo das unidades aproximadas
+  em Vitis. Atenção para a busca: com o produto exato a 64 LUTs, MUL8 T4 com ADD32 LOA10 já dá mais LUTs que a rede
+  exata no modelo (5427 contra 5355); no FPGA, o objetivo LUT tende a escolher as unidades exatas. Área e energia
+  (sky130) continuam com economia.
+* Também pendente: II 1 das maxpool dentro da rede (2 sozinhas); chamada outlined das densas (cerca de 4 ciclos).
 
 ## Regras do projeto
 

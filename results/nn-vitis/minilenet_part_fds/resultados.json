@@ -1,0 +1,2612 @@
+{
+ "dir": "build/fds/minilenet-mnist_part",
+ "model": "minilenet-mnist",
+ "clockNs": 10,
+ "network": {
+  "model": {
+   "cycles": 53288,
+   "timeUs": 532.88,
+   "area": 561523.7512000003,
+   "luts": 27575,
+   "carry4": 1766,
+   "ff": 4523,
+   "dsp": 2,
+   "energy": 1726421012.8730934,
+   "clockNs": 10,
+   "requantShared": true
+  },
+  "csim": {
+   "mismatches": 0,
+   "total": 1000,
+   "right": 99,
+   "images": 100
+  },
+  "hls": {
+   "estClockNs": 7.263,
+   "latencyBest": 53213,
+   "latencyWorst": 53213,
+   "intervalMin": 53214,
+   "lut": 86465,
+   "ff": 12130,
+   "dsp": 1,
+   "bram": 48,
+   "loops": []
+  },
+  "impl": {
+   "modules": [
+    {
+     "module": "axc_requant",
+     "count": 1,
+     "lut": 15,
+     "ff": 14,
+     "dsp": 2,
+     "depth": 1
+    },
+    {
+     "module": "mul_25ns_25s_50_1_1",
+     "count": 1,
+     "lut": 1,
+     "ff": 0,
+     "dsp": 2,
+     "depth": 2
+    },
+    {
+     "module": "conv1",
+     "count": 1,
+     "lut": 4345,
+     "ff": 1193,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "conv1_conv1_ap_uint_8_32_ap_uint_8_28_w_8_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv1_conv1_ap_uint_8_32_ap_uint_8_28_w_9_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "flow_control_loop_pipe_sequential_init",
+     "count": 15,
+     "lut": 392,
+     "ff": 30,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mul_5ns_7ns_11_1_1",
+     "count": 26,
+     "lut": 282,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mul_8ns_6ns_14_1_1",
+     "count": 2,
+     "lut": 75,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mul_8ns_7ns_15_1_1",
+     "count": 4,
+     "lut": 150,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mul_8ns_7s_15_1_1",
+     "count": 35,
+     "lut": 1841,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mul_8ns_8s_16_1_1",
+     "count": 57,
+     "lut": 2970,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv1_p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "urem_5ns_4ns_3_9_1",
+     "count": 8,
+     "lut": 329,
+     "ff": 164,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2",
+     "count": 1,
+     "lut": 11812,
+     "ff": 2940,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "conv2_b_V_2_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 2,
+     "ff": 5,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_conv2_ap_uint_8_18_ap_uint_8_14_w_12_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_conv2_ap_uint_8_18_ap_uint_8_14_w_13_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 3,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_conv2_ap_uint_8_18_ap_uint_8_14_w_14_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 3,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_conv2_ap_uint_8_18_ap_uint_8_14_w_16_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_conv2_ap_uint_8_18_ap_uint_8_14_w_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 0,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_m_V_2_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 2,
+     "ff": 7,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mul_4ns_6ns_9_1_1",
+     "count": 4,
+     "lut": 32,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mul_6ns_8ns_13_1_1",
+     "count": 26,
+     "lut": 279,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mul_8ns_6s_14_1_1",
+     "count": 2,
+     "lut": 92,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mux_144_8_1_1",
+     "count": 75,
+     "lut": 900,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mux_53_8_1_1",
+     "count": 75,
+     "lut": 930,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_10_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_11_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 0,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_12_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_18_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_21_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_22_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_23_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_24_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 4,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_25_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 0,
+     "ff": 3,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_26_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 2,
+     "ff": 4,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_27_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_29_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_30_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_31_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 3,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_32_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_34_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 0,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_35_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_36_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 3,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_37_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 2,
+     "ff": 4,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_38_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 2,
+     "ff": 5,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_39_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 2,
+     "ff": 5,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_44_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 3,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_46_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_48_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 3,
+     "ff": 7,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_49_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 4,
+     "ff": 6,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_50_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_54_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_55_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_57_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_59_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 3,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_61_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_62_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 0,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_63_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_64_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_65_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 2,
+     "ff": 5,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_66_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 4,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_67_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 2,
+     "ff": 3,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_68_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 3,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_69_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_70_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 3,
+     "ff": 5,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_71_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 3,
+     "ff": 4,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_72_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 2,
+     "ff": 7,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_73_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "conv2_p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_74_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 1,
+     "ff": 3,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "urem_4ns_4ns_3_8_1",
+     "count": 2,
+     "lut": 48,
+     "ff": 22,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "fc1",
+     "count": 1,
+     "lut": 208,
+     "ff": 148,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "fc1_b_V_1_ROM_2P_BRAM_1R",
+     "count": 1,
+     "lut": 3,
+     "ff": 2,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "fc1_Pipeline_fc1_i",
+     "count": 1,
+     "lut": 144,
+     "ff": 58,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "mul_8s_8ns_16_1_1",
+     "count": 2,
+     "lut": 104,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 3
+    },
+    {
+     "module": "fc1_Pipeline_fc1_i_w_V_1_ROM_2P_BRAM_1R",
+     "count": 1,
+     "lut": 16,
+     "ff": 1,
+     "dsp": 0,
+     "depth": 3
+    },
+    {
+     "module": "fc1_m_V_1_ROM_2P_BRAM_1R",
+     "count": 1,
+     "lut": 19,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "fc2",
+     "count": 1,
+     "lut": 207,
+     "ff": 184,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "fc2_b_V_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 10,
+     "ff": 16,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "fc2_Pipeline_fc2_i",
+     "count": 1,
+     "lut": 139,
+     "ff": 55,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "fc2_Pipeline_fc2_i_w_V_ROM_2P_BRAM_1R",
+     "count": 1,
+     "lut": 12,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 3
+    },
+    {
+     "module": "fc2_m_V_ROM_AUTO_1R",
+     "count": 1,
+     "lut": 12,
+     "ff": 23,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "flatten",
+     "count": 1,
+     "lut": 53,
+     "ff": 50,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "pad1",
+     "count": 1,
+     "lut": 431,
+     "ff": 291,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "pad1_Pipeline_pad1_in_L9",
+     "count": 1,
+     "lut": 199,
+     "ff": 108,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "pad1_Pipeline_pad1_left_L5",
+     "count": 1,
+     "lut": 68,
+     "ff": 54,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "pad1_Pipeline_pad1_right_L7",
+     "count": 1,
+     "lut": 68,
+     "ff": 54,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "pad1_Pipeline_pad1_top_L3",
+     "count": 1,
+     "lut": 91,
+     "ff": 63,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "urem_6ns_4ns_3_10_1",
+     "count": 1,
+     "lut": 29,
+     "ff": 28,
+     "dsp": 0,
+     "depth": 3
+    },
+    {
+     "module": "pad2",
+     "count": 1,
+     "lut": 832,
+     "ff": 312,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "pad2_Pipeline_pad2_in_L9",
+     "count": 1,
+     "lut": 178,
+     "ff": 91,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "urem_6ns_5ns_4_10_1",
+     "count": 4,
+     "lut": 367,
+     "ff": 92,
+     "dsp": 0,
+     "depth": 3
+    },
+    {
+     "module": "pad2_Pipeline_pad2_left_L5",
+     "count": 1,
+     "lut": 99,
+     "ff": 55,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "pad2_Pipeline_pad2_right_L7",
+     "count": 1,
+     "lut": 99,
+     "ff": 55,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "pad2_Pipeline_pad2_top_L3",
+     "count": 1,
+     "lut": 438,
+     "ff": 85,
+     "dsp": 0,
+     "depth": 2
+    },
+    {
+     "module": "pool1",
+     "count": 1,
+     "lut": 119,
+     "ff": 99,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "pool2",
+     "count": 1,
+     "lut": 115,
+     "ff": 91,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "t1_V_10_RAM_1WNR_AUTO_1R1W",
+     "count": 15,
+     "lut": 480,
+     "ff": 120,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "t1_V_RAM_AUTO_1R1W",
+     "count": 10,
+     "lut": 10,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "t2_V_RAM_1WNR_AUTO_1R1W",
+     "count": 1,
+     "lut": 24,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "t3_V_RAM_AUTO_1R1W",
+     "count": 1,
+     "lut": 5,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "t4_V_RAM_AUTO_1R1W",
+     "count": 75,
+     "lut": 601,
+     "ff": 600,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "t5_V_RAM_1WNR_AUTO_1R1W",
+     "count": 1,
+     "lut": 23,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "t6_V_RAM_AUTO_1R1W",
+     "count": 2,
+     "lut": 15,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 1
+    },
+    {
+     "module": "t8_V_RAM_AUTO_1R1W",
+     "count": 1,
+     "lut": 15,
+     "ff": 0,
+     "dsp": 0,
+     "depth": 1
+    }
+   ],
+   "lut": 19993,
+   "ff": 6072,
+   "dsp": 2,
+   "slice": 5744,
+   "bram": 58,
+   "achievedNs": 9.717,
+   "timingMet": "TRUE",
+   "carry4": 1875
+  }
+ },
+ "layers": [
+  {
+   "name": "pad1",
+   "model": {
+    "cycles": 974,
+    "II": 1,
+    "luts": 314,
+    "ff": 151,
+    "dsp": 0
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 1024
+    },
+    "hls": {
+     "estClockNs": 7.025,
+     "latencyBest": 976,
+     "latencyWorst": 976,
+     "intervalMin": 977,
+     "lut": 803,
+     "ff": 121,
+     "dsp": 0,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "pad1_in_L9",
+       "trip": 784,
+       "latency": 785,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 3
+      },
+      {
+       "name": "pad1_left_L5",
+       "trip": 56,
+       "latency": 56,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 1
+      },
+      {
+       "name": "pad1_right_L7",
+       "trip": 56,
+       "latency": 56,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 1
+      },
+      {
+       "name": "pad1_top_L3",
+       "trip": 64,
+       "latency": 64,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 2
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "pad1_Pipeline_pad1_in_L9",
+       "count": 1,
+       "lut": 49,
+       "ff": 49,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "flow_control_loop_pipe_sequential_init",
+       "count": 4,
+       "lut": 107,
+       "ff": 8,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "pad1_Pipeline_pad1_left_L5",
+       "count": 1,
+       "lut": 23,
+       "ff": 15,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "pad1_Pipeline_pad1_right_L7",
+       "count": 1,
+       "lut": 26,
+       "ff": 15,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "pad1_Pipeline_pad1_top_L3",
+       "count": 1,
+       "lut": 32,
+       "ff": 29,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 136,
+     "ff": 120,
+     "dsp": 0,
+     "slice": 43,
+     "bram": 0,
+     "achievedNs": 5.042,
+     "timingMet": "TRUE",
+     "carry4": 2
+    }
+   },
+   "inNet": {
+    "estClockNs": 7.025,
+    "latencyBest": 1004,
+    "latencyWorst": 1004,
+    "intervalMin": 1004,
+    "lut": 2824,
+    "ff": 1300,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "pad1_in_L9",
+      "trip": 784,
+      "latency": 791,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 9
+     },
+     {
+      "name": "pad1_left_L5",
+      "trip": 56,
+      "latency": 63,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 9
+     },
+     {
+      "name": "pad1_right_L7",
+      "trip": 56,
+      "latency": 63,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 9
+     },
+     {
+      "name": "pad1_top_L3",
+      "trip": 64,
+      "latency": 72,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 10
+     }
+    ]
+   },
+   "inNetImpl": {
+    "module": "pad1",
+    "count": 1,
+    "lut": 431,
+    "ff": 291,
+    "dsp": 0,
+    "depth": 1
+   }
+  },
+  {
+   "name": "conv1",
+   "model": {
+    "cycles": 2366,
+    "II": 1,
+    "luts": 4989,
+    "ff": 1142,
+    "dsp": 2
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 2352
+    },
+    "hls": {
+     "estClockNs": 7.149,
+     "latencyBest": 2372,
+     "latencyWorst": 2372,
+     "intervalMin": 2373,
+     "lut": 11066,
+     "ff": 2682,
+     "dsp": 1,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "conv1_f_conv1_h_conv1_w",
+       "trip": 2352,
+       "latency": 2370,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 20
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "conv1_ap_uint_8_32_ap_uint_8_28_w_8_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "conv1_ap_uint_8_32_ap_uint_8_28_w_9_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 0,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "flow_control_loop_pipe",
+       "count": 1,
+       "lut": 41,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "axc_requant",
+       "count": 1,
+       "lut": 34,
+       "ff": 0,
+       "dsp": 2,
+       "depth": 1
+      },
+      {
+       "module": "mul_24ns_20s_44_1_1",
+       "count": 1,
+       "lut": 26,
+       "ff": 0,
+       "dsp": 2,
+       "depth": 2
+      },
+      {
+       "module": "mul_5ns_7ns_11_1_1",
+       "count": 15,
+       "lut": 225,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mul_8ns_6ns_14_1_1",
+       "count": 2,
+       "lut": 91,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mul_8ns_7ns_15_1_1",
+       "count": 4,
+       "lut": 201,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mul_8ns_7s_15_1_1",
+       "count": 3,
+       "lut": 167,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mul_8ns_8s_16_1_1",
+       "count": 16,
+       "lut": 807,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mux_53_8_1_1",
+       "count": 50,
+       "lut": 600,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_10_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_14_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_15_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_17_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 2,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv1PA32_7ap_uintILi8EEPA28_S0_E1w_24_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "urem_5ns_4ns_3_9_1",
+       "count": 3,
+       "lut": 41,
+       "ff": 64,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 3447,
+     "ff": 1194,
+     "dsp": 2,
+     "slice": 1084,
+     "bram": 0,
+     "achievedNs": 7.415,
+     "timingMet": "TRUE",
+     "carry4": 471
+    }
+   },
+   "inNet": {
+    "estClockNs": 7.224,
+    "latencyBest": 2373,
+    "latencyWorst": 2373,
+    "intervalMin": 2373,
+    "lut": 10965,
+    "ff": 2632,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "conv1_f_conv1_h_conv1_w",
+      "trip": 2352,
+      "latency": 2371,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 21
+     }
+    ]
+   },
+   "inNetImpl": {
+    "module": "conv1",
+    "count": 1,
+    "lut": 4345,
+    "ff": 1193,
+    "dsp": 0,
+    "depth": 1
+   }
+  },
+  {
+   "name": "pool1",
+   "model": {
+    "cycles": 1178,
+    "II": 2,
+    "luts": 242,
+    "ff": 103,
+    "dsp": 0
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 588
+    },
+    "hls": {
+     "estClockNs": 7.181,
+     "latencyBest": 1181,
+     "latencyWorst": 1181,
+     "intervalMin": 1182,
+     "lut": 636,
+     "ff": 130,
+     "dsp": 0,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "pool1_c_pool1_h_pool1_w",
+       "trip": 588,
+       "latency": 1179,
+       "iterLatency": null,
+       "II": 2,
+       "depth": 6
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "flow_control_loop_pipe",
+       "count": 1,
+       "lut": 36,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 150,
+     "ff": 124,
+     "dsp": 0,
+     "slice": 60,
+     "bram": 0,
+     "achievedNs": 5.229,
+     "timingMet": "TRUE",
+     "carry4": 21
+    }
+   },
+   "inNet": {
+    "estClockNs": 7.263,
+    "latencyBest": 593,
+    "latencyWorst": 593,
+    "intervalMin": 593,
+    "lut": 655,
+    "ff": 224,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "pool1_c_pool1_h_pool1_w",
+      "trip": 588,
+      "latency": 591,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 5
+     }
+    ]
+   },
+   "inNetImpl": {
+    "module": "pool1",
+    "count": 1,
+    "lut": 119,
+    "ff": 99,
+    "dsp": 0,
+    "depth": 1
+   }
+  },
+  {
+   "name": "pad2",
+   "model": {
+    "cycles": 906,
+    "II": 1,
+    "luts": 502,
+    "ff": 146,
+    "dsp": 0
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 972
+    },
+    "hls": {
+     "estClockNs": 7.07,
+     "latencyBest": 916,
+     "latencyWorst": 916,
+     "intervalMin": 917,
+     "lut": 955,
+     "ff": 150,
+     "dsp": 0,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "pad2_c",
+       "trip": 3,
+       "latency": 915,
+       "iterLatency": 305,
+       "II": null,
+       "depth": null
+      },
+      {
+       "name": "pad2_in_L9",
+       "trip": 196,
+       "latency": 197,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 3
+      },
+      {
+       "name": "pad2_left_L5",
+       "trip": 28,
+       "latency": 28,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 2
+      },
+      {
+       "name": "pad2_right_L7",
+       "trip": 28,
+       "latency": 28,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 2
+      },
+      {
+       "name": "pad2_top_L3",
+       "trip": 36,
+       "latency": 36,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 2
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "pad2_Pipeline_pad2_in_L9",
+       "count": 1,
+       "lut": 48,
+       "ff": 46,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "flow_control_loop_pipe_sequential_init",
+       "count": 4,
+       "lut": 89,
+       "ff": 8,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "pad2_Pipeline_pad2_left_L5",
+       "count": 1,
+       "lut": 24,
+       "ff": 22,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "pad2_Pipeline_pad2_right_L7",
+       "count": 1,
+       "lut": 43,
+       "ff": 22,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "pad2_Pipeline_pad2_top_L3",
+       "count": 1,
+       "lut": 36,
+       "ff": 27,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 162,
+     "ff": 141,
+     "dsp": 0,
+     "slice": 66,
+     "bram": 0,
+     "achievedNs": 5.041,
+     "timingMet": "TRUE",
+     "carry4": 18
+    }
+   },
+   "inNet": {
+    "estClockNs": 7.041,
+    "latencyBest": 1018,
+    "latencyWorst": 1018,
+    "intervalMin": 1018,
+    "lut": 7888,
+    "ff": 1629,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "pad2_c",
+      "trip": 3,
+      "latency": 1017,
+      "iterLatency": 339,
+      "II": null,
+      "depth": null
+     },
+     {
+      "name": "pad2_in_L9",
+      "trip": 196,
+      "latency": 205,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 11
+     },
+     {
+      "name": "pad2_left_L5",
+      "trip": 28,
+      "latency": 37,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 11
+     },
+     {
+      "name": "pad2_right_L7",
+      "trip": 28,
+      "latency": 37,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 11
+     },
+     {
+      "name": "pad2_top_L3",
+      "trip": 36,
+      "latency": 44,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 10
+     }
+    ]
+   },
+   "inNetImpl": {
+    "module": "pad2",
+    "count": 1,
+    "lut": 832,
+    "ff": 312,
+    "dsp": 0,
+    "depth": 1
+   }
+  },
+  {
+   "name": "conv2",
+   "model": {
+    "cycles": 1191,
+    "II": 1,
+    "luts": 20827,
+    "ff": 2554,
+    "dsp": 2
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 1176
+    },
+    "hls": {
+     "estClockNs": 7.07,
+     "latencyBest": 1194,
+     "latencyWorst": 1194,
+     "intervalMin": 1195,
+     "lut": 58170,
+     "ff": 4708,
+     "dsp": 1,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "conv2_f_conv2_h_conv2_w",
+       "trip": 1176,
+       "latency": 1192,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 18
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "b_V_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 2,
+       "ff": 4,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "conv2_ap_uint_8_18_ap_uint_8_14_w_1_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "conv2_ap_uint_8_18_ap_uint_8_14_w_2_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "conv2_ap_uint_8_18_ap_uint_8_14_w_3_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "conv2_ap_uint_8_18_ap_uint_8_14_w_5_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "conv2_ap_uint_8_18_ap_uint_8_14_w_7_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "conv2_ap_uint_8_18_ap_uint_8_14_w_9_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "conv2_ap_uint_8_18_ap_uint_8_14_w_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 2,
+       "ff": 3,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "flow_control_loop_pipe",
+       "count": 1,
+       "lut": 36,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "axc_requant",
+       "count": 1,
+       "lut": 28,
+       "ff": 0,
+       "dsp": 2,
+       "depth": 1
+      },
+      {
+       "module": "mul_25ns_22s_47_1_1",
+       "count": 1,
+       "lut": 23,
+       "ff": 0,
+       "dsp": 2,
+       "depth": 2
+      },
+      {
+       "module": "m_V_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 8,
+       "ff": 20,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mul_4ns_6ns_9_1_1",
+       "count": 3,
+       "lut": 28,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mul_5ns_7ns_11_1_1",
+       "count": 6,
+       "lut": 96,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mul_6ns_8ns_13_1_1",
+       "count": 20,
+       "lut": 210,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mul_8ns_6s_14_1_1",
+       "count": 2,
+       "lut": 102,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mul_8ns_7s_15_1_1",
+       "count": 32,
+       "lut": 1947,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mul_8ns_8s_16_1_1",
+       "count": 41,
+       "lut": 2538,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mux_144_8_1_1",
+       "count": 75,
+       "lut": 900,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "mux_53_8_1_1",
+       "count": 75,
+       "lut": 1530,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_10_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_12_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_18_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_21_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_22_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_24_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_26_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_27_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_29_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_31_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_32_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_35_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_37_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_38_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_39_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_40_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 4,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_43_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 0,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_44_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 2,
+       "ff": 4,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_45_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 0,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_46_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_47_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_48_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 3,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_49_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 3,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_50_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_51_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 0,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_52_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_54_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 0,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_55_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 2,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_59_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_61_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_63_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 3,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_65_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 0,
+       "ff": 3,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_66_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 2,
+       "ff": 4,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_67_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 3,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_69_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_70_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 4,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_71_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 3,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_72_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 5,
+       "ff": 8,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_73_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 3,
+       "ff": 6,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "p_ZZ5conv2PA18_7ap_uintILi8EEPA14_S0_E1w_74_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 2,
+       "ff": 4,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "urem_4ns_4ns_3_8_1",
+       "count": 1,
+       "lut": 9,
+       "ff": 17,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 14011,
+     "ff": 2923,
+     "dsp": 2,
+     "slice": 4169,
+     "bram": 0,
+     "achievedNs": 9.667,
+     "timingMet": "TRUE",
+     "carry4": 1248
+    }
+   },
+   "inNet": {
+    "estClockNs": 7.224,
+    "latencyBest": 1195,
+    "latencyWorst": 1195,
+    "intervalMin": 1195,
+    "lut": 58062,
+    "ff": 4653,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "conv2_f_conv2_h_conv2_w",
+      "trip": 1176,
+      "latency": 1193,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 19
+     }
+    ]
+   },
+   "inNetImpl": {
+    "module": "conv2",
+    "count": 1,
+    "lut": 11812,
+    "ff": 2940,
+    "dsp": 0,
+    "depth": 1
+   }
+  },
+  {
+   "name": "pool2",
+   "model": {
+    "cycles": 590,
+    "II": 2,
+    "luts": 229,
+    "ff": 100,
+    "dsp": 0
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 294
+    },
+    "hls": {
+     "estClockNs": 7.178,
+     "latencyBest": 593,
+     "latencyWorst": 593,
+     "intervalMin": 594,
+     "lut": 616,
+     "ff": 122,
+     "dsp": 0,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "pool2_c_pool2_h_pool2_w",
+       "trip": 294,
+       "latency": 591,
+       "iterLatency": null,
+       "II": 2,
+       "depth": 6
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "flow_control_loop_pipe",
+       "count": 1,
+       "lut": 30,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 147,
+     "ff": 116,
+     "dsp": 0,
+     "slice": 57,
+     "bram": 0,
+     "achievedNs": 5.406,
+     "timingMet": "TRUE",
+     "carry4": 21
+    }
+   },
+   "inNet": {
+    "estClockNs": 7.248,
+    "latencyBest": 299,
+    "latencyWorst": 299,
+    "intervalMin": 299,
+    "lut": 635,
+    "ff": 219,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "pool2_c_pool2_h_pool2_w",
+      "trip": 294,
+      "latency": 297,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 5
+     }
+    ]
+   },
+   "inNetImpl": {
+    "module": "pool2",
+    "count": 1,
+    "lut": 115,
+    "ff": 91,
+    "dsp": 0,
+    "depth": 1
+   }
+  },
+  {
+   "name": "flatten",
+   "model": {
+    "cycles": 296,
+    "II": 1,
+    "luts": 68,
+    "ff": 48,
+    "dsp": 0
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 294
+    },
+    "hls": {
+     "estClockNs": 6.514,
+     "latencyBest": 297,
+     "latencyWorst": 297,
+     "intervalMin": 298,
+     "lut": 220,
+     "ff": 50,
+     "dsp": 0,
+     "bram": 0,
+     "loops": [
+      {
+       "name": "flatten_r_flatten_w",
+       "trip": 294,
+       "latency": 295,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 3
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "flow_control_loop_pipe",
+       "count": 1,
+       "lut": 51,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 52,
+     "ff": 49,
+     "dsp": 0,
+     "slice": 20,
+     "bram": 0,
+     "achievedNs": 4.978,
+     "timingMet": "TRUE",
+     "carry4": 6
+    }
+   },
+   "inNet": {
+    "estClockNs": 6.514,
+    "latencyBest": 297,
+    "latencyWorst": 297,
+    "intervalMin": 297,
+    "lut": 218,
+    "ff": 50,
+    "dsp": 0,
+    "bram": 0,
+    "loops": [
+     {
+      "name": "flatten_r_flatten_w",
+      "trip": 294,
+      "latency": 295,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 3
+     }
+    ]
+   },
+   "inNetImpl": {
+    "module": "flatten",
+    "count": 1,
+    "lut": 53,
+    "ff": 50,
+    "dsp": 0,
+    "depth": 1
+   }
+  },
+  {
+   "name": "fc1",
+   "model": {
+    "cycles": 44247,
+    "II": 1,
+    "luts": 339,
+    "ff": 141,
+    "dsp": 2
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 147
+    },
+    "hls": {
+     "estClockNs": 7.045,
+     "latencyBest": 44836,
+     "latencyWorst": 44836,
+     "intervalMin": 44837,
+     "lut": 483,
+     "ff": 250,
+     "dsp": 1,
+     "bram": 34,
+     "loops": [
+      {
+       "name": "fc1_o",
+       "trip": 147,
+       "latency": 44835,
+       "iterLatency": 305,
+       "II": null,
+       "depth": null
+      },
+      {
+       "name": "fc1_i",
+       "trip": 294,
+       "latency": 296,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 4
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "b_V_ROM_2P_BRAM_1R",
+       "count": 1,
+       "lut": 1,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "axc_requant",
+       "count": 1,
+       "lut": 12,
+       "ff": 13,
+       "dsp": 2,
+       "depth": 1
+      },
+      {
+       "module": "mul_24ns_25s_49_1_1",
+       "count": 1,
+       "lut": 1,
+       "ff": 0,
+       "dsp": 2,
+       "depth": 2
+      },
+      {
+       "module": "fc1_Pipeline_fc1_i",
+       "count": 1,
+       "lut": 150,
+       "ff": 66,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "flow_control_loop_pipe_sequential_init",
+       "count": 1,
+       "lut": 17,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "mul_8s_8ns_16_1_1",
+       "count": 1,
+       "lut": 52,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "fc1_Pipeline_fc1_i_w_V_ROM_2P_BRAM_1R",
+       "count": 1,
+       "lut": 30,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "m_V_ROM_2P_BRAM_1R",
+       "count": 1,
+       "lut": 2,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 179,
+     "ff": 143,
+     "dsp": 2,
+     "slice": 71,
+     "bram": 34,
+     "achievedNs": 7.963,
+     "timingMet": "TRUE",
+     "carry4": 43
+    }
+   },
+   "inNet": {
+    "estClockNs": 7.224,
+    "latencyBest": 44836,
+    "latencyWorst": 44836,
+    "intervalMin": 44836,
+    "lut": 327,
+    "ff": 189,
+    "dsp": 0,
+    "bram": 34,
+    "loops": [
+     {
+      "name": "fc1_o",
+      "trip": 147,
+      "latency": 44835,
+      "iterLatency": 305,
+      "II": null,
+      "depth": null
+     },
+     {
+      "name": "fc1_i",
+      "trip": 294,
+      "latency": 296,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 4
+     }
+    ]
+   },
+   "inNetImpl": {
+    "module": "fc1",
+    "count": 1,
+    "lut": 208,
+    "ff": 148,
+    "dsp": 0,
+    "depth": 1
+   }
+  },
+  {
+   "name": "fc2",
+   "model": {
+    "cycles": 1540,
+    "II": 1,
+    "luts": 287,
+    "ff": 138,
+    "dsp": 2
+   },
+   "iso": {
+    "csim": {
+     "mismatches": 0,
+     "total": 10
+    },
+    "hls": {
+     "estClockNs": 6.824,
+     "latencyBest": 1581,
+     "latencyWorst": 1581,
+     "intervalMin": 1582,
+     "lut": 466,
+     "ff": 262,
+     "dsp": 1,
+     "bram": 1,
+     "loops": [
+      {
+       "name": "fc2_o",
+       "trip": 10,
+       "latency": 1580,
+       "iterLatency": 158,
+       "II": null,
+       "depth": null
+      },
+      {
+       "name": "fc2_i",
+       "trip": 147,
+       "latency": 149,
+       "iterLatency": null,
+       "II": 1,
+       "depth": 4
+      }
+     ]
+    },
+    "impl": {
+     "modules": [
+      {
+       "module": "b_V_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 12,
+       "ff": 16,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "axc_requant",
+       "count": 1,
+       "lut": 29,
+       "ff": 13,
+       "dsp": 2,
+       "depth": 1
+      },
+      {
+       "module": "mul_23ns_24s_47_1_1",
+       "count": 1,
+       "lut": 13,
+       "ff": 0,
+       "dsp": 2,
+       "depth": 2
+      },
+      {
+       "module": "fc2_Pipeline_fc2_i",
+       "count": 1,
+       "lut": 143,
+       "ff": 63,
+       "dsp": 0,
+       "depth": 1
+      },
+      {
+       "module": "flow_control_loop_pipe_sequential_init",
+       "count": 1,
+       "lut": 21,
+       "ff": 2,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "mul_8s_8ns_16_1_1",
+       "count": 1,
+       "lut": 52,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "fc2_Pipeline_fc2_i_w_V_ROM_2P_BRAM_1R",
+       "count": 1,
+       "lut": 26,
+       "ff": 0,
+       "dsp": 0,
+       "depth": 2
+      },
+      {
+       "module": "m_V_ROM_AUTO_1R",
+       "count": 1,
+       "lut": 0,
+       "ff": 1,
+       "dsp": 0,
+       "depth": 1
+      }
+     ],
+     "lut": 197,
+     "ff": 135,
+     "dsp": 2,
+     "slice": 73,
+     "bram": 1,
+     "achievedNs": 7.205,
+     "timingMet": "TRUE",
+     "carry4": 36
+    }
+   },
+   "inNet": {
+    "estClockNs": 7.224,
+    "latencyBest": 1581,
+    "latencyWorst": 1581,
+    "intervalMin": 1581,
+    "lut": 317,
+    "ff": 203,
+    "dsp": 0,
+    "bram": 1,
+    "loops": [
+     {
+      "name": "fc2_o",
+      "trip": 10,
+      "latency": 1580,
+      "iterLatency": 158,
+      "II": null,
+      "depth": null
+     },
+     {
+      "name": "fc2_i",
+      "trip": 147,
+      "latency": 149,
+      "iterLatency": null,
+      "II": 1,
+      "depth": 4
+     }
+    ]
+   },
+   "inNetImpl": {
+    "module": "fc2",
+    "count": 1,
+    "lut": 207,
+    "ff": 184,
+    "dsp": 0,
+    "depth": 1
+   }
+  }
+ ],
+ "layersSum": {
+  "latency": 53946,
+  "lut": 18481,
+  "ff": 4945,
+  "dsp": 8
+ }
+}
