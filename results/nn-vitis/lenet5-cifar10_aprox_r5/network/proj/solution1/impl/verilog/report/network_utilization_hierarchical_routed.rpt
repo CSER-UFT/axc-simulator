@@ -1,0 +1,97 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+-----------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Sun Oct 25 11:26:05 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 8 -file ./report/network_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+-----------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++------------------------------------------------------+------------------------------------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+|                       Instance                       |                              Module                              | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs  | RAMB36 | RAMB18 | DSP Blocks |
++------------------------------------------------------+------------------------------------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+| bd_0_wrapper                                         |                                                            (top) |      17010 |      17004 |       0 |    6 | 13341 |     27 |     14 |          2 |
+|   bd_0_i                                             |                                                             bd_0 |      17010 |      17004 |       0 |    6 | 13341 |     27 |     14 |          2 |
+|     hls_inst                                         |                                                  bd_0_hls_inst_0 |      17010 |      17004 |       0 |    6 | 13341 |     27 |     14 |          2 |
+|       inst                                           |                                          bd_0_hls_inst_0_network |      17010 |      17004 |       0 |    6 | 13341 |     27 |     14 |          2 |
+|         (inst)                                       |                                          bd_0_hls_inst_0_network |          1 |          1 |       0 |    0 |    31 |      0 |      0 |          0 |
+|         grp_axc_requant_fu_185                       |                              bd_0_hls_inst_0_network_axc_requant |         15 |         15 |       0 |    0 |    22 |      0 |      0 |          2 |
+|           (grp_axc_requant_fu_185)                   |                              bd_0_hls_inst_0_network_axc_requant |         14 |         14 |       0 |    0 |    22 |      0 |      0 |          0 |
+|           mul_25ns_25s_50_1_1_U5                     |                      bd_0_hls_inst_0_network_mul_25ns_25s_50_1_1 |          1 |          1 |       0 |    0 |     0 |      0 |      0 |          2 |
+|         grp_conv1_fu_104                             |                                    bd_0_hls_inst_0_network_conv1 |       4531 |       4531 |       0 |    0 |  3938 |      0 |      1 |          0 |
+|           (grp_conv1_fu_104)                         |                                    bd_0_hls_inst_0_network_conv1 |       2559 |       2559 |       0 |    0 |  3871 |      0 |      0 |          0 |
+|           b_V_4_U                                    |                  bd_0_hls_inst_0_network_conv1_b_V_4_ROM_AUTO_1R |          0 |          0 |       0 |    0 |    14 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U   | bd_0_hls_inst_0_network_flow_control_loop_pipe_sequential_init_8 |         78 |         78 |       0 |    0 |     2 |      0 |      0 |          0 |
+|           grp_u_MUL8_T4_A2c_fu_2167                  |                            bd_0_hls_inst_0_network_u_MUL8_T4_A2c |        783 |        783 |       0 |    0 |    35 |      0 |      0 |          0 |
+|           m_V_4_U                                    |                  bd_0_hls_inst_0_network_conv1_m_V_4_ROM_AUTO_1R |          1 |          1 |       0 |    0 |    16 |      0 |      0 |          0 |
+|           mul_3ns_8ns_10_1_1_U10                     |                       bd_0_hls_inst_0_network_mul_3ns_8ns_10_1_1 |          5 |          5 |       0 |    0 |     0 |      0 |      0 |          0 |
+|           mul_3ns_8ns_10_1_1_U11                     |                     bd_0_hls_inst_0_network_mul_3ns_8ns_10_1_1_9 |          6 |          6 |       0 |    0 |     0 |      0 |      0 |          0 |
+|           w_V_4_U                                    |               bd_0_hls_inst_0_network_conv1_w_V_4_ROM_2P_BRAM_1R |       1121 |       1121 |       0 |    0 |     0 |      0 |      1 |          0 |
+|         grp_conv2_fu_124                             |                                    bd_0_hls_inst_0_network_conv2 |      10904 |      10904 |       0 |    0 |  8495 |      1 |      0 |          0 |
+|           (grp_conv2_fu_124)                         |                                    bd_0_hls_inst_0_network_conv2 |       6976 |       6976 |       0 |    0 |  8379 |      0 |      0 |          0 |
+|           b_V_3_U                                    |                  bd_0_hls_inst_0_network_conv2_b_V_3_ROM_AUTO_1R |          0 |          0 |       0 |    0 |    14 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U   | bd_0_hls_inst_0_network_flow_control_loop_pipe_sequential_init_6 |         95 |         95 |       0 |    0 |     2 |      0 |      0 |          0 |
+|           grp_u_MUL8_DRUM5_fu_4145                   |                             bd_0_hls_inst_0_network_u_MUL8_DRUM5 |       1548 |       1548 |       0 |    0 |    76 |      0 |      0 |          0 |
+|           m_V_3_U                                    |                  bd_0_hls_inst_0_network_conv2_m_V_3_ROM_AUTO_1R |          1 |          1 |       0 |    0 |    24 |      0 |      0 |          0 |
+|           mul_5ns_9ns_13_1_1_U22                     |                       bd_0_hls_inst_0_network_mul_5ns_9ns_13_1_1 |         15 |         15 |       0 |    0 |     0 |      0 |      0 |          0 |
+|           mul_5ns_9ns_13_1_1_U23                     |                     bd_0_hls_inst_0_network_mul_5ns_9ns_13_1_1_7 |         20 |         20 |       0 |    0 |     0 |      0 |      0 |          0 |
+|           w_V_3_U                                    |               bd_0_hls_inst_0_network_conv2_w_V_3_ROM_2P_BRAM_1R |       2263 |       2263 |       0 |    0 |     0 |      1 |      0 |          0 |
+|         grp_fc1_fu_148                               |                                      bd_0_hls_inst_0_network_fc1 |        421 |        420 |       0 |    1 |   171 |     16 |      2 |          0 |
+|           (grp_fc1_fu_148)                           |                                      bd_0_hls_inst_0_network_fc1 |        182 |        182 |       0 |    0 |   107 |      0 |      0 |          0 |
+|           b_V_2_U                                    |                 bd_0_hls_inst_0_network_fc1_b_V_2_ROM_2P_BRAM_1R |          3 |          3 |       0 |    0 |     2 |      0 |      1 |          0 |
+|           grp_fc1_Pipeline_fc1_i_fu_255              |                       bd_0_hls_inst_0_network_fc1_Pipeline_fc1_i |        232 |        231 |       0 |    1 |    60 |     16 |      0 |          0 |
+|             (grp_fc1_Pipeline_fc1_i_fu_255)          |                       bd_0_hls_inst_0_network_fc1_Pipeline_fc1_i |        180 |        179 |       0 |    1 |    57 |      0 |      0 |          0 |
+|             cv1_0_V_6_u_ADD32_LOA6_fu_111            |                             bd_0_hls_inst_0_network_u_ADD32_LOA6 |         22 |         22 |       0 |    0 |     0 |      0 |      0 |          0 |
+|             flow_control_loop_pipe_sequential_init_U | bd_0_hls_inst_0_network_flow_control_loop_pipe_sequential_init_5 |         21 |         21 |       0 |    0 |     2 |      0 |      0 |          0 |
+|             w_V_2_U                                  |  bd_0_hls_inst_0_network_fc1_Pipeline_fc1_i_w_V_2_ROM_2P_BRAM_1R |          9 |          9 |       0 |    0 |     1 |     16 |      0 |          0 |
+|           m_V_2_U                                    |                 bd_0_hls_inst_0_network_fc1_m_V_2_ROM_2P_BRAM_1R |          4 |          4 |       0 |    0 |     2 |      0 |      1 |          0 |
+|         grp_fc2_fu_160                               |                                      bd_0_hls_inst_0_network_fc2 |        390 |        389 |       0 |    1 |   166 |      4 |      2 |          0 |
+|           (grp_fc2_fu_160)                           |                                      bd_0_hls_inst_0_network_fc2 |        186 |        186 |       0 |    0 |    93 |      0 |      0 |          0 |
+|           b_V_1_U                                    |                 bd_0_hls_inst_0_network_fc2_b_V_1_ROM_2P_BRAM_1R |          5 |          5 |       0 |    0 |     2 |      0 |      1 |          0 |
+|           grp_fc2_Pipeline_fc2_i_fu_243              |                       bd_0_hls_inst_0_network_fc2_Pipeline_fc2_i |        198 |        197 |       0 |    1 |    69 |      4 |      0 |          0 |
+|             (grp_fc2_Pipeline_fc2_i_fu_243)          |                       bd_0_hls_inst_0_network_fc2_Pipeline_fc2_i |        176 |        175 |       0 |    1 |    67 |      0 |      0 |          0 |
+|             flow_control_loop_pipe_sequential_init_U | bd_0_hls_inst_0_network_flow_control_loop_pipe_sequential_init_4 |         17 |         17 |       0 |    0 |     2 |      0 |      0 |          0 |
+|             w_V_1_U                                  |  bd_0_hls_inst_0_network_fc2_Pipeline_fc2_i_w_V_1_ROM_2P_BRAM_1R |          5 |          5 |       0 |    0 |     0 |      4 |      0 |          0 |
+|           m_V_1_U                                    |                 bd_0_hls_inst_0_network_fc2_m_V_1_ROM_2P_BRAM_1R |          1 |          1 |       0 |    0 |     2 |      0 |      1 |          0 |
+|         grp_fc3_fu_172                               |                                      bd_0_hls_inst_0_network_fc3 |        463 |        461 |       0 |    2 |   214 |      0 |      1 |          0 |
+|           (grp_fc3_fu_172)                           |                                      bd_0_hls_inst_0_network_fc3 |         21 |         21 |       0 |    0 |    81 |      0 |      0 |          0 |
+|           b_V_U                                      |                      bd_0_hls_inst_0_network_fc3_b_V_ROM_AUTO_1R |         90 |         90 |       0 |    0 |    12 |      0 |      0 |          0 |
+|           grp_fc3_Pipeline_fc3_i_fu_261              |                       bd_0_hls_inst_0_network_fc3_Pipeline_fc3_i |        341 |        339 |       0 |    2 |   100 |      0 |      1 |          0 |
+|             (grp_fc3_Pipeline_fc3_i_fu_261)          |                       bd_0_hls_inst_0_network_fc3_Pipeline_fc3_i |        259 |        257 |       0 |    2 |    77 |      0 |      0 |          0 |
+|             flow_control_loop_pipe_sequential_init_U | bd_0_hls_inst_0_network_flow_control_loop_pipe_sequential_init_3 |         16 |         16 |       0 |    0 |     2 |      0 |      0 |          0 |
+|             grp_u_MUL8_DRUM3_fu_105                  |                             bd_0_hls_inst_0_network_u_MUL8_DRUM3 |         61 |         61 |       0 |    0 |    21 |      0 |      0 |          0 |
+|             w_V_U                                    |    bd_0_hls_inst_0_network_fc3_Pipeline_fc3_i_w_V_ROM_2P_BRAM_1R |          5 |          5 |       0 |    0 |     0 |      0 |      1 |          0 |
+|           m_V_U                                      |                      bd_0_hls_inst_0_network_fc3_m_V_ROM_AUTO_1R |         11 |         11 |       0 |    0 |    21 |      0 |      0 |          0 |
+|         grp_flatten_fu_142                           |                                  bd_0_hls_inst_0_network_flatten |         44 |         44 |       0 |    0 |    43 |      0 |      0 |          0 |
+|           (grp_flatten_fu_142)                       |                                  bd_0_hls_inst_0_network_flatten |         19 |         19 |       0 |    0 |    41 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U   | bd_0_hls_inst_0_network_flow_control_loop_pipe_sequential_init_2 |         25 |         25 |       0 |    0 |     2 |      0 |      0 |          0 |
+|         grp_pool1_fu_118                             |                                    bd_0_hls_inst_0_network_pool1 |        150 |        149 |       0 |    1 |   138 |      0 |      0 |          0 |
+|           (grp_pool1_fu_118)                         |                                    bd_0_hls_inst_0_network_pool1 |        100 |         99 |       0 |    1 |   136 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U   | bd_0_hls_inst_0_network_flow_control_loop_pipe_sequential_init_1 |         50 |         50 |       0 |    0 |     2 |      0 |      0 |          0 |
+|         grp_pool2_fu_136                             |                                    bd_0_hls_inst_0_network_pool2 |        138 |        137 |       0 |    1 |   123 |      0 |      0 |          0 |
+|           (grp_pool2_fu_136)                         |                                    bd_0_hls_inst_0_network_pool2 |         90 |         89 |       0 |    1 |   121 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U   |   bd_0_hls_inst_0_network_flow_control_loop_pipe_sequential_init |         48 |         48 |       0 |    0 |     2 |      0 |      0 |          0 |
+|         grp_u_ADD24_LOA7_fu_191                      |                             bd_0_hls_inst_0_network_u_ADD24_LOA7 |          0 |          0 |       0 |    0 |     0 |      0 |      0 |          0 |
+|         t1_V_U                                       |                  bd_0_hls_inst_0_network_t1_V_RAM_1WNR_AUTO_1R1W |         24 |         24 |       0 |    0 |     0 |      6 |      0 |          0 |
+|         t2_V_U                                       |                  bd_0_hls_inst_0_network_t2_V_RAM_1WNR_AUTO_1R1W |          0 |          0 |       0 |    0 |     0 |      0 |      1 |          0 |
+|         t3_V_U                                       |                  bd_0_hls_inst_0_network_t3_V_RAM_1WNR_AUTO_1R1W |         17 |         17 |       0 |    0 |     0 |      0 |      3 |          0 |
+|         t4_V_U                                       |                       bd_0_hls_inst_0_network_t4_V_RAM_AUTO_1R1W |          0 |          0 |       0 |    0 |     0 |      0 |      1 |          0 |
+|         t5_V_U                                       |                     bd_0_hls_inst_0_network_t4_V_RAM_AUTO_1R1W_0 |         21 |         21 |       0 |    0 |     0 |      0 |      1 |          0 |
+|         t6_V_U                                       |                       bd_0_hls_inst_0_network_t6_V_RAM_AUTO_1R1W |         16 |         16 |       0 |    0 |     0 |      0 |      1 |          0 |
+|         t7_V_U                                       |                       bd_0_hls_inst_0_network_t7_V_RAM_AUTO_1R1W |         10 |         10 |       0 |    0 |     0 |      0 |      1 |          0 |
++------------------------------------------------------+------------------------------------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

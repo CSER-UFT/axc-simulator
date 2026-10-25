@@ -268,11 +268,16 @@ export function exportIR(result, { inline = false, romStorage = null } = {}) {
         '',
         seqUnitsCode(result.lib, f.seqUnits),
         '',
+        signedCode([f]),
+        '',
         ...(f.requant ? [REQUANT_CPP, ''] : []),
         f.code,
     ];
     return code.join('\n');
 }
+
+/** Funções do produto com sinal das funções exportadas (cada uma uma vez). */
+export function signedCode(fns) { return [...new Map(fns.flatMap((f) => f.signed ?? [])).values()].join('\n\n'); }
 
 /** Unidades usadas por um conjunto de funções exportadas, como código C++ (cada unidade uma vez). */
 export function unitsCode(lib, names, inline = false) { return unitFunctions(lib, names, inline); }
@@ -309,7 +314,7 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
     // Unidades chamadas dentro de laços com pipeline (caixa preta ou C++, conforme a exportação) e fora deles: o
     // Vitis 2022.2 não aceita a caixa preta de RTL (ap_ctrl_none) numa região sequencial (HLS 200-1918), e ali vai
     // a mesma netlist em C++ (uc_*).
-    const unitsUsed = new Set(), seqUnits = new Set();
+    const unitsUsed = new Set(), seqUnits = new Set(), signedFns = new Map();
     let piped = false;
     function emitNode(n, d) {
         const a = n.args;
@@ -343,15 +348,26 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
                 const x = val(a[0]), y = val(a[1]);
                 const signedArgs = a.some((z) => (z.c !== undefined ? z.c < 0 : byId.get(z.n).range[0] < 0));
                 if (!signedArgs) { set(`${T}(${f}(ap_uint<${N}>(${x}), ap_uint<${N}>(${y})))`); return; }
-                // Uma chamada só e o sinal no resultado: com a chamada nos dois ramos de um ?:, o Vitis transforma
-                // a seleção em desvio e lê de novo a tabela de pesos em cada ramo (3 leituras por produto na BRAM,
-                // II 38 em vez de 13 na conv1 da MiniLenet, rodada do fim de semana).
+                // Produto com sinal numa função própria (INLINE off) que recebe o valor lido uma vez: com o módulo e
+                // o sinal escritos no laço, o Vitis lê de novo a tabela de pesos em cada uso do valor (rodada do fim
+                // de semana: a chamada nos dois ramos de um ?:, 3 leituras por produto, II 38 em vez de 13 na conv1
+                // da MiniLenet; rodada 5: o módulo e o sinal em comandos separados, 2 leituras, II 25).
                 const neg = a.map((z) => (z.c !== undefined ? z.c < 0 : byId.get(z.n).range[0] < 0));
-                const ab = (z, i) => (neg[i] ? `ap_uint<${N}>(${z} < 0 ? ap_int<${N + 1}>(-${z}) : ap_int<${N + 1}>(${z}))` : `ap_uint<${N}>(${z})`);
-                const sg = [x, y].filter((z, i) => neg[i]).map((z) => `(${z} < 0)`).join(' != ');
-                const p = `${vName(n.id)}_p`;
-                lines.push(`${ind(d)}ap_uint<${W}> ${p} = ${f}(${ab(x, 0)}, ${ab(y, 1)});`);
-                set(`${sg} ? ${T}(-ap_int<${W + 1}>(${p})) : ${T}(${p})`);
+                const pt = (i) => (neg[i] ? `ap_int<${N + 1}>` : `ap_uint<${N}>`);
+                const sw = `s${f}_${neg.map((b) => (b ? 's' : 'u')).join('')}`;
+                if (!signedFns.has(sw)) {
+                    const mag = (z, i) => (neg[i] ? `ap_uint<${N}>(${z} < 0 ? ap_int<${N + 1}>(-${z}) : ${z})` : `ap_uint<${N}>(${z})`);
+                    const sg = ['x', 'y'].filter((z, i) => neg[i]).map((z) => `(${z} < 0)`).join(' != ');
+                    signedFns.set(sw, [
+                        `// Produto com sinal de ${name}: os módulos na unidade, o sinal no resultado.`,
+                        `static ap_int<${W + 1}> ${sw}(${pt(0)} x, ${pt(1)} y) {`,
+                        '#pragma HLS INLINE off',
+                        `    ap_uint<${W}> p = ${f}(${mag('x', 0)}, ${mag('y', 1)});`,
+                        `    return ${sg} ? ap_int<${W + 1}>(-ap_int<${W + 1}>(p)) : ap_int<${W + 1}>(p);`,
+                        '}',
+                    ].join('\n'));
+                }
+                set(`${T}(${sw}(${pt(0)}(${x}), ${pt(1)}(${y})))`);
                 return;
             }
             case 'shl': set(`${T}(${T}(${val(a[0])}) << ${a[1].c})`); return;
@@ -408,7 +424,7 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
         '}',
         '',
     ];
-    return { code: code.join('\n'), units: [...unitsUsed], seqUnits: [...seqUnits], requant: usesRequant(design) };
+    return { code: code.join('\n'), units: [...unitsUsed], seqUnits: [...seqUnits], signed: [...signedFns], requant: usesRequant(design) };
 }
 
 /** Cabeçalho comum: tipos e a declaração do kernel. */

@@ -92,3 +92,13 @@ pesos sem partição em BRAM. Todas as csims sem diferenças (MiniLenet 99 acert
 * As maxpool têm II 1 dentro da rede (II 2 sozinhas, como no modelo): na rede, o vetor entre as camadas é local e o
   Vitis o implementa com mais portas.
 * Kernels de imagem (results/vitis, 61 casos): latência 0,6%, LUT 14,6%, FF 21,1%, sem mudança no modelo.
+
+## Rodada 5: as aproximadas com a unidade chamada uma vez (*_aprox_r5)
+
+* csims sem diferenças (99 e 72 acertos em 100). O II das convoluções ainda dobrou (conv1 da MiniLenet 13 para 25,
+  conv2 38 para 75; LeNet 5, 38 para 75 e 75 para 150): o módulo e o sinal do peso em comandos separados fizeram o
+  Vitis ler a tabela duas vezes por produto, e o invólucro da ROM em BRAM ficou com 311 e 1182 LUTs (145 na exata).
+* Na rede, o Vitis compartilha a instância de cada unidade (INLINE off) entre as chamadas do laço: uma só
+  MUL8 T6 A4c na conv2 (II 75), com 1047 LUTs incluindo os multiplexadores das entradas.
+* A exportação passou a pôr o produto com sinal numa função INLINE off (`su_*`), que recebe o peso lido uma vez; a
+  rodada 6 (`R=r6 scripts/rodada-aprox.sh`) mede de novo. Calibração das unidades aproximadas adiada para ela.

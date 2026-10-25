@@ -1,0 +1,45 @@
+{
+ "id": "minilenet-mnist_aprox_10ns_pool1",
+ "note": "MiniLenet, camada pool1",
+ "clockNs": 10,
+ "part": "xc7a100tcsg324-1",
+ "top": "pool1",
+ "delays": "fpga",
+ "assign": {},
+ "prediction": {
+  "cycles": 1178,
+  "timeNs": 11780,
+  "intervalNs": 20,
+  "critPs": 4978,
+  "luts": 150,
+  "carry4": 9,
+  "ff": 103,
+  "areaUm2": 3568.45,
+  "energyFj": 6656014.887599999,
+  "loops": [
+   {
+    "label": "pool1_c_pool1_h_pool1_w",
+    "mode": "pipelined",
+    "flattened": true,
+    "trip": 588,
+    "II": 2,
+    "iterLatency": 3,
+    "latency": 1178
+   }
+  ],
+  "addrLuts": 146,
+  "units": [],
+  "model": {
+   "memLatency": 1,
+   "loopOverhead": 1,
+   "subloopOverhead": 2,
+   "pipelineOverhead": 1,
+   "flatten": true,
+   "uremLatency": 4,
+   "divAddrCycles": 1,
+   "ffPerLoop": 11,
+   "addrScale": 0.5,
+   "controlScale": 0.6
+  }
+ }
+}

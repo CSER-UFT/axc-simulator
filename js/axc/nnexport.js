@@ -17,7 +17,7 @@
  */
 import { costModel, normalizeDirectives } from './nngen.js';
 import { inputActivations } from './nn.js';
-import { exportFunction, unitsCode, seqUnitsCode, REQUANT_CPP, projectFiles, blackboxFiles, tclScript, prediction } from '../hls/vitis.js';
+import { exportFunction, unitsCode, seqUnitsCode, signedCode, REQUANT_CPP, projectFiles, blackboxFiles, tclScript, prediction } from '../hls/vitis.js';
 import { execute, inputArrays, outputArrays } from '../hls/exec.js';
 import { opFunction } from '../hls/approx.js';
 
@@ -116,6 +116,8 @@ export function networkProject(net, o) {
         unitsCode(ks[0].result.lib, usedUnits, inline),
         '',
         seqUnitsCode(ks[0].result.lib, [...new Set(fns.flatMap((f) => f.seqUnits))]),
+        '',
+        signedCode(fns),
         '',
         fns.some((f) => f.requant) ? REQUANT_CPP : '',
         '',

@@ -1,0 +1,42 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Sun Oct 25 10:37:25 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 6 -file ./report/conv1_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-------------------------------------+----------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+|               Instance              |                    Module                    | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
++-------------------------------------+----------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+| bd_0_wrapper                        |                                        (top) |       1405 |       1405 |       0 |    0 | 1322 |      0 |      1 |          2 |
+|   bd_0_i                            |                                         bd_0 |       1405 |       1405 |       0 |    0 | 1322 |      0 |      1 |          2 |
+|     hls_inst                        |                              bd_0_hls_inst_0 |       1405 |       1405 |       0 |    0 | 1322 |      0 |      1 |          2 |
+|       inst                          |                        bd_0_hls_inst_0_conv1 |       1405 |       1405 |       0 |    0 | 1322 |      0 |      1 |          2 |
+|         (inst)                      |                        bd_0_hls_inst_0_conv1 |        867 |        867 |       0 |    0 | 1321 |      0 |      0 |          0 |
+|         flow_control_loop_pipe_U    | bd_0_hls_inst_0_conv1_flow_control_loop_pipe |         40 |         40 |       0 |    0 |    1 |      0 |      0 |          0 |
+|         grp_axc_requant_fu_835      |            bd_0_hls_inst_0_conv1_axc_requant |        141 |        141 |       0 |    0 |    0 |      0 |      0 |          2 |
+|           (grp_axc_requant_fu_835)  |            bd_0_hls_inst_0_conv1_axc_requant |          0 |          0 |       0 |    0 |    0 |      0 |      0 |          0 |
+|           mul_24ns_21s_45_1_1_U1    |    bd_0_hls_inst_0_conv1_mul_24ns_21s_45_1_1 |        141 |        141 |       0 |    0 |    0 |      0 |      0 |          2 |
+|         grp_u_ADD24_LOA11_bb_fu_829 |             bd_0_hls_inst_0_u_ADD24_LOA11_bb |        100 |        100 |       0 |    0 |    0 |      0 |      0 |          0 |
+|           u                         |                  bd_0_hls_inst_0_add24_loa11 |        100 |        100 |       0 |    0 |    0 |      0 |      0 |          0 |
+|         mul_2ns_6ns_7_1_1_U5        |      bd_0_hls_inst_0_conv1_mul_2ns_6ns_7_1_1 |          1 |          1 |       0 |    0 |    0 |      0 |      0 |          0 |
+|         mul_2ns_6ns_7_1_1_U6        |    bd_0_hls_inst_0_conv1_mul_2ns_6ns_7_1_1_0 |          2 |          2 |       0 |    0 |    0 |      0 |      0 |          0 |
+|         w_V_U                       |     bd_0_hls_inst_0_conv1_w_V_ROM_2P_BRAM_1R |        262 |        262 |       0 |    0 |    0 |      0 |      1 |          0 |
++-------------------------------------+----------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+

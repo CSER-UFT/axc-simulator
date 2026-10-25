@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-# Rodada 5 das redes: só as aproximadas (as unidades da busca do fim de semana, results/nn-vitis/busca_*.json), com
+# Rodada 5 e 6 das redes: só as aproximadas (as unidades da busca do fim de semana, results/nn-vitis/busca_*.json), com
 # o produto aproximado chamado uma vez só (antes, a chamada nos dois ramos do sinal fazia o Vitis ler a tabela de
-# pesos três vezes por produto e triplicava o II das convoluções). Pacote em ~/Downloads/r5_resultados.tar.gz.
+# pesos três vezes por produto e triplicava o II das convoluções; na rodada 5, com o módulo e o sinal em comandos
+# separados, duas vezes; na 6, o produto com sinal numa função INLINE off). Pacote em ~/Downloads/<R>_resultados.tar.gz.
 #
 # Uso, da pasta do repositório (com o Vitis no PATH: source /tools/Xilinx/Vitis_HLS/2022.2/settings64.sh):
-#   nohup bash scripts/rodada-aprox.sh > build/r5.log 2>&1 &
+#   nohup bash scripts/rodada-aprox.sh > build/r6.log 2>&1 &
 # J: projetos em paralelo (padrão 3). Rodar de novo continua de onde parou.
 set -u
 cd "$(dirname "$0")/.."
 J=${J:-3}
-OUT=build/r5
+R=${R:-r6}
+OUT=build/$R
 mkdir -p "$OUT"
 log() { echo "[$(date '+%d/%m %H:%M')] $*"; }
 feito() { [ -f "$OUT/.$1" ]; }
@@ -31,5 +33,5 @@ done
 log "pacote"
 find "$OUT" \( -name RESULTADOS.md -o -name resultados.json -o -name model.json -o -name kernel.cpp -o -name vitis_hls.log \
   -o -name '*_csynth.xml' -o -name csynth.xml -o -name '*_csim.log' -o -name '*utilization_hierarchical_routed.rpt' \
-  -o -name export_impl.xml \) -print | tar czf ~/Downloads/r5_resultados.tar.gz -T -
-log "fim: ~/Downloads/r5_resultados.tar.gz ($(du -h ~/Downloads/r5_resultados.tar.gz | cut -f1))"
+  -o -name export_impl.xml \) -print | tar czf ~/Downloads/${R}_resultados.tar.gz -T -
+log "fim: ~/Downloads/${R}_resultados.tar.gz ($(du -h ~/Downloads/${R}_resultados.tar.gz | cut -f1))"

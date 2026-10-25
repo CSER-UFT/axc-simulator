@@ -1,0 +1,46 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+--------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2022.2 (lin64) Build 3671981 Fri Oct 14 04:59:54 MDT 2022
+| Date         : Sun Oct 25 10:41:54 2026
+| Host         : Avell running 64-bit Ubuntu 20.04.6 LTS
+| Command      : report_utilization -hierarchical -hierarchical_depth 6 -file ./report/pad2_utilization_hierarchical_routed.rpt
+| Design       : bd_0_wrapper
+| Device       : xc7a100tcsg324-1
+| Speed File   : -1
+| Design State : Routed
+--------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++----------------------------------------------------+---------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|                      Instance                      |                             Module                            | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++----------------------------------------------------+---------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| bd_0_wrapper                                       |                                                         (top) |        168 |        168 |       0 |    0 | 148 |      0 |      0 |          0 |
+|   bd_0_i                                           |                                                          bd_0 |        168 |        168 |       0 |    0 | 148 |      0 |      0 |          0 |
+|     hls_inst                                       |                                               bd_0_hls_inst_0 |        168 |        168 |       0 |    0 | 148 |      0 |      0 |          0 |
+|       (hls_inst)                                   |                                               bd_0_hls_inst_0 |          0 |          0 |       0 |    0 |   0 |      0 |      0 |          0 |
+|       inst                                         |                                          bd_0_hls_inst_0_pad2 |        168 |        168 |       0 |    0 | 148 |      0 |      0 |          0 |
+|         (inst)                                     |                                          bd_0_hls_inst_0_pad2 |         13 |         13 |       0 |    0 |  29 |      0 |      0 |          0 |
+|         grp_pad2_Pipeline_pad2_in_L9_fu_89         |                 bd_0_hls_inst_0_pad2_pad2_Pipeline_pad2_in_L9 |         52 |         52 |       0 |    0 |  46 |      0 |      0 |          0 |
+|           (grp_pad2_Pipeline_pad2_in_L9_fu_89)     |                 bd_0_hls_inst_0_pad2_pad2_Pipeline_pad2_in_L9 |         19 |         19 |       0 |    0 |  44 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U | bd_0_hls_inst_0_pad2_flow_control_loop_pipe_sequential_init_2 |         33 |         33 |       0 |    0 |   2 |      0 |      0 |          0 |
+|         grp_pad2_Pipeline_pad2_left_L5_fu_75       |               bd_0_hls_inst_0_pad2_pad2_Pipeline_pad2_left_L5 |         24 |         24 |       0 |    0 |  22 |      0 |      0 |          0 |
+|           (grp_pad2_Pipeline_pad2_left_L5_fu_75)   |               bd_0_hls_inst_0_pad2_pad2_Pipeline_pad2_left_L5 |          4 |          4 |       0 |    0 |  20 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U | bd_0_hls_inst_0_pad2_flow_control_loop_pipe_sequential_init_1 |         20 |         20 |       0 |    0 |   2 |      0 |      0 |          0 |
+|         grp_pad2_Pipeline_pad2_right_L7_fu_82      |              bd_0_hls_inst_0_pad2_pad2_Pipeline_pad2_right_L7 |         41 |         41 |       0 |    0 |  22 |      0 |      0 |          0 |
+|           (grp_pad2_Pipeline_pad2_right_L7_fu_82)  |              bd_0_hls_inst_0_pad2_pad2_Pipeline_pad2_right_L7 |         21 |         21 |       0 |    0 |  20 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U | bd_0_hls_inst_0_pad2_flow_control_loop_pipe_sequential_init_0 |         20 |         20 |       0 |    0 |   2 |      0 |      0 |          0 |
+|         grp_pad2_Pipeline_pad2_top_L3_fu_68        |                bd_0_hls_inst_0_pad2_pad2_Pipeline_pad2_top_L3 |         38 |         38 |       0 |    0 |  29 |      0 |      0 |          0 |
+|           (grp_pad2_Pipeline_pad2_top_L3_fu_68)    |                bd_0_hls_inst_0_pad2_pad2_Pipeline_pad2_top_L3 |         16 |         16 |       0 |    0 |  27 |      0 |      0 |          0 |
+|           flow_control_loop_pipe_sequential_init_U |   bd_0_hls_inst_0_pad2_flow_control_loop_pipe_sequential_init |         22 |         22 |       0 |    0 |   2 |      0 |      0 |          0 |
++----------------------------------------------------+---------------------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+
