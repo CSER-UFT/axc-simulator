@@ -111,12 +111,17 @@
                             <label><span data-i18n="nn.searchObj">Objetivo</span> <select id="nnSearchObj"><option value="area" data-i18n="nn.searchObjArea">área (ASIC)</option><option value="luts" data-i18n="nn.searchObjLuts">LUTs (FPGA)</option><option value="energy" data-i18n="nn.searchObjEnergy">energia</option></select></label>
                             <label><span data-i18n="nn.searchDrop">Queda máxima (pontos)</span> <input type="number" id="nnSearchDrop" min="0" max="50" step="0.1" value="1" style="width:5em" /></label>
                             <label><span data-i18n="nn.searchSample">Imagens da validação</span> <select id="nnSearchSample"><option value="250" selected>250</option><option value="500">500</option><option value="0" data-i18n="nn.searchSampleAll">todas (1000)</option></select></label>
-                            <label><span data-i18n="nn.searchHeur">Heurística</span> <select id="nnSearchHeur"><option value="sensitivity" data-i18n="nn.searchSens">sensibilidade</option><option value="sequential" data-i18n="nn.searchSeq">sequencial</option></select></label>
+                            <label><span data-i18n="nn.searchHeur">Heurística</span> <select id="nnSearchHeur"><optgroup label="busca híbrida (modelo estático)" data-i18n-label="nn.searchGroupHybrid"><option value="hybrid:local" selected data-i18n="nn.hyb.local">busca local</option><option value="hybrid:tabu" data-i18n="nn.hyb.tabu">busca tabu</option><option value="hybrid:grasp" data-i18n="nn.hyb.grasp">GRASP</option><option value="hybrid:ga" data-i18n="nn.hyb.ga">genético</option><option value="hybrid:efficiency" data-i18n="nn.hyb.efficiency">eficiência</option><option value="hybrid:sequential" data-i18n="nn.hyb.sequential">sequencial</option><option value="hybrid:exhaustive" data-i18n="nn.hyb.exhaustive">exaustiva</option><option value="hybrid:random" data-i18n="nn.hyb.random">aleatória</option></optgroup><optgroup label="busca medida (classificação)" data-i18n-label="nn.searchGroupMeasured"><option value="sensitivity" data-i18n="nn.searchSens">sensibilidade</option><option value="sequential" data-i18n="nn.searchSeq">sequencial</option></optgroup></select></label>
                             <button type="button" class="btn primary" id="nnSearchBtn" data-i18n="nn.searchBtn">Buscar</button>
                             <button type="button" class="btn outline" id="nnSearchStop" data-i18n="nn.searchStop" disabled>Parar</button>
                         </div>
                         <p class="note" id="nnSearchStatus"></p>
                         <div id="nnSearchResult"></div>
+                        <div id="nnSearchFrontBox" class="hidden">
+                            <h3 style="margin-top:12px" data-i18n="nn.frontTitle">Fronteira de Pareto</h3>
+                            <p class="note" id="nnSearchFrontNote"></p>
+                            <div class="scroll-box"><table id="nnSearchFront" class="hls-table"></table></div>
+                        </div>
                     </div>
                     <div class="pane hidden" id="pane-arch">
                         <div class="nn-arch-box" id="nnArch"></div>

@@ -124,7 +124,7 @@ async function loadNN(id) {
     if (!testCache.has(ds.file)) testCache.set(ds.file, getBin(ds.file).then((b) => decodeTestSet(b, ds)));
     const changed = nnData?.net.id !== net.id;
     nnData = { net, test: await testCache.get(ds.file) };
-    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); $('nnSearchResult').innerHTML = ''; $('nnSearchStatus').textContent = ''; }
+    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); $('nnSearchResult').innerHTML = ''; $('nnSearchStatus').textContent = ''; $('nnSearchFrontBox').classList.add('hidden'); }
     return nnData;
 }
 
@@ -483,22 +483,29 @@ $('nnSearchBtn').onclick = () => {
     stopSearch();
     const net = nnData.net, entry = registry.models.find((m) => m.id === net.id);
     if (!net.dataset.val) { $('nnSearchStatus').textContent = t('nn.searchNoVal'); return; }
+    const hsel = $('nnSearchHeur').value, hybrid = hsel.startsWith('hybrid:');
     const o = {
-        file: entry.file, objective: $('nnSearchObj').value, maxDrop: Math.max(0, +$('nnSearchDrop').value || 0), heuristic: $('nnSearchHeur').value,
+        file: entry.file, objective: $('nnSearchObj').value, maxDrop: Math.max(0, +$('nnSearchDrop').value || 0), heuristic: hybrid ? hsel.slice(7) : hsel, hybrid,
         dirs: nnDirs, trees: directiveTrees(net, nnDirs), clockNs: +$('nnClock').value || 10, workers: searchWorkers(), sample: +$('nnSearchSample').value,
     };
     $('nnSearchBtn').disabled = true;
     $('nnSearchStop').disabled = false;
     $('nnSearchResult').innerHTML = '';
+    $('nnSearchFrontBox').classList.add('hidden');
     const t0 = Date.now();
     searchWorker = new Worker(new URL('./nn-search-worker.js', import.meta.url), { type: 'module' });
     searchWorker.onmessage = ({ data: m }) => {
         if (m.type === 'status') $('nnSearchStatus').textContent = t(m.key);
         else if (m.type === 'progress') {
-            $('nnSearchStatus').textContent = t('nn.searchProgress', { phase: m.phase === 'sens' ? t('nn.searchPhaseSens') : m.phase === 'comb' ? t('nn.searchPhaseComb') : m.phase === 'repair' ? t('nn.searchPhaseRepair') : m.phase, evals: m.evals, s: nf((Date.now() - t0) / 1000, 0), cost: nf(100 * m.cost, 1) });
+            const phase = { sens: 'nn.searchPhaseSens', comb: 'nn.searchPhaseComb', repair: 'nn.searchPhaseRepair', calib: 'nn.searchPhaseCalib', search: 'nn.searchPhaseSearch', verify: 'nn.searchPhaseVerify' }[m.phase];
+            const ph = phase ? t(phase) : m.phase, s = nf((Date.now() - t0) / 1000, 0);
+            $('nnSearchStatus').textContent = m.cost !== undefined ? t('nn.searchProgress', { phase: ph, evals: m.evals, s, cost: nf(100 * m.cost, 1) }) : t('nn.searchProgressHyb', { phase: ph, evals: nf(m.evals), s });
         } else if (m.type === 'error') stopSearch(m.message);
         else if (m.type === 'done') {
-            stopSearch(t('nn.searchDone', { evals: m.result.evals, images: nf(m.result.images), s: nf(m.result.ms / 1000, 1), workers: m.result.workers }));
+            const R = m.result;
+            stopSearch(R.hybrid
+                ? t('nn.searchDoneHyb', { calib: R.calib.length, evals: nf(R.evals), verified: R.verified, s: nf(R.ms / 1000, 1), sc: nf(R.phaseMs.calib / 1000, 1), ss: nf(R.phaseMs.search / 1000, 1), sv: nf(R.phaseMs.verify / 1000, 1), workers: R.workers }) + (R.error ? ` ${R.error}` : '')
+                : t('nn.searchDone', { evals: R.evals, images: nf(R.images), s: nf(R.ms / 1000, 1), workers: R.workers }));
             lastSearch = { ...m.result, net: net.id, o };
             renderSearch();
         }
@@ -529,21 +536,66 @@ function renderSearch() {
     h += `<div class="row" style="margin-top:6px"><button type="button" class="btn primary" id="nnSearchApply">${t('nn.searchApply')}</button></div>`;
     const left = h;
     h = '';
-    // Pontos avaliados por inteiro (os inviáveis abandonados no meio não têm acurácia).
-    const pts = r.points.filter((p) => p.full).map((p) => ({ x: (100 * p.cost) / r.exact.cost, y: 100 * (1 - p.wrong / r.n), infeasible: !p.feasible, label: p.assign.map((a, i) => (a.mul || a.add ? `${net.sites[i].name}: ${[a.mul, a.add].filter(Boolean).join(' + ')}` : '')).filter(Boolean).join('; ') || t('nn.searchExact') }));
+    // Pontos avaliados por inteiro (os inviáveis abandonados no meio não têm acurácia). Na híbrida, a acurácia é a
+    // estimada (a da exata menos a queda estimada).
+    const shown = r.hybrid ? r.points : r.points.filter((p) => p.full);
+    const pts = shown.map((p) => ({ x: (100 * p.cost) / r.exact.cost, y: r.hybrid ? 100 * r.exact.accVal - p.drop : 100 * (1 - p.wrong / r.n), infeasible: !p.feasible, label: unitsText(net, p.assign) || t('nn.searchExact') }));
     const front = new Set(r.front.map((f) => JSON.stringify(f.assign)));
-    for (const [k, p] of r.points.filter((q) => q.full).entries()) { if (front.has(JSON.stringify(p.assign))) pts[k].front = true; }
+    for (const [k, p] of shown.entries()) { if (front.has(JSON.stringify(p.assign))) pts[k].front = true; }
     pts.push({ x: 100, y: 100 * r.exact.accVal, label: t('nn.searchExact') });
     pts.push({ x: (100 * r.best.cost) / r.exact.cost, y: 100 * r.best.accVal, label: t('nn.searchBest'), current: true, front: true });
-    h += `<figure style="margin:0">${accuracyCostSvg(pts, { xLabel: t('nn.searchPlotX', { obj: t(`nn.searchObj_${obj}`) }), yLabel: t('nn.searchPlotY'), limit: 100 * (r.exact.accVal - r.maxDrop / 100), width: 520, height: 300 })}</figure>`;
+    h += `<figure style="margin:0">${accuracyCostSvg(pts, { xLabel: t('nn.searchPlotX', { obj: t(`nn.searchObj_${obj}`) }), yLabel: t(r.hybrid ? 'nn.searchPlotYHyb' : 'nn.searchPlotY'), limit: 100 * (r.exact.accVal - r.maxDrop / 100), width: 520, height: 300 })}</figure>`;
     const se = (a, n) => 100 * Math.sqrt((a * (1 - a)) / n);
     const plot = h;
     h = '';
     h += `<p class="note">${t('nn.searchNoise', { n: r.n, se: nf(se(r.exact.accVal, r.n), 1), seT: nf(se(r.exact.accTest, r.testN), 1), dv: nf(100 * (r.exact.accVal - r.best.accVal), 1), dt: nf(100 * (r.exact.accTest - r.best.accTest), 1) })}</p>`;
-    h += `<p class="note">${t('nn.searchNote', { cands: r.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} × ${c.add.length}`).join(', '), maxWrong: r.maxWrong, n: r.n })}</p>`;
+    const cands = r.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} × ${c.add.length}`).join(', ');
+    h += `<p class="note">${r.hybrid ? t('nn.searchNoteHyb', { cands, calib: r.calib.length, n: r.n, verified: r.verified }) : t('nn.searchNote', { cands, maxWrong: r.maxWrong, n: r.n })}</p>`;
     $('nnSearchResult').innerHTML = `<div class="nn-search-out"><div>${left}</div><div>${plot}</div></div>${h}`;
     $('nnSearchApply').onclick = () => { setOverride(r.best.assign); setTab('result'); render(); };
+    renderFront(r);
 }
+
+/** Nome curto de uma unidade (sem a largura, que é sempre a mesma: MUL8 e ADD32). */
+const shortUnit = (name) => name.replace(/^(MUL8|ADD32) /, '');
+/** Unidades aproximadas de uma configuração, por camada (as exatas ficam de fora). */
+const unitsText = (net, assign) => assign.map((a, i) => (a.mul || a.add ? `${net.sites[i].name}: ${[a.mul, a.add].filter(Boolean).map(dn).join(' + ')}` : '')).filter(Boolean).join('; ');
+
+/**
+ * Fronteira de Pareto da busca: custo, queda de acurácia (na híbrida, a estimada e a medida, quando o ponto foi
+ * classificado) e unidades por camada; Aplicar põe as unidades do ponto na página. Na híbrida, só os pontos até o
+ * dobro do limite (os de queda estimada quase zero e custo perto da exata não ajudam a decidir).
+ */
+function renderFront(r) {
+    const net = nnData.net, obj = r.o.objective;
+    const unit = { area: 'µm²', luts: 'LUT', energy: 'nJ' }[obj];
+    const val = (x) => (obj === 'energy' ? x / 1e6 : x);
+    const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    const rows = (r.hybrid ? r.front.filter((p) => p.cost < r.exact.cost && p.drop <= 2 * r.maxDrop) : r.front.filter((p) => p.cost < r.exact.cost)).map((p) => ({
+        p, est: r.hybrid ? p.drop : null,
+        meas: r.hybrid ? (p.measured ? (p.measured.ok ? p.measured.drop : null) : undefined) : 100 * (r.exact.accVal - p.accVal),
+        over: r.hybrid && p.measured && !p.measured.ok,
+    }));
+    lastFront = rows.map((x) => x.p.assign);
+    if (!rows.length) { $('nnSearchFrontBox').classList.add('hidden'); return; }
+    const dp = (v) => `${nf(v, 2)}`;
+    $('nnSearchFrontNote').textContent = t(r.hybrid ? 'nn.frontNoteHyb' : 'nn.frontNote', { n: rows.length, lim: nf(r.maxDrop, 2) });
+    $('nnSearchFront').innerHTML = `<tr><th>${t(`nn.searchObj_${obj}`)} (${unit})</th><th>${t('nn.frontSaving')}</th>${r.hybrid ? `<th>${t('nn.frontEst')}</th>` : ''}<th>${t('nn.frontMeas')}</th><th></th>${net.sites.map((l) => `<th class="left mono">${esc(l.name)}</th>`).join('')}<th></th></tr>`
+        + rows.map((x, i) => `<tr class="${same(x.p.assign, r.best.assign) ? 'best' : ''}"><td class="mono">${nf(val(x.p.cost), 0)}</td><td class="mono">${nf(100 * (1 - x.p.cost / r.exact.cost), 1)}%</td>`
+            + (r.hybrid ? `<td class="mono">${dp(x.est)}</td>` : '')
+            + `<td class="mono">${x.meas === undefined ? '<span class="note">-</span>' : x.over ? `&gt; ${dp(r.maxDrop)}` : dp(x.meas)}</td>`
+            + `<td>${x.over ? '' : x.p.feasible ? '✓' : ''}</td>${x.p.assign.map((a) => `<td class="left mono">${a.mul || a.add ? esc([a.mul, a.add].filter(Boolean).map(shortUnit).join(' + ')) : '<span class="note">·</span>'}</td>`).join('')}`
+            + `<td><button type="button" class="btn outline small" data-front="${i}">${t('dse.apply')}</button></td></tr>`).join('');
+    $('nnSearchFrontBox').classList.remove('hidden');
+}
+let lastFront = [];
+$('nnSearchFront').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-front]');
+    if (!b || !lastFront[+b.dataset.front]) return;
+    setOverride(lastFront[+b.dataset.front]);
+    setTab('result');
+    render();
+});
 $('nnSensBtn').onclick = async () => {
     if (!nnData) return;
     const run = ++nnRun;
@@ -581,6 +633,7 @@ function applyDomTranslations() {
     for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);
     for (const el of document.querySelectorAll('[data-i18n-html]')) el.innerHTML = t(el.dataset.i18nHtml);
     for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle);
+    for (const el of document.querySelectorAll('[data-i18n-label]')) el.label = t(el.dataset.i18nLabel);
     help.render();
     if (synth) { fillSelects(); renderArch(); render(); }
 }
