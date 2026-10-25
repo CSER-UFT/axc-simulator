@@ -11,7 +11,7 @@ Resumo para continuar o trabalho numa conversa nova. Estado do repositório no c
 * Exportação: `js/axc/nnexport.js`; validação: `node bin/axc.mjs nnvitis`; rodadas em `results/nn-vitis/`.
 * Documentos (fora do repositório): `modelos_e_heuristicas.tex` e `redes_neurais.tex`.
 
-## O que foi decidido para a busca (aprovado, ainda não implementado)
+## Busca híbrida (itens 1 a 5 implementados; interface pendente)
 
 1. Modelo estático de erro por camada: o erro RMS da soma (já calculado em `pareto`, com os histogramas reais de
    operandos e a estrutura das diretivas), convertido em LSB da saída pela escala do requant da camada.
@@ -21,6 +21,25 @@ Resumo para continuar o trabalho numa conversa nova. Estado do repositório no c
    genético, aleatória; exaustiva viável na MiniLenet). Custo por ponto em milissegundos.
 4. Verificação dos melhores pontos por classificação real (amostra + reparo, como hoje).
 5. A busca medida atual continua como opção.
+
+Implementação (out/2026): heurísticas num módulo genérico `js/axc/heuristics.js` (a HLS usa `hlsProblem`, resultado
+idêntico ao anterior em 32 execuções de referência); nas redes, `staticModel`, `monotoneCurve` (isotônica com origem
+fixa, cauda pela reta mais inclinada), `calibrateCurves` (8 trocas isoladas por camada espalhadas pelo erro, mais até
+4 de refinamento onde a queda salta mais de 1 p.p. abaixo de 3 p.p.), `nnProblem` e `hybridSearch` em
+`js/axc/nnsearch.js`; linha de comando `node bin/axc.mjs nnsearch --hybrid --heuristic local`. Verificação: os
+viáveis da fronteira estimada do mais barato para o mais caro, depois os outros viáveis; com amostra, o primeiro que
+passa é conferido na validação inteira. `onPoint({phase: calib|search|verify, cost, drop, ...})` e `steps` (o passo a
+passo das heurísticas, com `drop` no lugar de `psnr`) servem à animação e à tabela.
+
+| Área, limite 1 p.p. | MiniLenet MNIST | LeNet 5 CIFAR 10 |
+| --- | ---: | ---: |
+| Busca medida (sensibilidade) | 12,9%, 114 classificações | 9,6%, 143 |
+| Híbrida (local, tabu, GRASP, genético, eficiência) | 12,3%, 32 + 1 a 2 | 9,1%, 49 + 14 a 16 |
+| Híbrida sequencial | 1,0% | 9,0% |
+
+Pendências da busca: a sequencial fica presa em escolhas otimistas (na MiniLenet); no CIFAR 10 o modelo é otimista
+perto do limite e a verificação reprova muitos pontos (ideias: margem aprendida com as reprovações, base de ativações
+mais próxima do ponto verificado).
 
 ## Números do teste do proxy (scratch proxy.mjs / proxy2.mjs, refazer se preciso)
 

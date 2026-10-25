@@ -21,6 +21,9 @@
  *                             [--heuristic sensitivity|sequential] [--dirs "..."] [--clock 10] [--workers N] [--cands 12]
  *                             [--sample 250] (amostra estratificada da validação na busca; o ponto escolhido é conferido
  *                             na validação inteira e no teste)
+ *                             [--hybrid [--heuristic sequential|efficiency|exhaustive|random|local|tabu|grasp|ga]
+ *                             [--max-verify 25] [--verify-front 8]] (busca híbrida: curvas erro → queda calibradas com
+ *                             trocas isoladas, busca no modelo estático, verificação dos melhores pontos)
  *       busca do multiplicador e do somador de cada camada (js/axc/nnsearch.js): o menor custo com a queda de
  *       acurácia na validação até --max-drop pontos; a acurácia de teste do ponto escolhido no fim. --workers: threads
  *       de avaliação (padrão: os núcleos menos 1; 1 avalia na própria thread)
@@ -59,7 +62,7 @@ import { designSpace } from '../js/axc/designspace.js';
 import { PRESETS } from '../js/axc/presets.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize } from '../js/axc/nn.js';
 import { networkCost, networkKernels, normalizeDirectives, directiveTrees, CONV_PIPES, DENSE_PIPES } from '../js/axc/nngen.js';
-import { prepareSearch, searchNetwork, poolEngine, initMessage, SEARCH_OBJECTIVES, SEARCH_HEURISTICS } from '../js/axc/nnsearch.js';
+import { prepareSearch, searchNetwork, hybridSearch, poolEngine, initMessage, SEARCH_OBJECTIVES, SEARCH_HEURISTICS, HYBRID_HEURISTICS } from '../js/axc/nnsearch.js';
 import { Worker } from 'node:worker_threads';
 import { networkProject } from '../js/axc/nnexport.js';
 import { csynthSummary, implSummary, carry4Of } from '../js/hls/reports.js';
@@ -251,9 +254,11 @@ switch (cmd) {
         if (!ds.val) die(`${net.id} não tem conjunto de validação`);
         const valBuf = readFileSync(join(ROOT, ds.val.file));
         const val = decodeTestSet(valBuf, { ...ds, n: ds.val.n }), test = decodeTestSet(readFileSync(join(ROOT, ds.file)), ds);
-        const objective = opt('--objective', 'area'), heuristic = opt('--heuristic', 'sensitivity');
+        const hybrid = flag('--hybrid');
+        const objective = opt('--objective', 'area'), heuristic = opt('--heuristic', hybrid ? 'local' : 'sensitivity');
         if (!SEARCH_OBJECTIVES.includes(objective)) die(`objetivo: ${SEARCH_OBJECTIVES.join(', ')}`);
-        if (!SEARCH_HEURISTICS.includes(heuristic)) die(`heurística: ${SEARCH_HEURISTICS.join(', ')}`);
+        const hlist = hybrid ? HYBRID_HEURISTICS : SEARCH_HEURISTICS;
+        if (!hlist.includes(heuristic)) die(`heurística${hybrid ? ' (híbrida)' : ''}: ${hlist.join(', ')}`);
         const dirs = parseDirs(net, opt('--dirs'));
         const synthJ = synthData();
         const fpgaJ = existsSync(join(ROOT, 'data/vivado-units.json')) ? JSON.parse(readFileSync(join(ROOT, 'data/vivado-units.json'), 'utf8')) : null;
@@ -278,21 +283,30 @@ switch (cmd) {
             engine = poolEngine(send);
         }
         let last = 0;
-        const progress = (p) => { if (!flag('--json') && Date.now() - last > 2000) { last = Date.now(); process.stderr.write(`  ${p.phase}: ${p.evals} avaliações, ${(p.ms / 1000).toFixed(0)} s, custo ${(100 * p.cost).toFixed(1)}% da exata\n`); } };
+        const progress = (p) => { if (!flag('--json') && Date.now() - last > 2000) { last = Date.now(); process.stderr.write(`  ${p.phase}: ${p.evals} avaliações, ${(p.ms / 1000).toFixed(0)} s${p.cost !== undefined ? `, custo ${(100 * p.cost).toFixed(1)}% da exata` : ''}\n`); } };
         let r;
-        try { r = await searchNetwork(P, { heuristic, maxDrop: +opt('--max-drop', 1), progress }, engine); } catch (e) { die(e.message); } finally { for (const w of workers) w.terminate(); }
+        try {
+            r = hybrid
+                ? await hybridSearch(P, { heuristic, maxDrop: +opt('--max-drop', 1), maxVerify: +opt('--max-verify', 25), verifyFront: +opt('--verify-front', 8), progress }, engine)
+                : await searchNetwork(P, { heuristic, maxDrop: +opt('--max-drop', 1), progress }, engine);
+        } catch (e) { die(e.message); } finally { for (const w of workers) w.terminate(); }
         const unit = { area: 'µm²', luts: 'LUT', energy: 'nJ' }[objective];
         const cv = (x) => (objective === 'energy' ? (x / 1e6).toFixed(1) : x.toFixed(0));
         const pct = (v) => `${(100 * v).toFixed(1)}%`;
-        const res = { model: net.id, objective, heuristic, maxDrop: r.maxDrop, dirs, prepMs, ...r, points: flag('--points') ? r.points : r.points.length };
+        const res = { model: net.id, objective, heuristic, maxDrop: r.maxDrop, dirs, prepMs, ...r, points: flag('--points') ? r.points : r.points.length, steps: flag('--points') ? r.steps : undefined };
+        const ms = (x) => `${(x / 1000).toFixed(1)} s`;
         out(res, () => [
             `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n}${P.fullVal ? `, amostra de ${P.n} das ${P.valN}` : ''})`,
             `candidatas por camada: ${P.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} ×, ${c.add.length} +`).join('; ')}`,
-            `${r.evals} avaliações (${r.images} imagens), ${(r.ms / 1000).toFixed(1)} s com ${r.workers} worker(s); preparação ${(prepMs / 1000).toFixed(1)} s`,
+            r.hybrid
+                ? `híbrida: ${r.calib.length} trocas isoladas na calibração (${ms(r.phaseMs.calib)}), ${r.evals} pontos no modelo estático (${ms(r.phaseMs.search)}), ${r.verified} verificados (${ms(r.phaseMs.verify)}${r.repaired ? `, ${r.repaired} reprovados na validação inteira` : ''}); ${ms(r.ms)} com ${r.workers} worker(s); preparação ${ms(prepMs)}${r.error ? `; ${r.error}` : ''}`
+                : `${r.evals} avaliações (${r.images} imagens), ${ms(r.ms)} com ${r.workers} worker(s); preparação ${ms(prepMs)}`,
             `exata:   ${cv(r.exact.cost)} ${unit}, validação ${pct(r.exact.accVal)}${r.exact.accValFull !== undefined ? ` (inteira ${pct(r.exact.accValFull)})` : ''}, teste ${pct(r.exact.accTest)}`,
             `melhor:  ${cv(r.best.cost)} ${unit} (${pct(-r.best.saving)}), validação ${pct(r.best.accVal)}${r.best.accValFull !== undefined ? ` (inteira ${pct(r.best.accValFull)})` : ''}, teste ${pct(r.best.accTest)}`,
             ...r.best.assign.map((a, i) => `  ${net.sites[i].name.padEnd(6)} ${(a.mul ?? 'MUL8 exato').padEnd(18)} ${a.add ?? 'ADD32 exato'}`),
-            `fronteira (custo, validação): ${r.front.map((p) => `${pct(p.cost / r.exact.cost)} ${pct(p.accVal)}`).join('; ')}`,
+            r.hybrid
+                ? `fronteira estimada (custo, queda estimada [medida]): ${r.front.filter((p) => p.drop <= 2 * r.maxDrop).slice(0, 15).map((p) => `${pct(p.cost / r.exact.cost)} ${p.drop.toFixed(2)}${p.measured ? ` [${p.measured.drop.toFixed(2)}]` : ''}`).join('; ')}`
+                : `fronteira (custo, validação): ${r.front.map((p) => `${pct(p.cost / r.exact.cost)} ${pct(p.accVal)}`).join('; ')}`,
         ].join('\n'));
         break;
     }

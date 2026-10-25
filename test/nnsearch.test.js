@@ -82,3 +82,42 @@ test('busca com amostra: estratificada, e o reparo põe o ponto dentro do limite
     assert.equal(1 - wFull / val.n, r.best.accValFull);
     assert.ok(wFull <= wEx + 10, `${wFull} erradas contra ${wEx} da exata`);
 });
+
+test('curva monótona: origem, regressão isotônica, quedas negativas em zero e cauda inclinada', async () => {
+    const { monotoneCurve } = await import('../js/axc/nnsearch.js');
+    const f = monotoneCurve([{ err: 1, drop: -0.2 }, { err: 2, drop: 1 }, { err: 3, drop: 0.6 }, { err: 4, drop: 3 }]);
+    assert.equal(f(0), 0);
+    assert.equal(f(1), 0);
+    // 1 e 0,6 violam a ordem: viram a média, 0,8, nos dois.
+    assert.ok(Math.abs(f(2) - 0.8) < 1e-12 && Math.abs(f(3) - 0.8) < 1e-12);
+    assert.ok(Math.abs(f(3.5) - 1.9) < 1e-12);
+    for (let e = 0; e < 6; e += 0.25) assert.ok(f(e + 0.25) >= f(e));
+    // Depois do último ponto: a reta mais inclinada (último trecho, 2,2 por LSB).
+    assert.ok(Math.abs(f(5) - 5.2) < 1e-12);
+});
+
+test('busca híbrida: calibração, busca no modelo estático e ponto verificado dentro do limite', async () => {
+    const { hybridSearch, estimateDrop, staticModel } = await import('../js/axc/nnsearch.js');
+    const ev = { calib: 0, search: 0, verify: 0 };
+    const r = await hybridSearch(P, { heuristic: 'local', maxDrop: 1, onPoint: (e) => ev[e.phase]++ });
+    assert.ok(!r.error, r.error);
+    assert.ok(r.best.cost < r.exact.cost && r.best.saving > 0);
+    // O ponto escolhido foi conferido por classificação (de forma independente) e cabe no limite.
+    assert.equal(r.best.wrongVal, wrongOf(r.best.assign));
+    assert.ok(r.best.wrongVal <= r.maxWrong);
+    assert.ok(r.best.estDrop <= 1 + 1e-9);
+    assert.ok(Math.abs(estimateDrop(P, P.calib.curves, r.best.assign) - r.best.estDrop) < 1e-12);
+    // Eventos por ponto: um por calibração, um por ponto da busca, um por verificação.
+    assert.equal(ev.calib, r.calib.length);
+    assert.equal(ev.search, r.evals);
+    assert.ok(ev.verify >= 1 && ev.verify === r.points.filter((p) => p.measured).length);
+    // A fronteira estimada: custo crescente, queda decrescente.
+    for (let k = 1; k < r.front.length; k++) assert.ok(r.front[k].cost >= r.front[k - 1].cost && r.front[k].drop <= r.front[k - 1].drop + 1e-6);
+    // O erro estático da exata é zero, e o de uma troca, positivo.
+    assert.equal(staticModel(P).errors(P.exact).reduce((a, b) => a + b, 0), 0);
+    // A calibração fica na preparação: a segunda busca não classifica de novo as trocas isoladas.
+    const ev2 = { calib: 0, search: 0, verify: 0 };
+    const r2 = await hybridSearch(P, { heuristic: 'efficiency', maxDrop: 1, onPoint: (e) => ev2[e.phase]++ });
+    assert.equal(ev2.calib, 0);
+    assert.ok(r2.best.wrongVal <= r2.maxWrong);
+});

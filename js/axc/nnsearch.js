@@ -22,6 +22,7 @@ import { buildUnit } from './units.js';
 import { costModel, directiveTrees } from './nngen.js';
 import { makeLibrary } from '../hls/lib.js';
 import { rng } from './metrics.js';
+import { HEURISTICS, runHeuristic, newContext, paretoPoints } from './heuristics.js';
 
 export const SEARCH_OBJECTIVES = ['area', 'luts', 'energy'];
 export const SEARCH_HEURISTICS = ['sensitivity', 'sequential'];
@@ -279,6 +280,303 @@ export function prepareSearch(net, o) {
         return { mul: of('mul'), add: of('add') };
     });
     return { net, objective, target, trees, cm, lib, val, fullVal, test, exact, exactWrong, cands, metric, sumError, n: valSet.n, sample: valSet.n, valN: o.val.n };
+}
+
+// Modelo estático ---------------------------------------------------------------------------------------------------
+// A busca híbrida estima a queda de acurácia sem classificar: o erro de cada camada (o erro RMS da soma de uma saída,
+// sumError, com os operandos reais e a estrutura das diretivas) convertido em LSB da saída pela escala do requant da
+// camada, e uma curva erro → queda de acurácia por camada, calibrada com trocas isoladas classificadas. A queda de uma
+// combinação é a soma das curvas das camadas.
+
+const MUL_EXACT = 'MUL8 exato', ADD_EXACT = 'ADD32 exato';
+const unitName = (kind, name) => name ?? (kind === 'mul' ? MUL_EXACT : ADD_EXACT);
+const slotName = (name) => (name === MUL_EXACT || name === ADD_EXACT ? null : name);
+
+/**
+ * Erro estático por camada: errLsb(si, mul, add) é o erro RMS da soma de uma saída da camada si com o multiplicador e
+ * o somador (null: exato), vezes a escala do requant (com escala por canal, a média quadrática das escalas), com cache.
+ */
+export function staticModel(P) {
+    if (P.static) return P.static;
+    const scale = P.net.sites.map((l) => {
+        if (!l.rq.q32) return Math.abs(l.rq.M);
+        const m = l.rq.m;
+        let s = 0;
+        for (let i = 0; i < m.length; i++) s += (m[i] / 4294967296) ** 2;
+        return Math.sqrt(s / m.length);
+    });
+    const cache = new Map();
+    const errLsb = (si, mul, add) => {
+        if (!mul && !add) return 0;
+        const k = `${si}|${mul ?? ''}|${add ?? ''}`;
+        if (!cache.has(k)) cache.set(k, P.sumError(si, mul ?? null, add ?? null) * scale[si]);
+        return cache.get(k);
+    };
+    /** Erro de cada camada de uma configuração (assign: [{mul, add}]). */
+    const errors = (assign) => assign.map((a, si) => errLsb(si, a?.mul ?? null, a?.add ?? null));
+    P.static = { scale, errLsb, errors };
+    return P.static;
+}
+
+/**
+ * Curva monótona erro → queda: regressão isotônica (pool adjacent violators) dos pontos medidos, com a origem fixa e
+ * quedas negativas (ruído: uma unidade não melhora a rede de propósito) levadas a zero, e interpolação linear entre os
+ * pontos. Depois do último ponto, a reta da origem ao último ponto, ou a do último trecho, a mais inclinada (estimar
+ * a mais é o lado seguro).
+ */
+export function monotoneCurve(pts) {
+    const s = [...pts].filter((p) => Number.isFinite(p.err)).sort((a, b) => a.err - b.err);
+    // Blocos de PAV: cada um com a soma das quedas e o número de pontos.
+    const blocks = [];
+    for (const p of s) {
+        blocks.push({ sum: Math.max(0, p.drop), n: 1, err: [p.err] });
+        while (blocks.length > 1 && blocks.at(-2).sum / blocks.at(-2).n > blocks.at(-1).sum / blocks.at(-1).n) {
+            const b = blocks.pop(), a = blocks.at(-1);
+            a.sum += b.sum; a.n += b.n; a.err.push(...b.err);
+        }
+    }
+    const xs = [0], ys = [0];
+    for (const b of blocks) for (const e of b.err) {
+        const y = b.sum / b.n;
+        if (e === xs.at(-1)) ys[ys.length - 1] = Math.max(ys.at(-1), y);
+        else { xs.push(e); ys.push(y); }
+    }
+    const n = xs.length;
+    const tail = n < 2 ? 0 : Math.max(ys[n - 1] / xs[n - 1], (ys[n - 1] - ys[n - 2]) / (xs[n - 1] - xs[n - 2]));
+    const f = (e) => {
+        if (e <= 0 || n < 2) return 0;
+        if (e >= xs[n - 1]) return ys[n - 1] + tail * (e - xs[n - 1]);
+        let lo = 0, hi = n - 1;
+        while (hi - lo > 1) { const m = (lo + hi) >> 1; if (xs[m] <= e) lo = m; else hi = m; }
+        return ys[lo] + ((ys[hi] - ys[lo]) * (e - xs[lo])) / (xs[hi] - xs[lo]);
+    };
+    f.xs = xs; f.ys = ys; f.tail = tail;
+    return f;
+}
+
+/**
+ * Calibração: em cada camada, as trocas isoladas (o multiplicador ou o somador da camada, o resto exato) espalhadas
+ * pelo erro estático, perSite por camada (sempre a de maior erro, para a curva não depender de extrapolação nas
+ * unidades sozinhas), classificadas na amostra de validação. Depois, o refinamento: entre dois pontos vizinhos da
+ * mesma camada cuja queda salta mais que refineDrop pontos percentuais, com o de baixo abaixo de nearDrop (a faixa que
+ * decide a viabilidade), a troca isolada ainda não medida de erro mais perto da média geométrica dos dois; até refine
+ * pontos a mais por camada. Cada medida para quando a queda passa de capDrop (a queda fica então em capDrop, um limite
+ * inferior).
+ * @returns {{curves: function[], points: object[], ms: number}}
+ */
+export async function calibrateCurves(P, engine = localEngine(P), { perSite = 8, refine = 4, refineDrop = 1, nearDrop = 3, capDrop = 20, onPoint = null } = {}) {
+    const t0 = Date.now();
+    const S = staticModel(P);
+    const maxWrong = P.exactWrong + Math.ceil((capDrop * P.n) / 100);
+    const base = P.exact.map((x) => ({ ...x }));
+    const singles = P.net.sites.map((l, si) => {
+        const list = [];
+        for (const kind of ['mul', 'add']) for (const c of P.cands[si][kind]) {
+            const a = { mul: kind === 'mul' ? c.name : null, add: kind === 'add' ? c.name : null };
+            list.push({ si, kind, unit: c.name, a, err: S.errLsb(si, a.mul, a.add) });
+        }
+        return list.filter((x) => x.err > 0).sort((x, y) => x.err - y.err);
+    });
+    const points = [];
+    const measure = (jobs) => mapLimit(jobs, engine.size, async (j) => {
+        const assign = P.exact.map((x, i) => (i === j.si ? { ...j.a } : { ...x }));
+        const r = await engine.run(assign, { maxWrong, base });
+        const drop = r.feasible ? ((r.wrong - P.exactWrong) * 100) / P.n : capDrop;
+        const p = { site: j.si, kind: j.kind, unit: j.unit, err: j.err, drop, capped: !r.feasible, seen: r.seen };
+        j.done = true;
+        points.push(p);
+        onPoint?.({ phase: 'calib', ...p });
+        return p;
+    });
+    await measure(singles.flatMap((list) => spread(list, perSite)));
+    const extra = singles.map(() => 0);
+    for (;;) {
+        const jobs = [];
+        singles.forEach((list, si) => {
+            if (extra[si] >= refine) return;
+            const pts = points.filter((p) => p.site === si).sort((x, y) => x.err - y.err);
+            const chain = [{ err: 0, drop: 0 }, ...pts];
+            for (let k = 1; k < chain.length; k++) {
+                const lo = chain[k - 1], hi = chain[k];
+                if (hi.drop - lo.drop <= refineDrop || lo.drop >= nearDrop) continue;
+                const mid = lo.err > 0 ? Math.sqrt(lo.err * hi.err) : hi.err / 2;
+                const c = list.filter((x) => !x.done && x.err > lo.err && x.err < hi.err).sort((x, y) => Math.abs(Math.log(x.err / mid)) - Math.abs(Math.log(y.err / mid)))[0];
+                if (c) { jobs.push(c); c.done = true; extra[si]++; break; }
+            }
+        });
+        if (!jobs.length) break;
+        jobs.forEach((j) => { j.done = false; });
+        await measure(jobs);
+    }
+    const curves = P.net.sites.map((_, si) => monotoneCurve(points.filter((p) => p.site === si)));
+    return { curves, points, ms: Date.now() - t0 };
+}
+
+/** Queda estimada (pontos percentuais) de uma configuração: a soma das curvas das camadas. */
+export function estimateDrop(P, curves, assign) {
+    const e = staticModel(P).errors(assign);
+    let d = 0;
+    for (let si = 0; si < e.length; si++) d += curves[si](e[si]);
+    return d;
+}
+
+/**
+ * O problema da busca estática para js/axc/heuristics.js: dois grupos por camada com pesos (o multiplicador e o
+ * somador), na ordem da rede; o custo é o do modelo de síntese (por camada, com cache) e a queda, a estimada pelas
+ * curvas. O erro escalar (para a eficiência e a fronteira) é a queda estimada mais um desempate pequeno pela soma
+ * dos erros em LSB (trocas que as curvas dão como de queda zero ainda ficam ordenadas pelo erro).
+ */
+export function nnProblem(P, curves, { maxDrop = 1 } = {}) {
+    const S = staticModel(P);
+    const sites = P.net.sites;
+    const groups = [];
+    sites.forEach((l, si) => {
+        for (const kind of ['mul', 'add']) {
+            const exact = unitName(kind, null);
+            const own = (name) => S.errLsb(si, kind === 'mul' ? name : null, kind === 'add' ? name : null);
+            const list = P.cands[si][kind].map((c) => ({ name: c.name, own: own(c.name) })).sort((a, b) => a.own - b.own);
+            groups.push({ key: `${l.name}.${kind}`, label: `${l.name} ${kind === 'mul' ? '×' : '+'}`, cls: kind, W: kind === 'mul' ? 8 : 32, line: si, site: si, kind, exact, cands: [exact, ...list.map((x) => x.name)], ownOf: new Map([[exact, 0], ...list.map((x) => [x.name, x.own])]) });
+        }
+    });
+    const assignOf = (c) => sites.map((_, si) => ({ mul: slotName(c[2 * si]), add: slotName(c[2 * si + 1]) }));
+    const total = (assign) => P.metric(P.cm.network(assign).totals);
+    return {
+        groups,
+        assignOf,
+        seqOrder: groups.map((_, i) => i),
+        key: (c) => c.join('|'),
+        cost: (c) => total(assignOf(c)),
+        evaluate: (c, key) => {
+            const assign = assignOf(c);
+            const errs = S.errors(assign);
+            let drop = 0, tie = 0;
+            errs.forEach((e, si) => { drop += curves[si](e); tie += e; });
+            const units = [];
+            assign.forEach((a, si) => { if (a.mul) units.push(`${sites[si].name} ×: ${a.mul}`); if (a.add) units.push(`${sites[si].name} +: ${a.add}`); });
+            return { key, assign, cost: total(assign), score: total(assign), drop, errs, err: drop + 1e-6 * tie, feasible: drop <= maxDrop + 1e-9, units };
+        },
+        mark: (p) => ({ drop: p.drop }),
+    };
+}
+
+export const HYBRID_HEURISTICS = HEURISTICS;
+
+/**
+ * Busca híbrida: calibração das curvas (trocas isoladas classificadas), busca com uma heurística no modelo estático
+ * (milissegundos por ponto) e verificação por classificação dos melhores pontos.
+ *
+ *   verificação  os pontos viáveis pela estimativa, em ordem de custo, classificados na amostra (em lotes do tamanho
+ *                do motor); o primeiro que passa no limite é conferido na validação inteira (com amostra) e, se não
+ *                passar, segue o próximo (o reparo). Até maxVerify pontos (25 por padrão). Os verifyFront pontos mais
+ *                baratos da fronteira estimada (custo × queda) também são classificados, para a tabela da página.
+ *
+ * onPoint(ev) recebe cada ponto: { phase: 'calib' | 'search' | 'verify', cost, drop, units, feasible, ... }; na
+ * busca, drop é a queda estimada; na calibração e na verificação, a medida (com est, a estimada, na verificação).
+ *
+ * @param {object} P preparação (prepareSearch)
+ * @param {{heuristic?: string, maxDrop?: number, curves?: object, perSite?: number, maxVerify?: number,
+ *          verifyFront?: number, onPoint?: function, progress?: function}} o curves: calibração já feita (reaproveitada
+ *          entre buscas com a mesma preparação; sem ela, calibrateCurves); o resto vai para a heurística
+ * @param {object} engine motor de avaliação
+ */
+export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
+    const t0 = Date.now();
+    const heuristic = o.heuristic ?? 'local';
+    if (!HEURISTICS.includes(heuristic)) throw new Error(`heurística desconhecida: ${heuristic}`);
+    const maxDrop = o.maxDrop ?? 1;
+    const onPoint = o.onPoint ?? (() => {});
+    const progress = o.progress ?? (() => {});
+    const phaseMs = {};
+    // 1. Calibração (uma vez por preparação).
+    let calib = o.curves ?? P.calib ?? null;
+    if (!calib) {
+        let n = 0;
+        calib = await calibrateCurves(P, engine, { perSite: o.perSite ?? 8, refine: o.refine ?? 4, onPoint: (ev) => { n++; onPoint(ev); progress({ phase: 'calib', evals: n, ms: Date.now() - t0 }); } });
+        P.calib = calib;
+    }
+    phaseMs.calib = Date.now() - t0;
+    // 2. Busca no modelo estático.
+    const Pn = nnProblem(P, calib.curves, { maxDrop });
+    const exactCost = Pn.cost(Pn.groups.map((g) => g.exact));
+    const t1 = Date.now();
+    let last = 0;
+    const ctx = newContext({
+        progress: (n, p) => {
+            onPoint({ phase: 'search', n, cost: p.score, drop: p.drop, feasible: p.feasible, units: p.units });
+            const now = Date.now();
+            if (now - last > 100) { last = now; progress({ phase: 'search', evals: n, ms: now - t0 }); }
+        },
+    });
+    let error = null;
+    try { runHeuristic(heuristic, Pn, ctx, { granularity: 'class', ...o }); } catch (e) { error = e.message; }
+    phaseMs.search = Date.now() - t1;
+    // 3. Verificação por classificação.
+    const t2 = Date.now();
+    const maxWrong = P.exactWrong + Math.floor((maxDrop * P.n) / 100 + 1e-9);
+    let fullLimit = null;
+    if (P.fullVal) {
+        const exW = P.fullVal.run(P.exact, { record: true }).wrong;
+        fullLimit = exW + Math.floor((maxDrop * P.fullVal.set.n) / 100 + 1e-9);
+    }
+    const exactBase = P.exact.map((x) => ({ ...x }));
+    const measure = async (p) => {
+        if (p.measured) return p;
+        const r = await engine.run(p.assign, { maxWrong, base: exactBase });
+        p.measured = { wrong: r.wrong, seen: r.seen, drop: ((r.wrong - P.exactWrong) * 100) / P.n, ok: r.feasible };
+        onPoint({ phase: 'verify', cost: p.score, drop: p.measured.drop, est: p.drop, feasible: r.feasible, full: r.feasible || r.seen === P.n, units: p.units });
+        progress({ phase: 'verify', evals: ctx.points.length, ms: Date.now() - t0 });
+        return p;
+    };
+    // Ordem da verificação: os viáveis da fronteira estimada, do mais barato para o mais caro (cada falha leva a um
+    // ponto de queda estimada estritamente menor), e depois os outros viáveis, em ordem de custo. Os mais baratos de
+    // todos, em geral, estão num mesmo caminho da heurística, com a mesma queda estimada, e falham juntos.
+    const front = paretoPoints(ctx.points);
+    const onFront = new Set(front);
+    const feasible = [...front.filter((p) => p.feasible), ...ctx.points.filter((p) => p.feasible && !onFront.has(p)).sort((a, b) => a.score - b.score)].slice(0, o.maxVerify ?? 25);
+    let chosen = null, verified = 0, repaired = 0;
+    for (let b = 0; b < feasible.length && !chosen; b += engine.size) {
+        const batch = feasible.slice(b, b + engine.size);
+        await mapLimit(batch, engine.size, measure);
+        verified += batch.length;
+        for (const p of batch) {
+            if (!p.measured.ok) continue;
+            if (P.fullVal) {
+                const w = P.fullVal.run(p.assign).wrong;
+                p.measured.wrongFull = w;
+                if (w > fullLimit) { repaired++; continue; }
+            }
+            chosen = p;
+            break;
+        }
+    }
+    // Para a tabela: os pontos da fronteira estimada perto do limite (até o dobro dele), os mais baratos.
+    await mapLimit(front.filter((p) => p.score < exactCost && !p.measured && p.drop <= 2 * maxDrop).slice(0, o.verifyFront ?? 8), engine.size, measure);
+    phaseMs.verify = Date.now() - t2;
+    // O exato, se nada passou.
+    const bestAssign = chosen ? chosen.assign : P.exact.map((x) => ({ ...x }));
+    const fin = await engine.run(bestAssign, { base: bestAssign });
+    const total = (a) => P.metric(P.cm.network(a).totals);
+    const res = {
+        heuristic, hybrid: true, objective: P.objective, maxDrop, maxWrong, workers: engine.size, sample: P.sample, repaired, error,
+        exact: { cost: exactCost, wrongVal: P.exactWrong, accVal: 1 - P.exactWrong / P.n },
+        best: { assign: bestAssign, cost: total(bestAssign), wrongVal: fin.wrong, accVal: 1 - fin.wrong / P.n, saving: 1 - total(bestAssign) / exactCost, estDrop: chosen?.drop ?? 0 },
+        calib: calib.points, evals: ctx.points.length, verified, steps: ctx.steps,
+        points: ctx.points.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, feasible: p.feasible, measured: p.measured ?? null })),
+        front: front.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, feasible: p.feasible, units: p.units, measured: p.measured ?? null, saving: 1 - p.score / exactCost })),
+        ms: Date.now() - t0, phaseMs,
+    };
+    if (P.fullVal) {
+        const ex = P.fullVal.run(P.exact, { record: true }), b = P.fullVal.run(bestAssign);
+        res.exact.accValFull = 1 - ex.wrong / P.fullVal.set.n;
+        res.best.accValFull = 1 - b.wrong / P.fullVal.set.n;
+        res.valN = P.fullVal.set.n;
+    }
+    if (P.test) {
+        const ex = P.test.run(P.exact, { record: true }), b = P.test.run(bestAssign);
+        res.exact.accTest = 1 - ex.wrong / P.test.set.n;
+        res.best.accTest = 1 - b.wrong / P.test.set.n;
+    }
+    return res;
 }
 
 /**
