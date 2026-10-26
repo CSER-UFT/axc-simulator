@@ -178,6 +178,7 @@ export default {
     'nn.approxMacsShort': 'approximate operations',
     'nn.slowPart': 'Heavy partitioning for Vitis in {list} reads per iteration: the banks read change with every pixel, and scheduling can take an hour or more (MiniLenet conv2, 75 reads: about 1 h).',
     'nn.searchSample': 'Validation images',
+    'nn.searchFewImages': "With {n} images, the limit is {k} extra wrong image(s): the search is dominated by the luck of the sample (on the datasets with lower accuracy, Fashion MNIST and CIFAR 10, it may find nothing that passes on the whole validation set). Use all images or a larger limit.",
     'nn.searchSampleAll': 'all (1000)',
     'nn.searchAccValFull': 'accuracy on the whole validation set ({n} images)',
     'nn.confCsv': 'Download CSV',

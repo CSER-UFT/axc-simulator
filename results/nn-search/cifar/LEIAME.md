@@ -2,6 +2,21 @@
 
 Gerado por `node scripts/nnbench.mjs --workers 1 --id cifar --models lenet5-cifar10 --objectives area --samples 0,250 --heuristics sensitivity,h:local,h:sequential`. Quedas em pontos percentuais; a do limite é a da validação inteira.
 
+## Resumo
+
+6 casos; acima do limite na validação inteira: 0; ponto escolhido coberto: 0; erros: 0.
+
+| heurística | amostra | casos | economia média % | economia mínima % | da melhor % | abaixo de 2/3 da melhor | queda validação | queda teste | s |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| h:local | 1000 | 1 | 9.1 | 9.1 | 95 | 0 | 0.70 | 3.00 | 141 |
+| h:local | 250 | 1 | 9.5 | 9.5 | 100 | 0 | 0.00 | 0.90 | 56 |
+| h:sequential | 1000 | 1 | 9.2 | 9.2 | 96 | 0 | 0.90 | 2.10 | 100 |
+| h:sequential | 250 | 1 | 3.3 | 3.3 | 35 | 1 | 0.40 | 0.30 | 60 |
+| sensitivity | 1000 | 1 | 9.6 | 9.6 | 100 | 0 | 0.80 | 2.10 | 135 |
+| sensitivity | 250 | 1 | 9.1 | 9.1 | 95 | 0 | 0.40 | 2.10 | 74 |
+
+## Casos
+
 | modelo | objetivo | amostra | heurística | limite | economia % | queda amostra | queda validação | queda teste | exata amostra % | exata validação % | pontos | verificados | rodadas | reparos | coberto | s |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | lenet5-cifar10 | area | 1000 | sensitivity | 1 | 9.6 | 0.80 | 0.80 | 2.10 | 69.0 | 69.0 | 143 |  |  | 0 |  | 135 |

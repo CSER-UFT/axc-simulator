@@ -79,7 +79,28 @@ CIFAR 10 (2 a 3 p.p. com 1 p.p. na validação, pelo ruído de 1,4 p.p. da valid
 
 Próximos passos sugeridos: rodar a matriz com vários workers e nas outras redes (--models
 minilenet-fashion,lenet5-mnist,lenet5-fashion,lenet5-cifar10); conferir no CIFAR 10 se as rodadas reduzem as
-verificações; decidir o padrão de amostra da página (250 com o reparo novo, ou 500).
+verificações; decidir o padrão de amostra da página (feito em 26/out: a validação inteira).
+
+## Matriz nas outras redes (26/out, results/nn-search/2026-10-26-01-00)
+
+MiniLenet Fashion, LeNet 5 MNIST, LeNet 5 Fashion e LeNet 5 CIFAR 10; área e LUT; amostra de 250 e validação inteira;
+4 heurísticas; 7 workers. 64 casos: nenhum acima do limite na validação inteira, nenhum ponto coberto, nenhum erro.
+
+1. Com a validação inteira, a busca híbrida local é a melhor: 97% da melhor economia de cada caso em média, nunca
+   abaixo de 9,1%, e cerca de metade do tempo da sensibilidade (45 s contra 82 s). A sequencial híbrida oscila
+   (LeNet 5 MNIST, LUT: 7,9% contra 15,5% da local).
+2. A amostra de 250 imagens não serve com limite de 1 p.p.: o limite são 2 imagens, e a busca fica dominada pelo
+   acaso da amostra (quedas negativas na amostra; na LeNet 5 Fashion, área, três heurísticas terminam na exata). A
+   página passou a usar a validação inteira por padrão e avisa quando o limite cabe em menos de 5 imagens.
+3. A queda no teste é cerca do dobro da queda na validação (1,4 contra 0,7 p.p. em média, com a validação inteira; 2
+   a 4 p.p. no CIFAR 10): a busca escolhe o ponto mais barato que passa na validação de 1000 imagens, e os que passam
+   por sorte são favorecidos.
+
+Próximo passo sugerido para o item 3: usar mais imagens de validação. O scripts/nn/train.py já separa 5000 imagens
+de validação (500 por classe, sorteadas com a semente), mas grava só 1000 (as 100 primeiras de cada classe). As 5000
+podem ser exportadas sem treinar de novo (o sorteio depende só da semente e dos rótulos de treino), num arquivo
+separado para a linha de comando e o nnbench, deixando o de 1000 na página. A MiniLenet do MNIST veio do C
+(scripts/nn/import.mjs) e precisa de outro caminho.
 
 ## Números do teste do proxy (scratch proxy.mjs / proxy2.mjs, refazer se preciso)
 

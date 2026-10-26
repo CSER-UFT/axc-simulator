@@ -494,6 +494,15 @@ function stopSearch(msg = '') {
     if (msg) $('nnSearchStatus').textContent = msg;
 }
 $('nnSearchStop').onclick = () => stopSearch(t('nn.searchStopped'));
+// Aviso: com a amostra, o limite cabe em poucas imagens (1 ponto em 250 imagens são 2), e a diferença entre a rede
+// aproximada e a exata nessas imagens é dominada pelo acaso de quais imagens a amostra tem.
+function sampleWarn() {
+    const n = +$('nnSearchSample').value || nnData?.net.dataset.val?.n || 1000;
+    const k = Math.floor((Math.max(0, +$('nnSearchDrop').value || 0) * n) / 100 + 1e-9);
+    $('nnSearchWarn').textContent = k < 5 ? t('nn.searchFewImages', { k, n }) : '';
+}
+for (const id of ['nnSearchSample', 'nnSearchDrop']) $(id).addEventListener('input', sampleWarn);
+sampleWarn();
 $('nnSearchBtn').onclick = () => {
     if (!nnData || !registry) return;
     stopSearch();
@@ -811,6 +820,7 @@ function applyDomTranslations() {
     for (const el of document.querySelectorAll('[data-i18n-html]')) el.innerHTML = t(el.dataset.i18nHtml);
     for (const el of document.querySelectorAll('[data-i18n-title]')) el.title = t(el.dataset.i18nTitle);
     for (const el of document.querySelectorAll('[data-i18n-label]')) el.label = t(el.dataset.i18nLabel);
+    sampleWarn();
     help.render();
     if (synth) { fillSelects(); renderArch(); render(); }
 }

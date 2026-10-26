@@ -2,6 +2,23 @@
 
 Gerado por `node scripts/nnbench.mjs --models minilenet-fashion,lenet5-mnist,lenet5-fashion,lenet5-cifar10 --workers 7`. Quedas em pontos percentuais; a do limite é a da validação inteira.
 
+## Resumo
+
+64 casos; acima do limite na validação inteira: 0; ponto escolhido coberto: 0; erros: 0.
+
+| heurística | amostra | casos | economia média % | economia mínima % | da melhor % | abaixo de 2/3 da melhor | queda validação | queda teste | s |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| h:local | 1000 | 8 | 11.2 | 9.1 | 97 | 0 | 0.66 | 1.38 | 45 |
+| h:local | 250 | 8 | 9.4 | 0.0 | 83 | 1 | 0.30 | 0.85 | 31 |
+| h:sequential | 1000 | 8 | 9.8 | 7.9 | 88 | 1 | 0.64 | 1.35 | 39 |
+| h:sequential | 250 | 8 | 8.7 | 0.0 | 76 | 2 | 0.47 | 0.78 | 28 |
+| sensitivity | 1000 | 8 | 10.8 | 8.1 | 94 | 0 | 0.89 | 1.46 | 82 |
+| sensitivity | 250 | 8 | 9.3 | 4.1 | 87 | 1 | 0.53 | 1.13 | 44 |
+| sequential | 1000 | 8 | 10.2 | 5.5 | 88 | 1 | 0.90 | 1.61 | 38 |
+| sequential | 250 | 8 | 8.4 | 0.0 | 74 | 2 | 0.57 | 1.10 | 34 |
+
+## Casos
+
 | modelo | objetivo | amostra | heurística | limite | economia % | queda amostra | queda validação | queda teste | exata amostra % | exata validação % | pontos | verificados | rodadas | reparos | coberto | s |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | minilenet-fashion | area | 250 | sensitivity | 1 | 9.4 | -0.80 | 0.90 | 1.60 | 87.6 | 89.5 | 116 |  |  | 3 |  | 26 |

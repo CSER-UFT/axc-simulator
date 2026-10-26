@@ -2,6 +2,23 @@
 
 Gerado por `node scripts/nnbench.mjs --workers 1 --id depois`. Quedas em pontos percentuais; a do limite é a da validação inteira.
 
+## Resumo
+
+16 casos; acima do limite na validação inteira: 0; ponto escolhido coberto: 0; erros: 0.
+
+| heurística | amostra | casos | economia média % | economia mínima % | da melhor % | abaixo de 2/3 da melhor | queda validação | queda teste | s |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| h:local | 1000 | 2 | 10.7 | 8.9 | 83 | 0 | 0.90 | 1.30 | 42 |
+| h:local | 250 | 2 | 11.3 | 10.5 | 89 | 0 | 0.45 | 0.95 | 22 |
+| h:sequential | 1000 | 2 | 11.5 | 11.4 | 89 | 0 | 0.60 | 0.55 | 42 |
+| h:sequential | 250 | 2 | 11.7 | 10.4 | 92 | 0 | 0.75 | 1.00 | 25 |
+| sensitivity | 1000 | 2 | 12.9 | 12.9 | 100 | 0 | 0.85 | 0.75 | 53 |
+| sensitivity | 250 | 2 | 11.6 | 10.8 | 92 | 0 | 0.70 | 0.50 | 24 |
+| sequential | 1000 | 2 | 11.5 | 10.3 | 89 | 0 | 1.00 | 1.25 | 22 |
+| sequential | 250 | 2 | 11.1 | 10.7 | 88 | 0 | 0.90 | 1.25 | 20 |
+
+## Casos
+
 | modelo | objetivo | amostra | heurística | limite | economia % | queda amostra | queda validação | queda teste | exata amostra % | exata validação % | pontos | verificados | rodadas | reparos | coberto | s |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | minilenet-mnist | area | 250 | sensitivity | 1 | 12.5 | 0.80 | 0.50 | 0.70 | 99.2 | 99.3 | 120 |  |  | 0 |  | 24 |

@@ -178,6 +178,7 @@ export default {
     'nn.approxMacsShort': 'operações aproximadas',
     'nn.slowPart': 'Partição pesada para o Vitis em {list} leituras por iteração: os bancos lidos mudam a cada pixel, e o escalonamento pode levar uma hora ou mais (conv2 da MiniLenet, 75 leituras: cerca de 1 h).',
     'nn.searchSample': 'Imagens da validação',
+    'nn.searchFewImages': "Com {n} imagens, o limite cabe em {k} imagem(ns) erradas a mais: a busca fica dominada pelo acaso da amostra (nas bases com acurácia mais baixa, Fashion MNIST e CIFAR 10, pode não achar nada que passe na validação inteira). Use todas as imagens ou um limite maior.",
     'nn.searchSampleAll': 'todas (1000)',
     'nn.searchAccValFull': 'acurácia na validação inteira ({n} imagens)',
     'nn.confCsv': 'Baixar CSV',
