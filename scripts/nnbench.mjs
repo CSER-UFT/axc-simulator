@@ -75,6 +75,10 @@ if (!report) for (const model of models) for (const objective of objectives) for
         ? pts.filter((q) => q.measured?.ok && (q.measured.fullOk ?? !full))
         : pts.filter((q) => q.feasible && (q.fullOk ?? !full));
     const cheapest = okPts.reduce((m, q) => Math.min(m, q.cost), Infinity);
+    // O escolhido tem de estar na fronteira medida (na híbrida, também na estimada, a não ser a exata).
+    const key = (a) => JSON.stringify(a.map((x) => ({ mul: x.mul ?? null, add: x.add ?? null })));
+    const bk = key(r.best.assign), inF = (f) => (f ?? []).some((q) => key(q.assign) === bk);
+    const offFront = r.best.saving > 0 && (hybrid ? !inF(r.measuredFront) || !inF(r.front) : !inF(r.front));
     rows.push({
         model, objective, sample: r.sample, heuristic: h, maxDrop,
         saving: r.best.saving,
@@ -83,14 +87,14 @@ if (!report) for (const model of models) for (const objective of objectives) for
         dropTest: r.exact.accTest - r.best.accTest,
         accExactSample: r.exact.accVal, accExactVal: full ? r.exact.accValFull : r.exact.accVal,
         evals: r.evals, verified: r.verified ?? null, rounds: r.rounds ?? null, repaired: r.repaired ?? 0,
-        covered: Number.isFinite(cheapest) && cheapest < r.best.cost - 1e-6,
+        covered: Number.isFinite(cheapest) && cheapest < r.best.cost - 1e-6, offFront,
         ms: Date.now() - t0, units: r.best.assign.map((u, i) => `${i}:${u.mul ?? '-'}/${u.add ?? '-'}`).join(' '),
     });
 }
 
 const pct = (v, d = 1) => (v === undefined || v === null ? '' : (100 * v).toFixed(d));
-const head = ['modelo', 'objetivo', 'amostra', 'heurística', 'limite', 'economia %', 'queda amostra', 'queda validação', 'queda teste', 'exata amostra %', 'exata validação %', 'pontos', 'verificados', 'rodadas', 'reparos', 'coberto', 's'];
-const line = (r) => (r.error ? [r.model, r.objective, r.sample, r.heuristic, r.maxDrop, `erro: ${r.error}`] : [r.model, r.objective, r.sample, r.heuristic, r.maxDrop, pct(r.saving), pct(r.dropSample, 2), pct(r.dropVal, 2), pct(r.dropTest, 2), pct(r.accExactSample), pct(r.accExactVal), r.evals, r.verified ?? '', r.rounds ?? '', r.repaired, r.covered ? 'sim' : '', (r.ms / 1000).toFixed(0)]);
+const head = ['modelo', 'objetivo', 'amostra', 'heurística', 'limite', 'economia %', 'queda amostra', 'queda validação', 'queda teste', 'exata amostra %', 'exata validação %', 'pontos', 'verificados', 'rodadas', 'reparos', 'coberto', 'fora da fronteira', 's'];
+const line = (r) => (r.error ? [r.model, r.objective, r.sample, r.heuristic, r.maxDrop, `erro: ${r.error}`] : [r.model, r.objective, r.sample, r.heuristic, r.maxDrop, pct(r.saving), pct(r.dropSample, 2), pct(r.dropVal, 2), pct(r.dropTest, 2), pct(r.accExactSample), pct(r.accExactVal), r.evals, r.verified ?? '', r.rounds ?? '', r.repaired, r.covered ? 'sim' : '', r.offFront ? 'sim' : (r.offFront === undefined ? '?' : ''), (r.ms / 1000).toFixed(0)]);
 if (!report) writeFileSync(join(outDir, 'casos.json'), `${JSON.stringify(rows, null, 1)}\n`);
 writeFileSync(join(outDir, 'casos.csv'), `${[head, ...rows.map(line)].map((x) => x.join(',')).join('\n')}\n`);
 // Resumo por heurística e amostra.
@@ -109,6 +113,7 @@ const sumRows = [...groups].sort(([a], [b]) => (a < b ? -1 : 1)).map(([, a]) => 
     pct(mean(a.map((r) => r.dropVal)), 2), pct(mean(a.map((r) => r.dropTest)), 2), (mean(a.map((r) => r.ms)) / 1000).toFixed(0),
 ]);
 const over = ok.filter((r) => r.dropVal > r.maxDrop / 100 + 1e-9).length, covered = ok.filter((r) => r.covered).length, errors = rows.length - ok.length;
+const off = ok.filter((r) => r.offFront).length, offUnknown = ok.filter((r) => r.offFront === undefined).length;
 const md = [
     `# Buscas das redes: ${id}`,
     '',
@@ -117,7 +122,7 @@ const md = [
     '',
     `## Resumo`,
     '',
-    `${ok.length} casos; acima do limite na validação inteira: ${over}; ponto escolhido coberto: ${covered}; erros: ${errors}.`,
+    `${ok.length} casos; acima do limite na validação inteira: ${over}; ponto escolhido coberto: ${covered}; fora da fronteira: ${offUnknown === ok.length ? 'não conferido nesta rodada' : off}; erros: ${errors}.`,
     '',
     `| ${sumHead.join(' | ')} |`,
     `| ${sumHead.map(() => '---').join(' | ')} |`,

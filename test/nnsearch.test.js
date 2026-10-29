@@ -142,3 +142,33 @@ test('busca híbrida: só as seis heurísticas da página HLS (sem a exaustiva e
     assert.deepEqual(HYBRID_HEURISTICS, ['local', 'efficiency', 'sequential', 'tabu', 'grasp', 'ga']);
     for (const h of ['exhaustive', 'random']) await assert.rejects(hybridSearch(P, { heuristic: h }), /heurística desconhecida/);
 });
+
+test('busca híbrida: o escolhido está na fronteira medida e na estimada, com e sem amostra', async () => {
+    const { hybridSearch } = await import('../js/axc/nnsearch.js');
+    const key = (a) => JSON.stringify(a.map((x) => ({ mul: x.mul ?? null, add: x.add ?? null })));
+    const check = (r) => {
+        const bk = key(r.best.assign);
+        // Na fronteira medida (pontos classificados e a exata, sem os reprovados na validação inteira).
+        assert.ok(r.measuredFront.some((p) => key(p.assign) === bk), 'fora da fronteira medida');
+        for (let k = 1; k < r.measuredFront.length; k++) assert.ok(r.measuredFront[k].cost >= r.measuredFront[k - 1].cost && r.measuredFront[k].measured.drop < r.measuredFront[k - 1].measured.drop);
+        // Nenhum ponto classificado e aprovado custa menos e cai menos (ou igual) que o escolhido.
+        const b = r.measuredFront.find((p) => key(p.assign) === bk);
+        for (const p of r.points.filter((q) => q.measured?.ok && q.measured.fullOk !== false)) assert.ok(!(p.cost < b.cost - 1e-9 && p.measured.drop <= b.measured.drop + 1e-12), `${p.cost} domina ${b.cost}`);
+        // Na fronteira estimada final (a não ser a exata, quando nada passa).
+        if (r.best.saving > 0) assert.ok(r.front.some((p) => key(p.assign) === bk), 'fora da fronteira estimada');
+    };
+    check(await hybridSearch(P, { heuristic: 'sequential', maxDrop: 1 }));
+    const Ps = prepareSearch(net, { val, test: testSet, synth, cells, fpga, objective: 'area', maxCands: 4, sample: 250 });
+    for (const h of ['sequential', 'local']) check(await hybridSearch(Ps, { heuristic: h, maxDrop: 1 }));
+});
+
+test('busca medida com amostra: o escolhido está na fronteira (a validação inteira vale sobre a amostra)', async () => {
+    const key = (a) => JSON.stringify(a.map((x) => ({ mul: x.mul ?? null, add: x.add ?? null })));
+    const Ps = prepareSearch(net, { val, test: testSet, synth, cells, fpga, objective: 'area', maxCands: 4, sample: 250 });
+    for (const h of ['sequential', 'sensitivity']) {
+        const r = await searchNetwork(Ps, { heuristic: h, maxDrop: 1 });
+        if (r.best.saving > 0) assert.ok(r.front.some((p) => key(p.assign) === key(r.best.assign)), `${h}: fora da fronteira`);
+        // Nenhum ponto viável mais barato que o escolhido ficou sem conferir na validação inteira.
+        for (const p of r.points) if (p.feasible && p.cost < r.best.cost - 1e-9) assert.equal(p.fullOk, false, `${h}: ${p.cost}`);
+    }
+});

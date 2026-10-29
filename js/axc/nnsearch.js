@@ -432,6 +432,18 @@ export function estimateDrop(P, curves, assign) {
 }
 
 /**
+ * Fronteira de Pareto em custo contra a queda medida (pontos com p.measured), em ordem de custo. Os que pararam no
+ * limite (measured.ok falso) entram com a queda até onde a classificação foi, um limite inferior.
+ */
+function paretoMeasured(points) {
+    const s = [...points].sort((a, b) => a.score - b.score || a.measured.drop - b.measured.drop);
+    const out = [];
+    let best = Infinity;
+    for (const p of s) if (p.measured.drop < best - 1e-12) { out.push(p); best = p.measured.drop; }
+    return out;
+}
+
+/**
  * O problema da busca estática para js/axc/heuristics.js: dois grupos por camada com pesos (o multiplicador e o
  * somador), na ordem da rede; o custo é o do modelo de síntese (por camada, com cache) e a queda, a estimada pelas
  * curvas. O erro escalar (para a eficiência e a fronteira) é a queda estimada mais um desempate pequeno pela soma
@@ -477,9 +489,11 @@ export const HYBRID_HEURISTICS = ['local', 'efficiency', 'sequential', 'tabu', '
  * Busca híbrida: calibração das curvas (trocas isoladas classificadas), busca com uma heurística no modelo estático
  * (milissegundos por ponto) e verificação por classificação dos melhores pontos.
  *
- *   verificação  os pontos viáveis pela estimativa, em ordem de custo, classificados na amostra (em lotes do tamanho
- *                do motor); o primeiro que passa no limite é conferido na validação inteira (com amostra) e, se não
- *                passar, segue o próximo (o reparo). Até maxVerify pontos (25 por padrão). Os verifyFront pontos mais
+ *   verificação  só os pontos da fronteira estimada (de tudo o que foi visitado) dentro do limite, do mais barato
+ *                para o mais caro, classificados na amostra (em lotes do tamanho do motor); o primeiro que passa no
+ *                limite é conferido na validação inteira (com amostra) e, se não passar, segue o próximo (o reparo).
+ *                Nenhum ponto dominado no modelo estático é verificado; o resultado traz também a fronteira medida
+ *                (measuredFront), onde o escolhido está. Até maxVerify pontos (25 por padrão). Os verifyFront pontos mais
  *                baratos da fronteira estimada (custo × queda) também são classificados, para a tabela da página.
  *   rodadas      se os verificados de uma rodada passam do limite, a heurística roda de novo com o limite estimado
  *                apertado (rounds, frações do limite real: 1, 0,75, 0,5 e 0,25 por padrão) e verifica até
@@ -560,14 +574,14 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
         if (round > 0) steps.push({ kind: 'round', n: round + 1, limit: lim, frac: rounds[round], state: exactState });
         try { runHeuristic(heuristic, Pn, ctx, { granularity: 'class', ...o }); } catch (e) { error = e.message; }
         phaseMs.search += Date.now() - t1;
-        // Ordem da verificação: os viáveis da fronteira estimada desta rodada, do mais barato para o mais caro (cada
-        // falha leva a um ponto de queda estimada estritamente menor), e depois os outros viáveis, em ordem de custo.
+        // Ordem da verificação: só os pontos da fronteira estimada de tudo o que foi visitado até aqui (nesta rodada e
+        // nas anteriores) com a queda estimada dentro do limite da rodada, do mais barato para o mais caro; cada falha
+        // leva a um ponto de queda estimada estritamente menor. Um ponto dominado no modelo estático nunca é
+        // verificado: se a fronteira se esgota sem um ponto que passe, a rodada seguinte aperta o limite estimado.
         const t2 = Date.now();
-        const pts = [...new Set(ctx.points.map((p) => all.get(p.key) ?? p))];
-        const front = paretoPoints(pts), onFront = new Set(front);
-        const ok = (p) => p.drop <= lim + 1e-9 && !p.measured;
+        const front = paretoPoints([...all.values()]);
         const lastRound = round === rounds.length - 1;
-        const cands = [...front.filter(ok), ...pts.filter((p) => ok(p) && !onFront.has(p)).sort((a, b) => a.score - b.score)].slice(0, Math.min(maxVerify - verified, lastRound ? Infinity : perRound));
+        const cands = front.filter((p) => p.drop <= lim + 1e-9 && !p.measured).slice(0, Math.min(maxVerify - verified, lastRound ? Infinity : perRound));
         for (let b = 0; b < cands.length && !chosen; b += engine.size) {
             const batch = cands.slice(b, b + engine.size);
             await mapLimit(batch, engine.size, measure);
@@ -608,6 +622,12 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
         break;
     }
     phaseMs.verify += Date.now() - t3;
+    // Fronteira medida: os pontos classificados (e a rede exata, queda zero), sem os reprovados na validação inteira,
+    // em custo contra a queda medida. O escolhido (o mais barato que passa) está nela por definição.
+    const measuredFront = paretoMeasured([
+        { score: exactCost, assign: P.exact.map((x) => ({ ...x })), units: [], drop: 0, measured: { drop: 0, ok: true, exact: true } },
+        ...allPts.filter((p) => p.measured && p.measured.fullOk !== false),
+    ]);
     // O exato, se nada passou.
     const bestAssign = chosen ? chosen.assign : P.exact.map((x) => ({ ...x }));
     const fin = await engine.run(bestAssign, { base: bestAssign });
@@ -619,6 +639,7 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
         calib: calib.points, evals: allPts.length, verified, steps,
         points: allPts.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, feasible: p.feasible, measured: p.measured ?? null })),
         front: front.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, feasible: p.feasible, units: p.units, measured: p.measured ?? null, saving: 1 - p.score / exactCost })),
+        measuredFront: measuredFront.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, units: p.units, measured: p.measured, saving: 1 - p.score / exactCost })),
         ms: Date.now() - t0, phaseMs,
     };
     if (P.fullVal) {
@@ -772,6 +793,17 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
             // A volta mais perto de passar: menos erradas por imagem vista (a classificação para no limite).
             from = chosen ? null : tried.sort((x, y) => x.fullWrongSeen / x.fullSeen - y.fullWrongSeen / y.fullSeen)[0] ?? null;
         }
+        // Os viáveis mais baratos que o escolhido que ficaram sem conferir (além de maxVerify) são conferidos agora:
+        // o escolhido não pode ficar coberto por um ponto viável que passaria.
+        if (chosen) {
+            for (const p of byCost.filter((x) => x.fullOk === undefined && x.cost < chosen.cost - 1e-9)) {
+                const r = fv.run(p.assign, { maxWrong: limit });
+                p.fullWrong = r.feasible ? r.wrong : null;
+                p.fullOk = r.feasible;
+                if (r.feasible) { chosen = p; break; }
+                repaired++;
+            }
+        }
         // A acurácia na amostra dos pontos do reparo (para o gráfico, no mesmo eixo dos outros).
         for (const q of points.filter((x) => x.repair && x.wrong === null)) {
             const r = await engine.run(q.assign, { base: q.assign });
@@ -800,6 +832,9 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
         res.exact.accTest = 1 - ex.wrong / P.test.set.n;
         res.best.accTest = 1 - b.wrong / P.test.set.n;
     }
-    res.front = pareto(points.filter((p) => p.feasible).map((p) => ({ ...p, err: p.wrong }))).map((p) => ({ ...p, accVal: 1 - p.wrong / P.n }));
+    // Fronteira medida: os viáveis na amostra que não foram reprovados na validação inteira, e os aprovados nela
+    // (a validação inteira, quando conferida, vale sobre a amostra: um ponto do reparo pode passar do limite na
+    // amostra e caber na validação inteira). O escolhido está nela.
+    res.front = pareto(points.filter((p) => p.fullOk === true || (p.feasible && p.fullOk !== false)).map((p) => ({ ...p, err: p.wrong }))).map((p) => ({ ...p, accVal: 1 - p.wrong / P.n }));
     return res;
 }
