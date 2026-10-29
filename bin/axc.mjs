@@ -21,7 +21,7 @@
  *                             [--heuristic sensitivity|sequential] [--dirs "..."] [--clock 10] [--workers N] [--cands 12]
  *                             [--sample 250] (amostra estratificada da validação na busca; o ponto escolhido é conferido
  *                             na validação inteira e no teste)
- *                             [--hybrid [--heuristic sequential|efficiency|exhaustive|random|local|tabu|grasp|ga]
+ *                             [--hybrid [--heuristic local|efficiency|sequential|tabu|grasp|ga]
  *                             [--max-verify 25] [--verify-front 8]] (busca híbrida: curvas erro → queda calibradas com
  *                             trocas isoladas, busca no modelo estático, verificação dos melhores pontos)
  *       busca do multiplicador e do somador de cada camada (js/axc/nnsearch.js): o menor custo com a queda de

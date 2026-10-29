@@ -2,6 +2,50 @@
 
 Resumo para continuar o trabalho numa conversa nova. Estado do repositório no commit deste arquivo.
 
+## Plano em andamento (29/out)
+
+Decisões: exaustiva e aleatória fora da busca das redes por completo (página, linha de comando, nnbench; o módulo
+genérico continua porque a linha de comando da HLS ainda usa as duas); busca medida (sensibilidade e sequencial
+medida) selecionável na página, mas fora de "comparar todas"; o resumo exata contra escolhida vai para colunas da
+tabela das execuções, com o detalhe por camada ao clicar na linha; Baixar projeto por linha, como na HLS; a aba e o
+botão passam a se chamar Exploração e Explorar; o gráfico mostra a fronteira estimada (tracejada) e a medida (cheia),
+com o escolhido na medida; correção do viés aprovada, comparando média, mediana, média geométrica (do módulo, com o
+sinal predominante) e média aparada; na ResNet 8, os atalhos 1 × 1 entram como camadas próprias na busca; só domínio
+de imagens (ResNet 8 do MLPerf Tiny no CIFAR 10).
+
+Parte A, correções da busca:
+1. Ler a aba de exploração da HLS e listar as diferenças (feito).
+2. Tirar a exaustiva e a aleatória das redes (feito).
+3. Verificação só pela fronteira estimada, sem ponto dominado; escolhido sempre na fronteira medida.
+4. Gráfico com as duas fronteiras.
+5. Diagnóstico do teto de economia (unidade mais barata em tudo; fração do custo na aritmética), no nnbench.
+6. Correção do viés com a medida escolhível, no modelo estático, no avaliador bit exato e na exportação.
+7. Comparar as medidas da correção no nnbench.
+8. Exportar as 5000 imagens de validação do train.py (script; Tiago roda, precisa das bases).
+9. Rodar a matriz de novo com as 5000 imagens (Tiago, 7 workers).
+
+Parte B, aba de exploração igual à da HLS:
+10. Várias heurísticas por execução ("comparar todas" = as seis híbridas) e a tabela das execuções.
+11. Seletor "Fronteira de", tabela da fronteira por heurística com todos os custos, CSV e JSON, Baixar projeto.
+12. Passo a passo com seletor de heurística, blocos na ordem da HLS, bloco recolhível de explicação, controles
+    guardados entre visitas, nomes Exploração e Explorar.
+13. Conferir lado a lado com a HLS e atualizar a ajuda.
+
+Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
+14. Fixar a arquitetura pela referência oficial.
+15. Formato axc-nn/1 como grafo: convolução com passo e borda gerais, soma residual com reescala, média global.
+16. Avaliador bit exato em JavaScript com ramos (e as ativações guardadas da busca).
+17. Treino no train.py (normalização em lote incorporada, aumento de dados, quantização da soma residual, 5000
+    imagens de validação); Tiago treina na GPU.
+18. Conferência bit a bit Python e JavaScript.
+19. Diagrama da arquitetura com ramos.
+20. Gerador de código HLS para os tipos novos.
+21. Modelo de custo dos kernels novos.
+22. Busca na ResNet 8 (11 camadas com pesos, cerca de 22 grupos); ajustar tempos e padrões.
+23. Exportação para o Vitis e o Vivado dos tipos novos, com a correção do viés.
+24. Rodada no Vitis e no Vivado (Tiago).
+25. ResNet 8 no seletor, no nnbench e na ajuda; rodada da matriz.
+
 ## O que já existe
 
 * Rede: `js/axc/nn.js` (formato axc-nn/1, avaliador bit exato, `inferFrom`, `sumTerms` com U = 0, 1 ou grupos).

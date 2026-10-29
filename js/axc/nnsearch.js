@@ -22,7 +22,7 @@ import { buildUnit } from './units.js';
 import { costModel, directiveTrees } from './nngen.js';
 import { makeLibrary } from '../hls/lib.js';
 import { rng } from './metrics.js';
-import { HEURISTICS, runHeuristic, newContext, paretoPoints } from './heuristics.js';
+import { runHeuristic, newContext, paretoPoints } from './heuristics.js';
 
 export const SEARCH_OBJECTIVES = ['area', 'luts', 'energy'];
 export const SEARCH_HEURISTICS = ['sensitivity', 'sequential'];
@@ -470,7 +470,8 @@ export function nnProblem(P, curves, { maxDrop = 1 } = {}) {
     };
 }
 
-export const HYBRID_HEURISTICS = HEURISTICS;
+/** Heurísticas da busca híbrida, na ordem da página HLS (a exaustiva e a aleatória não fazem parte da busca das redes). */
+export const HYBRID_HEURISTICS = ['local', 'efficiency', 'sequential', 'tabu', 'grasp', 'ga'];
 
 /**
  * Busca híbrida: calibração das curvas (trocas isoladas classificadas), busca com uma heurística no modelo estático
@@ -496,7 +497,7 @@ export const HYBRID_HEURISTICS = HEURISTICS;
 export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
     const t0 = Date.now();
     const heuristic = o.heuristic ?? 'local';
-    if (!HEURISTICS.includes(heuristic)) throw new Error(`heurística desconhecida: ${heuristic}`);
+    if (!HYBRID_HEURISTICS.includes(heuristic)) throw new Error(`heurística desconhecida: ${heuristic} (${HYBRID_HEURISTICS.join(', ')})`);
     const maxDrop = o.maxDrop ?? 1;
     const onPoint = o.onPoint ?? (() => {});
     const progress = o.progress ?? (() => {});

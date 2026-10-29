@@ -664,11 +664,6 @@ function stepText(st, r) {
         case 'seq': return t(st.chosen ? 'nn.st.seq' : 'nn.st.seqKeep', { g: st.group, n: st.tries.length, f: feas, u: dn(st.chosen ?? ''), c, d });
         case 'eff': return t(st.zeroErr ? 'nn.st.effZero' : 'nn.st.eff', { k: st.n, n: st.tries.length, sk: st.skipped, f: feas, m: st.chosen, ds: sc(st.ds), de: dp(st.de), c, d });
         case 'effEnd': return t('nn.st.effEnd', { n: st.tries.length, sk: st.skipped });
-        case 'prune': return t(st.cut ? 'nn.st.pruneCut' : 'nn.st.prune', { g: st.group, k: st.kept - 1, of: st.of - 1, cut: st.cut });
-        case 'exhStop': return t('nn.st.exhStop', { n: nf(st.total), max: nf(st.max) });
-        case 'order': return t('nn.st.order', { n: nf(st.total) });
-        case 'exh': return t(st.found ? 'nn.st.exhFound' : 'nn.st.exh', { a: st.from, b: st.to, n: nf(st.total), f: feas, found: st.found });
-        case 'rnd': return t('nn.st.rnd', { a: st.from, b: st.to, n: st.total, f: feas, c, d });
         case 'seed': return t('nn.st.seed', { n: st.n ?? 1, c, d });
         case 'imp': return t(`nn.st.${st.h}`, { k: st.n, n: st.tries.length, f: feas, m: st.chosen ?? '-', c, d }) + ((st.h === 'local' || st.h === 'grasp') && !st.chosen ? ` ${t('nn.st.impNone')}` : '');
         case 'verify': return st.fullRejected

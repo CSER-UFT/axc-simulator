@@ -136,3 +136,9 @@ test('busca híbrida: calibração, busca no modelo estático e ponto verificado
     assert.equal(ev2.calib, 0);
     assert.ok(r2.best.wrongVal <= r2.maxWrong);
 });
+
+test('busca híbrida: só as seis heurísticas da página HLS (sem a exaustiva e a aleatória)', async () => {
+    const { hybridSearch, HYBRID_HEURISTICS } = await import('../js/axc/nnsearch.js');
+    assert.deepEqual(HYBRID_HEURISTICS, ['local', 'efficiency', 'sequential', 'tabu', 'grasp', 'ga']);
+    for (const h of ['exhaustive', 'random']) await assert.rejects(hybridSearch(P, { heuristic: h }), /heurística desconhecida/);
+});
