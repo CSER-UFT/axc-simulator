@@ -193,12 +193,15 @@ export function dseSvg(runs, { xLabel, psnrMin = null, refScore, names, chosenLa
  * série por busca, com o estilo do gráfico da exploração (forma e cor pela heurística, fronteira, ponto escolhido).
  * Os pontos da busca híbrida têm a acurácia estimada; os verificados por classificação aparecem também com a medida
  * (anel), ligada à estimada por um traço. Os reprovados na validação inteira (com amostra) levam um ×.
+ * Duas fronteiras por série: a estimada (front, tracejada e mais fina: custo contra a acurácia estimada dos pontos
+ * do modelo estático) e a medida (mfront, cheia: custo contra a acurácia medida dos pontos classificados que passam no
+ * limite). O escolhido é desenhado na acurácia medida e é o ponto mais barato da fronteira medida.
  * @param {{label: string, heuristic: string, cls?: string, shape?: string, points: {x, y, feasible, my?, rej?}[],
- *          front: {x, y}[], chosen?: {x, y}}[]} runs
+ *          front: {x, y}[], mfront?: {x, y}[], chosen?: {x, y}}[]} runs
  * @param {{xLabel: string, yLabel: string, accExact: number, limit: number, bot: number, chosenLabel: string,
- *          exactLabel: string}} o
+ *          exactLabel: string, estLabel?: string, measLabel?: string}} o
  */
-export function accSearchSvg(runs, { xLabel, yLabel, accExact, limit, bot, chosenLabel, exactLabel }) {
+export function accSearchSvg(runs, { xLabel, yLabel, accExact, limit, bot, chosenLabel, exactLabel, estLabel = 'estimada', measLabel = 'medida' }) {
     const W = 1000, H = 400, L = 64, R = 16, T = 34, B = 46;
     const all = runs.flatMap((r) => r.points);
     const xs = all.map((p) => p.x).concat(100);
@@ -228,10 +231,29 @@ export function accSearchSvg(runs, { xLabel, yLabel, accExact, limit, bot, chose
             if (p.rej) s += `<path class="rej" d="M${X(p.x) - 5},${Y(p.y) - 5} L${X(p.x) + 5},${Y(p.y) + 5} M${X(p.x) - 5},${Y(p.y) + 5} L${X(p.x) + 5},${Y(p.y) - 5}"/>`;
             if (p.my !== undefined && p.my !== null) s += `<line class="ref" x1="${X(p.x)}" y1="${Y(p.y)}" x2="${X(p.x)}" y2="${Y(p.my)}"/><circle class="chosen ${cls}" cx="${X(p.x)}" cy="${Y(p.my)}" r="4"><title>${esc(`${r.label}: ${f1(p.x)}%, ${p.my.toFixed(2)}%`)}</title></circle>`;
         }
-        if (r.front.length > 1) s += `<path class="front ${cls}" d="${r.front.map((p, k) => `${k ? 'L' : 'M'}${X(p.x)},${Y(p.y)}`).join(' ')}"/>`;
+        // Fronteira estimada (tracejada) e medida (cheia). O traço vai no estilo do elemento, que vale sobre o da folha
+        // de estilos (a segunda busca da mesma heurística, h-alt, tem fronteira tracejada na página HLS).
+        const path = (f) => f.map((p, k) => `${k ? 'L' : 'M'}${X(p.x)},${Y(p.y)}`).join(' ');
+        if (r.front.length > 1) s += `<path class="front ${cls}" style="stroke-dasharray:6 4;stroke-width:1.4" d="${path(r.front)}"/>`;
+        if ((r.mfront ?? []).length > 1) s += `<path class="front ${cls}" style="stroke-dasharray:none;stroke-width:2.2" d="${path(r.mfront)}"/>`;
         if (r.chosen) s += `<g>${mark(shape, X(r.chosen.x), Y(r.chosen.y), 7, `chosen ${cls}`)}<title>${esc(`${r.label}: ${chosenLabel}`)}</title></g>`;
     });
-    const step = Math.min(runs.length <= 3 ? 320 : 240, (W - L - R) / Math.max(1, runs.length));
+    // Legenda dos traços das fronteiras, no canto superior direito.
+    const hasEst = runs.some((r) => r.front.length > 1), hasMeas = runs.some((r) => (r.mfront ?? []).length > 1);
+    let lx = W - R - 4;
+    const key = (label, dash, w) => {
+        const tw = label.length * 6.2;
+        lx -= tw;
+        let k = `<text class="small muted" x="${lx}" y="20">${esc(label)}</text>`;
+        lx -= 30;
+        k += `<line x1="${lx}" y1="16" x2="${lx + 24}" y2="16" style="stroke:var(--ink);stroke-width:${w};stroke-dasharray:${dash}"/>`;
+        lx -= 14;
+        return k;
+    };
+    if (hasMeas) s += key(measLabel, 'none', 2.2);
+    if (hasEst) s += key(estLabel, '6 4', 1.4);
+    const legendW = Math.max(0, lx - L - 8);
+    const step = Math.min(runs.length <= 3 ? 320 : 240, legendW / Math.max(1, runs.length));
     runs.forEach((r, k) => {
         const x = L + 8 + k * step, n = r.label;
         s += `${mark(r.shape ?? DSE_SHAPES[r.heuristic] ?? 'circle', x, 16, 4.5, `pt ${r.cls ?? `h-${r.heuristic}`}`)}<text class="small" x="${x + 10}" y="20">${esc(n.length > step / 6.2 ? `${n.slice(0, Math.floor(step / 6.2) - 1)}…` : n)}</text>`;

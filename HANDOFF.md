@@ -20,7 +20,8 @@ Parte A, correções da busca:
    verificação anda só pela fronteira estimada de tudo o que foi visitado; o resultado traz measuredFront; na busca
    medida, a fronteira exclui os reprovados na validação inteira e os viáveis mais baratos que o escolhido são todos
    conferidos; o nnbench marca "fora da fronteira"; rodada results/nn-search/etapa3).
-4. Gráfico com as duas fronteiras.
+4. Gráfico com as duas fronteiras (feito: estimada tracejada, medida cheia com só os pontos que passam no limite e a
+   exata; o escolhido, na acurácia medida, é o ponto mais barato da fronteira medida; legenda dos traços no gráfico).
 5. Diagnóstico do teto de economia (unidade mais barata em tudo; fração do custo na aritmética), no nnbench.
 6. Correção do viés com a medida escolhível, no modelo estático, no avaliador bit exato e na exportação.
 7. Comparar as medidas da correção no nnbench.

@@ -151,6 +151,9 @@ test('busca híbrida: o escolhido está na fronteira medida e na estimada, com e
         // Na fronteira medida (pontos classificados e a exata, sem os reprovados na validação inteira).
         assert.ok(r.measuredFront.some((p) => key(p.assign) === bk), 'fora da fronteira medida');
         for (let k = 1; k < r.measuredFront.length; k++) assert.ok(r.measuredFront[k].cost >= r.measuredFront[k - 1].cost && r.measuredFront[k].measured.drop < r.measuredFront[k - 1].measured.drop);
+        // Só pontos que passam no limite, e o escolhido é o mais barato deles.
+        assert.ok(r.measuredFront.every((p) => p.measured.ok && p.measured.fullOk !== false));
+        assert.equal(key(r.measuredFront[0].assign), bk);
         // Nenhum ponto classificado e aprovado custa menos e cai menos (ou igual) que o escolhido.
         const b = r.measuredFront.find((p) => key(p.assign) === bk);
         for (const p of r.points.filter((q) => q.measured?.ok && q.measured.fullOk !== false)) assert.ok(!(p.cost < b.cost - 1e-9 && p.measured.drop <= b.measured.drop + 1e-12), `${p.cost} domina ${b.cost}`);

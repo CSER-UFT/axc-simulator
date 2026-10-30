@@ -593,8 +593,12 @@ function seriesOf(r) {
     const points = r.hybrid
         ? r.points.filter((p) => p.drop <= span).map((p) => ({ x: X(p.cost), y: acc - p.drop, feasible: p.feasible, my: p.measured ? acc - p.measured.drop : undefined, rej: p.measured?.fullOk === false }))
         : r.points.filter((p) => p.full).map((p) => ({ x: X(p.cost), y: 100 * (1 - p.wrong / r.n), feasible: p.feasible, rej: p.fullOk === false }));
-    const front = (r.hybrid ? r.front.filter((p) => p.drop <= span).map((p) => ({ x: X(p.cost), y: acc - p.drop })) : r.front.map((p) => ({ x: X(p.cost), y: 100 * p.accVal })));
-    return { label: hName(r.o), heuristic: r.hybrid ? r.o.heuristic : r.o.heuristic === 'sensitivity' ? 'msens' : 'mseq', shape: r.hybrid ? undefined : (r.o.heuristic === 'sensitivity' ? 'circle' : 'square'), points, front, chosen: { x: X(r.best.cost), y: 100 * r.best.accVal }, acc, span, maxDrop: r.maxDrop };
+    // Fronteira estimada (só na híbrida: custo contra a acurácia estimada) e medida (custo contra a acurácia medida na
+    // amostra: na híbrida, os pontos classificados e a exata; na busca medida, a fronteira da própria busca). O
+    // escolhido, na acurácia medida, está na fronteira medida.
+    const front = r.hybrid ? r.front.filter((p) => p.drop <= span).map((p) => ({ x: X(p.cost), y: acc - p.drop })) : [];
+    const mfront = r.hybrid ? (r.measuredFront ?? []).map((p) => ({ x: X(p.cost), y: acc - p.measured.drop })) : r.front.map((p) => ({ x: X(p.cost), y: 100 * p.accVal }));
+    return { label: hName(r.o), heuristic: r.hybrid ? r.o.heuristic : r.o.heuristic === 'sensitivity' ? 'msens' : 'mseq', shape: r.hybrid ? undefined : (r.o.heuristic === 'sensitivity' ? 'circle' : 'square'), points, front, mfront, chosen: { x: X(r.best.cost), y: 100 * r.best.accVal }, acc, span, maxDrop: r.maxDrop };
 }
 /** Série da busca em andamento (os pontos que o worker já mandou). */
 function liveSeries() {
@@ -626,6 +630,7 @@ function renderSearchFig() {
     $('nnSearchFig').innerHTML = accSearchSvg(runs, {
         xLabel: t('nn.searchPlotX', { obj: t(`nn.searchObj_${obj}`) }), yLabel: t('nn.searchPlotYCmp'), accExact: ref.acc, limit: ref.acc - ref.maxDrop,
         bot: ref.acc - Math.max(...runs.map((r) => r.span)), chosenLabel: t('nn.searchBest'), exactLabel: t('nn.searchExact'),
+        estLabel: t('nn.frontEstKey'), measLabel: t('nn.frontMeasKey'),
     });
     $('nnSearchFigNote').textContent = t('nn.searchFigNote') + (nnCompare.length ? ` ${t('nn.cmpNote', { n: same.length })}${other ? ` ${t('nn.cmpOther', { n: other })}` : ''}` : '');
 }

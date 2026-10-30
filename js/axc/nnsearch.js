@@ -432,8 +432,7 @@ export function estimateDrop(P, curves, assign) {
 }
 
 /**
- * Fronteira de Pareto em custo contra a queda medida (pontos com p.measured), em ordem de custo. Os que pararam no
- * limite (measured.ok falso) entram com a queda até onde a classificação foi, um limite inferior.
+ * Fronteira de Pareto em custo contra a queda medida (pontos com p.measured), em ordem de custo.
  */
 function paretoMeasured(points) {
     const s = [...points].sort((a, b) => a.score - b.score || a.measured.drop - b.measured.drop);
@@ -622,11 +621,12 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
         break;
     }
     phaseMs.verify += Date.now() - t3;
-    // Fronteira medida: os pontos classificados (e a rede exata, queda zero), sem os reprovados na validação inteira,
-    // em custo contra a queda medida. O escolhido (o mais barato que passa) está nela por definição.
+    // Fronteira medida: os pontos classificados que passam no limite (na amostra e, quando conferidos, na validação
+    // inteira) e a rede exata, em custo contra a queda medida. Os que não passam ficam de fora (a queda deles é só um
+    // limite inferior, porque a classificação para ao passar do limite). O escolhido é o ponto mais barato dela.
     const measuredFront = paretoMeasured([
         { score: exactCost, assign: P.exact.map((x) => ({ ...x })), units: [], drop: 0, measured: { drop: 0, ok: true, exact: true } },
-        ...allPts.filter((p) => p.measured && p.measured.fullOk !== false),
+        ...allPts.filter((p) => p.measured?.ok && p.measured.fullOk !== false),
     ]);
     // O exato, se nada passou.
     const bestAssign = chosen ? chosen.assign : P.exact.map((x) => ({ ...x }));
