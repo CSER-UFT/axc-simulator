@@ -293,6 +293,74 @@ export function prepareSearch(net, o) {
     return { net, objective, target, trees, cm, lib, val, fullVal, test, exact, exactWrong, cands, metric, sumError, n: valSet.n, sample: valSet.n, valN: o.val.n };
 }
 
+// Teto de economia -------------------------------------------------------------------------------------------------
+// Quanto a aproximação das unidades pode economizar, no máximo, sem olhar a acurácia: a fração do custo da rede exata
+// que está nos multiplicadores e somadores das camadas com pesos, e o custo da rede com a unidade mais barata em cada
+// uma delas. Se o teto é baixo, a economia da busca fica perto dele por causa da arquitetura (registradores,
+// endereçamento, multiplexadores e reescala dominam o custo), e não por falta de agressividade da busca.
+
+/**
+ * Fração aritmética do custo de uma rede (cm.network(assign)): a soma do custo das unidades de multiplicação e soma
+ * das camadas com pesos dividida pelo custo total da rede, no objetivo. Área e LUT pelas unidades instanciadas
+ * (contagem vezes o custo da unidade); energia pela energia das operações.
+ */
+export function arithmeticShare(cm, assign, objective) {
+    const R = cm.network(assign);
+    let arith = 0;
+    for (const l of R.layers) {
+        if (l.site === null) continue;
+        const c = l.result.cost;
+        if (objective === 'energy') { arith += c.energy.ops; continue; }
+        for (const u of c.units) if (u.cls === 'mul' || u.cls === 'add') arith += objective === 'luts' ? u.luts : u.area;
+    }
+    const total = R.totals[objective];
+    return { arith, total, share: total > 0 ? arith / total : 0 };
+}
+
+/**
+ * Teto de economia: para cada camada com pesos, o multiplicador (com o somador exato) e o somador (com o
+ * multiplicador exato) de menor custo da camada entre as unidades dadas, e a rede com os dois juntos. A combinação dos
+ * dois melhores é uma aproximação do melhor par (o custo de um par não é a soma exata das duas trocas).
+ * @param {object} cm modelo de custo (costModel)
+ * @param {number} nSites número de camadas com pesos
+ * @param {(si: number, kind: 'mul'|'add') => string[]} unitsOf unidades candidatas de cada camada
+ * @param {string} objective 'area' | 'luts' | 'energy'
+ * @returns {{exact: number, ceiling: number, mulOnly: number, addOnly: number, saving: number, savingMul: number,
+ *            savingAdd: number, assign: object[], share: number, layers: object[]}}
+ */
+export function savingCeiling(cm, nSites, unitsOf, objective) {
+    const metric = (x) => x[objective];
+    const exactAssign = Array.from({ length: nSites }, () => ({ mul: null, add: null }));
+    const total = (a) => metric(cm.network(a).totals);
+    const exact = total(exactAssign);
+    const best = [], layers = [];
+    for (let si = 0; si < nSites; si++) {
+        const base = metric(cm.site(si, null, null));
+        const pick = (kind) => {
+            let b = { name: null, cost: base };
+            for (const name of unitsOf(si, kind)) {
+                const c = metric(cm.site(si, kind === 'mul' ? name : null, kind === 'add' ? name : null));
+                if (c < b.cost - 1e-9) b = { name, cost: c };
+            }
+            return b;
+        };
+        const m = pick('mul'), a = pick('add');
+        const both = metric(cm.site(si, m.name, a.name));
+        best.push({ mul: m.name, add: a.name });
+        layers.push({ site: si, exact: base, mul: m.name, mulCost: m.cost, add: a.name, addCost: a.cost, both, saving: base > 0 ? 1 - both / base : 0 });
+    }
+    const ceiling = total(best);
+    const mulOnly = total(best.map((b) => ({ mul: b.mul, add: null })));
+    const addOnly = total(best.map((b) => ({ mul: null, add: b.add })));
+    const sh = arithmeticShare(cm, exactAssign, objective);
+    return { exact, ceiling, mulOnly, addOnly, saving: 1 - ceiling / exact, savingMul: 1 - mulOnly / exact, savingAdd: 1 - addOnly / exact, assign: best, share: sh.share, layers };
+}
+
+/** Teto de economia entre as candidatas da busca (P.cands, da preparação). */
+export function searchCeiling(P) {
+    return savingCeiling(P.cm, P.net.sites.length, (si, kind) => P.cands[si][kind].map((c) => c.name), P.objective);
+}
+
 // Modelo estático ---------------------------------------------------------------------------------------------------
 // A busca híbrida estima a queda de acurácia sem classificar: o erro de cada camada (o erro RMS da soma de uma saída,
 // sumError, com os operandos reais e a estrutura das diretivas) convertido em LSB da saída pela escala do requant da

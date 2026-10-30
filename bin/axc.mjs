@@ -27,6 +27,11 @@
  *       busca do multiplicador e do somador de cada camada (js/axc/nnsearch.js): o menor custo com a queda de
  *       acurácia na validação até --max-drop pontos; a acurácia de teste do ponto escolhido no fim. --workers: threads
  *       de avaliação (padrão: os núcleos menos 1; 1 avalia na própria thread)
+ *   node bin/axc.mjs nnceiling [--models minilenet-mnist,...|all] [--objectives area,luts,energy] [--dirs "..."] [--clock 10]
+ *                              [--md] [--json]
+ *       teto de economia das unidades aproximadas (js/axc/nnsearch.js, savingCeiling), sem olhar a acurácia: a fração do
+ *       custo da rede exata nos multiplicadores e somadores das camadas com pesos, e a economia com a unidade mais
+ *       barata da biblioteca em cada camada (e só com multiplicadores, e só com somadores), por camada e na rede
  *   node bin/axc.mjs nnexport [--model ...] [--dirs "..."] [--mul <m> --add <s> --layers ... | --units "conv1:MUL8 T4+ADD32 LOA10;..."
  *                             | --search resultado.json] [--clock 10] [--part xc7a100tcsg324-1] [--images 100] [--no-layers]
  *                             [--rtl-network] [--out pasta]
@@ -61,8 +66,8 @@ import { toVerilog, testbench, moduleName } from '../js/axc/verilog.js';
 import { designSpace } from '../js/axc/designspace.js';
 import { PRESETS } from '../js/axc/presets.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize } from '../js/axc/nn.js';
-import { networkCost, networkKernels, normalizeDirectives, directiveTrees, CONV_PIPES, DENSE_PIPES } from '../js/axc/nngen.js';
-import { prepareSearch, searchNetwork, hybridSearch, poolEngine, initMessage, SEARCH_OBJECTIVES, SEARCH_HEURISTICS, HYBRID_HEURISTICS } from '../js/axc/nnsearch.js';
+import { networkCost, costModel, networkKernels, normalizeDirectives, directiveTrees, CONV_PIPES, DENSE_PIPES } from '../js/axc/nngen.js';
+import { prepareSearch, searchNetwork, hybridSearch, poolEngine, initMessage, SEARCH_OBJECTIVES, SEARCH_HEURISTICS, HYBRID_HEURISTICS, searchCeiling, savingCeiling } from '../js/axc/nnsearch.js';
 import { Worker } from 'node:worker_threads';
 import { networkProject } from '../js/axc/nnexport.js';
 import { csynthSummary, implSummary, carry4Of } from '../js/hls/reports.js';
@@ -293,6 +298,9 @@ switch (cmd) {
         const unit = { area: 'µm²', luts: 'LUT', energy: 'nJ' }[objective];
         const cv = (x) => (objective === 'energy' ? (x / 1e6).toFixed(1) : x.toFixed(0));
         const pct = (v) => `${(100 * v).toFixed(1)}%`;
+        // Teto de economia entre as candidatas da busca (sem olhar a acurácia).
+        const ceil = searchCeiling(P);
+        r.ceiling = { saving: ceil.saving, savingMul: ceil.savingMul, savingAdd: ceil.savingAdd, share: ceil.share };
         const res = { model: net.id, objective, heuristic, maxDrop: r.maxDrop, dirs, prepMs, ...r, points: flag('--points') ? r.points : r.points.length, steps: flag('--points') ? r.steps : undefined };
         const ms = (x) => `${(x / 1000).toFixed(1)} s`;
         out(res, () => [
@@ -301,6 +309,7 @@ switch (cmd) {
             r.hybrid
                 ? `híbrida: ${r.calib.length} trocas isoladas na calibração (${ms(r.phaseMs.calib)}), ${r.evals} pontos no modelo estático (${ms(r.phaseMs.search)}), ${r.verified} verificados em ${r.rounds} rodada(s) (${ms(r.phaseMs.verify)}${r.repaired ? `, ${r.repaired} reprovados na validação inteira` : ''}); ${ms(r.ms)} com ${r.workers} worker(s); preparação ${ms(prepMs)}${r.error ? `; ${r.error}` : ''}`
                 : `${r.evals} avaliações (${r.images} imagens), ${ms(r.ms)} com ${r.workers} worker(s); preparação ${ms(prepMs)}`,
+            `teto das candidatas (sem olhar a acurácia): ${pct(r.ceiling.saving)} (só multiplicadores ${pct(r.ceiling.savingMul)}, só somadores ${pct(r.ceiling.savingAdd)}); fração aritmética do custo ${pct(r.ceiling.share)}; a busca alcançou ${pct(r.best.saving / Math.max(1e-12, r.ceiling.saving))} do teto`,
             `exata:   ${cv(r.exact.cost)} ${unit}, validação ${pct(r.exact.accVal)}${r.exact.accValFull !== undefined ? ` (inteira ${pct(r.exact.accValFull)})` : ''}, teste ${pct(r.exact.accTest)}`,
             `melhor:  ${cv(r.best.cost)} ${unit} (${pct(-r.best.saving)}), validação ${pct(r.best.accVal)}${r.best.accValFull !== undefined ? ` (inteira ${pct(r.best.accValFull)})` : ''}, teste ${pct(r.best.accTest)}`,
             ...r.best.assign.map((a, i) => `  ${net.sites[i].name.padEnd(6)} ${(a.mul ?? 'MUL8 exato').padEnd(18)} ${a.add ?? 'ADD32 exato'}`),
@@ -308,6 +317,35 @@ switch (cmd) {
                 ? `fronteira estimada (custo, queda estimada [medida]): ${r.front.filter((p) => p.drop <= 2 * r.maxDrop).slice(0, 15).map((p) => `${pct(p.cost / r.exact.cost)} ${p.drop.toFixed(2)}${p.measured ? ` [${p.measured.drop.toFixed(2)}]` : ''}`).join('; ')}`
                 : `fronteira (custo, validação): ${r.front.map((p) => `${pct(p.cost / r.exact.cost)} ${pct(p.accVal)}`).join('; ')}`,
         ].join('\n'));
+        break;
+    }
+    case 'nnceiling': {
+        const reg = JSON.parse(readFileSync(join(ROOT, 'data/nn/models.json'), 'utf8'));
+        const ids = opt('--models', 'all') === 'all' ? reg.models.map((m) => m.id) : opt('--models').split(',');
+        const objectives = opt('--objectives', 'area,luts,energy').split(',');
+        const synthJ = synthData(), cellsJ = JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8'));
+        const fpgaJ = existsSync(join(ROOT, 'data/vivado-units.json')) ? JSON.parse(readFileSync(join(ROOT, 'data/vivado-units.json'), 'utf8')) : null;
+        const pool = (kind) => synthJ.designs.filter((d) => d.cfg.kind === kind && d.cfg.width === (kind === 'mul' ? 8 : 32) && !/ exato$/.test(d.name)).map((d) => d.name);
+        const muls = pool('mul'), adds = pool('add');
+        const rows = [];
+        for (const id of ids) {
+            const entry = reg.models.find((m) => m.id === id) ?? die(`modelo desconhecido: ${id}`);
+            const net = decodeNet(JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8')));
+            const dirs = parseDirs(net, opt('--dirs'));
+            for (const objective of objectives) {
+                if (objective === 'luts' && !fpgaJ) die('o objetivo LUT precisa de data/vivado-units.json');
+                const cm = costModel(net, { synth: synthJ, cells: cellsJ, fpga: fpgaJ, target: objective === 'luts' ? 'fpga' : 'asic', flow: 'delay', clockNs: +opt('--clock', 10), dirs });
+                const c = savingCeiling(cm, net.sites.length, (si, k) => (k === 'mul' ? muls : adds), objective);
+                rows.push({ model: id, objective, share: c.share, saving: c.saving, savingMul: c.savingMul, savingAdd: c.savingAdd, layers: c.layers.map((l, si) => ({ name: net.sites[si].name, ...l })) });
+                if (!flag('--json')) process.stderr.write(`  ${id} ${objective}\n`);
+            }
+        }
+        const p1 = (v) => (100 * v).toFixed(1);
+        if (flag('--json')) { console.log(JSON.stringify(rows, null, 1)); break; }
+        const head = ['modelo', 'objetivo', 'fração aritmética %', 'teto %', 'só multiplicadores %', 'só somadores %', 'teto por camada %'];
+        const line = (r) => [r.model, r.objective, p1(r.share), p1(r.saving), p1(r.savingMul), p1(r.savingAdd), r.layers.map((l) => `${l.name} ${p1(l.saving)}`).join(', ')];
+        if (flag('--md')) console.log([`| ${head.join(' | ')} |`, `| ${head.map(() => '---').join(' | ')} |`, ...rows.map((r) => `| ${line(r).join(' | ')} |`)].join('\n'));
+        else console.log([head.join('; '), ...rows.map((r) => line(r).join('; '))].join('\n'));
         break;
     }
     case 'nnexport': {

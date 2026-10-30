@@ -22,7 +22,10 @@ Parte A, correções da busca:
    conferidos; o nnbench marca "fora da fronteira"; rodada results/nn-search/etapa3).
 4. Gráfico com as duas fronteiras (feito: estimada tracejada, medida cheia com só os pontos que passam no limite e a
    exata; o escolhido, na acurácia medida, é o ponto mais barato da fronteira medida; legenda dos traços no gráfico).
-5. Diagnóstico do teto de economia (unidade mais barata em tudo; fração do custo na aritmética), no nnbench.
+5. Diagnóstico do teto de economia (feito: savingCeiling, searchCeiling e arithmeticShare em nnsearch.js; comando
+   nnceiling; o nnsearch mostra o teto das candidatas e o nnbench as colunas teto e do teto; results/nn-search/teto:
+   área 35% a 37%, LUT 46% a 49%, energia 3% a 7%, porque os registradores dominam a energia; as buscas chegam a
+   um terço do teto em área).
 6. Correção do viés com a medida escolhível, no modelo estático, no avaliador bit exato e na exportação.
 7. Comparar as medidas da correção no nnbench.
 8. Exportar as 5000 imagens de validação do train.py (script; Tiago roda, precisa das bases).

@@ -175,3 +175,17 @@ test('busca medida com amostra: o escolhido está na fronteira (a validação in
         for (const p of r.points) if (p.feasible && p.cost < r.best.cost - 1e-9) assert.equal(p.fullOk, false, `${h}: ${p.cost}`);
     }
 });
+
+test('teto de economia: fração aritmética e teto entre 0 e 1, e o teto não perde para só uma das trocas', async () => {
+    const { searchCeiling, arithmeticShare } = await import('../js/axc/nnsearch.js');
+    const c = searchCeiling(P);
+    assert.ok(c.share > 0 && c.share < 1 && c.saving > 0 && c.saving < 1);
+    assert.ok(c.saving >= c.savingMul - 1e-9 && c.saving >= c.savingAdd - 1e-9);
+    assert.ok(Math.abs(c.exact - networkCost(net, { synth, cells, fpga, units: P.exact }).totals.area) < 1e-6);
+    // A busca não passa do teto.
+    const r = await searchNetwork(P, { heuristic: 'sequential', maxDrop: 1 });
+    assert.ok(r.best.saving <= c.saving + 1e-9);
+    // Fração aritmética: a das unidades das camadas com pesos, menor que o total.
+    const sh = arithmeticShare(P.cm, P.exact, 'area');
+    assert.ok(sh.arith > 0 && sh.arith < sh.total);
+});
