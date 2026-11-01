@@ -24,9 +24,10 @@
  *                             [--hybrid [--heuristic local|efficiency|sequential|tabu|grasp|ga]
  *                             [--max-verify 25] [--verify-front 8]] (busca híbrida: curvas erro → queda calibradas com
  *                             trocas isoladas, busca no modelo estático, verificação dos melhores pontos)
- *                             [--bias-fix none|mean|median|gmean|trim] (correção do viés de cada canal pela medida do
- *                             erro da pré-ativação: média, mediana, média geométrica do módulo com o sinal predominante
- *                             ou média aparada; vai no resultado, e o nnexport --search aplica)
+ *                             [--bias-fix none|mean|median|gmean|trim|gain|affine] (correção do viés de cada canal pela
+ *                             medida do erro da pré-ativação: média, mediana, média geométrica do módulo com o sinal
+ *                             predominante ou média aparada; gain: ganho na reescala de cada canal; affine: ganho e
+ *                             viés por mínimos quadrados; vai no resultado, e o nnexport --search aplica)
  *       busca do multiplicador e do somador de cada camada (js/axc/nnsearch.js): o menor custo com a queda de
  *       acurácia na validação até --max-drop pontos; a acurácia de teste do ponto escolhido no fim. --workers: threads
  *       de avaliação (padrão: os núcleos menos 1; 1 avalia na própria thread)
@@ -307,7 +308,7 @@ switch (cmd) {
         const res = { model: net.id, objective, heuristic, maxDrop: r.maxDrop, dirs, prepMs, ...r, points: flag('--points') ? r.points : r.points.length, steps: flag('--points') ? r.steps : undefined };
         const ms = (x) => `${(x / 1000).toFixed(1)} s`;
         out(res, () => [
-            `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}${r.biasFix && r.biasFix !== 'none' ? `, correção do viés pela ${{ mean: 'média', median: 'mediana', gmean: 'média geométrica', trim: 'média aparada' }[r.biasFix]}` : ''}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n}${P.fullVal ? `, amostra de ${P.n} das ${P.valN}` : ''})`,
+            `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}${r.biasFix && r.biasFix !== 'none' ? `, correção do viés pela ${{ mean: 'média', median: 'mediana', gmean: 'média geométrica', trim: 'média aparada', gain: 'correção de ganho', affine: 'correção de ganho e viés' }[r.biasFix]}` : ''}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n}${P.fullVal ? `, amostra de ${P.n} das ${P.valN}` : ''})`,
             `candidatas por camada: ${P.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} ×, ${c.add.length} +`).join('; ')}`,
             r.hybrid
                 ? `híbrida: ${r.calib.length} trocas isoladas na calibração (${ms(r.phaseMs.calib)}), ${r.evals} pontos no modelo estático (${ms(r.phaseMs.search)}), ${r.verified} verificados em ${r.rounds} rodada(s) (${ms(r.phaseMs.verify)}${r.repaired ? `, ${r.repaired} reprovados na validação inteira` : ''}); ${ms(r.ms)} com ${r.workers} worker(s); preparação ${ms(prepMs)}${r.error ? `; ${r.error}` : ''}`
@@ -357,7 +358,7 @@ switch (cmd) {
         const modelId = found?.model ?? opt('--model', 'minilenet-mnist');
         const entry = reg.models.find((m) => m.id === modelId) ?? die(`modelo desconhecido: ${modelId} (${reg.models.map((m) => m.id).join(', ')})`);
         // Com --search, o viés corrigido pela busca (best.biasDelta), quando ela usou a correção.
-        const net = withBiases(decodeNet(JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8'))), found?.best?.biasDelta ?? null);
+        const net = withBiases(decodeNet(JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8'))), found?.best?.biasDelta ?? null, found?.best?.requantM ?? null);
         const names = net.sites.map((l) => l.name);
         const dirs = found?.dirs ?? parseDirs(net, opt('--dirs'));
         let units;

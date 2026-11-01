@@ -237,8 +237,8 @@ export function adderAccumulate(unit) {
 // Inferência ---------------------------------------------------------------------------------------------------
 
 const clamp8 = (v) => (v < 0 ? 0 : v > 255 ? 255 : v);
-function requantize(l, acc, ch) {
-    const v = l.rq.q32 ? mulQ32(acc, l.rq.m[l.rq.m.length === 1 ? 0 : ch]) : Math.floor(acc * l.rq.M + 0.5);
+function requantize(l, acc, ch, M = l.rq.m) {
+    const v = l.rq.q32 ? mulQ32(acc, M[M.length === 1 ? 0 : ch]) : Math.floor(acc * l.rq.M + 0.5);
     return clamp8(v + l.zOut);
 }
 
@@ -369,8 +369,8 @@ function makeScratch() {
  * @param {Array<number>} trees estrutura da soma de cada camada com pesos (1: em cadeia, o padrão; 0: árvore com todos
  *   os termos; U: árvores de U termos). Com a soma exata, não muda nada.
  */
-export function infer(net, img, tables, adds = [], scratch = makeScratch(), trees = [], biases = null) {
-    return inferFrom(net, inputActivations(net, img), 0, tables, adds, scratch, trees, null, biases);
+export function infer(net, img, tables, adds = [], scratch = makeScratch(), trees = [], biases = null, scales = null) {
+    return inferFrom(net, inputActivations(net, img), 0, tables, adds, scratch, trees, null, biases, scales);
 }
 
 /** Ativações da entrada da rede (os pixels pela tabela de quantização de cada canal). */
@@ -399,18 +399,19 @@ export function preActivation(l, x, T, add = null, tree = 1, b = l.b, scratch = 
 }
 
 /**
- * Rede com o viés das camadas com pesos trocado: b - delta[si] em cada canal (delta[si] null: o da rede). Os pesos,
- * as escalas e as formas são os mesmos objetos da rede original (só o viés muda); é a rede que a página classifica e
- * exporta com a correção do viés da busca.
+ * Rede com o viés das camadas com pesos trocado (b - delta[si] em cada canal) e, opcionalmente, a reescala (m[si], o
+ * multiplicador Q32 de cada canal, na correção de ganho); null: o da rede. Os pesos e as formas são os mesmos objetos
+ * da rede original; é a rede que a página classifica e exporta com a correção da busca.
  */
-export function withBiases(net, delta) {
-    if (!delta || delta.every((d) => !d)) return net;
+export function withBiases(net, delta, scales = null) {
+    if ((!delta || delta.every((d) => !d)) && (!scales || scales.every((m) => !m))) return net;
     const map = new Map();
     net.sites.forEach((l, si) => {
-        const d = delta[si];
-        if (!d) return;
-        const b = Int32Array.from(l.b, (v, ch) => v - (d[ch] ?? 0));
-        map.set(l, { ...l, b });
+        const d = delta?.[si], m = scales?.[si];
+        if (!d && !m) return;
+        const b = d ? Int32Array.from(l.b, (v, ch) => v - (d[ch] ?? 0)) : l.b;
+        const rq = m && l.rq ? { ...l.rq, m: Uint32Array.from(m) } : l.rq;
+        map.set(l, { ...l, b, rq });
     });
     const layers = net.layers.map((l) => map.get(l) ?? l);
     return { ...net, layers, sites: layers.filter((l) => l.w) };
@@ -419,16 +420,17 @@ export function withBiases(net, delta) {
 /**
  * Inferência a partir da camada net.layers[from], com x as ativações da entrada dela (não é alterado). record(li, x),
  * se dado, recebe as ativações da entrada de cada camada li (a busca guarda as das camadas que não mudam). biases[si],
- * se dado, é o viés da camada com pesos si no lugar do dela (a correção do viés da busca).
+ * se dado, é o viés da camada com pesos si no lugar do dela (a correção do viés da busca); scales[si], a reescala
+ * (m de cada canal, a correção de ganho).
  */
-export function inferFrom(net, x, from, tables, adds = [], scratch = makeScratch(), trees = [], record = null, biases = null) {
+export function inferFrom(net, x, from, tables, adds = [], scratch = makeScratch(), trees = [], record = null, biases = null, scales = null) {
     let si = 0, out = null;
     for (let li = 0; li < from; li++) if (net.layers[li].type === 'conv' || net.layers[li].type === 'dense') si++;
     for (let li = from; li < net.layers.length; li++) {
         const l = net.layers[li];
         if (record) record(li, x);
         if (l.type === 'conv' || l.type === 'dense') {
-            const T = tables[si], add = adds[si] ?? null, tree = trees[si] ?? 1, B = biases?.[si] ?? l.b;
+            const T = tables[si], add = adds[si] ?? null, tree = trees[si] ?? 1, B = biases?.[si] ?? l.b, MS = scales?.[si] ?? l.rq?.m;
             si++;
             const acc = l.type === 'conv' ? convAcc(l, x, T, add, tree, scratch) : denseAcc(l, x, T, add, tree, scratch);
             const n = l.outShape.reduce((a, b) => a * b, 1), per = n / l.outShape[0];
@@ -451,9 +453,9 @@ export function inferFrom(net, x, from, tables, adds = [], scratch = makeScratch
                         const seg = acc.subarray(ch * per, (ch + 1) * per);
                         add(seg, tmp, per);
                     }
-                    for (let i = 0; i < n; i++) y[i] = requantize(l, acc[i], Math.floor(i / per));
+                    for (let i = 0; i < n; i++) y[i] = requantize(l, acc[i], Math.floor(i / per), MS);
                 } else {
-                    for (let i = 0; i < n; i++) { const ch = Math.floor(i / per); y[i] = requantize(l, acc[i] + B[ch], ch); }
+                    for (let i = 0; i < n; i++) { const ch = Math.floor(i / per); y[i] = requantize(l, acc[i] + B[ch], ch, MS); }
                 }
                 x = y;
                 out = y;
@@ -483,9 +485,9 @@ export function inferFrom(net, x, from, tables, adds = [], scratch = makeScratch
 }
 
 /** Classifica as imagens [from, to) do conjunto de teste (trees: a estrutura da soma de cada camada, veja infer). */
-export function classifyRange(net, test, tables, adds, from, to, preds, trees = [], biases = null) {
+export function classifyRange(net, test, tables, adds, from, to, preds, trees = [], biases = null, scales = null) {
     const scratch = makeScratch();
-    for (let k = from; k < to; k++) preds[k] = infer(net, test.images.subarray(k * test.size, (k + 1) * test.size), tables, adds, scratch, trees, biases).pred;
+    for (let k = from; k < to; k++) preds[k] = infer(net, test.images.subarray(k * test.size, (k + 1) * test.size), tables, adds, scratch, trees, biases, scales).pred;
     return preds;
 }
 

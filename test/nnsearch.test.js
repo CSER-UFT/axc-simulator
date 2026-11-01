@@ -202,15 +202,17 @@ test('correção do viés: medidas do erro em valores conhecidos', async () => {
     assert.ok(Math.abs(errorStat(v, 'gmean') + g) < 1e-12);
 });
 
-test('correção do viés: a busca classifica igual à rede com o viés trocado, na validação e no teste', async () => {
+for (const fix of ['mean', 'affine']) test(`correção ${fix}: a busca classifica igual à rede com o viés e a reescala trocados, na validação e no teste`, async () => {
     const { withBiases } = await import('../js/axc/nn.js');
-    const Pm = prepareSearch(net, { val, test: testSet, synth, cells, fpga, objective: 'area', maxCands: 4, biasFix: 'mean' });
-    assert.equal(Pm.biasFix, 'mean');
+    const Pm = prepareSearch(net, { val, test: testSet, synth, cells, fpga, objective: 'area', maxCands: 4, biasFix: fix });
+    assert.equal(Pm.biasFix, fix);
+    if (fix === 'affine') assert.ok(Pm.bf.stats(1, Pm.cands[1].mul.at(-1).name, null).gain.some((g) => g !== 1));
     const r = await searchNetwork(Pm, { heuristic: 'sequential', maxDrop: 1 });
-    assert.ok(r.best.biasDelta && r.best.biasDelta.some((d) => d && d.some((x) => x !== 0)), 'sem desconto no ponto escolhido');
+    if (fix === 'mean') assert.ok(r.best.biasDelta && r.best.biasDelta.some((d) => d && d.some((x) => x !== 0)), 'sem desconto no ponto escolhido');
+    else assert.ok(r.best.requantM && r.best.requantM.some((m) => m), 'sem reescala corrigida no ponto escolhido');
     assert.ok(r.best.biasDelta.every((d, si) => (d === null) === !(r.best.assign[si].mul || r.best.assign[si].add)));
     // Independente: a rede com o viés trocado, classificada sem o reaproveitamento das ativações.
-    const nb = withBiases(net, r.best.biasDelta);
+    const nb = withBiases(net, r.best.biasDelta, r.best.requantM);
     const wrong = (set) => {
         const tables = r.best.assign.map((a) => productTable(a.mul ? buildUnit(cfgOf(a.mul)) : null));
         const adds = r.best.assign.map((a) => (a.add ? adderAccumulate(buildUnit(cfgOf(a.add))) : null));
@@ -224,7 +226,7 @@ test('correção do viés: a busca classifica igual à rede com o viés trocado,
     // A rede original não muda (withBiases copia só as camadas com o viés trocado).
     assert.notEqual(nb.sites[0].b, net.sites[0].b);
     // Os workers usam a mesma correção (a mesma amostra, as mesmas imagens).
-    const init = initMessage(netJson, valBuf, synth, Pm.trees, 0, 'mean');
+    const init = initMessage(netJson, valBuf, synth, Pm.trees, 0, fix);
     const send = [evalHandler(), evalHandler()].map((h) => { h(init); return (msg) => Promise.resolve(h(msg)); });
     const r2 = await searchNetwork(Pm, { heuristic: 'sequential', maxDrop: 1 }, poolEngine(send));
     assert.deepEqual(r2.best.assign, r.best.assign);

@@ -15,7 +15,7 @@ self.onmessage = async ({ data: o }) => {
     try {
         const [synth, cells, fpga, netJson] = await Promise.all([getJson(url('data/synth.json')), getJson(url('data/hls-cells.json')), getJson(url('data/vivado-units.json')).catch(() => null), getJson(url(o.file))]);
         // o.biasDelta: o desconto do viés de cada camada da busca aplicada (null: o viés da rede).
-        const net = withBiases(decodeNet(netJson), o.biasDelta ?? null);
+        const net = withBiases(decodeNet(netJson), o.biasDelta ?? null, o.requantM ?? null);
         const test = decodeTestSet(await getBin(url(net.dataset.file)), net.dataset);
         self.postMessage({ type: 'status', key: 'nn.exportBuilding' });
         let last = 0;
