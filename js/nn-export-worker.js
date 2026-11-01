@@ -2,7 +2,7 @@
  * Exportação do projeto da rede para o Vitis HLS e o Vivado em segundo plano (página de redes): carrega os dados, gera
  * os arquivos (js/axc/nnexport.js) e devolve o .zip.
  */
-import { decodeNet, decodeTestSet } from './axc/nn.js';
+import { decodeNet, decodeTestSet, withBiases } from './axc/nn.js';
 import { networkProject } from './axc/nnexport.js';
 import { makeZip } from './ui/zip.js';
 
@@ -14,7 +14,8 @@ const url = (f) => new URL(f, base).href;
 self.onmessage = async ({ data: o }) => {
     try {
         const [synth, cells, fpga, netJson] = await Promise.all([getJson(url('data/synth.json')), getJson(url('data/hls-cells.json')), getJson(url('data/vivado-units.json')).catch(() => null), getJson(url(o.file))]);
-        const net = decodeNet(netJson);
+        // o.biasDelta: o desconto do viés de cada camada da busca aplicada (null: o viés da rede).
+        const net = withBiases(decodeNet(netJson), o.biasDelta ?? null);
         const test = decodeTestSet(await getBin(url(net.dataset.file)), net.dataset);
         self.postMessage({ type: 'status', key: 'nn.exportBuilding' });
         let last = 0;

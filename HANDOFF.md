@@ -26,7 +26,13 @@ Parte A, correções da busca:
    nnceiling; o nnsearch mostra o teto das candidatas e o nnbench as colunas teto e do teto; results/nn-search/teto:
    área 35% a 37%, LUT 46% a 49%, energia 3% a 7%, porque os registradores dominam a energia; as buscas chegam a
    um terço do teto em área).
-6. Correção do viés com a medida escolhível, no modelo estático, no avaliador bit exato e na exportação.
+6. Correção do viés com a medida escolhível, no modelo estático, no avaliador bit exato e na exportação (feito:
+   makeBiasFix e errorStat em nnsearch.js, medida por canal com as ativações reais da rede exata em imagens
+   espalhadas pelo conjunto da busca, metade para medir e metade para avaliar; candidatas pelo desvio (o erro sem a
+   média); preActivation, withBiases e o parâmetro biases de inferFrom em nn.js; biasDelta no resultado; --bias-fix,
+   --biasfix no nnbench, seletor na página, Aplicar e Exportar com o viés corrigido; results/nn-search/vies-preliminar:
+   a correção reduz o erro que sobra em 5% a 42%, mas quase não muda a acurácia nem a economia na MiniLenet; o erro
+   destas unidades é mais proporcional ao sinal do que um deslocamento constante).
 7. Comparar as medidas da correção no nnbench.
 8. Exportar as 5000 imagens de validação do train.py (script; Tiago roda, precisa das bases).
 9. Rodar a matriz de novo com as 5000 imagens (Tiago, 7 workers).

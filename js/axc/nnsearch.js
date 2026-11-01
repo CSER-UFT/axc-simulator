@@ -17,7 +17,7 @@
  *                camada i refaz só as camadas de i em diante. A avaliação para assim que as imagens erradas passam do
  *                limite (o ponto já é inviável).
  */
-import { productTable, adderAccumulate, inferFrom, inputActivations, sumTerms, decodeNet, decodeTestSet } from './nn.js';
+import { productTable, adderAccumulate, inferFrom, inputActivations, sumTerms, decodeNet, decodeTestSet, preActivation } from './nn.js';
 import { buildUnit } from './units.js';
 import { costModel, directiveTrees } from './nngen.js';
 import { makeLibrary } from '../hls/lib.js';
@@ -31,11 +31,13 @@ const isWeighted = (l) => l.type === 'conv' || l.type === 'dense';
 
 /** Avaliador da acurácia com as ativações da configuração base guardadas na entrada de cada camada com pesos. */
 class Evaluator {
-    constructor(net, set, trees, unitOf) {
+    constructor(net, set, trees, unitOf, biasOf = null) {
         this.net = net;
         this.set = set;
         this.trees = trees;
         this.unitOf = unitOf;
+        // biasOf(si, mul, add): o viés corrigido da camada si com as unidades (null: o da rede).
+        this.biasOf = biasOf;
         this.siteLayer = [];
         net.layers.forEach((l, li) => { if (isWeighted(l)) this.siteLayer.push(li); });
         this.sizes = net.sites.map((l) => l.inShape.reduce((a, b) => a * b, 1));
@@ -77,6 +79,7 @@ class Evaluator {
         const { net, set } = this;
         const tables = net.sites.map((_, si) => this.table(assign[si]?.mul ?? null));
         const adds = net.sites.map((_, si) => this.adder(assign[si]?.add ?? null));
+        const biases = this.biasOf ? net.sites.map((_, si) => this.biasOf(si, assign[si]?.mul ?? null, assign[si]?.add ?? null)) : null;
         const preds = record ? this.basePreds : new Uint8Array(set.n);
         const li0 = this.siteLayer[from];
         const slot = new Map(this.siteLayer.map((li, si) => [li, si]));
@@ -87,7 +90,7 @@ class Evaluator {
             if (from === 0 && !this.base) { x = inputActivations(net, set.images.subarray(k * set.size, (k + 1) * set.size), this.input); li = 0; }
             else x = this.buf[from].subarray(k * this.sizes[from], (k + 1) * this.sizes[from]);
             const rec = record ? (l, v) => { const si = slot.get(l); if (si !== undefined && si >= from) this.buf[si].set(v, k * this.sizes[si]); } : null;
-            const { pred } = inferFrom(net, x, li, tables, adds, undefined, this.trees, rec);
+            const { pred } = inferFrom(net, x, li, tables, adds, undefined, this.trees, rec, biases);
             preds[k] = pred;
             if (pred !== set.labels[k] && ++wrong > maxWrong) { k++; break; }
         }
@@ -95,6 +98,102 @@ class Evaluator {
         if (record) { this.base = assign.map((a) => ({ mul: a?.mul ?? null, add: a?.add ?? null })); this.baseWrong = wrong; }
         return { feasible: wrong <= maxWrong, wrong, seen: k, preds };
     }
+}
+
+// Correção do viés ----------------------------------------------------------------------------------------------
+// Unidades truncadas erram quase sempre para o mesmo lado, e numa soma de dezenas ou centenas de termos o viés desloca
+// as ativações. A correção desconta do viés de cada canal de saída uma medida do erro da pré-ativação (soma dos
+// produtos mais o viés, pela unidade, menos a exata), medida com as ativações reais da rede exata em imagens da
+// validação da busca. Não custa hardware: só muda os valores do viés, que já são constantes da camada.
+
+export const BIAS_FIXES = ['none', 'mean', 'median', 'gmean', 'trim'];
+
+/**
+ * Medida do erro de um canal:
+ *   mean    média;
+ *   median  mediana;
+ *   gmean   média geométrica do módulo, deslocada para aceitar zeros (exp(média de ln(1 + |e|)) - 1), com o sinal
+ *           predominante (o de mais amostras; empate: o da média). A média geométrica só existe para valores
+ *           positivos, e o erro tem sinal;
+ *   trim    média aparada, sem 10% de cada ponta.
+ */
+export function errorStat(values, mode) {
+    const n = values.length;
+    if (!n) return 0;
+    if (mode === 'mean') { let s = 0; for (let i = 0; i < n; i++) s += values[i]; return s / n; }
+    if (mode === 'gmean') {
+        let pos = 0, neg = 0, s = 0, l = 0;
+        for (let i = 0; i < n; i++) { const v = values[i]; if (v > 0) pos++; else if (v < 0) neg++; s += v; l += Math.log1p(Math.abs(v)); }
+        const sign = pos !== neg ? Math.sign(pos - neg) : Math.sign(s);
+        return sign * Math.expm1(l / n);
+    }
+    const v = Float64Array.from(values).sort();
+    if (mode === 'median') return n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2;
+    if (mode === 'trim') {
+        const k = Math.floor(0.1 * n);
+        let s = 0;
+        for (let i = k; i < n - k; i++) s += v[i];
+        return s / (n - 2 * k);
+    }
+    throw new Error(`medida desconhecida: ${mode}`);
+}
+
+/**
+ * Correção do viés de uma rede para um conjunto (o da busca). As imagens são espalhadas pelo conjunto (pool de até
+ * 128, uma a cada n / 128), metade para medir a correção e metade para avaliar o erro que sobra; as camadas
+ * convolucionais usam só as imagens necessárias para cerca de 2048 amostras por canal (pelo menos 8), as densas todas
+ * as 64. As ativações de entrada de cada camada são as da rede exata.
+ *
+ * stats(si, mul, add) devolve { delta (Int32Array, o desconto de cada canal), b (o viés corrigido), rms (raiz do erro
+ * quadrático médio da pré-ativação que sobra, nas imagens de avaliação), rmsRaw (o mesmo sem a correção) }, com cache.
+ * biasOf(si, mul, add) é o viés corrigido (null com as duas unidades exatas), para os avaliadores.
+ * @param {{table: function, adder: function}} units a tabela de produtos e a soma de cada unidade (as do avaliador)
+ */
+export function makeBiasFix(net, set, trees, units, mode, { pool = 128, perChannel = 2048, minImages = 8 } = {}) {
+    if (!BIAS_FIXES.includes(mode) || mode === 'none') throw new Error(`correção do viés desconhecida: ${mode}`);
+    const m = Math.min(pool, set.n);
+    const idx = Array.from({ length: m }, (_, j) => Math.min(set.n - 1, Math.floor(((j + 0.5) * set.n) / m)));
+    // Ativações de entrada de cada camada com pesos, na rede exata, para as imagens do pool.
+    const siteOf = new Map();
+    net.layers.forEach((l, li) => { if (isWeighted(l)) siteOf.set(li, siteOf.size); });
+    const inputs = net.sites.map(() => []);
+    const exactT = net.sites.map(() => units.table(null));
+    const img = new Uint8Array(set.size);
+    for (const k of idx) {
+        img.set(set.images.subarray(k * set.size, (k + 1) * set.size));
+        inferFrom(net, inputActivations(net, img), 0, exactT, [], undefined, trees, (li, x) => { const si = siteOf.get(li); if (si !== undefined) inputs[si].push(Uint8Array.from(x)); });
+    }
+    const cache = new Map();
+    const stats = (si, mul, add) => {
+        const key = `${si}|${mul ?? ''}|${add ?? ''}`;
+        if (cache.has(key)) return cache.get(key);
+        const l = net.sites[si], C = l.outShape[0], per = l.outShape.reduce((a, b) => a * b, 1) / C;
+        const nImg = Math.max(1, Math.min(Math.floor(m / 2), Math.max(minImages, Math.ceil(perChannel / per))));
+        const T = units.table(mul), addf = units.adder(add), T0 = units.table(null), tree = trees[si] ?? 1;
+        const errOf = (x) => {
+            const pa = preActivation(l, x, T, addf, tree), pe = preActivation(l, x, T0, null, 1);
+            for (let i = 0; i < pa.length; i++) pa[i] -= pe[i];
+            return pa;
+        };
+        // Medida: as imagens pares do pool.
+        const byCh = Array.from({ length: C }, () => new Float64Array(nImg * per));
+        for (let j = 0; j < nImg; j++) {
+            const e = errOf(inputs[si][2 * j]);
+            for (let c = 0; c < C; c++) byCh[c].set(e.subarray(c * per, (c + 1) * per), j * per);
+        }
+        const delta = Int32Array.from(byCh, (v) => Math.round(errorStat(v, mode)));
+        // Avaliação: as ímpares.
+        let s2 = 0, s2raw = 0, n = 0;
+        for (let j = 0; j < nImg; j++) {
+            const e = errOf(inputs[si][2 * j + 1]);
+            for (let i = 0; i < e.length; i++) { const r = e[i] - delta[Math.floor(i / per)]; s2 += r * r; s2raw += e[i] * e[i]; n++; }
+        }
+        const b = Int32Array.from(l.b, (v, c) => v - delta[c]);
+        const res = { delta, b, rms: Math.sqrt(s2 / n), rmsRaw: Math.sqrt(s2raw / n), images: nImg };
+        cache.set(key, res);
+        return res;
+    };
+    return { mode, stats, biasOf: (si, mul, add) => (mul || add ? stats(si, mul, add).b : null), deltas: (assign) => assign.map((a, si) => (a?.mul || a?.add ? Array.from(stats(si, a.mul ?? null, a.add ?? null).delta) : null)) };
 }
 
 /**
@@ -162,9 +261,9 @@ export function poolEngine(send) {
     };
 }
 /** Mensagem de início de um worker de avaliação: a rede (JSON), o conjunto de validação e as unidades. */
-export function initMessage(netJson, valBuf, synth, trees, sample = 0) {
+export function initMessage(netJson, valBuf, synth, trees, sample = 0, biasFix = 'none') {
     const used = synth.designs.filter((d) => (d.cfg.kind === 'mul' && d.cfg.width === 8) || (d.cfg.kind === 'add' && d.cfg.width === 32));
-    return { type: 'init', net: netJson, buf: valBuf, designs: used.map((d) => ({ name: d.name, cfg: d.cfg })), trees, sample };
+    return { type: 'init', net: netJson, buf: valBuf, designs: used.map((d) => ({ name: d.name, cfg: d.cfg })), trees, sample, biasFix };
 }
 /** Tratador das mensagens de um worker de avaliação (o mesmo no navegador e no Node). */
 export function evalHandler() {
@@ -176,6 +275,8 @@ export function evalHandler() {
             const cfgs = new Map(m.designs.map((d) => [d.name, d.cfg])), units = new Map();
             const unitOf = (name) => { if (!units.has(name)) units.set(name, buildUnit(cfgs.get(name))); return units.get(name); };
             ev = new Evaluator(net, set, m.trees, unitOf);
+            // A mesma correção do viés da preparação: o mesmo conjunto (a mesma amostra) e as mesmas imagens.
+            if (m.biasFix && m.biasFix !== 'none') ev.biasOf = makeBiasFix(net, set, m.trees, ev, m.biasFix).biasOf;
             return { type: 'ready' };
         }
         if (m.type === 'run') {
@@ -266,8 +367,11 @@ export function prepareSearch(net, o) {
         for (let i = 0; i < W.length; i++) { W[i] = draw(cw) - 128; A[i] = draw(ca); }
         return { K, W, A };
     });
-    /** Erro da soma de uma saída (raiz do erro quadrático médio) com o multiplicador e o somador da camada. */
-    const sumError = (si, mul, add) => {
+    /**
+     * Erro da soma de uma saída com o multiplicador e o somador da camada: { rms (raiz do erro quadrático médio), mean,
+     * std (o desvio, o que sobra com o viés descontado) }.
+     */
+    const sumErrorStats = (si, mul, add) => {
         const { K, W, A } = stats[si];
         const T = val.table(mul), addf = val.adder(add);
         const fillX = (t, out) => { for (let j = 0; j < samples; j++) { const i = j * K + t; out[j] = W[i] * A[i]; } };
@@ -275,10 +379,18 @@ export function prepareSearch(net, o) {
         const exactAdd = (acc, p, n) => { for (let i = 0; i < n; i++) acc[i] += p[i]; return acc; };
         const ex = Int32Array.from(sumTerms(K, fillX, samples, exactAdd, 1).subarray(0, samples));
         const ap = sumTerms(K, fillU, samples, addf ?? exactAdd, trees[si] ?? 1);
-        let s2 = 0;
-        for (let j = 0; j < samples; j++) { const e = ap[j] - ex[j]; s2 += e * e; }
-        return Math.sqrt(s2 / samples);
+        let s1 = 0, s2 = 0;
+        for (let j = 0; j < samples; j++) { const e = ap[j] - ex[j]; s1 += e; s2 += e * e; }
+        const mean = s1 / samples;
+        return { rms: Math.sqrt(s2 / samples), mean, std: Math.sqrt(Math.max(0, s2 / samples - mean * mean)) };
     };
+    const sumError = (si, mul, add) => sumErrorStats(si, mul, add).rms;
+    // Correção do viés (o.biasFix: mean, median, gmean ou trim; none, o padrão, sem correção), medida no conjunto da
+    // busca e usada também na validação inteira e no teste (é parte do projeto, como as unidades).
+    const biasFix = o.biasFix ?? 'none';
+    if (!BIAS_FIXES.includes(biasFix)) throw new Error(`correção do viés desconhecida: ${biasFix} (${BIAS_FIXES.join(', ')})`);
+    const bf = biasFix === 'none' ? null : makeBiasFix(net, valSet, trees, val, biasFix);
+    if (bf) for (const ev of [val, fullVal, test]) if (ev) ev.biasOf = bf.biasOf;
     // Candidatas: fronteira de Pareto (custo da unidade no objetivo, erro da soma) por camada, sem as que custam
     // tanto quanto a exata.
     const maxCands = o.maxCands ?? 12;
@@ -286,11 +398,13 @@ export function prepareSearch(net, o) {
     const exactCost = { mul: metric(lib.unit('MUL8 exato')), add: metric(lib.unit('ADD32 exato')) };
     const cands = net.sites.map((l, si) => {
         const of = (kind) => spread(pareto(pool(kind)
-            .map((name) => ({ name, cost: metric(lib.unit(name)), err: kind === 'mul' ? sumError(si, name, null) : sumError(si, null, name) }))
+            // Com a correção do viés, o erro que conta é o desvio (o que sobra com a média descontada): uma unidade de
+            // erro grande mas quase constante fica boa.
+            .map((name) => { const st = kind === 'mul' ? sumErrorStats(si, name, null) : sumErrorStats(si, null, name); return { name, cost: metric(lib.unit(name)), err: bf ? st.std : st.rms }; })
             .filter((x) => x.cost < exactCost[kind])), maxCands);
         return { mul: of('mul'), add: of('add') };
     });
-    return { net, objective, target, trees, cm, lib, val, fullVal, test, exact, exactWrong, cands, metric, sumError, n: valSet.n, sample: valSet.n, valN: o.val.n };
+    return { net, objective, target, trees, cm, lib, val, fullVal, test, exact, exactWrong, cands, metric, sumError, sumErrorStats, bf, biasFix, n: valSet.n, sample: valSet.n, valN: o.val.n };
 }
 
 // Teto de economia -------------------------------------------------------------------------------------------------
@@ -388,7 +502,8 @@ export function staticModel(P) {
     const errLsb = (si, mul, add) => {
         if (!mul && !add) return 0;
         const k = `${si}|${mul ?? ''}|${add ?? ''}`;
-        if (!cache.has(k)) cache.set(k, P.sumError(si, mul ?? null, add ?? null) * scale[si]);
+        // Com a correção do viés, o erro que sobra na pré-ativação, medido por canal com as ativações reais.
+        if (!cache.has(k)) cache.set(k, (P.bf ? P.bf.stats(si, mul ?? null, add ?? null).rms : P.sumError(si, mul ?? null, add ?? null)) * scale[si]);
         return cache.get(k);
     };
     /** Erro de cada camada de uma configuração (assign: [{mul, add}]). */
@@ -549,6 +664,9 @@ export function nnProblem(P, curves, { maxDrop = 1 } = {}) {
     };
 }
 
+/** Desconto do viés de cada camada com pesos de uma configuração (null sem correção, ou na camada exata). */
+const deltasOf = (P, assign) => (P.bf ? P.bf.deltas(assign) : null);
+
 /** Heurísticas da busca híbrida, na ordem da página HLS (a exaustiva e a aleatória não fazem parte da busca das redes). */
 export const HYBRID_HEURISTICS = ['local', 'efficiency', 'sequential', 'tabu', 'grasp', 'ga'];
 
@@ -701,13 +819,13 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
     const fin = await engine.run(bestAssign, { base: bestAssign });
     const total = (a) => P.metric(P.cm.network(a).totals);
     const res = {
-        heuristic, hybrid: true, objective: P.objective, maxDrop, maxWrong, workers: engine.size, sample: P.sample, repaired, error, rounds: round,
+        heuristic, hybrid: true, objective: P.objective, maxDrop, maxWrong, workers: engine.size, sample: P.sample, repaired, error, rounds: round, biasFix: P.biasFix ?? 'none',
         exact: { cost: exactCost, wrongVal: P.exactWrong, accVal: 1 - P.exactWrong / P.n },
-        best: { assign: bestAssign, cost: total(bestAssign), wrongVal: fin.wrong, accVal: 1 - fin.wrong / P.n, saving: 1 - total(bestAssign) / exactCost, estDrop: chosen?.drop ?? 0 },
+        best: { assign: bestAssign, cost: total(bestAssign), wrongVal: fin.wrong, accVal: 1 - fin.wrong / P.n, saving: 1 - total(bestAssign) / exactCost, estDrop: chosen?.drop ?? 0, biasDelta: deltasOf(P, bestAssign) },
         calib: calib.points, evals: allPts.length, verified, steps,
         points: allPts.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, feasible: p.feasible, measured: p.measured ?? null })),
-        front: front.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, feasible: p.feasible, units: p.units, measured: p.measured ?? null, saving: 1 - p.score / exactCost })),
-        measuredFront: measuredFront.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, units: p.units, measured: p.measured, saving: 1 - p.score / exactCost })),
+        front: front.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, feasible: p.feasible, units: p.units, measured: p.measured ?? null, saving: 1 - p.score / exactCost, biasDelta: deltasOf(P, p.assign) })),
+        measuredFront: measuredFront.map((p) => ({ assign: p.assign, cost: p.score, drop: p.drop, units: p.units, measured: p.measured, saving: 1 - p.score / exactCost, biasDelta: deltasOf(P, p.assign) })),
         ms: Date.now() - t0, phaseMs,
     };
     if (P.fullVal) {
@@ -882,9 +1000,9 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
     const best = cur;
     const fin = await engine.run(best, { base: best });
     const res = {
-        heuristic, objective: P.objective, maxDrop, maxWrong, workers: engine.size, sample: P.sample, repaired,
+        heuristic, objective: P.objective, maxDrop, maxWrong, workers: engine.size, sample: P.sample, repaired, biasFix: P.biasFix ?? 'none',
         exact: { cost: exactCost, wrongVal: P.exactWrong, accVal: 1 - P.exactWrong / P.n },
-        best: { assign: best, cost: total(best), wrongVal: fin.wrong, accVal: 1 - fin.wrong / P.n, saving: 1 - total(best) / exactCost },
+        best: { assign: best, cost: total(best), wrongVal: fin.wrong, accVal: 1 - fin.wrong / P.n, saving: 1 - total(best) / exactCost, biasDelta: deltasOf(P, best) },
         evals, images, points, trace, last, ms: Date.now() - t0, phaseMs,
     };
     // Com a amostra: a validação inteira, para a exata e o ponto escolhido.
@@ -903,6 +1021,6 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
     // Fronteira medida: os viáveis na amostra que não foram reprovados na validação inteira, e os aprovados nela
     // (a validação inteira, quando conferida, vale sobre a amostra: um ponto do reparo pode passar do limite na
     // amostra e caber na validação inteira). O escolhido está nela.
-    res.front = pareto(points.filter((p) => p.fullOk === true || (p.feasible && p.fullOk !== false)).map((p) => ({ ...p, err: p.wrong }))).map((p) => ({ ...p, accVal: 1 - p.wrong / P.n }));
+    res.front = pareto(points.filter((p) => p.fullOk === true || (p.feasible && p.fullOk !== false)).map((p) => ({ ...p, err: p.wrong }))).map((p) => ({ ...p, accVal: 1 - p.wrong / P.n, biasDelta: deltasOf(P, p.assign) }));
     return res;
 }

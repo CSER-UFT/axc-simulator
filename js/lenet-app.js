@@ -30,7 +30,8 @@ let fromUnits = null;       // configuração vinda da página de unidades
 let registry = null;        // data/nn/models.json
 let nnData = null, nnRun = 0;
 let nnDirs = null;
-let nnOverride = null;        // unidades de cada camada aplicadas da busca ([{mul, add}] com os nomes da biblioteca)           // diretivas de cada camada com pesos (js/axc/nngen.js), guardadas por modelo
+let nnOverride = null;        // unidades de cada camada aplicadas da busca ([{mul, add}] com os nomes da biblioteca)
+let nnOverrideBias = null;    // desconto do viés de cada camada da busca aplicada (null: sem correção)           // diretivas de cada camada com pesos (js/axc/nngen.js), guardadas por modelo
 const modelCache = new Map(), testCache = new Map(), predCache = new Map(), tableCache = new Map(), unitCache = new Map();
 
 // Unidade vinda da página de unidades (#cfg=...), somador (#add=nome) e modelo (#model=id).
@@ -105,7 +106,9 @@ function nnSetup(mask) {
         // Unidades por camada (da busca): a máscara e os seletores não valem.
         const tables = nnOverride.map((a) => tableOf(unitByName(a.mul)));
         const adds = nnOverride.map((a) => (a.add ? accumOf(a.add) : null));
-        return { mul: null, add: null, override: true, tables, adds, trees: nnTrees(), key: `${nnData.net.id}|busca|${JSON.stringify(nnOverride)}|${nnTrees().join(',')}` };
+        // O viés corrigido pela busca (quando ela usou a correção).
+        const biases = nnOverrideBias ? nnData.net.sites.map((l, si) => (nnOverrideBias[si] ? Int32Array.from(l.b, (v, c) => v - nnOverrideBias[si][c]) : null)) : null;
+        return { mul: null, add: null, override: true, tables, adds, biases, trees: nnTrees(), key: `${nnData.net.id}|busca|${JSON.stringify(nnOverride)}|${JSON.stringify(nnOverrideBias)}|${nnTrees().join(',')}` };
     }
     const { mul, add } = nnUnits();
     const Tu = tableOf(mul), Tx = tableOf(null);
@@ -130,7 +133,7 @@ async function loadNN(id) {
 }
 
 /** Classifica em lotes, sem travar a página; uma execução nova cancela as antigas. */
-function classifyAsync(tables, adds, key, onProgress, trees = []) {
+function classifyAsync(tables, adds, key, onProgress, trees = [], biases = null) {
     if (predCache.has(key)) return Promise.resolve(predCache.get(key));
     const { net, test } = nnData;
     const run = nnRun;
@@ -144,7 +147,7 @@ function classifyAsync(tables, adds, key, onProgress, trees = []) {
         const step = () => {
             if (run !== nnRun) { reject(new Error('cancelada')); return; }
             const end = Math.min(test.n, k + chunk);
-            classifyRange(net, test, tables, adds, k, end, preds, trees);
+            classifyRange(net, test, tables, adds, k, end, preds, trees, biases);
             k = end;
             onProgress?.(k, test.n);
             if (k < test.n) setTimeout(step, 0);
@@ -216,7 +219,7 @@ async function render() {
     const progress = (k, n) => { $('nnStatus').textContent = t('nn.progress', { k, n }); };
     let preds, refUnitPreds = null, refUnit = null;
     try {
-        preds = await classifyAsync(setup.tables, setup.adds, setup.key, progress, setup.trees);
+        preds = await classifyAsync(setup.tables, setup.adds, setup.key, progress, setup.trees, setup.biases);
         // Booth de 8 bits: a unidade recebe a >> 1; a referência da técnica (Booth exato) também perde o bit baixo.
         if (setup.mul?.signed && setup.mul.cfg.width === 8) {
             refUnit = unitOf({ kind: 'mul', width: 8, method: 'booth' });
@@ -470,16 +473,17 @@ $('nnExportBtn').onclick = () => {
         }
     };
     exportWorker.onerror = (e) => done(e.message || t('nn.searchError'));
-    exportWorker.postMessage({ file: entry.file, clockNs, dirs: nnDirs, units, images: Math.max(1, Math.min(1000, +$('nnExportImages').value || 50)), id, layers: $('nnExportLayers').checked });
+    exportWorker.postMessage({ file: entry.file, clockNs, dirs: nnDirs, units, biasDelta: nnOverride ? nnOverrideBias : null, images: Math.max(1, Math.min(1000, +$('nnExportImages').value || 50)), id, layers: $('nnExportLayers').checked });
 };
 
 // Busca das unidades por camada ------------------------------------------------------------------------------------
 /** Unidades por camada aplicadas da busca (null: as dos seletores). */
-function setOverride(assign) {
+function setOverride(assign, biasDelta = null) {
     nnOverride = assign ? assign.map((a) => ({ mul: a.mul ?? null, add: a.add ?? null })) : null;
+    nnOverrideBias = assign && biasDelta?.some((d) => d) ? biasDelta : null;
     if (!nnOverride) { $('nnOverride').innerHTML = ''; return; }
     const rows = nnData.net.sites.map((l, i) => `<tr><th class="mono">${esc(l.name)}</th><td class="mono">${esc(dn(nnOverride[i].mul ?? 'MUL8 exato'))}</td><td class="mono">${esc(dn(nnOverride[i].add ?? 'ADD32 exato'))}</td></tr>`).join('');
-    $('nnOverride').innerHTML = `<div class="scroll-box" style="padding:8px;margin:8px 0"><p class="note"><b>${t('nn.searchApplied')}</b></p><table class="kv">${rows}</table>`
+    $('nnOverride').innerHTML = `<div class="scroll-box" style="padding:8px;margin:8px 0"><p class="note"><b>${t('nn.searchApplied')}</b></p><table class="kv">${rows}</table>${nnOverrideBias ? `<p class="note">${t('nn.biasApplied')}</p>` : ''}`
         + `<button type="button" class="btn outline" id="nnOverrideOff">${t('nn.searchUnapply')}</button></div>`;
     $('nnOverrideOff').onclick = () => { setOverride(null); render(); };
 }
@@ -510,7 +514,7 @@ $('nnSearchBtn').onclick = () => {
     if (!net.dataset.val) { $('nnSearchStatus').textContent = t('nn.searchNoVal'); return; }
     const hsel = $('nnSearchHeur').value, hybrid = hsel.startsWith('hybrid:');
     const o = {
-        file: entry.file, objective: $('nnSearchObj').value, maxDrop: Math.max(0, +$('nnSearchDrop').value || 0), heuristic: hybrid ? hsel.slice(7) : hsel, hybrid,
+        file: entry.file, objective: $('nnSearchObj').value, maxDrop: Math.max(0, +$('nnSearchDrop').value || 0), heuristic: hybrid ? hsel.slice(7) : hsel, hybrid, biasFix: $('nnSearchBias').value,
         dirs: nnDirs, trees: directiveTrees(net, nnDirs), clockNs: +$('nnClock').value || 10, workers: searchWorkers(), sample: +$('nnSearchSample').value,
     };
     $('nnSearchBtn').disabled = true;
@@ -574,7 +578,7 @@ function renderSearch() {
     const cands = r.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} × ${c.add.length}`).join(', ');
     h += `<p class="note">${r.hybrid ? t('nn.searchNoteHyb', { cands, calib: r.calib.length, n: r.n, verified: r.verified }) : t('nn.searchNote', { cands, maxWrong: r.maxWrong, n: r.n })}</p>`;
     $('nnSearchResult').innerHTML = `${left}${h}`;
-    $('nnSearchApply').onclick = () => { setOverride(r.best.assign); setTab('result'); render(); };
+    $('nnSearchApply').onclick = () => { setOverride(r.best.assign, r.best.biasDelta); setTab('result'); render(); };
     renderFront(r);
     initSteps(r);
     renderSearchFig();
@@ -585,7 +589,7 @@ function renderSearch() {
 // var: lidos também ao trocar de modelo, o que pode acontecer antes desta linha na carga da página.
 var nnCompare = [], live = null, searchId = 0, figPending = false; // eslint-disable-line no-var
 const cmpKeyOf = (netId, o) => JSON.stringify([netId, o.objective, o.dirs, o.clockNs, o.sample]);
-const hName = (o) => `${o.hybrid ? t(`nn.hyb.${o.heuristic}`) : t(o.heuristic === 'sensitivity' ? 'nn.searchSens' : 'nn.searchSeq')} · ${t(o.hybrid ? 'nn.kindHyb' : 'nn.kindMeas')} · ${nf(o.maxDrop, 2)} ${t('nn.pp')}`;
+const hName = (o) => `${o.hybrid ? t(`nn.hyb.${o.heuristic}`) : t(o.heuristic === 'sensitivity' ? 'nn.searchSens' : 'nn.searchSeq')} · ${t(o.hybrid ? 'nn.kindHyb' : 'nn.kindMeas')} · ${nf(o.maxDrop, 2)} ${t('nn.pp')}${o.biasFix && o.biasFix !== 'none' ? ` · ${t(`nn.bias.${o.biasFix}`)}` : ''}`;
 /** Série do gráfico a partir de um resultado da busca (pontos em % do custo da exata e % de acurácia). */
 function seriesOf(r) {
     const acc = 100 * r.exact.accVal, E = r.exact.cost, span = Math.max(5, 4 * r.maxDrop);
@@ -735,7 +739,7 @@ function renderFront(r) {
         meas: r.hybrid ? (p.measured ? (p.measured.ok ? p.measured.drop : null) : undefined) : 100 * (r.exact.accVal - p.accVal),
         over: r.hybrid && p.measured && !p.measured.ok,
     }));
-    lastFront = rows.map((x) => x.p.assign);
+    lastFront = rows.map((x) => ({ assign: x.p.assign, biasDelta: x.p.biasDelta ?? null }));
     if (!rows.length) { $('nnSearchFrontBox').classList.add('hidden'); return; }
     const dp = (v) => `${nf(v, 2)}`;
     $('nnSearchFrontNote').textContent = t(r.hybrid ? 'nn.frontNoteHyb' : 'nn.frontNote', { n: rows.length, lim: nf(r.maxDrop, 2) });
@@ -778,7 +782,7 @@ $('nnFrontJson').onclick = () => {
 $('nnSearchFront').addEventListener('click', (e) => {
     const b = e.target.closest('[data-front]');
     if (!b || !lastFront[+b.dataset.front]) return;
-    setOverride(lastFront[+b.dataset.front]);
+    setOverride(lastFront[+b.dataset.front].assign, lastFront[+b.dataset.front].biasDelta);
     setTab('result');
     render();
 });

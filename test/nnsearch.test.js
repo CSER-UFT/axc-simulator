@@ -189,3 +189,44 @@ test('teto de economia: fração aritmética e teto entre 0 e 1, e o teto não p
     const sh = arithmeticShare(P.cm, P.exact, 'area');
     assert.ok(sh.arith > 0 && sh.arith < sh.total);
 });
+
+test('correção do viés: medidas do erro em valores conhecidos', async () => {
+    const { errorStat } = await import('../js/axc/nnsearch.js');
+    const v = [-4, -3, -3, -2, -1, 0, 0, 1, 2, 30];
+    assert.equal(errorStat(v, 'mean'), 2);
+    assert.equal(errorStat(v, 'median'), -0.5);
+    // Média aparada: sem o primeiro e o último (10% de cada ponta de 10 valores).
+    assert.equal(errorStat(v, 'trim'), (-3 - 3 - 2 - 1 + 0 + 0 + 1 + 2) / 8);
+    // Média geométrica do módulo, deslocada, com o sinal predominante (5 negativos contra 3 positivos).
+    const g = Math.expm1(v.reduce((s, x) => s + Math.log1p(Math.abs(x)), 0) / v.length);
+    assert.ok(Math.abs(errorStat(v, 'gmean') + g) < 1e-12);
+});
+
+test('correção do viés: a busca classifica igual à rede com o viés trocado, na validação e no teste', async () => {
+    const { withBiases } = await import('../js/axc/nn.js');
+    const Pm = prepareSearch(net, { val, test: testSet, synth, cells, fpga, objective: 'area', maxCands: 4, biasFix: 'mean' });
+    assert.equal(Pm.biasFix, 'mean');
+    const r = await searchNetwork(Pm, { heuristic: 'sequential', maxDrop: 1 });
+    assert.ok(r.best.biasDelta && r.best.biasDelta.some((d) => d && d.some((x) => x !== 0)), 'sem desconto no ponto escolhido');
+    assert.ok(r.best.biasDelta.every((d, si) => (d === null) === !(r.best.assign[si].mul || r.best.assign[si].add)));
+    // Independente: a rede com o viés trocado, classificada sem o reaproveitamento das ativações.
+    const nb = withBiases(net, r.best.biasDelta);
+    const wrong = (set) => {
+        const tables = r.best.assign.map((a) => productTable(a.mul ? buildUnit(cfgOf(a.mul)) : null));
+        const adds = r.best.assign.map((a) => (a.add ? adderAccumulate(buildUnit(cfgOf(a.add))) : null));
+        const preds = classifyRange(nb, set, tables, adds, 0, set.n, new Uint8Array(set.n), directiveTrees(net, null));
+        let w = 0;
+        for (let k = 0; k < set.n; k++) if (preds[k] !== set.labels[k]) w++;
+        return w;
+    };
+    assert.equal(r.best.wrongVal, wrong(val));
+    assert.ok(Math.abs(1 - r.best.accTest - wrong(testSet) / testSet.n) < 1e-12);
+    // A rede original não muda (withBiases copia só as camadas com o viés trocado).
+    assert.notEqual(nb.sites[0].b, net.sites[0].b);
+    // Os workers usam a mesma correção (a mesma amostra, as mesmas imagens).
+    const init = initMessage(netJson, valBuf, synth, Pm.trees, 0, 'mean');
+    const send = [evalHandler(), evalHandler()].map((h) => { h(init); return (msg) => Promise.resolve(h(msg)); });
+    const r2 = await searchNetwork(Pm, { heuristic: 'sequential', maxDrop: 1 }, poolEngine(send));
+    assert.deepEqual(r2.best.assign, r.best.assign);
+    assert.equal(r2.best.wrongVal, r.best.wrongVal);
+});

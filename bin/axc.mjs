@@ -24,6 +24,9 @@
  *                             [--hybrid [--heuristic local|efficiency|sequential|tabu|grasp|ga]
  *                             [--max-verify 25] [--verify-front 8]] (busca híbrida: curvas erro → queda calibradas com
  *                             trocas isoladas, busca no modelo estático, verificação dos melhores pontos)
+ *                             [--bias-fix none|mean|median|gmean|trim] (correção do viés de cada canal pela medida do
+ *                             erro da pré-ativação: média, mediana, média geométrica do módulo com o sinal predominante
+ *                             ou média aparada; vai no resultado, e o nnexport --search aplica)
  *       busca do multiplicador e do somador de cada camada (js/axc/nnsearch.js): o menor custo com a queda de
  *       acurácia na validação até --max-drop pontos; a acurácia de teste do ponto escolhido no fim. --workers: threads
  *       de avaliação (padrão: os núcleos menos 1; 1 avalia na própria thread)
@@ -65,9 +68,9 @@ import { testInputs, errorMetrics, loadOperands, APP_DISTRIBUTIONS, DISTRIBUTION
 import { toVerilog, testbench, moduleName } from '../js/axc/verilog.js';
 import { designSpace } from '../js/axc/designspace.js';
 import { PRESETS } from '../js/axc/presets.js';
-import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize } from '../js/axc/nn.js';
+import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize, withBiases } from '../js/axc/nn.js';
 import { networkCost, costModel, networkKernels, normalizeDirectives, directiveTrees, CONV_PIPES, DENSE_PIPES } from '../js/axc/nngen.js';
-import { prepareSearch, searchNetwork, hybridSearch, poolEngine, initMessage, SEARCH_OBJECTIVES, SEARCH_HEURISTICS, HYBRID_HEURISTICS, searchCeiling, savingCeiling } from '../js/axc/nnsearch.js';
+import { prepareSearch, searchNetwork, hybridSearch, poolEngine, initMessage, SEARCH_OBJECTIVES, SEARCH_HEURISTICS, HYBRID_HEURISTICS, searchCeiling, savingCeiling, BIAS_FIXES } from '../js/axc/nnsearch.js';
 import { Worker } from 'node:worker_threads';
 import { networkProject } from '../js/axc/nnexport.js';
 import { csynthSummary, implSummary, carry4Of } from '../js/hls/reports.js';
@@ -270,13 +273,13 @@ switch (cmd) {
         const t0 = Date.now();
         let P;
         try {
-            P = prepareSearch(net, { val, test, synth: synthJ, cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')), fpga: fpgaJ, objective, dirs, clockNs: +opt('--clock', 10), maxCands: +opt('--cands', 12), sample: +opt('--sample', 0) });
+            P = prepareSearch(net, { val, test, synth: synthJ, cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')), fpga: fpgaJ, objective, dirs, clockNs: +opt('--clock', 10), maxCands: +opt('--cands', 12), sample: +opt('--sample', 0), biasFix: opt('--bias-fix', 'none') });
         } catch (e) { die(e.message); }
         const prepMs = Date.now() - t0;
         const nw = Math.max(1, +opt('--workers', Math.max(1, availableParallelism() - 1)));
         let engine, workers = [];
         if (nw > 1) {
-            const init = initMessage(netJson, valBuf, synthJ, P.trees, +opt('--sample', 0));
+            const init = initMessage(netJson, valBuf, synthJ, P.trees, +opt('--sample', 0), opt('--bias-fix', 'none'));
             workers = Array.from({ length: nw }, () => new Worker(new URL('./nn-eval-worker.mjs', import.meta.url)));
             const send = workers.map((w) => {
                 let next = 0;
@@ -304,7 +307,7 @@ switch (cmd) {
         const res = { model: net.id, objective, heuristic, maxDrop: r.maxDrop, dirs, prepMs, ...r, points: flag('--points') ? r.points : r.points.length, steps: flag('--points') ? r.steps : undefined };
         const ms = (x) => `${(x / 1000).toFixed(1)} s`;
         out(res, () => [
-            `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n}${P.fullVal ? `, amostra de ${P.n} das ${P.valN}` : ''})`,
+            `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}${r.biasFix && r.biasFix !== 'none' ? `, correção do viés pela ${{ mean: 'média', median: 'mediana', gmean: 'média geométrica', trim: 'média aparada' }[r.biasFix]}` : ''}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n}${P.fullVal ? `, amostra de ${P.n} das ${P.valN}` : ''})`,
             `candidatas por camada: ${P.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} ×, ${c.add.length} +`).join('; ')}`,
             r.hybrid
                 ? `híbrida: ${r.calib.length} trocas isoladas na calibração (${ms(r.phaseMs.calib)}), ${r.evals} pontos no modelo estático (${ms(r.phaseMs.search)}), ${r.verified} verificados em ${r.rounds} rodada(s) (${ms(r.phaseMs.verify)}${r.repaired ? `, ${r.repaired} reprovados na validação inteira` : ''}); ${ms(r.ms)} com ${r.workers} worker(s); preparação ${ms(prepMs)}${r.error ? `; ${r.error}` : ''}`
@@ -353,7 +356,8 @@ switch (cmd) {
         const found = opt('--search') ? JSON.parse(readFileSync(opt('--search'), 'utf8')) : null;
         const modelId = found?.model ?? opt('--model', 'minilenet-mnist');
         const entry = reg.models.find((m) => m.id === modelId) ?? die(`modelo desconhecido: ${modelId} (${reg.models.map((m) => m.id).join(', ')})`);
-        const net = decodeNet(JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8')));
+        // Com --search, o viés corrigido pela busca (best.biasDelta), quando ela usou a correção.
+        const net = withBiases(decodeNet(JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8'))), found?.best?.biasDelta ?? null);
         const names = net.sites.map((l) => l.name);
         const dirs = found?.dirs ?? parseDirs(net, opt('--dirs'));
         let units;
