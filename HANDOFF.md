@@ -33,7 +33,10 @@ Parte A, correções da busca:
    --biasfix no nnbench, seletor na página, Aplicar e Exportar com o viés corrigido; results/nn-search/vies-preliminar:
    a correção reduz o erro que sobra em 5% a 42%, mas quase não muda a acurácia nem a economia na MiniLenet; o erro
    destas unidades é mais proporcional ao sinal do que um deslocamento constante).
-7. Comparar as medidas da correção no nnbench.
+7. Comparar as medidas da correção no nnbench (feito, com a correção de ganho acrescentada: gain e affine na reescala
+   Q32 de cada canal; results/nn-search/etapa7 e ANALISE.md: affine, ganho e viés por mínimos quadrados, é a melhor,
+   12,5% contra 10,3% sem correção, melhor em 10 de 12 casos e com a menor queda no teste; as correções só de viés
+   ganham 1,6 a 1,8 ponto mas aumentam a queda no teste; pendente decidir o padrão da página).
 8. Exportar as 5000 imagens de validação do train.py (script; Tiago roda, precisa das bases).
 9. Rodar a matriz de novo com as 5000 imagens (Tiago, 7 workers).
 

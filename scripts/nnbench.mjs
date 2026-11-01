@@ -98,6 +98,7 @@ if (!report) for (const model of models) for (const objective of objectives) for
     });
 }
 
+const fixOf = (r) => r.biasFix ?? 'none';
 const pct = (v, d = 1) => (v === undefined || v === null ? '' : (100 * v).toFixed(d));
 const head = ['modelo', 'objetivo', 'amostra', 'heurística', 'viés', 'limite', 'economia %', 'teto %', 'do teto %', 'queda amostra', 'queda validação', 'queda teste', 'exata amostra %', 'exata validação %', 'pontos', 'verificados', 'rodadas', 'reparos', 'coberto', 'fora da fronteira', 's'];
 const line = (r) => (r.error ? [r.model, r.objective, r.sample, r.heuristic, fixOf(r), r.maxDrop, `erro: ${r.error}`] : [r.model, r.objective, r.sample, r.heuristic, fixOf(r), r.maxDrop, pct(r.saving), pct(r.ceiling), r.ceiling ? pct(r.saving / r.ceiling, 0) : '', pct(r.dropSample, 2), pct(r.dropVal, 2), pct(r.dropTest, 2), pct(r.accExactSample), pct(r.accExactVal), r.evals, r.verified ?? '', r.rounds ?? '', r.repaired, r.covered ? 'sim' : '', r.offFront ? 'sim' : (r.offFront === undefined ? '?' : ''), (r.ms / 1000).toFixed(0)]);
@@ -106,7 +107,6 @@ writeFileSync(join(outDir, 'casos.csv'), `${[head, ...rows.map(line)].map((x) =>
 // Resumo por heurística e amostra.
 const ok = rows.filter((r) => !r.error);
 const caseKey = (r) => [r.model, r.objective, r.sample, r.maxDrop].join('|');
-const fixOf = (r) => r.biasFix ?? 'none';
 const bestOf = new Map();
 for (const r of ok) bestOf.set(caseKey(r), Math.max(bestOf.get(caseKey(r)) ?? 0, r.saving));
 const groups = new Map();
