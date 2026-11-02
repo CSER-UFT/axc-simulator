@@ -47,10 +47,20 @@ Parte A, correções da busca:
    oficial github.com/zalandoresearch/fashion-mnist (data/fashion), CIFAR 10 do pacote npm tfjs-cifar10 1.1.1; os
    três passaram na conferência com os arquivos de 1000. SHA256: mnist-val5000 9bb467e1..., fashion-val5000
    322f9ac2..., cifar10-val5000 1f0315e1...)
-9. Rodar a matriz de novo com as 5000 imagens (Tiago, 7 workers).
+9. Rodar a matriz de novo com as 5000 imagens (feito por Tiago, 7 workers; results/nn-search/etapa9, 48 casos: a
+   diferença entre a queda no teste e a na validação caiu para cerca de 0,1 ponto; com affine, local híbrida 10,9%
+   contra 9,8% sem correção e sensibilidade 12,0% contra 10,7%; a local híbrida terminou na exata em 2 de 24 casos,
+   MNIST com LUT. Ideia pendente: recalibrar as curvas com os pontos reprovados na verificação antes de cada rodada
+   nova, para que a rodada seguinte não volte a propor pontos do mesmo tipo).
 
 Parte B, aba de exploração igual à da HLS:
-10. Várias heurísticas por execução ("comparar todas" = as seis híbridas) e a tabela das execuções.
+10. Várias heurísticas por execução e a tabela das execuções (feito: o worker da busca recebe o.runs, uma lista de
+    {heuristic, hybrid}, prepara a busca e calibra as curvas uma vez só para todas, e manda meta, run-start,
+    points e progress com o índice k, run-done e done; "comparar todas" no seletor roda as seis híbridas; a tabela
+    #nnRuns tem uma linha por busca com pontos, classificados, tempo, custo, economia, queda estimada, na validação
+    e no teste, as unidades de cada camada e Aplicar; clicar na linha seleciona a busca, e o detalhe, a fronteira e
+    o passo a passo passam a ser dela; ao terminar fica selecionada a de maior economia; o gráfico mostra todas as
+    buscas da execução e a que está rodando).
 11. Seletor "Fronteira de", tabela da fronteira por heurística com todos os custos, CSV e JSON, Baixar projeto.
 12. Passo a passo com seletor de heurística, blocos na ordem da HLS, bloco recolhível de explicação, controles
     guardados entre visitas, nomes Exploração e Explorar.

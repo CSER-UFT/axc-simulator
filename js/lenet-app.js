@@ -491,7 +491,9 @@ function setOverride(assign, biasDelta = null, requantM = null) {
     $('nnOverrideOff').onclick = () => { setOverride(null); render(); };
 }
 
-var searchWorker = null, lastSearch = null; // eslint-disable-line no-var
+// exec: a execução atual ({net, o, key, runs, cur, meta}), uma busca por heurística (com "comparar todas", as seis
+// híbridas); lastSearch é a busca selecionada na tabela das execuções (o detalhe, a fronteira e o passo a passo).
+var searchWorker = null, lastSearch = null, exec = null; // eslint-disable-line no-var
 const searchWorkers = () => Math.max(1, Math.min(8, (navigator.hardwareConcurrency || 2) - 1));
 function stopSearch(msg = '') {
     if (searchWorker) { searchWorker.terminate(); searchWorker = null; }
@@ -515,44 +517,101 @@ $('nnSearchBtn').onclick = () => {
     stopSearch();
     const net = nnData.net, entry = registry.models.find((m) => m.id === net.id);
     if (!net.dataset.val) { $('nnSearchStatus').textContent = t('nn.searchNoVal'); return; }
-    const hsel = $('nnSearchHeur').value, hybrid = hsel.startsWith('hybrid:');
+    const hsel = $('nnSearchHeur').value, hybrid = hsel.startsWith('hybrid:'), h = hybrid ? hsel.slice(7) : hsel;
+    const runs = h === 'all' ? HYBRID_LIST.map((x) => ({ heuristic: x, hybrid: true })) : [{ heuristic: h, hybrid }];
     const o = {
-        file: entry.file, objective: $('nnSearchObj').value, maxDrop: Math.max(0, +$('nnSearchDrop').value || 0), heuristic: hybrid ? hsel.slice(7) : hsel, hybrid, biasFix: $('nnSearchBias').value,
-        dirs: nnDirs, trees: directiveTrees(net, nnDirs), clockNs: +$('nnClock').value || 10, workers: searchWorkers(), sample: +$('nnSearchSample').value,
+        file: entry.file, objective: $('nnSearchObj').value, maxDrop: Math.max(0, +$('nnSearchDrop').value || 0), heuristic: runs[0].heuristic, hybrid: runs[0].hybrid, biasFix: $('nnSearchBias').value,
+        dirs: nnDirs, trees: directiveTrees(net, nnDirs), clockNs: +$('nnClock').value || 10, workers: searchWorkers(), sample: +$('nnSearchSample').value, runs,
     };
     $('nnSearchBtn').disabled = true;
     $('nnSearchStop').disabled = false;
     $('nnSearchResult').innerHTML = '';
+    $('nnRuns').innerHTML = '';
     $('nnSearchFrontBox').classList.add('hidden');
     stopPlay();
     $('nnStepBox').classList.add('hidden');
-    live = { o, meta: null, pts: [], key: cmpKeyOf(net.id, o) };
+    exec = { net: net.id, o, key: cmpKeyOf(net.id, o), runs: [], cur: 0, meta: null };
     lastSearch = null;
+    live = null;
     renderSearchFig();
     const t0 = Date.now();
+    const runO = (k) => ({ ...o, heuristic: runs[k].heuristic, hybrid: runs[k].hybrid });
+    const prefix = (k) => (runs.length > 1 ? `${t('nn.runOf', { k: k + 1, n: runs.length, h: hName(runO(k)).split(' · ')[0] })}: ` : '');
     searchWorker = new Worker(new URL('./nn-search-worker.js', import.meta.url), { type: 'module' });
     searchWorker.onmessage = ({ data: m }) => {
         if (m.type === 'status') $('nnSearchStatus').textContent = t(m.key);
-        else if (m.type === 'meta') { if (live) live.meta = m; }
-        else if (m.type === 'points') { if (live?.meta) { live.pts.push(...m.pts); scheduleFig(); } }
+        else if (m.type === 'meta') exec.meta = m;
+        else if (m.type === 'run-start') { live = { o: runO(m.k), meta: exec.meta, pts: [], key: exec.key, k: m.k }; renderSearchFig(); }
+        else if (m.type === 'points') { if (live?.meta && live.k === m.k) { live.pts.push(...m.pts); scheduleFig(); } }
         else if (m.type === 'progress') {
             const phase = { sens: 'nn.searchPhaseSens', comb: 'nn.searchPhaseComb', repair: 'nn.searchPhaseRepair', calib: 'nn.searchPhaseCalib', search: 'nn.searchPhaseSearch', verify: 'nn.searchPhaseVerify' }[m.phase];
-            const ph = phase ? t(phase) : m.phase, s = nf((Date.now() - t0) / 1000, 0);
-            $('nnSearchStatus').textContent = m.cost !== undefined ? t('nn.searchProgress', { phase: ph, evals: m.evals, s, cost: nf(100 * m.cost, 1) }) : t('nn.searchProgressHyb', { phase: ph, evals: nf(m.evals), s });
+            const ph = phase ? t(phase) : m.phase, sec = nf((Date.now() - t0) / 1000, 0);
+            $('nnSearchStatus').textContent = prefix(m.k) + (m.cost !== undefined ? t('nn.searchProgress', { phase: ph, evals: m.evals, s: sec, cost: nf(100 * m.cost, 1) }) : t('nn.searchProgressHyb', { phase: ph, evals: nf(m.evals), s: sec }));
         } else if (m.type === 'error') stopSearch(m.message);
-        else if (m.type === 'done') {
+        else if (m.type === 'run-done') {
             const R = m.result;
-            stopSearch(R.hybrid
-                ? t('nn.searchDoneHyb', { calib: R.calib.length, evals: nf(R.evals), verified: R.verified, s: nf(R.ms / 1000, 1), sc: nf(R.phaseMs.calib / 1000, 1), ss: nf(R.phaseMs.search / 1000, 1), sv: nf(R.phaseMs.verify / 1000, 1), workers: R.workers }) + (R.error ? ` ${R.error}` : '')
-                : t('nn.searchDone', { evals: R.evals, images: nf(R.images), s: nf(R.ms / 1000, 1), workers: R.workers }));
-            lastSearch = { ...m.result, net: net.id, o, id: ++searchId };
+            exec.runs.push({ ...R, net: net.id, o: runO(m.k), id: ++searchId });
             live = null;
-            renderSearch();
+            // A primeira busca já aparece selecionada; as outras entram na tabela e no gráfico.
+            if (exec.runs.length === 1) { exec.cur = 0; lastSearch = exec.runs[0]; renderSearch(); } else { renderRuns(); renderSearchFig(); }
+            if (runs.length === 1) {
+                $('nnSearchStatus').textContent = R.hybrid
+                    ? t('nn.searchDoneHyb', { calib: R.calib.length, evals: nf(R.evals), verified: R.verified, s: nf(R.ms / 1000, 1), sc: nf(R.phaseMs.calib / 1000, 1), ss: nf(R.phaseMs.search / 1000, 1), sv: nf(R.phaseMs.verify / 1000, 1), workers: R.workers }) + (R.error ? ` ${R.error}` : '')
+                    : t('nn.searchDone', { evals: R.evals, images: nf(R.images), s: nf(R.ms / 1000, 1), workers: R.workers });
+            }
+        } else if (m.type === 'done') {
+            const msg = $('nnSearchStatus').textContent;
+            stopSearch(runs.length > 1 ? t('nn.searchDoneMulti', { n: runs.length, s: nf((Date.now() - t0) / 1000, 1), calib: exec.runs[0]?.calib?.length ?? 0 }) : msg);
+            // Com várias buscas, fica selecionada a de maior economia.
+            if (exec.runs.length > 1) selectRun(exec.runs.reduce((b, r, k) => (r.best.saving > exec.runs[b].best.saving ? k : b), 0));
         }
     };
     searchWorker.onerror = (e) => stopSearch(e.message || t('nn.searchError'));
     searchWorker.postMessage(o);
 };
+
+/** Heurísticas da busca híbrida, na ordem da página HLS (comparar todas). */
+const HYBRID_LIST = ['local', 'efficiency', 'sequential', 'tabu', 'grasp', 'ga'];
+
+/** Seleciona a busca k da execução: o detalhe, a fronteira e o passo a passo passam a ser dela. */
+function selectRun(k) {
+    if (!exec?.runs[k]) return;
+    exec.cur = k;
+    lastSearch = exec.runs[k];
+    renderSearch();
+}
+
+/**
+ * Tabela das execuções: uma linha por busca da execução, com o custo, a economia, a queda de acurácia (estimada e
+ * medida, na validação que conta para o limite; e no teste) e as unidades de cada camada; clicar na linha seleciona a
+ * busca, e Aplicar põe as unidades dela na página.
+ */
+function renderRuns() {
+    if (!exec || !nnData || exec.net !== nnData.net.id || !exec.runs.length) { $('nnRuns').innerHTML = ''; return; }
+    const net = nnData.net, obj = exec.o.objective;
+    const unit = { area: 'µm²', luts: 'LUT', energy: 'nJ' }[obj];
+    const val = (x) => (obj === 'energy' ? x / 1e6 : x);
+    const dp = (v) => nf(100 * v, 2);
+    const head = `<tr><th class="left">${t('dse.th.heuristic')}</th><th>${t('nn.runs.points')}</th><th>${t('nn.runs.classified')}</th><th>${t('dse.th.time')}</th><th>${t(`nn.searchObj_${obj}`)} (${unit})</th><th>${t('nn.frontSaving')}</th><th>${t('nn.runs.dropEst')}</th><th>${t('nn.runs.dropVal')}</th><th>${t('nn.runs.dropTest')}</th>${net.sites.map((l) => `<th class="left mono">${esc(l.name)}</th>`).join('')}<th></th></tr>`;
+    const rows = exec.runs.map((r, k) => {
+        const accV = r.exact.accValFull !== undefined ? [r.exact.accValFull, r.best.accValFull] : [r.exact.accVal, r.best.accVal];
+        const units = r.best.assign.map((a) => `<td class="left mono">${a.mul || a.add ? esc([a.mul, a.add].filter(Boolean).map(shortUnit).join(' + ')) : '<span class="note">·</span>'}</td>`).join('');
+        return `<tr class="${k === exec.cur ? 'pick' : ''}" data-run="${k}" style="cursor:pointer"><td class="left">${esc(hName(r.o).split(' · ').slice(0, 2).join(' · '))}</td><td class="mono">${nf(r.evals)}</td><td class="mono">${r.hybrid ? `${nf(r.calib.length + r.verified)}` : nf(r.evals)}</td><td class="mono">${nf(r.ms / 1000, 1)} s</td>`
+            + `<td class="mono">${nf(val(r.best.cost), 0)}</td><td class="mono"><b>${nf(100 * r.best.saving, 1)}%</b></td><td class="mono">${r.hybrid ? nf(r.best.estDrop, 2) : '-'}</td><td class="mono">${dp(accV[0] - accV[1])}</td><td class="mono">${dp(r.exact.accTest - r.best.accTest)}</td>${units}`
+            + `<td><button type="button" class="btn outline small" data-run-apply="${k}">${t('dse.apply')}</button></td></tr>`;
+    });
+    $('nnRuns').innerHTML = head + rows.join('');
+}
+$('nnRuns').addEventListener('click', (e) => {
+    const ap = e.target.closest('[data-run-apply]');
+    if (ap) {
+        const r = exec?.runs[+ap.dataset.runApply];
+        if (r) { setOverride(r.best.assign, r.best.biasDelta, r.best.requantM); setTab('result'); render(); }
+        return;
+    }
+    const tr = e.target.closest('[data-run]');
+    if (tr) selectRun(+tr.dataset.run);
+});
 
 function renderSearch() {
     const r = lastSearch;
@@ -584,6 +643,7 @@ function renderSearch() {
     $('nnSearchApply').onclick = () => { setOverride(r.best.assign, r.best.biasDelta, r.best.requantM); setTab('result'); render(); };
     renderFront(r);
     initSteps(r);
+    renderRuns();
     renderSearchFig();
 }
 
@@ -621,18 +681,21 @@ const scheduleFig = () => { if (figPending) return; figPending = true; requestAn
 function renderSearchFig() {
     if (!nnData || !nnCompare) return; // nnCompare ainda não existe na carga da página
     const net = nnData.net;
-    const cur = live?.meta ? liveSeries() : lastSearch && lastSearch.net === net.id ? seriesOf(lastSearch) : null;
-    const curKey = live ? live.key : lastSearch && lastSearch.net === net.id ? cmpKeyOf(net.id, lastSearch.o) : null;
+    // A execução atual: as buscas já terminadas e a que está rodando (ao vivo).
+    const mine = exec && exec.net === net.id ? exec : null;
+    const curKey = mine ? mine.key : null;
     const same = nnCompare.filter((e) => e.key === curKey || !curKey && e.net === net.id), other = nnCompare.length - same.length;
     let runs = same.map((e) => e.run);
-    if (cur && !(lastSearch && !live && same.some((e) => e.id === lastSearch.id))) runs.push(same.length && !live ? { ...cur, label: `${cur.label} (${t('dse.cmpCurrent')})` } : cur);
+    const cur = (mine?.runs ?? []).filter((r) => !same.some((e) => e.id === r.id)).map(seriesOf);
+    if (live?.meta) cur.push(liveSeries());
+    for (const c of cur) runs.push(same.length && !c.label.endsWith(`(${t('nn.searchLive')})`) ? { ...c, label: `${c.label} (${t('dse.cmpCurrent')})` } : c);
     // Duas buscas com a mesma heurística: a segunda em outra cor, com a fronteira tracejada.
     const seen = new Set();
     runs = runs.map((r) => { const k = `${r.heuristic}|${r.shape ?? ''}`, dup = seen.has(k); seen.add(k); return dup ? { ...r, cls: 'h-alt' } : r; });
     $('nnCmpAdd').disabled = !lastSearch || !!live || lastSearch.net !== net.id;
     $('nnCmpClear').disabled = !nnCompare.length;
     if (!runs.length) { $('nnSearchFig').innerHTML = ''; $('nnSearchFigNote').textContent = ''; return; }
-    const ref = cur ?? runs[0];
+    const ref = cur[0] ?? runs[0];
     const obj = (live ?? lastSearch)?.o.objective ?? 'area';
     $('nnSearchFig').innerHTML = accSearchSvg(runs, {
         xLabel: t('nn.searchPlotX', { obj: t(`nn.searchObj_${obj}`) }), yLabel: t('nn.searchPlotYCmp'), accExact: ref.acc, limit: ref.acc - ref.maxDrop,

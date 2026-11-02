@@ -3,6 +3,10 @@
  * (js/axc/nnsearch.js), distribui as avaliações entre workers de avaliação (quando o navegador permite workers dentro
  * de workers) e devolve o progresso e o resultado. Com o.hybrid, a busca híbrida (curvas calibradas, heurística no
  * modelo estático e verificação dos melhores pontos); sem ele, a busca medida.
+ *
+ * o.runs: a lista de buscas da execução ({heuristic, hybrid}; sem ela, a de o.heuristic e o.hybrid). Todas usam a
+ * mesma preparação (e, na híbrida, a mesma calibração); cada uma manda run-start, os pontos ao vivo (points, com o
+ * índice k) e run-done com o resultado, e no fim vem done.
  */
 import { decodeNet, decodeTestSet } from './axc/nn.js';
 import { prepareSearch, searchNetwork, hybridSearch, poolEngine, initMessage } from './axc/nnsearch.js';
@@ -40,39 +44,43 @@ self.onmessage = async ({ data: o }) => {
                 engine = poolEngine(send);
             } catch { for (const w of subs.splice(0)) w.terminate(); engine = undefined; }
         }
-        let last = 0;
-        const progress = (p) => { const now = Date.now(); if (now - last > 200) { last = now; self.postMessage({ type: 'progress', ...p }); } };
+        const runs = o.runs?.length ? o.runs : [{ heuristic: o.heuristic, hybrid: o.hybrid }];
         // Animação ao vivo: o custo e a acurácia da exata, e depois os pontos avaliados, em lotes (a cada 150 ms).
         const exactCost = P.metric(P.cm.network(P.exact).totals);
         self.postMessage({ type: 'meta', exactCost, accVal: 1 - P.exactWrong / P.n, n: P.n, maxDrop: o.maxDrop });
-        let batch = [], lastB = 0;
-        const flush = () => { if (batch.length) { self.postMessage({ type: 'points', pts: batch }); batch = []; } lastB = Date.now(); };
-        const onPoint = (e) => {
-            if (e.phase === 'calib') return;
-            batch.push(o.hybrid
-                ? { v: e.phase === 'verify', c: e.cost, d: e.phase === 'verify' ? e.est : e.drop, m: e.phase === 'verify' ? e.drop : undefined, f: e.feasible }
-                : { c: e.cost, w: e.wrong, f: e.feasible, full: e.full });
-            if (Date.now() - lastB > 150) flush();
-        };
-        const r = o.hybrid
-            ? await hybridSearch(P, { heuristic: o.heuristic, maxDrop: o.maxDrop, progress, onPoint }, engine)
-            : await searchNetwork(P, { heuristic: o.heuristic, maxDrop: o.maxDrop, progress, onPoint }, engine);
-        flush();
-        // Custo de cada camada do ponto escolhido e da exata (para a tabela).
+        // Custo de cada camada (para a tabela do detalhe).
         const layers = (assign) => P.cm.network(assign).layers.map((l) => ({ name: l.name, site: l.site, area: l.area, luts: l.luts, energy: l.energy, cycles: l.cycles }));
-        // Na híbrida, os pontos do modelo estático são milhares: só os perto do limite vão para o gráfico; o passo a
-        // passo (calibração, iterações da heurística e verificações) vai para a animação.
-        const points = o.hybrid
-            ? r.points.filter((p) => p.drop <= Math.max(5, 4 * r.maxDrop) || p.measured).map((p) => ({ cost: p.cost, drop: p.drop, feasible: p.feasible, measured: p.measured, assign: p.assign }))
-            : r.points.map((p) => ({ cost: p.cost, wrong: p.wrong, feasible: p.feasible, full: p.full, assign: p.assign, fullOk: p.fullOk }));
-        self.postMessage({
-            type: 'done',
-            result: {
-                ...r, points, steps: o.hybrid ? r.steps : undefined,
-                cands: P.cands.map((c) => ({ mul: c.mul.map((x) => x.name), add: c.add.map((x) => x.name) })),
-                layersBest: layers(r.best.assign), layersExact: layers(P.exact), n: P.n, testN: test.n,
-            },
-        });
+        const layersExact = layers(P.exact);
+        const cands = P.cands.map((c) => ({ mul: c.mul.map((x) => x.name), add: c.add.map((x) => x.name) }));
+        for (let k = 0; k < runs.length; k++) {
+            const { heuristic, hybrid } = runs[k];
+            self.postMessage({ type: 'run-start', k, n: runs.length, heuristic, hybrid });
+            let last = 0;
+            const progress = (p) => { const now = Date.now(); if (now - last > 200) { last = now; self.postMessage({ type: 'progress', k, ...p }); } };
+            let batch = [], lastB = 0;
+            const flush = () => { if (batch.length) { self.postMessage({ type: 'points', k, pts: batch }); batch = []; } lastB = Date.now(); };
+            const onPoint = (e) => {
+                if (e.phase === 'calib') return;
+                batch.push(hybrid
+                    ? { v: e.phase === 'verify', c: e.cost, d: e.phase === 'verify' ? e.est : e.drop, m: e.phase === 'verify' ? e.drop : undefined, f: e.feasible }
+                    : { c: e.cost, w: e.wrong, f: e.feasible, full: e.full });
+                if (Date.now() - lastB > 150) flush();
+            };
+            const r = hybrid
+                ? await hybridSearch(P, { heuristic, maxDrop: o.maxDrop, progress, onPoint }, engine)
+                : await searchNetwork(P, { heuristic, maxDrop: o.maxDrop, progress, onPoint }, engine);
+            flush();
+            // Na híbrida, os pontos do modelo estático são milhares: só os perto do limite vão para o gráfico; o passo
+            // a passo (calibração, iterações da heurística e verificações) vai para a animação.
+            const points = hybrid
+                ? r.points.filter((p) => p.drop <= Math.max(5, 4 * r.maxDrop) || p.measured).map((p) => ({ cost: p.cost, drop: p.drop, feasible: p.feasible, measured: p.measured, assign: p.assign }))
+                : r.points.map((p) => ({ cost: p.cost, wrong: p.wrong, feasible: p.feasible, full: p.full, assign: p.assign, fullOk: p.fullOk }));
+            self.postMessage({
+                type: 'run-done', k,
+                result: { ...r, hybrid: !!hybrid, points, steps: hybrid ? r.steps : undefined, cands, layersBest: layers(r.best.assign), layersExact, n: P.n, testN: test.n },
+            });
+        }
+        self.postMessage({ type: 'done', n: runs.length });
     } catch (e) {
         self.postMessage({ type: 'error', message: e.message });
     } finally {
