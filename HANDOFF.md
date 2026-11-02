@@ -41,7 +41,12 @@ Parte A, correções da busca:
    grava data/nn/<base>-val5000.bin conferindo que as 100 primeiras de cada classe são as do arquivo de 1000;
    --val 5000 no nnsearch e no nnbench; os workers recebem o tamanho da validação; testado aqui na CIFAR 10 com o
    pacote npm tfjs-cifar10: LeNet 5, área, local com ganho e viés, 1000 imagens 10,3% e queda no teste 1,9 ponto,
-   5000 imagens 9,4% e teste 0,2 ponto acima da exata, cerca de 9 min com 2 workers; Tiago gera os três arquivos)
+   5000 imagens 9,4% e teste 0,2 ponto acima da exata, cerca de 9 min com 2 workers. Os três arquivos foram gerados
+   na sessão e estão no repositório, porque as bases completas não ficaram em nenhuma máquina: MNIST do espelho
+   github.com/fgnt/mnist (SHA256 dos originais, imagens de treino 440fcabf...), Fashion MNIST do repositório
+   oficial github.com/zalandoresearch/fashion-mnist (data/fashion), CIFAR 10 do pacote npm tfjs-cifar10 1.1.1; os
+   três passaram na conferência com os arquivos de 1000. SHA256: mnist-val5000 9bb467e1..., fashion-val5000
+   322f9ac2..., cifar10-val5000 1f0315e1...)
 9. Rodar a matriz de novo com as 5000 imagens (Tiago, 7 workers).
 
 Parte B, aba de exploração igual à da HLS:
