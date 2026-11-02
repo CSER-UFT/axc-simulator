@@ -306,9 +306,10 @@ export function poolEngine(send) {
     };
 }
 /** Mensagem de início de um worker de avaliação: a rede (JSON), o conjunto de validação e as unidades. */
-export function initMessage(netJson, valBuf, synth, trees, sample = 0, biasFix = 'none') {
+/** valN: o número de imagens de valBuf (o padrão é o da rede, dataset.val.n; a linha de comando aceita a validação de 5000). */
+export function initMessage(netJson, valBuf, synth, trees, sample = 0, biasFix = 'none', valN = null) {
     const used = synth.designs.filter((d) => (d.cfg.kind === 'mul' && d.cfg.width === 8) || (d.cfg.kind === 'add' && d.cfg.width === 32));
-    return { type: 'init', net: netJson, buf: valBuf, designs: used.map((d) => ({ name: d.name, cfg: d.cfg })), trees, sample, biasFix };
+    return { type: 'init', net: netJson, buf: valBuf, designs: used.map((d) => ({ name: d.name, cfg: d.cfg })), trees, sample, biasFix, valN };
 }
 /** Tratador das mensagens de um worker de avaliação (o mesmo no navegador e no Node). */
 export function evalHandler() {
@@ -316,7 +317,7 @@ export function evalHandler() {
     return (m) => {
         if (m.type === 'init') {
             const net = decodeNet(m.net), ds = net.dataset;
-            const set = stratified(decodeTestSet(m.buf, { ...ds, n: ds.val.n }), m.sample, net.classes);
+            const set = stratified(decodeTestSet(m.buf, { ...ds, n: m.valN ?? ds.val.n }), m.sample, net.classes);
             const cfgs = new Map(m.designs.map((d) => [d.name, d.cfg])), units = new Map();
             const unitOf = (name) => { if (!units.has(name)) units.set(name, buildUnit(cfgs.get(name))); return units.get(name); };
             ev = new Evaluator(net, set, m.trees, unitOf);

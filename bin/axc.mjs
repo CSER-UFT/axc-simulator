@@ -24,6 +24,8 @@
  *                             [--hybrid [--heuristic local|efficiency|sequential|tabu|grasp|ga]
  *                             [--max-verify 25] [--verify-front 8]] (busca híbrida: curvas erro → queda calibradas com
  *                             trocas isoladas, busca no modelo estático, verificação dos melhores pontos)
+ *                             [--val 5000] (a validação inteira do train.py, gravada por scripts/nn/export_val.py; o
+ *                             padrão é o subconjunto de 1000 da página)
  *                             [--bias-fix none|mean|median|gmean|trim|gain|affine] (correção do viés de cada canal pela
  *                             medida do erro da pré-ativação: média, mediana, média geométrica do módulo com o sinal
  *                             predominante ou média aparada; gain: ganho na reescala de cada canal; affine: ganho e
@@ -261,8 +263,14 @@ switch (cmd) {
         const netJson = JSON.parse(readFileSync(join(ROOT, entry.file), 'utf8'));
         const net = decodeNet(netJson), ds = net.dataset;
         if (!ds.val) die(`${net.id} não tem conjunto de validação`);
-        const valBuf = readFileSync(join(ROOT, ds.val.file));
-        const val = decodeTestSet(valBuf, { ...ds, n: ds.val.n }), test = decodeTestSet(readFileSync(join(ROOT, ds.file)), ds);
+        // --val 5000: a validação inteira que o train.py separa (scripts/nn/export_val.py grava <base>-val5000.bin);
+        // o padrão é o subconjunto de 1000 da página.
+        const valN = +opt('--val', ds.val.n);
+        const valFile = valN === ds.val.n ? ds.val.file : ds.val.file.replace(/val\d+\.bin$/, `val${valN}.bin`);
+        if (!existsSync(join(ROOT, valFile))) die(`não existe ${valFile}: rode python3 scripts/nn/export_val.py ${ds.id} <pasta da base>`);
+        const valBuf = readFileSync(join(ROOT, valFile));
+        if (valBuf.length !== valN * (1 + ds.shape.reduce((a, b) => a * b, 1))) die(`${valFile} não tem ${valN} imagens`);
+        const val = decodeTestSet(valBuf, { ...ds, n: valN }), test = decodeTestSet(readFileSync(join(ROOT, ds.file)), ds);
         const hybrid = flag('--hybrid');
         const objective = opt('--objective', 'area'), heuristic = opt('--heuristic', hybrid ? 'local' : 'sensitivity');
         if (!SEARCH_OBJECTIVES.includes(objective)) die(`objetivo: ${SEARCH_OBJECTIVES.join(', ')}`);
@@ -280,7 +288,7 @@ switch (cmd) {
         const nw = Math.max(1, +opt('--workers', Math.max(1, availableParallelism() - 1)));
         let engine, workers = [];
         if (nw > 1) {
-            const init = initMessage(netJson, valBuf, synthJ, P.trees, +opt('--sample', 0), opt('--bias-fix', 'none'));
+            const init = initMessage(netJson, valBuf, synthJ, P.trees, +opt('--sample', 0), opt('--bias-fix', 'none'), valN);
             workers = Array.from({ length: nw }, () => new Worker(new URL('./nn-eval-worker.mjs', import.meta.url)));
             const send = workers.map((w) => {
                 let next = 0;

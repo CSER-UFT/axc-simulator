@@ -232,3 +232,19 @@ for (const fix of ['mean', 'affine']) test(`correção ${fix}: a busca classific
     assert.deepEqual(r2.best.assign, r.best.assign);
     assert.equal(r2.best.wrongVal, r.best.wrongVal);
 });
+
+test('workers: o tamanho da validação vem na mensagem de início (a validação de 5000 da linha de comando)', async () => {
+    // Um conjunto de 600 imagens (o de 1000 cortado), com o tamanho na mensagem; sem ele, o worker leria 1000.
+    const n = 600, size = val.size, buf = new Uint8Array(n + n * size);
+    buf.set(val.labels.subarray(0, n), 0);
+    buf.set(val.images.subarray(0, n * size), n);
+    const set = decodeTestSet(buf, { ...ds, n });
+    const Pn = prepareSearch(net, { val: set, synth, cells, fpga, objective: 'area', maxCands: 4 });
+    const init = initMessage(netJson, buf, synth, Pn.trees, 0, 'none', n);
+    const h = evalHandler();
+    h(init);
+    const a = Pn.exact.map((x, i) => (i === 3 ? { mul: Pn.cands[3].mul.at(-1).name, add: null } : { ...x }));
+    const w = h({ type: 'run', assign: a, base: Pn.exact, maxWrong: -1 });
+    assert.equal(w.seen, n);
+    assert.equal(w.wrong, Pn.val.run(a).wrong);
+});

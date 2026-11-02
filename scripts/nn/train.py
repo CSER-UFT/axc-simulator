@@ -351,6 +351,14 @@ def b64(a, dtype):
     return base64.b64encode(np.ascontiguousarray(a, dtype=dtype).tobytes()).decode()
 
 
+def split_validation(tr_y, seed, per_class=500):
+    """Índices (em ordem) das imagens de treino que ficam de fora do treino e servem de validação: per_class de cada
+    classe, sorteadas com a semente. Depende só da semente e dos rótulos de treino (scripts/nn/export_val.py refaz a
+    mesma separação sem treinar)."""
+    rng = np.random.default_rng(seed)
+    return np.sort(np.concatenate([rng.choice(np.flatnonzero(tr_y == c), per_class, replace=False) for c in range(int(tr_y.max()) + 1)]))
+
+
 def write_subset(path, x, y):
     with open(path, 'wb') as f:
         f.write(y.astype(np.uint8).tobytes())
@@ -378,8 +386,7 @@ def main():
     print(f'{ds["name"]}: {len(tr_x)} de treino, {len(te_x)} de teste, forma {shape}')
 
     # Validação separada do treino: 500 de cada classe, sorteadas com a semente.
-    rng = np.random.default_rng(args.seed)
-    val_idx = np.sort(np.concatenate([rng.choice(np.flatnonzero(tr_y == c), 500, replace=False) for c in range(10)]))
+    val_idx = split_validation(tr_y, args.seed)
     mask = np.ones(len(tr_x), bool)
     mask[val_idx] = False
     fit_x, fit_y, va_x, va_y = tr_x[mask], tr_y[mask], tr_x[val_idx], tr_y[val_idx]

@@ -37,7 +37,11 @@ Parte A, correções da busca:
    Q32 de cada canal; results/nn-search/etapa7 e ANALISE.md: affine, ganho e viés por mínimos quadrados, é a melhor,
    12,5% contra 10,3% sem correção, melhor em 10 de 12 casos e com a menor queda no teste; as correções só de viés
    ganham 1,6 a 1,8 ponto mas aumentam a queda no teste; pendente decidir o padrão da página).
-8. Exportar as 5000 imagens de validação do train.py (script; Tiago roda, precisa das bases).
+8. Exportar as 5000 imagens de validação do train.py (feito: split_validation no train.py, scripts/nn/export_val.py
+   grava data/nn/<base>-val5000.bin conferindo que as 100 primeiras de cada classe são as do arquivo de 1000;
+   --val 5000 no nnsearch e no nnbench; os workers recebem o tamanho da validação; testado aqui na CIFAR 10 com o
+   pacote npm tfjs-cifar10: LeNet 5, área, local com ganho e viés, 1000 imagens 10,3% e queda no teste 1,9 ponto,
+   5000 imagens 9,4% e teste 0,2 ponto acima da exata, cerca de 9 min com 2 workers; Tiago gera os três arquivos)
 9. Rodar a matriz de novo com as 5000 imagens (Tiago, 7 workers).
 
 Parte B, aba de exploração igual à da HLS:
