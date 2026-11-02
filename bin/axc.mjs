@@ -26,7 +26,7 @@
  *                             trocas isoladas, busca no modelo estático, verificação dos melhores pontos)
  *                             [--val 5000] (a validação inteira do train.py, gravada por scripts/nn/export_val.py; o
  *                             padrão é o subconjunto de 1000 da página)
- *                             [--bias-fix none|mean|median|gmean|trim|gain|affine] (correção do viés de cada canal pela
+ *                             [--bias-fix affine|none|mean|median|gmean|trim|gain] (padrão affine; correção do viés de cada canal pela
  *                             medida do erro da pré-ativação: média, mediana, média geométrica do módulo com o sinal
  *                             predominante ou média aparada; gain: ganho na reescala de cada canal; affine: ganho e
  *                             viés por mínimos quadrados; vai no resultado, e o nnexport --search aplica)
@@ -282,13 +282,13 @@ switch (cmd) {
         const t0 = Date.now();
         let P;
         try {
-            P = prepareSearch(net, { val, test, synth: synthJ, cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')), fpga: fpgaJ, objective, dirs, clockNs: +opt('--clock', 10), maxCands: +opt('--cands', 12), sample: +opt('--sample', 0), biasFix: opt('--bias-fix', 'none') });
+            P = prepareSearch(net, { val, test, synth: synthJ, cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')), fpga: fpgaJ, objective, dirs, clockNs: +opt('--clock', 10), maxCands: +opt('--cands', 12), sample: +opt('--sample', 0), biasFix: opt('--bias-fix', 'affine') });
         } catch (e) { die(e.message); }
         const prepMs = Date.now() - t0;
         const nw = Math.max(1, +opt('--workers', Math.max(1, availableParallelism() - 1)));
         let engine, workers = [];
         if (nw > 1) {
-            const init = initMessage(netJson, valBuf, synthJ, P.trees, +opt('--sample', 0), opt('--bias-fix', 'none'), valN);
+            const init = initMessage(netJson, valBuf, synthJ, P.trees, +opt('--sample', 0), opt('--bias-fix', 'affine'), valN);
             workers = Array.from({ length: nw }, () => new Worker(new URL('./nn-eval-worker.mjs', import.meta.url)));
             const send = workers.map((w) => {
                 let next = 0;
@@ -316,7 +316,7 @@ switch (cmd) {
         const res = { model: net.id, objective, heuristic, maxDrop: r.maxDrop, dirs, prepMs, ...r, points: flag('--points') ? r.points : r.points.length, steps: flag('--points') ? r.steps : undefined };
         const ms = (x) => `${(x / 1000).toFixed(1)} s`;
         out(res, () => [
-            `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}${r.biasFix && r.biasFix !== 'none' ? `, correção do viés pela ${{ mean: 'média', median: 'mediana', gmean: 'média geométrica', trim: 'média aparada', gain: 'correção de ganho', affine: 'correção de ganho e viés' }[r.biasFix]}` : ''}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n}${P.fullVal ? `, amostra de ${P.n} das ${P.valN}` : ''})`,
+            `${net.name} (${ds.name}), ${heuristic}, objetivo ${objective}${r.biasFix && r.biasFix !== 'none' ? `, correção: ${{ mean: 'viés pela média', median: 'viés pela mediana', gmean: 'viés pela média geométrica', trim: 'viés pela média aparada', gain: 'ganho', affine: 'ganho e viés' }[r.biasFix]}` : ''}, queda máxima ${r.maxDrop} ponto(s) na validação (até ${r.maxWrong} erradas em ${P.n}${P.fullVal ? `, amostra de ${P.n} das ${P.valN}` : ''})`,
             `candidatas por camada: ${P.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} ×, ${c.add.length} +`).join('; ')}`,
             r.hybrid
                 ? `híbrida: ${r.calib.length} trocas isoladas na calibração (${ms(r.phaseMs.calib)}), ${r.evals} pontos no modelo estático (${ms(r.phaseMs.search)}), ${r.verified} verificados em ${r.rounds} rodada(s) (${ms(r.phaseMs.verify)}${r.repaired ? `, ${r.repaired} reprovados na validação inteira` : ''}); ${ms(r.ms)} com ${r.workers} worker(s); preparação ${ms(prepMs)}${r.error ? `; ${r.error}` : ''}`

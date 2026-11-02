@@ -5,7 +5,7 @@
  *
  *   node scripts/nnbench.mjs [--models minilenet-mnist,lenet5-cifar10] [--objectives area,luts] [--samples 250,0]
  *        [--heuristics sensitivity,sequential,h:local,h:sequential,h:efficiency,h:ga] [--drops 1] [--workers N]
- *        [--biasfix none,mean,median,gmean,trim,gain,affine] [--val 5000]
+ *        [--biasfix affine,none,mean,median,gmean,trim,gain] (padrão affine) [--val 5000]
  *        [--id nome] [--note "texto"] [--quick]
  *   node scripts/nnbench.mjs --report <id>   (refaz o LEIAME.md de results/nn-search/<id> a partir do casos.json,
  *                                             mantendo a linha de comando e a nota do relatório anterior)
@@ -37,7 +37,7 @@ const objectives = quick ? ['area'] : list('--objectives', 'area,luts');
 const samples = (quick ? ['250'] : list('--samples', '250,0')).map(Number);
 const heuristics = quick ? ['sensitivity', 'h:local'] : list('--heuristics', 'sensitivity,sequential,h:local,h:sequential');
 const drops = list('--drops', '1').map(Number);
-const fixes = list('--biasfix', 'none');
+const fixes = list('--biasfix', 'affine');
 // --val 5000: a validação inteira (scripts/nn/export_val.py); a amostra 0 passa a ser as 5000.
 const valN = opt('--val', null);
 const workers = opt('--workers', null);
@@ -68,7 +68,7 @@ if (!report) for (const model of models) for (const objective of objectives) for
     const hybrid = h.startsWith('h:');
     const a = ['bin/axc.mjs', 'nnsearch', '--json', '--points', '--model', model, '--objective', objective, '--sample', String(sample), '--max-drop', String(maxDrop), '--heuristic', hybrid ? h.slice(2) : h];
     if (hybrid) a.push('--hybrid');
-    if (biasFix !== 'none') a.push('--bias-fix', biasFix);
+    a.push('--bias-fix', biasFix);
     if (valN) a.push('--val', valN);
     if (workers) a.push('--workers', workers);
     process.stderr.write(`[${k}/${total}] ${model} ${objective} amostra ${sample || 'todas'} ${h} ${maxDrop} p.p. viés ${biasFix}\n`);
