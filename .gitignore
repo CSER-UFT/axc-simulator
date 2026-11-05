@@ -1,3 +1,6 @@
 build/
 node_modules/
 __pycache__/
+
+# Ponto de retomada do treino da ResNet 8 (scripts/nn/train.py resnet8 --resume)
+data/nn/*.ckpt

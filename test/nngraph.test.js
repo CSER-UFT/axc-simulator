@@ -3,7 +3,8 @@
 // com laços diretos e BigInt na reescala, numa ResNet pequena com pesos sorteados.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, inferFrom, inputActivations, mulQ32Sum, withBiases, infer } from '../js/axc/nn.js';
 import { buildUnit } from '../js/axc/units.js';
 import { Evaluator, makeBiasFix } from '../js/axc/nnsearch.js';
@@ -304,4 +305,50 @@ test('custo da rede com ramos: kernels da borda, da soma e da média; reescalas 
 test('exportação para o Vitis: erro claro nas redes com ramos (etapa 23)', async () => {
     const { networkProject } = await import('../js/axc/nnexport.js');
     assert.throws(() => networkProject(decodeNet(tinyResnet()), {}), /ainda não aceita redes com ramos/);
+});
+
+// Etapa 18: a inferência inteira do Python (scripts/nn/train.py, int_forward_graph) e a do avaliador dão as mesmas
+// saídas, bit a bit. Com a ResNet 8 de pesos sorteados (sempre) e com a treinada, quando data/nn/resnet8-cifar10.json
+// existir (as 1000 imagens do subconjunto de teste, contra expected e expectedOut gravados pelo treino).
+test('ResNet 8: inferência inteira do Python igual à do avaliador (pesos sorteados)', async (t) => {
+    const { spawnSync } = await import('node:child_process');
+    const { mkdtempSync, writeFileSync, rmSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const { resnet8Json } = await import('./fixtures/resnet8.js');
+    const probe = spawnSync('python3', ['-c', 'import numpy'], { encoding: 'utf8' });
+    if (probe.status !== 0) { t.skip('sem python3 com numpy'); return; }
+    const dir = mkdtempSync(join(tmpdir(), 'axc-r8-'));
+    try {
+        for (const [seed, f] of [[1, 16], [4, 8]]) {
+            const json = resnet8Json(seed, f), net = decodeNet(json), n = 12;
+            const set = randomSet(n, json.dataset.shape, 10, seed);
+            writeFileSync(join(dir, 'net.json'), JSON.stringify(json));
+            writeFileSync(join(dir, 'set.bin'), Buffer.concat([Buffer.from(set.labels), Buffer.from(set.images)]));
+            const p = spawnSync('python3', [fileURLToPath(new URL('scripts/nn/intcheck.py', R)), join(dir, 'net.json'), join(dir, 'set.bin'), '--n', String(n)], { encoding: 'utf8', maxBuffer: 1 << 26 });
+            assert.equal(p.status, 0, p.stderr);
+            const py = JSON.parse(p.stdout);
+            const T = net.sites.map(() => productTable(null));
+            for (let k = 0; k < n; k++) {
+                const r = infer(net, set.images.subarray(k * set.size, (k + 1) * set.size), T, []);
+                assert.deepEqual(Array.from(r.out), py.outs[k], `semente ${seed}, ${f} filtros, imagem ${k}`);
+                assert.equal(r.pred, py.preds[k]);
+            }
+        }
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('ResNet 8 treinada: classes e saídas do avaliador iguais às do treino (se data/nn/resnet8-cifar10.json existir)', (t) => {
+    const url = new URL('data/nn/resnet8-cifar10.json', R);
+    if (!existsSync(url)) { t.skip('ResNet 8 ainda não treinada (etapa 17)'); return; }
+    const json = JSON.parse(readFileSync(url, 'utf8')), net = decodeNet(json), ds = json.dataset;
+    const set = decodeTestSet(readFileSync(new URL(ds.file, R)), ds);
+    const T = net.sites.map(() => productTable(null));
+    const outs = Buffer.from(json.expectedOut, 'base64');
+    assert.equal(outs.length, set.n * net.classes);
+    for (let k = 0; k < set.n; k++) {
+        const r = infer(net, set.images.subarray(k * set.size, (k + 1) * set.size), T, []);
+        assert.deepEqual(Array.from(r.out), Array.from(outs.subarray(k * net.classes, (k + 1) * net.classes)), `imagem ${k}`);
+        assert.equal(r.pred, net.expected[k], `imagem ${k}`);
+    }
 });

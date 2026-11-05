@@ -137,6 +137,25 @@ cálculo precisa ir para um worker (etapa 22 ou 25).
 
 A exportação para o Vitis (`networkProject`) ainda recusa as redes com ramos (etapa 23).
 
+## Treino e conferência bit a bit (etapas 17 e 18)
+
+`scripts/nn/train.py resnet8 cifar10 <pasta>` treina a rede (classe `ResNet8`, com a borda do Keras e o BN de
+momento 0,99 e epsilon 1e-3, como no Keras) com a receita da referência, na GPU se houver, e grava um ponto de
+retomada a cada época (`data/nn/resnet8-cifar10.ckpt`; `--resume` continua dali). O aumento de dados (rotação,
+deslocamento e espelho) é feito na GPU com `affine_grid` e `grid_sample`, com a borda repetida, como o `fill_mode`
+padrão do Keras. A melhor época na validação é a que fica.
+
+A quantização (`quantize_resnet`) dobra o BN nos pesos, calibra a escala de cada tensor de 8 bits em 3000 imagens de
+treino e monta a soma residual: o m de cada ramo é a escala do acumulador (ou a da ativação, no atalho identidade)
+sobre a da saída, e o expoente e fica em 0, a não ser que algum M passe de 1. A inferência inteira em Python
+(`int_forward_graph`) é a mesma conta de `js/axc/nn.js`; o JSON leva as classes (`expected`) e as saídas inteiras
+(`expectedOut`) das 1000 imagens do subconjunto de teste.
+
+A conferência (test/nngraph.test.js) tem duas partes: a ResNet 8 de pesos sorteados passa pela inferência do Python
+(`scripts/nn/intcheck.py`, que lê qualquer rede do formato e não precisa do PyTorch) e pela do avaliador, saída a
+saída; e, quando `data/nn/resnet8-cifar10.json` existir, as 1000 classes e as 10 000 saídas do avaliador são
+comparadas com as do treino.
+
 ## Custo da avaliação bit exata
 
 Medido na etapa 16 com a ResNet 8 inteira e pesos sorteados (`js/axc/nn.js`, uma thread): 39 ms por imagem com as

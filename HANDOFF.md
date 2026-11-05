@@ -99,8 +99,14 @@ Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
     ResNet 8 com pesos sorteados: 39 ms por imagem exata e 45 ms com unidades aproximadas numa thread. Pendente
     para a etapa 22: memória dos avaliadores com 5000 imagens, 220 MB cada).
 17. Treino no train.py (normalização em lote incorporada, aumento de dados, quantização da soma residual, 5000
-    imagens de validação); Tiago treina na GPU.
-18. Conferência bit a bit Python e JavaScript.
+    imagens de validação); Tiago treina na GPU (código feito: train.py resnet8 cifar10 com a receita da referência,
+    aumento de dados na GPU, ponto de retomada por época e --resume, BN dobrado, quantize_resnet e
+    int_forward_graph; testado aqui na CPU com 3000 imagens e 2 épocas, 5 s por época, int8 a 0,5 ponto do float;
+    compatível com o Python 3.8 do Tiago. Falta o treino de verdade: GTX 1650, 500 épocas).
+18. Conferência bit a bit Python e JavaScript (feito: scripts/nn/intcheck.py roda a inferência inteira do Python em
+    qualquer rede do formato, sem PyTorch; test/nngraph.test.js compara com o avaliador a ResNet 8 de pesos
+    sorteados, saída a saída, e, quando data/nn/resnet8-cifar10.json existir, as 1000 classes e as 10 000 saídas
+    gravadas pelo treino em expected e expectedOut; conferido com a rede de 2 épocas).
 19. Diagrama da arquitetura com ramos (feito: caminho principal na linha, soma residual num círculo ⊕, atalhos em
     arcos com a caixa da convolução 1 × 1; o das redes de hoje continua igual, byte a byte; ResNet 8 com pesos
     sorteados em test/fixtures/resnet8.js).
