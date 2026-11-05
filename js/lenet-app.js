@@ -130,7 +130,7 @@ async function loadNN(id) {
     if (!testCache.has(ds.file)) testCache.set(ds.file, getBin(ds.file).then((b) => decodeTestSet(b, ds)));
     const changed = nnData?.net.id !== net.id;
     nnData = { net, test: await testCache.get(ds.file) };
-    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); $('nnSearchResult').innerHTML = ''; $('nnSearchStatus').textContent = ''; $('nnSearchFrontBox').classList.add('hidden'); stopPlay(); $('nnStepBox').classList.add('hidden'); renderSearchFig(); }
+    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); clearSearchView(); $('nnSearchStatus').textContent = ''; renderSearchFig(); }
     return nnData;
 }
 
@@ -510,6 +510,12 @@ function sampleWarn() {
     const k = Math.floor((Math.max(0, +$('nnSearchDrop').value || 0) * n) / 100 + 1e-9);
     $('nnSearchWarn').textContent = k < 5 ? t('nn.searchFewImages', { k, n }) : '';
 }
+// Os controles da exploração ficam guardados entre visitas (como na página da HLS).
+for (const id of ['nnSearchObj', 'nnSearchDrop', 'nnSearchSample', 'nnSearchBias', 'nnSearchHeur', 'nnStSpeed']) {
+    const el = $(id), v = store.get(`nn.${id}`);
+    if (v !== null && (el.tagName !== 'SELECT' || [...el.options].some((o) => o.value === v))) el.value = v;
+    el.addEventListener('change', () => store.set(`nn.${id}`, el.value));
+}
 for (const id of ['nnSearchSample', 'nnSearchDrop']) $(id).addEventListener('input', sampleWarn);
 sampleWarn();
 $('nnSearchBtn').onclick = () => {
@@ -525,11 +531,7 @@ $('nnSearchBtn').onclick = () => {
     };
     $('nnSearchBtn').disabled = true;
     $('nnSearchStop').disabled = false;
-    $('nnSearchResult').innerHTML = '';
-    $('nnRuns').innerHTML = '';
-    $('nnSearchFrontBox').classList.add('hidden');
-    stopPlay();
-    $('nnStepBox').classList.add('hidden');
+    clearSearchView();
     exec = { net: net.id, o, key: cmpKeyOf(net.id, o), runs: [], cur: 0, meta: null };
     lastSearch = null;
     live = null;
@@ -553,7 +555,7 @@ $('nnSearchBtn').onclick = () => {
             exec.runs.push({ ...R, net: net.id, o: runO(m.k), id: ++searchId });
             live = null;
             // A primeira busca já aparece selecionada; as outras entram na tabela e no gráfico.
-            if (exec.runs.length === 1) { exec.cur = 0; lastSearch = exec.runs[0]; renderSearch(); } else { renderRuns(); renderSearchFig(); }
+            if (exec.runs.length === 1) selectRun(0); else { renderRuns(); fillRunSels(); renderSearchFig(); }
             if (runs.length === 1) {
                 $('nnSearchStatus').textContent = R.hybrid
                     ? t('nn.searchDoneHyb', { calib: R.calib.length, evals: nf(R.evals), verified: R.verified, s: nf(R.ms / 1000, 1), sc: nf(R.phaseMs.calib / 1000, 1), ss: nf(R.phaseMs.search / 1000, 1), sv: nf(R.phaseMs.verify / 1000, 1), workers: R.workers }) + (R.error ? ` ${R.error}` : '')
@@ -578,7 +580,54 @@ function selectRun(k) {
     if (!exec?.runs[k]) return;
     exec.cur = k;
     lastSearch = exec.runs[k];
+    fillRunSels();
+    $('nnFrontSel').value = String(k);
+    if (exec.runs[k].hybrid) $('nnStepSel').value = String(k);
     renderSearch();
+}
+/** Limpa a tabela das execuções, o passo a passo, a fronteira e o detalhe (nova busca ou outra rede). */
+function clearSearchView() {
+    $('nnRuns').innerHTML = '';
+    $('nnSearchResult').innerHTML = '';
+    $('nnDetailBox').classList.add('hidden');
+    $('nnSearchFrontBox').classList.add('hidden');
+    $('nnFrontSel').innerHTML = '';
+    $('nnStepSel').innerHTML = '';
+    stopPlay();
+    stSearch = null;
+    $('nnStepBox').classList.add('hidden');
+}
+/** Nome curto de uma busca da execução (heurística e tipo). */
+const runName = (r) => hName(r.o).split(' · ').slice(0, 2).join(' · ');
+/**
+ * Seletores "Fronteira de" (todas as buscas da execução) e "Heurística" do passo a passo (só as híbridas, que têm o
+ * passo a passo), mantendo a escolha de cada um.
+ */
+function fillRunSels() {
+    if (!exec) return;
+    const fill = (sel, ks) => {
+        const prev = sel.value;
+        sel.innerHTML = ks.map((k) => `<option value="${k}">${esc(runName(exec.runs[k]))}</option>`).join('');
+        if (prev !== '' && ks.includes(+prev)) sel.value = prev;
+    };
+    const all = exec.runs.map((_, k) => k);
+    fill($('nnFrontSel'), all);
+    fill($('nnStepSel'), all.filter((k) => exec.runs[k].hybrid && exec.runs[k].steps?.length));
+    $('nnSearchFrontBox').classList.toggle('hidden', !all.length);
+}
+const frontRun = () => (exec && nnData && exec.net === nnData.net.id ? exec.runs[+$('nnFrontSel').value || 0] ?? null : null);
+const stepRun = () => (exec && $('nnStepSel').value !== '' ? exec.runs[+$('nnStepSel').value] ?? null : null);
+$('nnFrontSel').addEventListener('change', () => { const r = frontRun(); if (r) renderFront(r); renderSearchFig(); });
+$('nnStepSel').addEventListener('change', () => initSteps(stepRun()));
+/**
+ * Baixar projeto: põe as unidades do ponto na página (como Aplicar), vai para a aba Custo, onde fica a exportação, e
+ * gera o projeto para o Vitis HLS e o Vivado com elas.
+ */
+function downloadPoint(p) {
+    setOverride(p.assign, p.biasDelta ?? null, p.requantM ?? null);
+    setTab('cost');
+    render();
+    $('nnExportBtn').click();
 }
 
 /**
@@ -596,13 +645,15 @@ function renderRuns() {
     const rows = exec.runs.map((r, k) => {
         const accV = r.exact.accValFull !== undefined ? [r.exact.accValFull, r.best.accValFull] : [r.exact.accVal, r.best.accVal];
         const units = r.best.assign.map((a) => `<td class="left mono">${a.mul || a.add ? esc([a.mul, a.add].filter(Boolean).map(shortUnit).join(' + ')) : '<span class="note">·</span>'}</td>`).join('');
-        return `<tr class="${k === exec.cur ? 'pick' : ''}" data-run="${k}" style="cursor:pointer"><td class="left">${esc(hName(r.o).split(' · ').slice(0, 2).join(' · '))}</td><td class="mono">${nf(r.evals)}</td><td class="mono">${r.hybrid ? `${nf(r.calib.length + r.verified)}` : nf(r.evals)}</td><td class="mono">${nf(r.ms / 1000, 1)} s</td>`
+        return `<tr class="${k === exec.cur ? 'pick' : ''}" data-run="${k}" style="cursor:pointer"><td class="left">${esc(runName(r))}</td><td class="mono">${nf(r.evals)}</td><td class="mono">${r.hybrid ? `${nf(r.calib.length + r.verified)}` : nf(r.evals)}</td><td class="mono">${nf(r.ms / 1000, 1)} s</td>`
             + `<td class="mono">${nf(val(r.best.cost), 0)}</td><td class="mono"><b>${nf(100 * r.best.saving, 1)}%</b></td><td class="mono">${r.hybrid ? nf(r.best.estDrop, 2) : '-'}</td><td class="mono">${dp(accV[0] - accV[1])}</td><td class="mono">${dp(r.exact.accTest - r.best.accTest)}</td>${units}`
-            + `<td><button type="button" class="btn outline small" data-run-apply="${k}">${t('dse.apply')}</button></td></tr>`;
+            + `<td><button type="button" class="btn outline small" data-run-apply="${k}">${t('dse.apply')}</button> <button type="button" class="btn outline small" data-run-dl="${k}" title="${esc(t('nn.downloadHelp'))}">${t('dse.download')}</button></td></tr>`;
     });
     $('nnRuns').innerHTML = head + rows.join('');
 }
 $('nnRuns').addEventListener('click', (e) => {
+    const dl = e.target.closest('[data-run-dl]');
+    if (dl) { const r = exec?.runs[+dl.dataset.runDl]; if (r) downloadPoint(r.best); return; }
     const ap = e.target.closest('[data-run-apply]');
     if (ap) {
         const r = exec?.runs[+ap.dataset.runApply];
@@ -640,9 +691,13 @@ function renderSearch() {
     const cands = r.cands.map((c, i) => `${net.sites[i].name} ${c.mul.length} × ${c.add.length}`).join(', ');
     h += `<p class="note">${r.hybrid ? t('nn.searchNoteHyb', { cands, calib: r.calib.length, n: r.n, verified: r.verified }) : t('nn.searchNote', { cands, maxWrong: r.maxWrong, n: r.n })}</p>`;
     $('nnSearchResult').innerHTML = `${left}${h}`;
+    $('nnDetailTitle').textContent = t('nn.detailOf', { h: runName(r) });
+    $('nnDetailBox').classList.remove('hidden');
     $('nnSearchApply').onclick = () => { setOverride(r.best.assign, r.best.biasDelta, r.best.requantM); setTab('result'); render(); };
-    renderFront(r);
-    initSteps(r);
+    fillRunSels();
+    const fr = frontRun();
+    if (fr) renderFront(fr);
+    initSteps(stepRun());
     renderRuns();
     renderSearchFig();
 }
@@ -692,7 +747,7 @@ function renderSearchFig() {
     // Duas buscas com a mesma heurística: a segunda em outra cor, com a fronteira tracejada.
     const seen = new Set();
     runs = runs.map((r) => { const k = `${r.heuristic}|${r.shape ?? ''}`, dup = seen.has(k); seen.add(k); return dup ? { ...r, cls: 'h-alt' } : r; });
-    $('nnCmpAdd').disabled = !lastSearch || !!live || lastSearch.net !== net.id;
+    $('nnCmpAdd').disabled = !frontRun() || !!live;
     $('nnCmpClear').disabled = !nnCompare.length;
     if (!runs.length) { $('nnSearchFig').innerHTML = ''; $('nnSearchFigNote').textContent = ''; return; }
     const ref = cur[0] ?? runs[0];
@@ -705,7 +760,7 @@ function renderSearchFig() {
     $('nnSearchFigNote').textContent = t('nn.searchFigNote') + (nnCompare.length ? ` ${t('nn.cmpNote', { n: same.length })}${other ? ` ${t('nn.cmpOther', { n: other })}` : ''}` : '');
 }
 $('nnCmpAdd').addEventListener('click', () => {
-    const r = lastSearch;
+    const r = frontRun();
     if (!r || live || nnCompare.some((e) => e.id === r.id)) return;
     nnCompare.push({ id: r.id, net: r.net, key: cmpKeyOf(r.net, r.o), run: seriesOf(r) });
     renderSearchFig();
@@ -719,7 +774,7 @@ var stTimer = null, stSearch = null; // eslint-disable-line no-var
 function stopPlay() { if (stTimer) { clearInterval(stTimer); stTimer = null; } $('nnStPlay').textContent = '▶'; }
 function initSteps(r) {
     stopPlay();
-    stSearch = r.hybrid && r.steps?.length ? r : null;
+    stSearch = r?.hybrid && r.steps?.length ? r : null;
     $('nnStepBox').classList.toggle('hidden', !stSearch);
     if (!stSearch) return;
     $('nnStSlider').max = String(r.steps.length - 1);
@@ -791,14 +846,13 @@ const shortUnit = (name) => name.replace(/^(MUL8|ADD32) /, '');
 const unitsText = (net, assign) => assign.map((a, i) => (a.mul || a.add ? `${net.sites[i].name}: ${[a.mul, a.add].filter(Boolean).map(dn).join(' + ')}` : '')).filter(Boolean).join('; ');
 
 /**
- * Fronteira de Pareto da busca: custo, queda de acurácia (na híbrida, a estimada e a medida, quando o ponto foi
- * classificado) e unidades por camada; Aplicar põe as unidades do ponto na página. Na híbrida, só os pontos até o
- * dobro do limite (os de queda estimada quase zero e custo perto da exata não ajudam a decidir).
+ * Fronteira de Pareto de uma busca da execução (seletor "Fronteira de"): a economia no objetivo, todos os custos (área,
+ * LUT e energia), a queda de acurácia (na híbrida, a estimada e a medida, quando o ponto foi classificado) e as
+ * unidades por camada; Aplicar põe as unidades do ponto na página e Baixar gera o projeto com elas. Na híbrida, só os
+ * pontos até o dobro do limite (os de queda estimada quase zero e custo perto da exata não ajudam a decidir).
  */
 function renderFront(r) {
     const net = nnData.net, obj = r.o.objective;
-    const unit = { area: 'µm²', luts: 'LUT', energy: 'nJ' }[obj];
-    const val = (x) => (obj === 'energy' ? x / 1e6 : x);
     const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
     const rows = (r.hybrid ? r.front.filter((p) => p.cost < r.exact.cost && p.drop <= 2 * r.maxDrop) : r.front.filter((p) => p.cost < r.exact.cost)).map((p) => ({
         p, est: r.hybrid ? p.drop : null,
@@ -806,16 +860,23 @@ function renderFront(r) {
         over: r.hybrid && p.measured && !p.measured.ok,
     }));
     lastFront = rows.map((x) => ({ assign: x.p.assign, biasDelta: x.p.biasDelta ?? null, requantM: x.p.requantM ?? null }));
-    if (!rows.length) { $('nnSearchFrontBox').classList.add('hidden'); return; }
-    const dp = (v) => `${nf(v, 2)}`;
-    $('nnSearchFrontNote').textContent = t(r.hybrid ? 'nn.frontNoteHyb' : 'nn.frontNote', { n: rows.length, lim: nf(r.maxDrop, 2) });
-    $('nnSearchFront').innerHTML = `<tr><th>${t(`nn.searchObj_${obj}`)} (${unit})</th><th>${t('nn.frontSaving')}</th>${r.hybrid ? `<th>${t('nn.frontEst')}</th>` : ''}<th>${t('nn.frontMeas')}</th><th></th>${net.sites.map((l) => `<th class="left mono">${esc(l.name)}</th>`).join('')}<th></th></tr>`
-        + rows.map((x, i) => `<tr class="${same(x.p.assign, r.best.assign) ? 'best' : ''}"><td class="mono">${nf(val(x.p.cost), 0)}</td><td class="mono">${nf(100 * (1 - x.p.cost / r.exact.cost), 1)}%</td>`
-            + (r.hybrid ? `<td class="mono">${dp(x.est)}</td>` : '')
-            + `<td class="mono">${x.meas === undefined ? '<span class="note">-</span>' : x.over ? `&gt; ${dp(r.maxDrop)}` : dp(x.meas)}</td>`
-            + `<td>${x.over ? '' : x.p.feasible ? '✓' : ''}</td>${x.p.assign.map((a) => `<td class="left mono">${a.mul || a.add ? esc([a.mul, a.add].filter(Boolean).map(shortUnit).join(' + ')) : '<span class="note">·</span>'}</td>`).join('')}`
-            + `<td><button type="button" class="btn outline small" data-front="${i}">${t('dse.apply')}</button></td></tr>`).join('');
     $('nnSearchFrontBox').classList.remove('hidden');
+    $('nnSearchFrontNote').textContent = rows.length ? t(r.hybrid ? 'nn.frontNoteHyb' : 'nn.frontNote', { n: rows.length, lim: nf(r.maxDrop, 2), obj: t(`nn.searchObj_${obj}`) }) : t('nn.frontEmpty');
+    if (!rows.length) { $('nnSearchFront').innerHTML = ''; return; }
+    const dp = (v) => `${nf(v, 2)}`;
+    // Custos de cada ponto (os resultados de antes desta versão só têm o do objetivo).
+    const cs = (p) => p.costs ?? { [obj]: p.cost };
+    const cell = (v, f) => (v === undefined ? '<span class="note">-</span>' : f(v));
+    $('nnSearchFront').innerHTML = `<tr><th>${t('nn.frontSaving')}</th><th>µm²</th><th>LUT</th><th>nJ</th>${r.hybrid ? `<th>${t('nn.frontEst')}</th>` : ''}<th>${t('nn.frontMeas')}</th><th></th>${net.sites.map((l) => `<th class="left mono">${esc(l.name)}</th>`).join('')}<th></th></tr>`
+        + rows.map((x, i) => {
+            const c = cs(x.p);
+            return `<tr class="${same(x.p.assign, r.best.assign) ? 'best' : ''}"><td class="mono"><b>${nf(100 * (1 - x.p.cost / r.exact.cost), 1)}%</b></td>`
+                + `<td class="mono">${cell(c.area, (v) => nf(v, 0))}</td><td class="mono">${cell(c.luts, (v) => nf(v, 0))}</td><td class="mono">${cell(c.energy, (v) => nf(v / 1e6, 1))}</td>`
+                + (r.hybrid ? `<td class="mono">${dp(x.est)}</td>` : '')
+                + `<td class="mono">${x.meas === undefined ? '<span class="note">-</span>' : x.over ? `&gt; ${dp(r.maxDrop)}` : dp(x.meas)}</td>`
+                + `<td>${x.over ? '' : x.p.feasible ? '✓' : ''}</td>${x.p.assign.map((a) => `<td class="left mono">${a.mul || a.add ? esc([a.mul, a.add].filter(Boolean).map(shortUnit).join(' + ')) : '<span class="note">·</span>'}</td>`).join('')}`
+                + `<td><button type="button" class="btn outline small" data-front="${i}">${t('dse.apply')}</button> <button type="button" class="btn outline small" data-front="${i}" data-dl="1" title="${esc(t('nn.downloadHelp'))}">${t('dse.download')}</button></td></tr>`;
+        }).join('');
 }
 var lastFront = []; // eslint-disable-line no-var
 const dlText = (name, text, type) => {
@@ -825,30 +886,36 @@ const dlText = (name, text, type) => {
     document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
-const searchFileId = (r) => `${r.net}_${r.o.objective}_${r.hybrid ? `hibrida-${r.o.heuristic}` : r.o.heuristic}_${String(r.maxDrop).replace('.', 'p')}pp`;
-// Fronteira inteira da busca (não só as linhas da tabela): custo, quedas (estimada e medida) e unidades por camada.
+const execFileId = (E) => `${E.net}_${E.o.objective}_${E.runs.length > 1 ? 'comparacao' : E.runs[0].hybrid ? `hibrida-${E.runs[0].o.heuristic}` : E.runs[0].o.heuristic}_${String(E.o.maxDrop).replace('.', 'p')}pp`;
+// Fronteiras inteiras de todas as buscas da execução (não só as linhas da tabela): heurística, todos os custos, quedas
+// (estimada e medida) e unidades por camada.
 $('nnFrontCsv').onclick = () => {
-    const r = lastSearch;
-    if (!r || !nnData) return;
+    if (!exec?.runs.length || !nnData) return;
     const sites = nnData.net.sites.map((l) => l.name);
-    const head = ['custo', 'economia', 'queda_estimada_pp', 'queda_medida_pp', 'viavel', 'aprovado_validacao_inteira', ...sites.flatMap((n) => [`${n}_mul`, `${n}_add`])];
-    const rows = r.front.map((p) => {
-        const meas = r.hybrid ? (p.measured ? p.measured.drop : '') : 100 * (r.exact.accVal - p.accVal);
-        const full = r.hybrid ? (p.measured?.fullOk ?? '') : (p.fullOk ?? '');
-        return [p.cost, 1 - p.cost / r.exact.cost, r.hybrid ? p.drop : '', meas, r.hybrid ? p.feasible && (p.measured ? p.measured.ok : true) : p.feasible, full, ...p.assign.flatMap((a) => [a.mul ?? 'MUL8 exato', a.add ?? 'ADD32 exato'])];
-    });
-    dlText(`${searchFileId(r)}_fronteira.csv`, `${[head, ...rows].map((x) => x.map(csvCell).join(',')).join('\n')}\n`, 'text/csv');
+    const head = ['heuristica', 'tipo', 'objetivo', 'custo', 'economia', 'area_um2', 'luts', 'energia_fJ', 'ciclos', 'queda_estimada_pp', 'queda_medida_pp', 'viavel', 'aprovado_validacao_inteira', 'escolhido', ...sites.flatMap((n) => [`${n}_mul`, `${n}_add`])];
+    const rows = [];
+    for (const r of exec.runs) {
+        const bk = JSON.stringify(r.best.assign);
+        for (const p of r.front) {
+            const meas = r.hybrid ? (p.measured ? p.measured.drop : '') : 100 * (r.exact.accVal - p.accVal);
+            const full = r.hybrid ? (p.measured?.fullOk ?? '') : (p.fullOk ?? '');
+            const c = p.costs ?? {};
+            rows.push([r.o.heuristic, r.hybrid ? 'hibrida' : 'medida', r.o.objective, p.cost, 1 - p.cost / r.exact.cost, c.area ?? '', c.luts ?? '', c.energy ?? '', c.cycles ?? '', r.hybrid ? p.drop : '', meas, r.hybrid ? p.feasible && (p.measured ? p.measured.ok : true) : p.feasible, full, JSON.stringify(p.assign) === bk, ...p.assign.flatMap((a) => [a.mul ?? 'MUL8 exato', a.add ?? 'ADD32 exato'])]);
+        }
+    }
+    dlText(`${execFileId(exec)}_fronteira.csv`, `${[head, ...rows].map((x) => x.map(csvCell).join(',')).join('\n')}\n`, 'text/csv');
 };
 $('nnFrontJson').onclick = () => {
-    const r = lastSearch;
-    if (!r) return;
-    const { steps, ...rest } = r;
-    dlText(`${searchFileId(r)}.json`, `${JSON.stringify(rest, null, 1)}\n`, 'application/json');
+    if (!exec?.runs.length) return;
+    const runs = exec.runs.map(({ steps, ...rest }) => rest);
+    dlText(`${execFileId(exec)}.json`, `${JSON.stringify({ net: exec.net, options: { ...exec.o, trees: undefined }, runs }, null, 1)}\n`, 'application/json');
 };
 $('nnSearchFront').addEventListener('click', (e) => {
     const b = e.target.closest('[data-front]');
-    if (!b || !lastFront[+b.dataset.front]) return;
-    setOverride(lastFront[+b.dataset.front].assign, lastFront[+b.dataset.front].biasDelta, lastFront[+b.dataset.front].requantM);
+    const p = b && lastFront[+b.dataset.front];
+    if (!p) return;
+    if (b.dataset.dl) { downloadPoint(p); return; }
+    setOverride(p.assign, p.biasDelta, p.requantM);
     setTab('result');
     render();
 });

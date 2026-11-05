@@ -75,9 +75,14 @@ self.onmessage = async ({ data: o }) => {
             const points = hybrid
                 ? r.points.filter((p) => p.drop <= Math.max(5, 4 * r.maxDrop) || p.measured).map((p) => ({ cost: p.cost, drop: p.drop, feasible: p.feasible, measured: p.measured, assign: p.assign }))
                 : r.points.map((p) => ({ cost: p.cost, wrong: p.wrong, feasible: p.feasible, full: p.full, assign: p.assign, fullOk: p.fullOk }));
+            // Todos os custos (área, LUT, energia e ciclos) de cada ponto da fronteira e do escolhido, para a tabela da
+            // fronteira mostrar todas as colunas, qualquer que seja o objetivo.
+            const costs = (assign) => { const T = P.cm.network(assign).totals; return { area: T.area, luts: T.luts, energy: T.energy, cycles: T.cycles }; };
+            const front = r.front.map((p) => ({ ...p, costs: costs(p.assign) }));
+            const best = { ...r.best, costs: costs(r.best.assign) };
             self.postMessage({
                 type: 'run-done', k,
-                result: { ...r, hybrid: !!hybrid, points, steps: hybrid ? r.steps : undefined, cands, layersBest: layers(r.best.assign), layersExact, n: P.n, testN: test.n },
+                result: { ...r, front, best, exactCosts: costs(P.exact), hybrid: !!hybrid, points, steps: hybrid ? r.steps : undefined, cands, layersBest: layers(r.best.assign), layersExact, n: P.n, testN: test.n },
             });
         }
         self.postMessage({ type: 'done', n: runs.length });

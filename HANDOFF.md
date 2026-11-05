@@ -61,9 +61,17 @@ Parte B, aba de exploração igual à da HLS:
     e no teste, as unidades de cada camada e Aplicar; clicar na linha seleciona a busca, e o detalhe, a fronteira e
     o passo a passo passam a ser dela; ao terminar fica selecionada a de maior economia; o gráfico mostra todas as
     buscas da execução e a que está rodando).
-11. Seletor "Fronteira de", tabela da fronteira por heurística com todos os custos, CSV e JSON, Baixar projeto.
+11. Seletor "Fronteira de", tabela da fronteira por heurística com todos os custos, CSV e JSON, Baixar projeto
+    (feito: o worker manda os custos de área, LUT, energia e ciclos de cada ponto da fronteira e do escolhido;
+    a tabela da fronteira tem a economia no objetivo, µm², LUT, nJ, as quedas, as unidades, Aplicar e Baixar; o
+    CSV e o JSON levam as fronteiras de todas as buscas da execução, com a heurística em cada linha; Baixar, na
+    tabela das execuções e na da fronteira, aplica o ponto, vai para a aba Custo e gera o projeto; Adicionar à
+    comparação guarda a busca do seletor "Fronteira de").
 12. Passo a passo com seletor de heurística, blocos na ordem da HLS, bloco recolhível de explicação, controles
-    guardados entre visitas, nomes Exploração e Explorar.
+    guardados entre visitas, nomes Exploração e Explorar (feito: ordem controles, execuções, gráfico, passo a passo,
+    fronteira, detalhe da busca selecionada e "Como a exploração funciona" (nn.help); o seletor do passo a passo
+    lista só as híbridas; clicar numa linha das execuções põe a busca nos dois seletores e no detalhe; objetivo,
+    queda, amostra, correção, heurística e velocidade ficam no localStorage).
 13. Conferir lado a lado com a HLS e atualizar a ajuda.
 
 Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
