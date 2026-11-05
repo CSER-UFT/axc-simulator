@@ -229,6 +229,7 @@ export default {
     'nn.searchDoneMulti': "{n} searches in {s} s, with the same calibration ({calib} classified single swaps). The one with the largest saving is selected; click a row to see its detail.",
     'nn.runs.points': "points",
     'nn.runs.classified': "classified",
+    'nn.runs.savings': "saving (area, LUT, energy)",
     'nn.runs.dropEst': "estimated drop (pp)",
     'nn.runs.dropVal': "validation drop (pp)",
     'nn.runs.dropTest': "test drop (pp)",

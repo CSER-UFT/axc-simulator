@@ -229,6 +229,7 @@ export default {
     'nn.searchDoneMulti': "{n} buscas em {s} s, com a mesma calibração ({calib} trocas isoladas classificadas). A de maior economia está selecionada; clique numa linha para ver o detalhe dela.",
     'nn.runs.points': "pontos",
     'nn.runs.classified': "classificados",
+    'nn.runs.savings': "economia (área, LUT, energia)",
     'nn.runs.dropEst': "queda estimada (p.p.)",
     'nn.runs.dropVal': "queda na validação (p.p.)",
     'nn.runs.dropTest': "queda no teste (p.p.)",

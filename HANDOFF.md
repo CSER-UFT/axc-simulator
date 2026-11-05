@@ -72,10 +72,19 @@ Parte B, aba de exploração igual à da HLS:
     fronteira, detalhe da busca selecionada e "Como a exploração funciona" (nn.help); o seletor do passo a passo
     lista só as híbridas; clicar numa linha das execuções põe a busca nos dois seletores e no detalhe; objetivo,
     queda, amostra, correção, heurística e velocidade ficam no localStorage).
-13. Conferir lado a lado com a HLS e atualizar a ajuda.
+13. Conferir lado a lado com a HLS e atualizar a ajuda (feito: as duas abas na mesma ordem; a tabela das execuções
+    passou a mostrar a economia em área, LUT e energia, como a da HLS mostra área, energia e latência; ajuda das redes
+    reescrita em torno da aba Exploração, em português e inglês, com os resultados das etapas 7 e 9 e o teto. Ficam
+    diferentes de propósito: as unidades por camada em colunas, as quedas estimada, na validação e no teste, e o
+    detalhe da busca selecionada).
 
 Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
-14. Fixar a arquitetura pela referência oficial.
+14. Fixar a arquitetura pela referência oficial (feito: docs/RESNET8.md e scripts/nn/resnet8_arch.py, que confere
+    com o pretrainedResnet.h5 do mlcommons/tiny; 16, 32 e 64 filtros, 78 666 valores no .h5, 77 706 pesos e vieses
+    com o BN dobrado, 12 501 632 multiplicações por imagem, 10 camadas com pesos; a referência dá 87,19% em ponto
+    flutuante e 86,97% em int8 no teste, medido aqui; borda do padding='same' assimétrica no passo 2; proposta da
+    soma residual dentro da reescala da segunda convolução de cada pilha; avaliação estimada em 30 ms por imagem
+    numa thread).
 15. Formato axc-nn/1 como grafo: convolução com passo e borda gerais, soma residual com reescala, média global.
 16. Avaliador bit exato em JavaScript com ramos (e as ativações guardadas da busca).
 17. Treino no train.py (normalização em lote incorporada, aumento de dados, quantização da soma residual, 5000
@@ -84,7 +93,7 @@ Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
 19. Diagrama da arquitetura com ramos.
 20. Gerador de código HLS para os tipos novos.
 21. Modelo de custo dos kernels novos.
-22. Busca na ResNet 8 (11 camadas com pesos, cerca de 22 grupos); ajustar tempos e padrões.
+22. Busca na ResNet 8 (10 camadas com pesos, 20 grupos); ajustar tempos e padrões.
 23. Exportação para o Vitis e o Vivado dos tipos novos, com a correção do viés.
 24. Rodada no Vitis e no Vivado (Tiago).
 25. ResNet 8 no seletor, no nnbench e na ajuda; rodada da matriz.

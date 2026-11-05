@@ -635,18 +635,24 @@ function downloadPoint(p) {
  * medida, na validação que conta para o limite; e no teste) e as unidades de cada camada; clicar na linha seleciona a
  * busca, e Aplicar põe as unidades dela na página.
  */
+/** Economia do escolhido em área, LUT e energia, como na HLS (a do objetivo em negrito). */
+function savings3(r) {
+    const b = r.best.costs, e = r.exactCosts;
+    if (!b || !e) return `<b>${nf(100 * r.best.saving, 1)}%</b>`;
+    return ['area', 'luts', 'energy'].map((k) => { const v = `${nf(100 * (1 - b[k] / e[k]), 1)}%`; return k === r.o.objective ? `<b>${v}</b>` : v; }).join(', ');
+}
 function renderRuns() {
     if (!exec || !nnData || exec.net !== nnData.net.id || !exec.runs.length) { $('nnRuns').innerHTML = ''; return; }
     const net = nnData.net, obj = exec.o.objective;
     const unit = { area: 'µm²', luts: 'LUT', energy: 'nJ' }[obj];
     const val = (x) => (obj === 'energy' ? x / 1e6 : x);
     const dp = (v) => nf(100 * v, 2);
-    const head = `<tr><th class="left">${t('dse.th.heuristic')}</th><th>${t('nn.runs.points')}</th><th>${t('nn.runs.classified')}</th><th>${t('dse.th.time')}</th><th>${t(`nn.searchObj_${obj}`)} (${unit})</th><th>${t('nn.frontSaving')}</th><th>${t('nn.runs.dropEst')}</th><th>${t('nn.runs.dropVal')}</th><th>${t('nn.runs.dropTest')}</th>${net.sites.map((l) => `<th class="left mono">${esc(l.name)}</th>`).join('')}<th></th></tr>`;
+    const head = `<tr><th class="left">${t('dse.th.heuristic')}</th><th>${t('nn.runs.points')}</th><th>${t('nn.runs.classified')}</th><th>${t('dse.th.time')}</th><th>${t(`nn.searchObj_${obj}`)} (${unit})</th><th>${t('nn.runs.savings')}</th><th>${t('nn.runs.dropEst')}</th><th>${t('nn.runs.dropVal')}</th><th>${t('nn.runs.dropTest')}</th>${net.sites.map((l) => `<th class="left mono">${esc(l.name)}</th>`).join('')}<th></th></tr>`;
     const rows = exec.runs.map((r, k) => {
         const accV = r.exact.accValFull !== undefined ? [r.exact.accValFull, r.best.accValFull] : [r.exact.accVal, r.best.accVal];
         const units = r.best.assign.map((a) => `<td class="left mono">${a.mul || a.add ? esc([a.mul, a.add].filter(Boolean).map(shortUnit).join(' + ')) : '<span class="note">·</span>'}</td>`).join('');
         return `<tr class="${k === exec.cur ? 'pick' : ''}" data-run="${k}" style="cursor:pointer"><td class="left">${esc(runName(r))}</td><td class="mono">${nf(r.evals)}</td><td class="mono">${r.hybrid ? `${nf(r.calib.length + r.verified)}` : nf(r.evals)}</td><td class="mono">${nf(r.ms / 1000, 1)} s</td>`
-            + `<td class="mono">${nf(val(r.best.cost), 0)}</td><td class="mono"><b>${nf(100 * r.best.saving, 1)}%</b></td><td class="mono">${r.hybrid ? nf(r.best.estDrop, 2) : '-'}</td><td class="mono">${dp(accV[0] - accV[1])}</td><td class="mono">${dp(r.exact.accTest - r.best.accTest)}</td>${units}`
+            + `<td class="mono">${nf(val(r.best.cost), 0)}</td><td class="mono">${savings3(r)}</td><td class="mono">${r.hybrid ? nf(r.best.estDrop, 2) : '-'}</td><td class="mono">${dp(accV[0] - accV[1])}</td><td class="mono">${dp(r.exact.accTest - r.best.accTest)}</td>${units}`
             + `<td><button type="button" class="btn outline small" data-run-apply="${k}">${t('dse.apply')}</button> <button type="button" class="btn outline small" data-run-dl="${k}" title="${esc(t('nn.downloadHelp'))}">${t('dse.download')}</button></td></tr>`;
     });
     $('nnRuns').innerHTML = head + rows.join('');
