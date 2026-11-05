@@ -110,7 +110,32 @@ Exemplo da pilha 2 (pesos e reescalas em base64, como nas outras camadas):
 {"type": "add", "name": "s2add", "inputs": ["s2sc", "s2b"], "requant": {"mode": "q32", "m": ["...", "..."], "exp": 0, "zero": 0}}
 ```
 
-O gerador de código, o modelo de custo e o diagrama ainda recusam essas redes com um erro claro (etapas 19 a 21).
+## Diagrama, código gerado e custo (etapas 19 a 21)
+
+O diagrama (`js/axc/nnsvg.js`) põe o caminho principal na linha, cada soma residual num círculo ⊕ e os atalhos em
+arcos por cima, com uma caixa com o nome e a operação quando o atalho é uma convolução 1 × 1.
+
+O gerador (`js/axc/nngen.js`) escreve, além dos kernels de sempre: a borda com lados diferentes (`padKernel4`), a
+convolução que entrega o acumulador com o viés (`i32 y`, sem reescala), a soma residual (`addKernel`, com a função
+nova `requant2(a, ma, b, mb, z[, e])` da linguagem da página de síntese) e a média (`avgPoolKernel`, com n potência de
+2). Cada kernel diz os tensores que lê e o que escreve; executados por esses tensores, dão exatamente as saídas do
+avaliador, com unidades exatas e com o somador aproximado (test/nngraph.test.js). Nas redes de hoje, o código gerado
+continua igual, byte a byte.
+
+`requant2` entrou em toda a cadeia da página de síntese: elaboração (`requant2Value`, com os dois produtos em DSP pela
+faixa dos operandos), execução, modelo de erro, custo (classe `requant2`) e C++ do Vitis (`axc_requant2`, num módulo
+próprio como a reescala). A peça ainda não foi caracterizada à parte: o custo é o de duas reescalas (área, LUT,
+energia e DSP) com o atraso de uma. Como o Vitis instancia cada módulo de reescala uma vez só, a rede conta uma
+reescala e uma `requant2`.
+
+Custo da ResNet 8 com pesos sorteados, diretivas padrão (sem partição), 10 ns, ASIC: 6,38 milhões de ciclos (64 ms
+por imagem), 4,28 mm², 69 594 LUTs e 6 DSP48; com o MUL8 DRUM4 e o ADD32 LOA10 em todas as camadas, 14,5% menos área e
+0,9% menos energia (os registradores e as memórias dominam a energia, como nas LeNets). O II das convoluções fica
+limitado pela memória (72 a 288 sem partição), como nas outras redes. Montar o modelo de custo leva cerca de 70 s,
+quase tudo na elaboração das convoluções (6 a 10 s cada); trocar as unidades depois leva menos de 1 s. Na página, esse
+cálculo precisa ir para um worker (etapa 22 ou 25).
+
+A exportação para o Vitis (`networkProject`) ainda recusa as redes com ramos (etapa 23).
 
 ## Custo da avaliação bit exata
 

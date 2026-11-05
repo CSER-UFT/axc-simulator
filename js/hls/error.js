@@ -27,7 +27,7 @@ import { ssimEstimate, ssimEstimateBins, SSIM_BINS } from '../axc/ssim.js';
 import { outputArrays, compile, wrapTo, bit, CMP, execute, compareOutputs, outputSsimStats } from './exec.js';
 import { rng } from '../axc/metrics.js';
 import { opFunction } from './approx.js';
-import { typeRange, requantValue } from './elab.js';
+import { typeRange, requantValue, requant2Value } from './elab.js';
 
 const ZERO = { mu: 0, m2: 0 };
 const varOf = (s) => Math.max(0, s.m2 - s.mu * s.mu);
@@ -306,6 +306,7 @@ export function propagate(result, prof, { intrinsic = new Map(), fns = new Map()
                     case 'sel': v = X(k, 0) ? X(k, 1) : X(k, 2); break;
                     case 'trunc': v = wrapTo(X(k, 0), ins.bits, ins.signed); break;
                     case 'rq': v = requantValue(X(k, 0), X(k, 1), X(k, 2)); break;
+                    case 'rq2': v = requant2Value(X(k, 0), X(k, 1), X(k, 2), X(k, 3), X(k, 4), consts[k][5]); break;
                     default: v = row[k];
                 }
                 ap[k] = v;

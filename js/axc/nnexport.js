@@ -15,9 +15,9 @@
  * As unidades aproximadas entram como caixa preta de RTL (o Verilog da netlist com o invólucro que o Vitis pede), ou
  * como C++ da netlist (inline: false), e a reescala (requant) como uma função com a multiplicação em DSP.
  */
-import { costModel, normalizeDirectives } from './nngen.js';
+import { costModel, normalizeDirectives, assertSequential } from './nngen.js';
 import { inputActivations } from './nn.js';
-import { exportFunction, unitsCode, seqUnitsCode, signedCode, REQUANT_CPP, projectFiles, blackboxFiles, tclScript, prediction } from '../hls/vitis.js';
+import { exportFunction, unitsCode, seqUnitsCode, signedCode, REQUANT_CPP, REQUANT2_CPP, projectFiles, blackboxFiles, tclScript, prediction } from '../hls/vitis.js';
 import { execute, inputArrays, outputArrays } from '../hls/exec.js';
 import { opFunction } from '../hls/approx.js';
 
@@ -55,6 +55,7 @@ function runKernels(ks, x) {
  * @returns {{files: Record<string, string>, summary: object}}
  */
 export function networkProject(net, o) {
+    assertSequential(net);
     const clockNs = o.clockNs ?? 10, part = o.part ?? 'xc7a100tcsg324-1', target = o.target ?? 'fpga';
     const dirs = normalizeDirectives(net, o.dirs);
     const units = net.sites.map((_, si) => ({ mul: o.units?.[si]?.mul ?? null, add: o.units?.[si]?.add ?? null }));
@@ -120,6 +121,7 @@ export function networkProject(net, o) {
         signedCode(fns),
         '',
         fns.some((f) => f.requant) ? REQUANT_CPP : '',
+        fns.some((f) => f.requant2) ? REQUANT2_CPP : '',
         '',
         ...layerCode,
         `// Topo: as camadas em sequência, com os vetores entre elas (sem dataflow, como no código C da MiniLenet).`,

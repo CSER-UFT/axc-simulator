@@ -99,7 +99,7 @@ export function bindAndCost(design, segs, lib, { totalCycles, clockPs, model, ad
             } else if (SHARED.has(me.cls)) {
                 if (!byKey.has(me.key)) byKey.set(me.key, []);
                 byKey.get(me.key).push({ id, s: s.cycle, e: s.cycle + me.k - 1, me, slots: Array.from({ length: me.k }, (_, j) => (pipelined ? (s.cycle + j) % sch.II : s.cycle + j)) });
-            } else if (['cmp', 'mux', 'logic', 'requant'].includes(me.cls)) opsCells.push({ me, execs });
+            } else if (['cmp', 'mux', 'logic', 'requant', 'requant2'].includes(me.cls)) opsCells.push({ me, execs });
             if (me.unit) energyOps += (opKnown ? lib.effective(me.unit, { a: opKnown[0], b: opKnown[1] }) : me.unit).energy * execs;
         }
         for (const [key, list] of byKey) {

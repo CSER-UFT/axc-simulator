@@ -8,7 +8,7 @@
 import { ssim, ssimStats } from '../axc/ssim.js';
 import { rng } from '../axc/metrics.js';
 import { testImage } from '../axc/image.js';
-import { typeRange, requantValue } from './elab.js';
+import { typeRange, requantValue, requant2Value } from './elab.js';
 
 const SAMPLES = 4096;     // amostras dos operandos de cada operação
 const SEG_SAMPLES = 2048; // instâncias amostradas de cada trecho (todos os valores de uma execução do trecho)
@@ -189,6 +189,7 @@ export function execute(design, inputs, { ops = null, profile = false, seed = 7 
                 case 'sel': v = arg(a[0]) ? arg(a[1]) : arg(a[2]); break;
                 case 'trunc': v = wrapTo(arg(a[0]), ins.bits, ins.signed); break;
                 case 'rq': v = requantValue(arg(a[0]), arg(a[1]), arg(a[2])); break;
+                case 'rq2': v = requant2Value(arg(a[0]), arg(a[1]), arg(a[2]), arg(a[3]), arg(a[4]), a[5].c); break;
                 default: throw new Error(`operação ${ins.op} sem execução`);
             }
             vals[ins.ix] = v;

@@ -101,9 +101,17 @@ Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
 17. Treino no train.py (normalização em lote incorporada, aumento de dados, quantização da soma residual, 5000
     imagens de validação); Tiago treina na GPU.
 18. Conferência bit a bit Python e JavaScript.
-19. Diagrama da arquitetura com ramos.
-20. Gerador de código HLS para os tipos novos.
-21. Modelo de custo dos kernels novos.
+19. Diagrama da arquitetura com ramos (feito: caminho principal na linha, soma residual num círculo ⊕, atalhos em
+    arcos com a caixa da convolução 1 × 1; o das redes de hoje continua igual, byte a byte; ResNet 8 com pesos
+    sorteados em test/fixtures/resnet8.js).
+20. Gerador de código HLS para os tipos novos (feito: borda com lados diferentes, convolução que entrega o
+    acumulador, soma residual com a função nova requant2 da linguagem da página de síntese, média; requant2 em toda a
+    cadeia da HLS, inclusive o C++ do Vitis; os kernels, executados pelos tensores, dão as saídas do avaliador; o
+    código das redes de hoje continua igual, byte a byte).
+21. Modelo de custo dos kernels novos (feito: o modelo de custo roda na ResNet 8; requant2 estimada como duas
+    reescalas, ainda sem caracterização própria; a rede compartilha uma requant2 como já fazia com a reescala;
+    ResNet 8 com pesos sorteados: 64 ms por imagem a 10 ns, 4,28 mm², 69,6 mil LUTs, 6 DSP; montar o modelo leva
+    cerca de 70 s, quase tudo na elaboração das convoluções, então na página isso vai para um worker).
 22. Busca na ResNet 8 (10 camadas com pesos, 20 grupos); ajustar tempos e padrões.
 23. Exportação para o Vitis e o Vivado dos tipos novos, com a correção do viés.
 24. Rodada no Vitis e no Vivado (Tiago).

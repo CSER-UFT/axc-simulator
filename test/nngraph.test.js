@@ -233,10 +233,75 @@ test('correção de ganho numa convolução "acc": muda o m do ramo na add, como
     assert.notDeepEqual(outs(net, scales), outs(net, null));
 });
 
-test('gerador de código, custo e diagrama: erro claro nas redes com ramos (ainda não suportadas)', async () => {
-    const { networkKernels } = await import('../js/axc/nngen.js');
+test('código gerado da rede com ramos: os kernels, executados pelos tensores, dão as saídas do avaliador', async () => {
+    const { networkKernels, directiveTrees } = await import('../js/axc/nngen.js');
+    const { parse } = await import('../js/hls/lang.js');
+    const { elaborate } = await import('../js/hls/elab.js');
+    const { execute, inputArrays, outputArrays } = await import('../js/hls/exec.js');
+    const { resnet8Json } = await import('./fixtures/resnet8.js');
+    const acc = adderAccumulate(unitOf('ADD32 LOA10'));
+    const a1 = new Int32Array(1), b1 = new Int32Array(1);
+    const fadd = (x, y) => { a1[0] = x; b1[0] = y; acc(a1, b1, 1); return a1[0]; };
+    const cases = [[tinyResnet(7), null, false], [tinyResnet(8, { mScale: 40, exp: -6 }), null, true], [resnet8Json(2, 4), null, true]];
+    for (const [json, dirs, approx] of cases) {
+        const net = decodeNet(json), set = randomSet(2, json.dataset.shape, 5, 4);
+        const ks = networkKernels(net, dirs);
+        const kinds = ks.map((k) => k.type);
+        assert.ok(kinds.includes('add') && kinds.includes('pad'), kinds.join());
+        const trees = directiveTrees(net, dirs);
+        for (let i = 0; i < set.n; i++) {
+            const img = set.images.subarray(i * set.size, (i + 1) * set.size);
+            const want = [...infer(net, img, net.sites.map(() => productTable(null)), approx ? net.sites.map(() => acc) : [], undefined, trees).out];
+            const mem = new Map([[0, Float64Array.from(inputActivations(net, img))]]);
+            for (const k of ks) {
+                const d = elaborate(parse(k.src), { ports: 2 });
+                const ops = new Map();
+                if (approx && k.site !== null) for (const sg of d.segments) for (const n of sg.nodes) if (n.op === 'add') ops.set(n.id, fadd);
+                const ins = inputArrays(d), [outA] = outputArrays(d);
+                assert.equal(ins.length, k.ins.length, k.name);
+                const res = execute(d, new Map(ins.map((A, j) => [A.name ?? A, mem.get(k.ins[j])])), { ops });
+                mem.set(k.out, Float64Array.from(res.mem.get(outA.name ?? outA)));
+            }
+            assert.deepEqual([...mem.get(ks.at(-1).out)], want, `${json.id} imagem ${i}`);
+        }
+    }
+});
+
+test('diagrama da ResNet 8: caminho principal, três somas, dois atalhos 1 x 1 com caixa e a identidade sem caixa', async () => {
     const { archSvg } = await import('../js/axc/nnsvg.js');
-    const net = decodeNet(tinyResnet());
-    assert.throws(() => networkKernels(net), /ainda não aceita redes com ramos/);
-    assert.throws(() => archSvg(net), /ainda não desenha/);
+    const { resnet8Json } = await import('./fixtures/resnet8.js');
+    const svg = archSvg(decodeNet(resnet8Json()), { labels: { add: 'soma' } });
+    const count = (re) => (svg.match(re) ?? []).length;
+    assert.equal(count(/class="nn-add"/g), 3);
+    assert.equal(count(/class="nn-skip"/g), 3);
+    assert.equal(count(/class="nn-skip-box"/g), 2);
+    assert.ok(svg.includes('s2sc: conv 1×1, s2') && svg.includes('s3sc: conv 1×1, s2'));
+    assert.ok(svg.includes('p0,1,0,1, s2') && svg.includes('avg pool 8×8'));
+    assert.ok(svg.includes('nn-wide'));
+    // Os atalhos não aparecem na linha principal; a s2a sim.
+    assert.ok(!svg.includes('>s2sc<') && svg.includes('>s2a<'));
+});
+
+test('custo da rede com ramos: kernels da borda, da soma e da média; reescalas compartilhadas; unidades aproximadas economizam área', async () => {
+    const { costModel } = await import('../js/axc/nngen.js');
+    const D = (f) => JSON.parse(readFileSync(new URL(`data/${f}`, R), 'utf8'));
+    const net = decodeNet(tinyResnet(7));
+    const cm = costModel(net, { synth, cells: D('hls-cells.json'), fpga: D('vivado-units.json'), target: 'asic', clockNs: 10 });
+    const ex = cm.network();
+    const by = (n) => ex.layers.find((l) => l.name === n);
+    assert.deepEqual(ex.layers.map((l) => l.type), ['pad', 'conv', 'pad', 'conv', 'pad', 'conv', 'add', 'pad', 'conv', 'pad', 'conv', 'conv', 'add', 'avgpool', 'flatten', 'dense']);
+    // Dois produtos por soma (requant2); a convolução "acc" não tem reescala. Na pilha 1, o atalho é uma ativação de 8
+    // bits (o produto estreita e usa menos DSP); na 2, os dois ramos são acumuladores de 32 bits.
+    assert.ok(by('s1add').rq2.dsp >= 2 && by('s2add').rq2.dsp >= by('s1add').rq2.dsp);
+    assert.ok(by('s1b').rq.dsp === 0 && by('s1b').rq2.dsp === 0 && by('conv1').rq.dsp > 0);
+    // A rede compartilha uma reescala de cada tipo: DSP = o da maior de cada.
+    assert.equal(ex.totals.dsp, Math.max(...ex.layers.map((l) => l.rq.dsp)) + Math.max(...ex.layers.map((l) => l.rq2.dsp)));
+    const ap = cm.network(net.sites.map(() => ({ mul: 'MUL8 DRUM4', add: 'ADD32 LOA10' })));
+    assert.ok(ap.totals.area < ex.totals.area, `${ap.totals.area} ${ex.totals.area}`);
+    assert.equal(ap.totals.cycles > 0, true);
+});
+
+test('exportação para o Vitis: erro claro nas redes com ramos (etapa 23)', async () => {
+    const { networkProject } = await import('../js/axc/nnexport.js');
+    assert.throws(() => networkProject(decodeNet(tinyResnet()), {}), /ainda não aceita redes com ramos/);
 });

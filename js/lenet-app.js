@@ -191,7 +191,7 @@ function drawImage(canvas, img, shape) {
 function renderArch() {
     if (!nnData) return;
     const { net } = nnData;
-    $('nnArch').innerHTML = archSvg(net, { labels: { input: t('nn.archInput'), conv: t('nn.archConv'), pool: t('nn.archPool'), flatten: t('nn.archFlatten'), dense: t('nn.archDense') } });
+    $('nnArch').innerHTML = archSvg(net, { labels: { input: t('nn.archInput'), conv: t('nn.archConv'), pool: t('nn.archPool'), flatten: t('nn.archFlatten'), dense: t('nn.archDense'), avgpool: t('nn.archAvgPool'), add: t('nn.archAdd') } });
 }
 
 function modelNote(net) {

@@ -16,10 +16,15 @@
  *              anterior entra no DFG como 'carry' e o novo sai como 'carryout', com a aresta de distância 1.
  */
 import { HlsError, parsePragma, typeOf } from './lang.js';
-import { mulQ32 } from '../axc/nn.js';
+import { mulQ32, mulQ32Sum } from '../axc/nn.js';
 
 /** Reescala das redes (a função requantize do C): (acc × m + 2^31) >> 32, mais z, saturada entre 0 e 255. */
 export const requantValue = (acc, m, z) => Math.min(255, Math.max(0, mulQ32(acc, m) + z));
+/**
+ * Reescala da soma residual (camada add das redes com ramos, js/axc/nn.js): floor((a ma + b mb + 2^(31+e)) / 2^(32+e)),
+ * mais z, saturada entre 0 e 255; e de -16 a 20 (0 por padrão).
+ */
+export const requant2Value = (a, ma, b, mb, z, e = 0) => Math.min(255, Math.max(0, mulQ32Sum([a, b], [ma, mb], e) + z));
 
 const MAX_UNROLL = 4096;
 
@@ -161,7 +166,7 @@ export function elaborate(ast, { ports = 2 } = {}) {
         return seg;
     };
     const closeSeg = () => { seg = null; };
-    const PURE = new Set(['add', 'sub', 'mul', 'shl', 'shr', 'and', 'or', 'xor', 'not', 'cmp', 'sel', 'trunc', 'rq']);
+    const PURE = new Set(['add', 'sub', 'mul', 'shl', 'shr', 'and', 'or', 'xor', 'not', 'cmp', 'sel', 'trunc', 'rq', 'rq2']);
     const COMM = new Set(['add', 'mul', 'and', 'or', 'xor']);
     // Origem de cada operação: a expressão do código e as iterações dos laços desenrolados por estarem dentro de um
     // pipeline (cópias diferentes, como os pesos de uma janela). As cópias pedidas com a diretiva unroll (com ou sem
@@ -348,7 +353,19 @@ export function elaborate(ast, { ports = 2 } = {}) {
                     node.dsp = Math.min(Math.ceil(wa / 25) * Math.ceil(wb / 17), Math.ceil((wb + 1) / 25) * Math.ceil(wa / 18));
                     return v;
                 }
-                throw new HlsError(`função ${e.name} não suportada (só min, max, abs e requant)`, e.line);
+                if (e.name === 'requant2') {
+                    // Reescala da soma residual: dois produtos de 32 x 32 bits somados antes do arredondamento.
+                    if (args.length !== 5 && args.length !== 6) throw new HlsError('requant2 recebe 5 ou 6 argumentos (a, ma, b, mb, z, e)', e.line);
+                    if (args.length === 6 && (args[5].k !== 'const' || args[5].v < -16 || args[5].v > 20)) throw new HlsError('requant2: o expoente e tem de ser uma constante de -16 a 20', e.line);
+                    const ex = args.length === 6 ? args[5].v : 0;
+                    if (args.slice(0, 5).every((a) => a.k === 'const')) return cval(requant2Value(args[0].v, args[1].v, args[2].v, args[3].v, args[4].v, ex));
+                    const [A, MA, B, MB, Z] = args.slice(0, 5).map((a) => use(a, e.line));
+                    const v = emit('rq2', [asArg(A), asArg(MA), asArg(B), asArg(MB), asArg(Z), { c: ex }], [0, 255], e.line);
+                    const dspOf = (X, M) => { const wa = bitsFor(X.range), wb = magBits(M.range); return Math.min(Math.ceil(wa / 25) * Math.ceil(wb / 17), Math.ceil((wb + 1) / 25) * Math.ceil(wa / 18)); };
+                    (v.node ?? v).dsp = dspOf(A, MA) + dspOf(B, MB);
+                    return v;
+                }
+                throw new HlsError(`função ${e.name} não suportada (só min, max, abs, requant e requant2)`, e.line);
             }
             default: throw new HlsError('expressão não suportada', e.line);
         }

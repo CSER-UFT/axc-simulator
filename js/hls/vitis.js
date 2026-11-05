@@ -233,7 +233,7 @@ static inline long long axc_abs(long long a) { return a < 0 ? -a : a; }
 #define min(a, b) axc_min((long long)(a), (long long)(b))
 #define max(a, b) axc_max((long long)(a), (long long)(b))
 #define abs(a) axc_abs((long long)(a))
-${/\brequant\s*\(/.test(src) ? `\n${REQUANT_CPP}\n#define requant(acc, m, z) axc_requant(acc, m, z)\n` : ''}
+${/\brequant\s*\(/.test(src) ? `\n${REQUANT_CPP}\n#define requant(acc, m, z) axc_requant(acc, m, z)\n` : ''}${/\brequant2\s*\(/.test(src) ? `\n${REQUANT2_CPP}\n#define requant2(...) axc_requant2(__VA_ARGS__)\n` : ''}
 ${body.replace(/^\s*\/\/.*\n/, '')}`.replace(/\n{3,}/g, '\n\n') + (params.length ? '' : '');
 }
 
@@ -252,7 +252,24 @@ static ap_uint<8> axc_requant(ap_int<32> acc, ap_uint<32> m, ap_int<32> z) {
     ap_int<35> v = ap_int<35>(q) + ap_int<35>(z);
     return v < 0 ? ap_uint<8>(0) : v > 255 ? ap_uint<8>(255) : ap_uint<8>(v);
 }`;
-const usesRequant = (design) => design.segments.some((s) => s.nodes.some((n) => n.op === 'rq'));
+/**
+ * Reescala da soma residual (requant2 da linguagem do simulador): floor((a ma + b mb + 2^(31+e)) / 2^(32+e)), mais z,
+ * saturada entre 0 e 255; os dois produtos em DSP, num módulo próprio, como a reescala.
+ */
+export const REQUANT2_CPP = `// Reescala da soma residual: (a x ma + b x mb + 2^(31+e)) >> (32+e), mais z, saturada entre 0 e 255.
+static ap_uint<8> axc_requant2(ap_int<32> a, ap_uint<32> ma, ap_int<32> b, ap_uint<32> mb, ap_int<32> z, int e = 0) {
+#pragma HLS INLINE off
+    ap_int<64> pa = ap_int<64>(a) * ap_int<64>(ma);
+#pragma HLS BIND_OP variable=pa op=mul impl=dsp
+    ap_int<64> pb = ap_int<64>(b) * ap_int<64>(mb);
+#pragma HLS BIND_OP variable=pb op=mul impl=dsp
+    ap_int<66> s = ap_int<66>(pa) + ap_int<66>(pb) + (ap_int<66>(1) << (31 + e));
+    ap_int<66> q = s >> (32 + e);
+    ap_int<35> v = ap_int<35>(q) + ap_int<35>(z);
+    return v < 0 ? ap_uint<8>(0) : v > 255 ? ap_uint<8>(255) : ap_uint<8>(v);
+}`;
+const usesRequant = (design) => design.segments.some((s) => s.nodes.some((n) => n.op === 'rq' || n.op === 'rq2'));
+const usesRequant2 = (design) => design.segments.some((s) => s.nodes.some((n) => n.op === 'rq2'));
 
 /**
  * Kernel do projeto elaborado (IR), com as unidades atribuídas.
@@ -271,6 +288,7 @@ export function exportIR(result, { inline = false, romStorage = null } = {}) {
         signedCode([f]),
         '',
         ...(f.requant ? [REQUANT_CPP, ''] : []),
+        ...(f.requant2 ? [REQUANT2_CPP, ''] : []),
         f.code,
     ];
     return code.join('\n');
@@ -385,6 +403,7 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
             case 'sel': set(`${val(a[0])} ? ${T}(${val(a[1])}) : ${T}(${val(a[2])})`); return;
             case 'trunc': set(`${T}(${val(a[0])})`); return;
             case 'rq': set(`${T}(axc_requant(${val(a[0])}, ${val(a[1])}, ${val(a[2])}))`); return;
+            case 'rq2': set(`${T}(axc_requant2(${val(a[0])}, ${val(a[1])}, ${val(a[2])}, ${val(a[3])}, ${val(a[4])}, ${a[5].c}))`); return;
             default: throw new Error(`exportação: operação ${n.op}`);
         }
     }
@@ -429,7 +448,7 @@ export function exportFunction(result, { interfaces = true, paramPartitions = tr
         '}',
         '',
     ];
-    return { code: code.join('\n'), units: [...unitsUsed], seqUnits: [...seqUnits], signed: [...signedFns], requant: usesRequant(design) };
+    return { code: code.join('\n'), units: [...unitsUsed], seqUnits: [...seqUnits], signed: [...signedFns], requant: usesRequant(design), requant2: usesRequant2(design) };
 }
 
 /** Cabeçalho comum: tipos e a declaração do kernel. */

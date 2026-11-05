@@ -310,6 +310,8 @@ export default {
     'nn.archConv': 'conv',
     'nn.archPool': 'max pool',
     'nn.archFlatten': 'flatten',
+    'nn.archAvgPool': "avg pool",
+    'nn.archAdd': "add",
     'nn.archDense': 'dense',
     'nn.modelInfo': '{name} on {dataset} ({n} test images): {weights} weights and {macs} multiplications per image.',
     'nn.noteTrained': 'Trained with scripts/nn/train.py (PyTorch, {epochs} epochs, with 5000 training images held out for validation) and quantized after training in the MiniLenet convention: per channel int8 weights, uint8 activations with a zero point and Q32 requantization. On the full test set of 10 thousand images, the accuracy is {float} in floating point and {int8} in 8 bits.',

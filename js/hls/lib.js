@@ -24,7 +24,7 @@ export const WIDTHS = [8, 16, 32];
 const NETS = new Map();
 const FREE = new Set(['shl', 'shr', 'trunc', 'iv', 'in', 'carry', 'carryout', 'out', 'const']);
 export const MEM = new Set(['load', 'store']);
-const CLASS = { add: 'add', sub: 'add', mul: 'mul', cmp: 'cmp', sel: 'mux', and: 'logic', or: 'logic', xor: 'logic', not: 'logic', rq: 'requant' };
+const CLASS = { add: 'add', sub: 'add', mul: 'mul', cmp: 'cmp', sel: 'mux', and: 'logic', or: 'logic', xor: 'logic', not: 'logic', rq: 'requant', rq2: 'requant2' };
 /** Larguras das somas com a opção wide (redes neurais). */
 export const WIDE_ADD = [8, 16, 24, 32];
 export const SHARED = new Set(['add', 'mul']);
@@ -44,7 +44,7 @@ export const opClass = (n) => (FREE.has(n.op) ? 'free' : MEM.has(n.op) ? 'mem' :
 
 /** Largura (8, 16 ou 32) da operação, a partir das faixas dos operandos e do resultado (addWidths: as das somas). */
 export function opWidth(n, rangeOf, addWidths = WIDTHS) {
-    if (opClass(n) === 'requant') return 32;
+    if (opClass(n) === 'requant' || opClass(n) === 'requant2') return 32;
     const ranges = n.args.map((a) => (a.c !== undefined ? [a.c, a.c] : rangeOf(a.n)));
     let w;
     switch (opClass(n)) {
@@ -161,6 +161,12 @@ export function makeLibrary(synth, cells, { flow = 'delay', target = 'asic', fpg
         return [ex, ...names.filter((n) => n !== ex)];
     }
     function cell(cls, W) {
+        // Reescala da soma residual: estimada como duas reescalas (dois produtos de 32 bits em DSP) com o atraso de uma
+        // (os produtos são em paralelo); a peça ainda não foi caracterizada à parte.
+        if (cls === 'requant2') {
+            const r = cell('requant', 32);
+            return { ...r, name: 'requant2_32', area: 2 * r.area, energy: 2 * r.energy, luts: 2 * r.luts, carry4: 2 * r.carry4, dsp: 2 * r.dsp };
+        }
         const key = { cmp: 'cmp', mux: 'mux', logic: 'xor', requant: 'requant' }[cls];
         if (cls === 'requant' && !cells.cells.requant) throw new HlsError('requant: a peça não está em data/hls-cells.json (node scripts/hls-cells.mjs --only requant)');
         const c = cells.cells[key][cls === 'requant' ? 32 : W][cellFlow];

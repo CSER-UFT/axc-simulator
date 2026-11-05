@@ -11,7 +11,12 @@
  *   maxpool  pipeline no laço da saída, máximo da janela;
  *   flatten  cópia para um vetor (como a função flattenLayer do C);
  *   dense    pipeline no laço das entradas (o laço interno, como o Vitis faz sozinho), acumulação em cadeia, e a
- *            reescala no fim de cada saída.
+ *            reescala no fim de cada saída;
+ *   add      soma residual das redes com ramos (ResNet 8, docs/RESNET8.md): os dois ramos (o acumulador int32 de uma
+ *            convolução "acc", que sai sem reescala, ou uma ativação menos o ponto zero) numa reescala só, requant2;
+ *   avgpool  média da janela, (soma + n / 2) >> log2 n, com pipeline no laço da janela.
+ * A borda pode ter lados diferentes (a do padding='same' do Keras no passo 2: 0, 1, 0, 1). Nas redes com ramos, cada
+ * kernel lê os tensores das camadas de l.src (ins) e escreve o seu (out).
  *
  * Os vetores de mais de duas dimensões ficam em duas (canal × linha, coluna); os pesos, os viéses e os M da reescala
  * são tabelas const, com os pesos na ordem dos laços (ky, kx, canal), a mesma ordem dos termos do avaliador (nn.js).
@@ -106,51 +111,61 @@ function treeExpr(terms) {
  * fator é o menor que separa as linhas.
  */
 /**
- * As redes com ramos, soma residual, média ou borda assimétrica (o formato da ResNet 8, docs/RESNET8.md) ainda não têm
- * código gerado nem custo: erro claro em vez de um plano que pule essas camadas (etapas 20 e 21 do plano).
+ * Plano da rede: os kernels em sequência e os tensores entre eles (C x H x W guardados em [C * Hs][W]: Hs >= H é o
+ * passo das linhas entre canais). Com a partição das linhas da entrada de uma conv de vários canais, o passo do
+ * tensor é escolhido para que as linhas lidas numa iteração caiam em bancos diferentes com o menor fator, F = g x C
+ * (Hs mod F = g, com g = K na janela inteira e 1 no laço kx); a entrada da rede tem o passo fixo (H), e então o
+ * fator é o menor que separa as linhas.
+ *
+ * Redes com ramos (ResNet 8): cada camada lê o tensor das camadas de l.src; as convoluções "acc" escrevem um tensor
+ * int32 (o acumulador com o viés), e a soma residual (add) lê os dois e escreve o de 8 bits. Cada passo tem ins (os
+ * tensores lidos) e out.
  */
-export function assertSequential(net, what = 'o gerador de código') {
-    const bad = net.layers.find((l) => l.type === 'add' || l.type === 'avgpool' || l.accOut || (l.pads && new Set(l.pads).size > 1));
-    if (net.graph || bad) throw new Error(`${what} ainda não aceita redes com ramos, soma residual, média ou borda assimétrica (${bad?.name ?? net.id})`);
-}
-
 function plan(net, dirs) {
-    assertSequential(net);
     const D = normalizeDirectives(net, dirs);
     const first = net.layers[0].inShape;
-    const tensors = [{ shape: first, stride: first[1], fixed: true }];
+    const tensors = [{ shape: first, stride: first[1], fixed: true, type: 'u8' }];
     const steps = [];
-    let cur = 0, pools = 0, pads = 0, si = -1;
-    const newT = (shape) => { tensors.push({ shape, stride: shape[1], fixed: false }); return tensors.length - 1; };
-    for (const l of net.layers) {
+    const outT = new Map([[-1, 0]]);
+    let pools = 0, pads = 0, si = -1;
+    const newT = (shape, type = 'u8') => { tensors.push({ shape, stride: shape[1], fixed: false, type }); return tensors.length - 1; };
+    net.layers.forEach((l, li) => {
+        const src = l.src ?? [li - 1];
+        let cur = outT.get(src[0]);
         if (l.type === 'conv') {
             si++;
-            const [C, H, W] = l.inShape, p = l.pad ?? 0;
-            if (p > 0) {
+            const [C, H, W] = l.inShape, [pt, pb, pl, pr] = l.pads ?? [l.pad ?? 0, l.pad ?? 0, l.pad ?? 0, l.pad ?? 0];
+            if (pt || pb || pl || pr) {
                 pads++;
-                const t = newT([C, H + 2 * p, W + 2 * p]);
-                steps.push({ name: `pad${pads}`, type: 'pad', site: null, l, in: cur, out: t, p });
+                const t = newT([C, H + pt + pb, W + pl + pr]);
+                steps.push({ name: `pad${pads}`, type: 'pad', site: null, l, in: cur, out: t, p: pt, pads: [pt, pb, pl, pr] });
                 cur = t;
             }
-            const t = newT(l.outShape);
+            const t = newT(l.outShape, l.logits || l.accOut ? 'i32' : 'u8');
             steps.push({ name: l.name, type: 'conv', site: si, l, in: cur, out: t, d: D[si] });
-            cur = t;
-        } else if (l.type === 'maxpool') {
+            outT.set(li, t);
+        } else if (l.type === 'maxpool' || l.type === 'avgpool') {
             pools++;
             const t = newT(l.outShape);
-            steps.push({ name: `pool${pools}`, type: 'maxpool', site: null, l, in: cur, out: t });
-            cur = t;
+            steps.push({ name: l.type === 'avgpool' ? (l.name ?? `avgpool${pools}`) : `pool${pools}`, type: l.type, site: null, l, in: cur, out: t });
+            outT.set(li, t);
         } else if (l.type === 'flatten') {
             const t = newT([l.outShape[0], 1, 1]);
             steps.push({ name: 'flatten', type: 'flatten', site: null, l, in: cur, out: t });
-            cur = t;
+            outT.set(li, t);
         } else if (l.type === 'dense') {
             si++;
-            const t = newT([l.out, 1, 1]);
+            const t = newT([l.out, 1, 1], l.logits ? 'i32' : 'u8');
             steps.push({ name: l.name, type: 'dense', site: si, l, in: cur, out: t, d: D[si] });
-            cur = t;
+            outT.set(li, t);
+        } else if (l.type === 'add') {
+            const ins = src.map((j) => outT.get(j));
+            const t = newT(l.outShape);
+            steps.push({ name: l.name, type: 'add', site: null, l, in: ins[0], ins, out: t, layers: net.layers });
+            outT.set(li, t);
         }
-    }
+    });
+    for (const st of steps) st.ins ??= [st.in];
     // Passos das linhas e fatores da partição da entrada das conv.
     for (const s of steps) {
         if (s.type !== 'conv' || !s.d.part || s.d.pipe === 'off') continue;
@@ -192,19 +207,139 @@ function plan(net, dirs) {
     return { steps, tensors, dirs: D };
 }
 
-/** Os kernels de uma rede decodificada (decodeNet) com as diretivas: [{name, type, site, src}]. */
+/**
+ * As redes com ramos ainda não têm o projeto para o Vitis (etapa 23 do plano): erro claro em vez de um topo que chame
+ * as camadas em sequência.
+ */
+export function assertSequential(net, what = 'a exportação para o Vitis') {
+    const bad = net.layers.find((l) => l.type === 'add' || l.type === 'avgpool' || l.accOut || (l.pads && new Set(l.pads).size > 1));
+    if (net.graph || bad) throw new Error(`${what} ainda não aceita redes com ramos, soma residual, média ou borda assimétrica (${bad?.name ?? net.id})`);
+}
+
+/**
+ * Os kernels de uma rede decodificada (decodeNet) com as diretivas: [{name, type, site, src, ins, out}], com ins e out
+ * os índices dos tensores lidos e escrito (tensors: as formas, os passos das linhas e o tipo de cada um).
+ */
 export function networkKernels(net, dirs = null) {
     const { steps, tensors } = plan(net, dirs);
-    return steps.map((s) => {
+    const kernels = steps.map((s) => {
         const xi = tensors[s.in], yo = tensors[s.out];
         let src;
-        if (s.type === 'pad') src = padKernel(s.name, ...xi.shape, s.p, s.l.zIn, xi.stride, yo.stride);
-        else if (s.type === 'conv') src = convKernel(s, xi, yo);
+        if (s.type === 'pad') {
+            const [pt, pb, pl, pr] = s.pads;
+            src = pt === pb && pl === pr && pt === pl ? padKernel(s.name, ...xi.shape, s.p, s.l.zIn, xi.stride, yo.stride) : padKernel4(s.name, ...xi.shape, s.pads, s.l.zIn, xi.stride, yo.stride);
+        } else if (s.type === 'conv') src = convKernel(s, xi, yo);
         else if (s.type === 'maxpool') src = poolKernel(s.name, s.l, xi.stride, yo.stride);
+        else if (s.type === 'avgpool') src = avgPoolKernel(s.name, s.l, xi.stride, yo.stride);
         else if (s.type === 'flatten') src = flattenKernel(xi.shape, xi.stride);
+        else if (s.type === 'add') src = addKernel(s, s.ins.map((t) => tensors[t]), yo);
         else src = denseKernel(s);
-        return { name: s.name, type: s.type, site: s.site, src };
+        return { name: s.name, type: s.type, site: s.site, src, ins: s.ins, out: s.out };
     });
+    Object.defineProperty(kernels, 'tensors', { value: tensors, enumerable: false });
+    return kernels;
+}
+
+/** Borda com lados diferentes (a do padding='same' do Keras no passo 2: 0, 1, 0, 1), com o ponto zero da entrada. */
+function padKernel4(name, C, H, W, [pt, pb, pl, pr], z, Hs = H, HPs = H + pt + pb) {
+    const HP = H + pt + pb, WP = W + pl + pr, Y = HPs !== HP ? 'HPS' : 'HP', X = Hs !== H ? 'HS' : 'H';
+    const loop = (label, rows, cols, body) => `${name}_${label}:
+        for (int h = 0; h < ${rows}; h++)
+            for (int w = 0; w < ${cols}; w++) {
+#pragma HLS pipeline II=1
+                ${body}
+            }
+`;
+    return `// ${name}: borda de ${pt}, ${pb}, ${pl} e ${pr} pixels (cima, baixo, esquerda, direita) com o ponto zero da entrada (${z}).
+#define C ${C}
+#define H ${H}
+#define W ${W}
+#define Z ${z}
+#define HP ${HP}
+#define WP ${WP}
+${Hs !== H ? `#define HS ${Hs}\n` : ''}${HPs !== HP ? `#define HPS ${HPs}\n` : ''}
+void ${name}(u8 x[C * ${X}][W], u8 y[C * ${Y}][WP]) {
+${name}_c:
+    for (int c = 0; c < C; c++) {
+${pt ? loop('top', pt, 'WP', `y[c * ${Y} + h][w] = Z;`) : ''}${pb ? loop('bottom', pb, 'WP', `y[c * ${Y} + ${pt + H} + h][w] = Z;`) : ''}${pl ? loop('left', 'H', pl, `y[c * ${Y} + ${pt} + h][w] = Z;`) : ''}${pr ? loop('right', 'H', pr, `y[c * ${Y} + ${pt} + h][${pl} + W + w] = Z;`) : ''}${loop('in', 'H', 'W', `y[c * ${Y} + ${pt} + h][${pl} + w] = x[c * ${X} + h][w];`)}    }
+}
+`;
+}
+
+/** Média de size x size (a de nn.js): soma da janela e (soma + n / 2) / n, com n potência de 2 (um deslocamento). */
+function avgPoolKernel(name, l, Hs, PHs) {
+    const [C, H, W] = l.inShape, [, PH, PW] = l.outShape, s = l.size, n = s * s, sh = Math.log2(n);
+    if (!Number.isInteger(sh)) throw new Error(`${name}: a média de ${s} x ${s} precisa de n potência de 2 no código gerado`);
+    return `// ${name}: média de ${s} x ${s}, (soma + ${n / 2}) >> ${sh}, na escala e no ponto zero da entrada.
+#define C ${C}
+#define H ${H}
+#define W ${W}
+#define S ${s}
+#define PH ${PH}
+#define PW ${PW}
+#define HS ${Hs ?? H}
+#define PHS ${PHs ?? PH}
+
+void ${name}(u8 x[C * HS][W], u8 y[C * PHS][PW]) {
+${name}_c:
+    for (int c = 0; c < C; c++) {
+${name}_h:
+        for (int ph = 0; ph < PH; ph++) {
+${name}_w:
+            for (int pw = 0; pw < PW; pw++) {
+                i32 acc = 0;
+${name}_y:
+                for (int dy = 0; dy < S; dy++)
+${name}_x:
+                    for (int dx = 0; dx < S; dx++) {
+#pragma HLS pipeline II=1
+                        acc += x[c * HS + ph * S + dy][pw * S + dx];
+                    }
+                y[c * PHS + ph][pw] = (acc + ${n / 2}) >> ${sh};
+            }
+        }
+    }
+}
+`;
+}
+
+/**
+ * Soma residual (camada add de nn.js): cada entrada é o acumulador de uma convolução "acc" (int32) ou uma ativação
+ * menos o ponto zero dela; as duas vão para a reescala de dois produtos (requant2), com o m de cada ramo por canal.
+ */
+function addKernel(s, ins, yo) {
+    const l = s.l, [C, H, W] = l.outShape;
+    if (ins.length !== 2) throw new Error(`${l.name}: o código gerado só soma duas entradas`);
+    const srcL = l.src.map((j) => (j >= 0 ? s.layers[j] : null));
+    const isAcc = srcL.map((P) => !!P?.accOut);
+    const mOf = (k) => { const m = isAcc[k] ? srcL[k].rq.m : l.mIn[k]; return m.length === 1 ? Array(C).fill(m[0]) : Array.from(m); };
+    const Hs = ins.map((t) => t.stride), OHs = yo.stride;
+    const v = (k) => {
+        const idx = `${'ab'[k]}[c * ${Hs[k]} + h][w]`;
+        return isAcc[k] ? idx : l.zInOf[k] ? `(${idx} - ${l.zInOf[k]})` : idx;
+    };
+    return `// ${l.name}: soma residual de ${srcL.map((P, k) => `${P?.name ?? 'entrada'}${isAcc[k] ? ' (acumulador)' : ' (ativação)'}`).join(' e ')}, uma reescala só (requant2).
+#define C ${C}
+#define H ${H}
+#define W ${W}
+#define Z ${l.zOut}
+
+void ${l.name}(${isAcc[0] ? 'i32' : 'u8'} a[C * ${Hs[0]}][W], ${isAcc[1] ? 'i32' : 'u8'} b[C * ${Hs[1]}][W], u8 y[C * ${OHs}][W]) {
+    const u32 ma[C] = {${list(mOf(0))}};
+    const u32 mb[C] = {${list(mOf(1))}};
+${l.name}_c:
+    for (int c = 0; c < C; c++) {
+${l.name}_h:
+        for (int h = 0; h < H; h++) {
+${l.name}_w:
+            for (int w = 0; w < W; w++) {
+#pragma HLS pipeline II=1
+                y[c * ${OHs} + h][w] = requant2(${v(0)}, ma[c], ${v(1)}, mb[c], Z${l.exp ? `, ${l.exp}` : ''});
+            }
+        }
+    }
+}
+`;
 }
 
 function padKernel(name, C, H, W, p, z, Hs = H, HPs = H + 2 * p) {
@@ -269,7 +404,8 @@ function convKernel(s, xi, yo) {
     const P = d.par;
     const fx = d.pipe !== 'pixel' || P === 1 ? 'f' : P === F ? 'f' : '(fo * PF + fi)';
     const yRow = `${fx === 'f' ? 'f' : fx} * OHS + oh`;
-    const out = l.logits ? `y[${yRow}][ow] = acc + b[${fx}];` : `y[${yRow}][ow] = requant(acc + b[${fx}], m[${fx}], Z);`;
+    const noRq = l.logits || l.accOut;
+    const out = noRq ? `y[${yRow}][ow] = acc + b[${fx}];` : `y[${yRow}][ow] = requant(acc + b[${fx}], m[${fx}], Z);`;
     const prod = (c, kh, kw, f) => `x[${c ? `${c} * HP + ` : ''}oh * S${kh ? ` + ${kh}` : ''}][ow * S${kw ? ` + ${kw}` : ''}] * w[${f}][${(kh * k + kw) * C + c}]`;
     const parts = [];
     if (d.part && d.pipe !== 'off') {
@@ -279,7 +415,7 @@ function convKernel(s, xi, yo) {
         else if (C > 1) parts.push(`#pragma HLS array_partition variable=w cyclic factor=${C} dim=2`);
         if (d.pipe === 'pixel' && P > 1 && P < F) {
             parts.push(`#pragma HLS array_partition variable=w cyclic factor=${P} dim=1`, `#pragma HLS array_partition variable=b cyclic factor=${P} dim=1`);
-            if (!l.logits) parts.push(`#pragma HLS array_partition variable=m cyclic factor=${P} dim=1`);
+            if (!noRq) parts.push(`#pragma HLS array_partition variable=m cyclic factor=${P} dim=1`);
         }
         if (s.outF) parts.push(`#pragma HLS array_partition variable=y cyclic factor=${s.outF} dim=1`);
     }
@@ -323,7 +459,7 @@ ${mac}
     }`;
     }
     const what = { pixel: `pipeline na coluna de saída (II ${d.ii}), janela desenrolada e somada em árvore${P > 1 ? `, ${P} filtros por iteração` : ''}`, tap: `pipeline no laço kx (II ${d.ii}), ${C > 1 ? `${C} canais por iteração, somados em árvore` : 'um produto por iteração'}`, off: 'sem pipeline, um produto por vez' }[d.pipe];
-    return `// ${l.name}: ${F} filtros ${k} x ${k} sobre ${C} canais; ${what}${parts.length ? '; vetores particionados' : ''}.
+    return `// ${l.name}: ${F} filtros ${k} x ${k} sobre ${C} canais; ${what}${parts.length ? '; vetores particionados' : ''}${l.accOut ? '; sai o acumulador com o viés (a reescala fica na soma residual)' : ''}.
 #define C ${C}
 #define HP ${HP}
 #define WP ${WP}
@@ -335,10 +471,10 @@ ${mac}
 #define OW ${OW}
 #define Z ${l.zOut ?? 0}
 ${P > 1 && P < F ? `#define PF ${P}\n` : ''}
-void ${l.name}(u8 x[C * HP][WP], ${l.logits ? 'i32' : 'u8'} y[F * OHS][OW]) {
+void ${l.name}(u8 x[C * HP][WP], ${noRq ? 'i32' : 'u8'} y[F * OHS][OW]) {
     const i8 w[F][K * K * C] = {${rows.join(', ')}};
     const i32 b[F] = {${list(l.b)}};
-${l.logits ? '' : `    const u32 m[F] = {${list(l.rq.m.length === 1 ? Array(F).fill(l.rq.m[0]) : l.rq.m)}};\n`}${parts.join('\n')}${parts.length ? '\n' : ''}${body}
+${noRq ? '' : `    const u32 m[F] = {${list(l.rq.m.length === 1 ? Array(F).fill(l.rq.m[0]) : l.rq.m)}};\n`}${parts.join('\n')}${parts.length ? '\n' : ''}${body}
 }
 `;
 }
@@ -473,6 +609,12 @@ ${l.logits ? '' : `    const u32 m[O] = {${list(l.rq.m.length === 1 ? Array(O).f
 // Custo ---------------------------------------------------------------------------------------------------------
 
 const DESIGNS = new Map();
+/** Peças de reescala de uma classe (requant ou requant2) num kernel sintetizado. */
+function rqParts(r, cls) {
+    const c = r.cost.cells.filter((x) => x.cls === cls);
+    const t = (f) => c.reduce((a, x) => a + (x[f] ?? 0), 0);
+    return { count: t('count'), dsp: t('dsp'), luts: t('luts'), carry4: t('carry4'), area: t('area') };
+}
 /** Elaboração de um kernel, guardada pelo código (é a parte cara). */
 function designOf(src, ports) {
     const key = `${ports}|${src}`;
@@ -547,7 +689,8 @@ export function costModel(net, o) {
             units: r.cost.units.map((u) => ({ name: u.unit.name, count: u.count })),
             warnings,
             // Peças de reescala da camada (a rede compartilha uma só entre as camadas, veja network).
-            rq: (() => { const c = r.cost.cells.filter((x) => x.cls === 'requant'); const t = (f) => c.reduce((a, x) => a + (x[f] ?? 0), 0); return { count: t('count'), dsp: t('dsp'), luts: t('luts'), carry4: t('carry4'), area: t('area') }; })(),
+            rq: rqParts(r, 'requant'),
+            rq2: rqParts(r, 'requant2'),
         };
         // A síntese (projeto, atribuição, biblioteca) fica junto, fora do JSON: é dela que sai o C++ (nnexport.js).
         Object.defineProperty(row, 'result', { value: r, enumerable: false });
@@ -565,9 +708,14 @@ export function costModel(net, o) {
         // Reescala compartilhada: as camadas rodam uma depois da outra, e o Vitis 2022.2 instancia o módulo da reescala
         // uma vez só no topo da rede (MiniLenet: 2 DSP48 na rede, 2 em cada camada sozinha). Na soma, ficam as peças
         // da camada que mais usa, no lugar das de todas.
-        const rqAll = (f) => layers.reduce((a, x) => a + (x.rq?.[f] ?? 0), 0);
-        const big = layers.reduce((b, x) => ((x.rq?.dsp ?? 0) > (b?.rq?.dsp ?? -1) ? x : b), null)?.rq ?? { dsp: 0, luts: 0, carry4: 0, area: 0 };
-        const shared = (f) => rqAll(f) - (big[f] ?? 0);
+        // O mesmo vale para a reescala da soma residual (axc_requant2, também num módulo próprio): fica a de uma soma.
+        const sharedOf = (key) => {
+            const all = (f) => layers.reduce((a, x) => a + (x[key]?.[f] ?? 0), 0);
+            const big = layers.reduce((b, x) => ((x[key]?.dsp ?? 0) > (b?.[key]?.dsp ?? -1) ? x : b), null)?.[key] ?? {};
+            return (f) => all(f) - (big[f] ?? 0);
+        };
+        const s1 = sharedOf('rq'), s2 = sharedOf('rq2');
+        const shared = (f) => s1(f) + s2(f);
         return {
             layers, warnings: [...new Set(layers.flatMap((l) => l.warnings))],
             totals: { cycles, timeUs: (cycles * clockNs) / 1000, area: sum('area') - shared('area'), luts: sum('luts') - shared('luts'), carry4: sum('carry4') - shared('carry4'), ff: sum('ff'), dsp: sum('dsp') - shared('dsp'), energy: sum('energy'), clockNs, requantShared: shared('dsp') > 0 || shared('luts') > 0 },

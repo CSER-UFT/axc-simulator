@@ -6,7 +6,8 @@
  *   comandos   declarações, atribuições (= += -= *= <<= >>= &= |= ^=, ++ e --), for com limites constantes e
  *              rótulo opcional (rotulo: for ...), blocos;
  *   expressões + - * / % << >> & | ^ ~ comparações, ?: e as funções min, max e abs; / e % só por potência de 2;
- *              requant(acc, m, z), a reescala das redes quantizadas (uma peça exata, js/axc/nngen.js);
+ *              requant(acc, m, z), a reescala das redes quantizadas (uma peça exata, js/axc/nngen.js), e
+ *              requant2(a, ma, b, mb, z[, e]), a da soma residual (dois produtos somados antes do arredondamento);
  *   diretivas  #pragma HLS pipeline [II=n], unroll [factor=n], array_partition variable=v [type=]cyclic|block|complete
  *              [factor=n] [dim=d], allocation operation instances=add|mul limit=n; array_partition vale por dimensão (uma
  *              diretiva por dimensão, os bancos das duas se combinam).

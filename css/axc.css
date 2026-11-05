@@ -153,6 +153,13 @@ table.metrics td.note { text-align: left; }
 .nn-arch .nn-dims { fill: var(--muted); font-size: 10.5px; font-family: var(--mono, 'IBM Plex Mono', monospace); }
 .nn-arch .nn-op { fill: var(--muted); font-size: 10px; }
 .nn-arch .nn-note { fill: var(--faint); font-size: 9px; }
+/* Redes com ramos: largas demais para encolher (a caixa rola); atalhos e somas residuais. */
+.nn-arch.nn-wide { max-width: none; }
+.nn-arch .nn-skip { fill: none; stroke: var(--focus); stroke-width: 1.3; }
+.nn-arch .nn-skip-head { fill: var(--focus); }
+.nn-arch .nn-skip-box { fill: var(--panel); stroke: var(--focus); stroke-width: 1; }
+.nn-arch .nn-add { fill: var(--panel); stroke: var(--ink); stroke-width: 1.3; }
+.nn-arch .nn-add-mark { stroke: var(--ink); stroke-width: 1.6; }
 
 /* Página das redes: a mesma grade da página de síntese, controles à esquerda e abas à direita. */
 .nn-main .pane h2 { margin-top: 4px; }
