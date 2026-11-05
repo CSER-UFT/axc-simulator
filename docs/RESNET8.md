@@ -68,14 +68,17 @@ CIFAR 10 (651 720).
 2. **Atalhos 1 × 1 como camadas da busca**, como combinado: a busca tem 10 camadas e 20 grupos (o multiplicador e o
    somador de cada camada). O plano dizia 11 camadas e cerca de 22 grupos; a contagem certa é 10 e 20. As três
    somas residuais e a média ficam exatas (cerca de 29 mil somas por imagem, contra 12,5 milhões de produtos).
-3. **Soma residual com reescala** (etapa 15). Proposta: a soma entra na reescala da segunda convolução da pilha. Na
-   pilha 1, saída = min(127, max(0, ((acc M + (x − z_x) M_x + 2^31) >> 32) + z_saída)), com x a ativação do atalho
-   identidade; nas pilhas 2 e 3, os dois acumuladores int32 (o da convolução 3 × 3 e o do atalho 1 × 1), cada um
-   com o seu M em Q32, somados antes do arredondamento. Assim não há uma quantização intermediária do ramo sem ReLU,
-   e a conta continua inteira e bit exata. A alternativa (como o TFLite) é quantizar cada ramo em 8 bits e somar
-   com duas reescalas; ela perde precisão no ramo com sinal e não traz vantagem para o hardware.
-4. **Média de 8 × 8**: soma das 64 ativações (até 8128) e (soma + 32) >> 6, na mesma escala e ponto zero da
-   entrada; a densa recebe ativações de 8 bits, como as tabelas de produtos pedem.
+3. **Soma residual com reescala** (feita na etapa 15). A segunda convolução de cada pilha e os atalhos 1 × 1 têm
+   `output: "acc"`: entregam o acumulador com o viés (int32), sem reescala. A camada `add` faz uma reescala só:
+   v_j é o acumulador (convolução "acc") ou a − z_a (a ativação do atalho identidade, na pilha 1), e
+   saída = min(255, max(0, floor((soma de v_j m_j + 2^(31+e)) / 2^(32+e)) + z_saída)), com m_j em Q32 por canal e
+   e = `requant.exp` (0 por padrão; negativo quando algum m_j / 2^32 passaria de 1). A ReLU é o limite em 0, como
+   nas convoluções. Não há quantização intermediária do ramo sem ReLU, e a conta é inteira e bit exata (`mulQ32Sum`,
+   conferida contra BigInt). A alternativa do TFLite, quantizar cada ramo em 8 bits e somar com duas reescalas, perde
+   precisão no ramo com sinal e não traz vantagem para o hardware.
+4. **Média** (feita na etapa 15): `avgpool` com `size` 8, soma das 64 ativações (até 16 320) e
+   floor((soma + 32) / 64), na mesma escala e ponto zero da entrada; a densa recebe ativações de 8 bits, como as
+   tabelas de produtos pedem.
 5. **Quantização** igual à das redes de hoje (`scripts/nn/train.py`): pesos int8 simétricos por canal, ativações de
    0 a 127 com escala e ponto zero por camada, viés int32, reescala em Q32. A entrada segue a nossa normalização por
    canal (a referência usa o pixel cru, de 0 a 255; com o BN depois da primeira convolução, isso não muda a rede).
@@ -85,11 +88,43 @@ CIFAR 10 (651 720).
    5000 de validação de `split_validation`, com a escolha da melhor época na validação. Alvo: pelo menos 85% no teste
    depois da quantização, perto dos 86,97% do int8 da referência.
 
+## Formato (etapa 15)
+
+O formato continua `axc-nn/1` (`js/axc/nn.js`), e as redes de hoje decodificam e classificam igual. O que entrou:
+
+* `name` em cada camada e `input` (o nome da camada lida; `"input"` é a entrada da rede); sem `input`, a camada lê a
+  anterior. A ordem das camadas é a de execução;
+* `pad` da convolução como número ou como `[cima, baixo, esquerda, direita]`;
+* `output: "acc"` na convolução, `add` com `inputs` e `requant: {mode: "q32", m: [um por entrada], exp, zero}`, e
+  `avgpool` com `size`;
+* no decodificador, `l.src` (os índices lidos), `net.cuts` (o tensor vivo antes de cada camada, quando é um só e de
+  8 bits), `net.lastUse` e `net.graph`. O m de cada ramo "acc" fica também em `l.rq.m` da convolução, e a correção de
+  ganho da busca muda esse m (o `scales` de `inferFrom` e de `withBiases`).
+
+Exemplo da pilha 2 (pesos e reescalas em base64, como nas outras camadas):
+
+```json
+{"type": "conv", "name": "s2a", "input": "s1add", "out": 32, "k": 3, "stride": 2, "pad": [0, 1, 0, 1], "w": "...", "b": "...", "requant": {"mode": "q32", "m": "...", "zero": 0}},
+{"type": "conv", "name": "s2b", "out": 32, "k": 3, "stride": 1, "pad": 1, "output": "acc", "w": "...", "b": "..."},
+{"type": "conv", "name": "s2sc", "input": "s1add", "out": 32, "k": 1, "stride": 2, "pad": 0, "output": "acc", "w": "...", "b": "..."},
+{"type": "add", "name": "s2add", "inputs": ["s2sc", "s2b"], "requant": {"mode": "q32", "m": ["...", "..."], "exp": 0, "zero": 0}}
+```
+
+O gerador de código, o modelo de custo e o diagrama ainda recusam essas redes com um erro claro (etapas 19 a 21).
+
 ## Custo da avaliação bit exata
 
-O avaliador de hoje (`js/axc/nn.js`) faz cerca de 410 milhões de multiplicações por segundo numa thread (medido com a
-LeNet 5: 1,6 ms por imagem no CIFAR 10). Na ResNet 8, isso dá cerca de 30 ms por imagem: 150 s para as 5000 imagens
-de validação numa thread, uns 22 s com 7 workers. Uma calibração de 40 trocas isoladas sobre as 5000 imagens levaria
-uns 15 minutos com 7 workers. Por isso a etapa 16 guarda as ativações da rede exata na entrada de cada camada: uma
-troca isolada numa camada só recalcula dali para a frente (em média, 46% das multiplicações, de 100% na
-primeira camada a quase nada na densa), e a amostra de 1000 imagens fica para as rodadas rápidas.
+Medido na etapa 16 com a ResNet 8 inteira e pesos sorteados (`js/axc/nn.js`, uma thread): 39 ms por imagem com as
+unidades exatas e 45 ms com o MUL8 DRUM4 e o ADD32 LOA10 em todas as camadas. Isso dá cerca de 200 s para as 5000
+imagens de validação numa thread, uns 28 s com 7 workers; uma calibração de 40 trocas isoladas sobre as 5000 imagens
+levaria uns 15 minutos com 7 workers.
+
+O avaliador da busca (`Evaluator` em `js/axc/nnsearch.js`) guarda as ativações da configuração base nos cortes: os
+pontos com um tensor vivo só. Na ResNet 8 são 7 (antes da conv1, da s1a, da s2a, da s3a, da média, do flatten e da
+densa), 44 kB por imagem; guardar todos os tensores vivos antes de cada camada com pesos levaria uns 180 kB. Uma troca
+isolada recomeça do último corte antes da camada: 39 ms por imagem na conv1, 38 ms na s1b (recomeça da saída da
+conv1), 23 ms no atalho da pilha 2, 12 ms no da pilha 3 e quase nada na densa.
+
+Memória: com as 5000 imagens, 220 MB por avaliador; a preparação da busca tem o da amostra, o da validação inteira e o
+do teste, e cada worker de avaliação tem o seu da amostra. Na etapa 22, a validação inteira deve ficar só para a
+conferência no fim (sem guardar os cortes) e a amostra de 1000 imagens para a busca (44 MB por worker).

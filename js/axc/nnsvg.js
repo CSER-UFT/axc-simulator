@@ -15,6 +15,7 @@ const f1 = (v) => Math.round(v * 10) / 10;
  * @returns {string} SVG
  */
 export function archSvg(net, o = {}) {
+    if (net.graph || net.layers.some((l) => l.type === 'add' || l.type === 'avgpool')) throw new Error('o diagrama ainda não desenha redes com ramos (etapa 19 do plano)');
     const lb = { input: 'input', conv: 'conv', pool: 'max pool', flatten: 'flatten', dense: 'dense', ...(o.labels ?? {}) };
     const maxPlanes = o.maxPlanes ?? 16;
     // Tensores: a entrada e a saída de cada camada.

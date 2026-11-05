@@ -85,8 +85,19 @@ Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
     flutuante e 86,97% em int8 no teste, medido aqui; borda do padding='same' assimétrica no passo 2; proposta da
     soma residual dentro da reescala da segunda convolução de cada pilha; avaliação estimada em 30 ms por imagem
     numa thread).
-15. Formato axc-nn/1 como grafo: convolução com passo e borda gerais, soma residual com reescala, média global.
-16. Avaliador bit exato em JavaScript com ramos (e as ativações guardadas da busca).
+15. Formato axc-nn/1 como grafo: convolução com passo e borda gerais, soma residual com reescala, média global
+    (feito, com as três decisões da etapa 14: borda do Keras, soma residual dentro de uma reescala só e somas
+    residuais e média exatas; name e input em cada camada, pad em lista, conv com output "acc", add com um m em Q32
+    por entrada e exp, avgpool; decodeNet dá l.src, net.cuts, net.lastUse e net.graph; mulQ32Sum exata; as redes de
+    hoje decodificam e classificam igual; o gerador de código, o custo e o diagrama recusam as redes com ramos com
+    erro claro até as etapas 19 a 21; docs/RESNET8.md, seção Formato).
+16. Avaliador bit exato em JavaScript com ramos (e as ativações guardadas da busca) (feito: inferFrom executa o
+    grafo e libera os tensores que ninguém mais lê; o Evaluator guarda as ativações nos cortes, 44 kB por imagem
+    na ResNet 8, e recomeça do último corte antes da camada trocada; o histograma das entradas das camadas, que a
+    preparação usava dos buffers, vem da passada gravada; a correção de ganho de uma convolução "acc" muda o m do
+    ramo dela na add; test/nngraph.test.js confere tudo contra uma referência com BigInt numa ResNet pequena;
+    ResNet 8 com pesos sorteados: 39 ms por imagem exata e 45 ms com unidades aproximadas numa thread. Pendente
+    para a etapa 22: memória dos avaliadores com 5000 imagens, 220 MB cada).
 17. Treino no train.py (normalização em lote incorporada, aumento de dados, quantização da soma residual, 5000
     imagens de validação); Tiago treina na GPU.
 18. Conferência bit a bit Python e JavaScript.

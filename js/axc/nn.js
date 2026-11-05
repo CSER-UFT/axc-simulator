@@ -11,8 +11,23 @@
  * A reescala é em Q32, como no C (M inteiro sem sinal: (acc * M + 2^31) >> 32), ou com M em ponto flutuante,
  * floor(acc * M + 0.5) (a LeNet 5 de scripts/lenet5/train.py).
  *
- * Camadas: conv {out, k, pad, stride}, maxpool {size}, flatten, dense {out}. As camadas com pesos são os pontos de
- * aproximação (os "sites"): cada uma tem a sua tabela de produtos e a sua soma.
+ * Camadas: conv {out, k, pad, stride}, maxpool {size}, avgpool {size}, flatten, dense {out} e add {inputs}. As
+ * camadas com pesos são os pontos de aproximação (os "sites"): cada uma tem a sua tabela de produtos e a sua soma.
+ *
+ * Grafo (redes com ramos, como a ResNet 8; docs/RESNET8.md): cada camada lê a anterior, a não ser que diga outra em
+ * input (o nome dela, ou "input" para a entrada da rede); add lê as duas de inputs. A ordem das camadas é a de
+ * execução. Nas convoluções, pad pode ser um número (a mesma borda dos quatro lados) ou [cima, baixo, esquerda,
+ * direita], como o padding='same' do Keras no passo 2 (0, 1, 0, 1).
+ *
+ * Soma residual: a convolução com output "acc" não tem reescala e entrega o acumulador com o viés (int32); a camada
+ * add soma as entradas já na escala da saída e faz uma reescala só, sem quantizar os ramos no meio:
+ *   v_j = acumulador (convolução "acc") ou a - z_a (ativação uint8);
+ *   saída = min(255, max(0, floor((soma de v_j m_j + 2^(31+e)) / 2^(32+e)) + z_saída)),
+ * com m_j em Q32 por canal (requant.m, uma lista com um por entrada) e e = requant.exp (0 por padrão; negativo
+ * deixa m_j / 2^(32+e) passar de 1). O m da entrada que vem de uma convolução "acc" fica também em l.rq.m dela: é a
+ * reescala daquele ramo, e a correção de ganho da busca muda esse m.
+ * avgpool soma as size x size ativações de cada janela e divide arredondando para cima no meio:
+ *   floor((soma + floor(n / 2)) / n), n = size², na mesma escala e ponto zero da entrada.
  */
 
 import { adderFunction } from './units.js';
@@ -57,20 +72,55 @@ export function mulQ32(acc, m) {
     return Math.floor((acc * mh + q0) / 65536);
 }
 
-/** Rede a partir do JSON: camadas com os pesos decodificados e as formas de cada tensor. */
+/**
+ * floor((soma de v[j] m[j] + 2^(31+e)) / 2^(32+e)), exato, com v inteiros de até 32 bits com sinal e m de 32 bits sem
+ * sinal (os produtos passam de 2^53: m é separado em duas metades de 16 bits). e de -16 a 20.
+ */
+export function mulQ32Sum(v, m, e = 0) {
+    let hi = 0, lo = 2 ** (31 + e);
+    for (let j = 0; j < v.length; j++) {
+        const mh = Math.floor(m[j] / 65536), ml = m[j] % 65536;
+        hi += v[j] * mh;
+        lo += v[j] * ml;
+    }
+    return Math.floor((hi + Math.floor(lo / 65536)) / 2 ** (16 + e));
+}
+
+/** Borda [cima, baixo, esquerda, direita] de uma convolução (pad: número ou lista de quatro). */
+const padsOf = (pad) => (Array.isArray(pad) ? pad.map((v) => v | 0) : [pad | 0, pad | 0, pad | 0, pad | 0]);
+
+/**
+ * Rede a partir do JSON: camadas com os pesos decodificados, as formas de cada tensor e as ligações do grafo
+ * (l.src: os índices das camadas que ela lê, -1 para a entrada da rede). net.cuts[li]: o índice do único tensor vivo
+ * antes da camada li (o que a inferência precisa para começar dali), quando é um só e de 8 bits; senão, undefined.
+ * Nas redes em sequência, todas as camadas são cortes (cuts[li] = li - 1).
+ */
 export function decodeNet(json) {
     if (json.format !== FORMAT) throw new Error(`formato desconhecido: ${json.format}`);
     const ds = json.dataset;
-    let shape = [...ds.shape];                     // [C, H, W] ou [N]
-    let z = json.input?.zero ?? 0;                 // ponto zero do tensor atual
+    const byName = new Map([['input', -1]]);
+    const shapeOf = [], zOf = [], accOf = [];          // por índice; a entrada da rede é -1
+    const inShape0 = [...ds.shape], z0 = json.input?.zero ?? 0;
+    const sh = (j) => (j === -1 ? inShape0 : shapeOf[j]), zz = (j) => (j === -1 ? z0 : zOf[j]);
     const layers = [];
-    for (const L of json.layers) {
-        const l = { ...L, inShape: shape, zIn: z };
+    json.layers.forEach((L, li) => {
+        const ref = (name) => {
+            if (!byName.has(name)) throw new Error(`${L.name ?? L.type}: entrada desconhecida ${name}`);
+            return byName.get(name);
+        };
+        const src = L.type === 'add' ? (L.inputs ?? []).map(ref) : [L.input !== undefined ? ref(L.input) : li - 1];
+        if (L.type === 'add' && src.length < 2) throw new Error(`${L.name}: add precisa de duas entradas`);
+        for (const j of src) {
+            if (accOf[j] && L.type !== 'add') throw new Error(`${L.name ?? L.type}: só add lê o acumulador de ${json.layers[j].name}`);
+        }
+        const shape = sh(src[0]);
+        const l = { ...L, src, inShape: shape, zIn: zz(src[0]) };
         if (L.type === 'conv') {
-            const [C, H, W] = shape, k = L.k, pad = L.pad ?? 0, s = L.stride ?? 1;
+            const [C, H, W] = shape, k = L.k, s = L.stride ?? 1, [pt, pb, pl, pr] = padsOf(L.pad ?? 0);
+            l.pads = [pt, pb, pl, pr];
             l.w = i8(L.w); l.b = i32(L.b);
             if (l.w.length !== L.out * C * k * k) throw new Error(`${L.name}: ${l.w.length} pesos, esperados ${L.out * C * k * k}`);
-            l.outShape = [L.out, Math.floor((H + 2 * pad - k) / s) + 1, Math.floor((W + 2 * pad - k) / s) + 1];
+            l.outShape = [L.out, Math.floor((H + pt + pb - k) / s) + 1, Math.floor((W + pl + pr - k) / s) + 1];
             l.macs = l.outShape[0] * l.outShape[1] * l.outShape[2] * C * k * k;
         } else if (L.type === 'dense') {
             const I = shape.length === 1 ? shape[0] : shape.reduce((a, b) => a * b, 1);
@@ -78,31 +128,73 @@ export function decodeNet(json) {
             if (l.w.length !== L.out * I) throw new Error(`${L.name}: ${l.w.length} pesos, esperados ${L.out * I}`);
             l.outShape = [L.out];
             l.macs = L.out * I;
-        } else if (L.type === 'maxpool') {
+        } else if (L.type === 'maxpool' || L.type === 'avgpool') {
             const [C, H, W] = shape, s = L.size;
             l.outShape = [C, Math.floor(H / s), Math.floor(W / s)];
         } else if (L.type === 'flatten') {
             l.outShape = [shape.reduce((a, b) => a * b, 1)];
+        } else if (L.type === 'add') {
+            const shapes = src.map(sh);
+            if (shapes.some((x) => x.join() !== shape.join())) throw new Error(`${L.name}: entradas de formas diferentes (${shapes.map((x) => x.join('x')).join(', ')})`);
+            const rq = L.requant;
+            if (!rq || rq.mode !== 'q32' || !Array.isArray(rq.m) || rq.m.length !== src.length) throw new Error(`${L.name}: add precisa de requant q32 com um m por entrada`);
+            l.outShape = shape;
+            l.exp = rq.exp ?? 0;
+            if (l.exp < -16 || l.exp > 20) throw new Error(`${L.name}: requant.exp fora de -16 a 20`);
+            l.mIn = rq.m.map(u32);
+            l.zInOf = src.map(zz);
+            l.zOut = rq.zero ?? 0;
         } else throw new Error(`camada desconhecida: ${L.type}`);
+        let zOut = l.type === 'add' ? l.zOut : l.zIn;
         if (l.w) {
             const rq = L.requant;
-            if (rq) {
+            if (L.output === 'acc') {
+                l.accOut = true;
+                zOut = undefined;
+            } else if (rq) {
                 l.rq = rq.mode === 'q32' ? { q32: true, m: u32(rq.m) } : { q32: false, M: rq.M };
                 l.zOut = rq.zero ?? 0;
-                z = l.zOut;
+                zOut = l.zOut;
             } else l.logits = true;
         }
-        shape = l.outShape;
+        if (L.name !== undefined) {
+            if (byName.has(L.name)) throw new Error(`nome repetido: ${L.name}`);
+            byName.set(L.name, li);
+        }
+        shapeOf[li] = l.outShape; zOf[li] = zOut; accOf[li] = !!l.accOut;
         layers.push(l);
-    }
+    });
+    // As convoluções "acc" alimentam uma add: a reescala do ramo (o m da entrada) e o ponto zero da saída da add.
+    layers.forEach((l, li) => {
+        if (l.type !== 'add') return;
+        l.src.forEach((j, k) => {
+            if (j >= 0 && layers[j].accOut) {
+                if (layers[j].addLayer !== undefined) throw new Error(`${layers[j].name}: o acumulador vai para mais de uma add`);
+                Object.assign(layers[j], { addLayer: li, addInput: k, rq: { q32: true, m: l.mIn[k] }, zOut: l.zOut });
+            } else if (j >= 0 && layers[j].logits) throw new Error(`${l.name}: entrada sem reescala (${layers[j].name})`);
+        });
+    });
+    layers.forEach((l) => { if (l.accOut && l.addLayer === undefined) throw new Error(`${l.name}: output "acc" sem add que o leia`); });
+    const last = layers.length - 1;
+    // Tensores vivos antes de cada camada: os produzidos antes dela e lidos por ela ou por uma depois.
+    const lastUse = new Map();
+    layers.forEach((l, li) => { for (const j of l.src) lastUse.set(j, li); });
+    const cuts = layers.map((_, li) => {
+        const live = [];
+        for (let j = -1; j < li; j++) if ((lastUse.get(j) ?? -2) >= li) live.push(j);
+        return live.length === 1 && !accOf[live[0]] ? live[0] : undefined;
+    });
     const sites = layers.filter((l) => l.w);
     if (!sites.length || !sites[sites.length - 1]) throw new Error('rede sem camadas com pesos');
+    if (layers[last].accOut || layers[last].type === 'add') throw new Error('a última camada tem de dar as saídas (uma camada com pesos)');
+    const shape = layers[last].outShape;
     return {
         id: json.id, name: json.name, description: json.description ?? '', source: json.source ?? null,
         dataset: ds, input: json.input ?? null,
         // Uma tabela por canal de entrada (a normalização pode ser por canal, como na CIFAR 10).
         inputLuts: Array.from({ length: ds.shape.length === 3 ? ds.shape[0] : 1 }, (_, c) => inputTable(json.input, c)),
-        layers, sites, classes: shape[0],
+        layers, sites, cuts, classes: shape[0], lastUse: layers.map((_, j) => lastUse.get(j) ?? j),
+        graph: layers.some((l, li) => l.src.length > 1 || l.src[0] !== li - 1),
         accuracy: json.accuracy ?? {}, expected: json.expected ? fromB64(json.expected) : null,
     };
 }
@@ -279,7 +371,8 @@ export function sumTerms(nTerms, fill, n, add, tree, scratch = makeScratch()) {
 
 /** Convolução: acumuladores (sem o viés ainda) de todas as saídas, termo a termo na ordem ky, kx, canal. */
 function convAcc(l, x, T, add, tree, scratch) {
-    const [C, H, W] = l.inShape, [F, OH, OW] = l.outShape, k = l.k, pad = l.pad ?? 0, s = l.stride ?? 1, z = l.zIn;
+    const [C, H, W] = l.inShape, [F, OH, OW] = l.outShape, k = l.k, s = l.stride ?? 1, z = l.zIn;
+    const [pt, pb, pl, pr] = l.pads ?? padsOf(l.pad ?? 0), pad = pt + pb + pl + pr;
     const n = F * OH * OW;
     const acc = scratch.acc(n);
     acc.fill(0, 0, n);
@@ -287,10 +380,10 @@ function convAcc(l, x, T, add, tree, scratch) {
     if (!add) {
         // Soma exata: a ordem não muda o resultado. A entrada vai para um buffer com a borda (preenchida com o
         // ponto zero) e os pesos viram deslocamentos na tabela.
-        const PH = H + 2 * pad, PW = W + 2 * pad;
+        const PH = H + pt + pb, PW = W + pl + pr;
         const xp = scratch.padded(C * PH * PW);
         if (pad) xp.fill(z, 0, C * PH * PW);
-        for (let c = 0; c < C; c++) for (let y = 0; y < H; y++) xp.set(x.subarray((c * H + y) * W, (c * H + y + 1) * W), (c * PH + y + pad) * PW + pad);
+        for (let c = 0; c < C; c++) for (let y = 0; y < H; y++) xp.set(x.subarray((c * H + y) * W, (c * H + y + 1) * W), (c * PH + y + pt) * PW + pl);
         const wo = l.wOff ??= Int32Array.from(w, (v) => (v + 128) * 256);
         for (let f = 0; f < F; f++) {
             for (let oy = 0; oy < OH; oy++) {
@@ -311,10 +404,10 @@ function convAcc(l, x, T, add, tree, scratch) {
     }
     // Com a unidade, a ordem conta: termo t = (ky, kx, canal), a ordem dos laços do C. A entrada vai para o buffer
     // com a borda (o ponto zero), como no caminho exato.
-    const PH = H + 2 * pad, PW = W + 2 * pad;
+    const PH = H + pt + pb, PW = W + pl + pr;
     const xp = scratch.padded(C * PH * PW);
     if (pad) xp.fill(z, 0, C * PH * PW);
-    for (let c = 0; c < C; c++) for (let y = 0; y < H; y++) xp.set(x.subarray((c * H + y) * W, (c * H + y + 1) * W), (c * PH + y + pad) * PW + pad);
+    for (let c = 0; c < C; c++) for (let y = 0; y < H; y++) xp.set(x.subarray((c * H + y) * W, (c * H + y + 1) * W), (c * PH + y + pt) * PW + pl);
     const fill = (t, out) => {
         const ky = Math.floor(t / (k * C)), kx = Math.floor(t / C) % k, c = t % C;
         let i = 0;
@@ -417,51 +510,59 @@ export function withBiases(net, delta, scales = null) {
     return { ...net, layers, sites: layers.filter((l) => l.w) };
 }
 
+/** Viés pela unidade (mais uma soma do acumulador) ou exato, canal a canal, em acc (n = canais x per). */
+function addBias(acc, B, C, per, add, scratch) {
+    if (add) {
+        for (let ch = 0; ch < C; ch++) {
+            const tmp = scratch.prod(per);
+            tmp.fill(B[ch], 0, per);
+            add(acc.subarray(ch * per, (ch + 1) * per), tmp, per);
+        }
+    } else for (let ch = 0, i = 0; ch < C; ch++) { const b = B[ch]; for (let e = i + per; i < e; i++) acc[i] += b; }
+}
+
 /**
- * Inferência a partir da camada net.layers[from], com x as ativações da entrada dela (não é alterado). record(li, x),
- * se dado, recebe as ativações da entrada de cada camada li (a busca guarda as das camadas que não mudam). biases[si],
- * se dado, é o viés da camada com pesos si no lugar do dela (a correção do viés da busca); scales[si], a reescala
- * (m de cada canal, a correção de ganho).
+ * Inferência a partir da camada net.layers[from], com x o tensor vivo antes dela (não é alterado): a entrada dela nas
+ * redes em sequência; nas redes com ramos, from tem de ser um corte (net.cuts[from] definido), e x é o único tensor
+ * vivo ali. record(li, x), se dado, recebe a primeira entrada de cada camada li (a busca guarda as dos cortes e mede
+ * os operandos das camadas com pesos). biases[si], se dado, é o viés da camada com pesos si no lugar do dela (a
+ * correção do viés da busca); scales[si], a reescala (m de cada canal, a correção de ganho; numa convolução "acc", o m
+ * do ramo dela na add).
  */
 export function inferFrom(net, x, from, tables, adds = [], scratch = makeScratch(), trees = [], record = null, biases = null, scales = null) {
-    let si = 0, out = null;
-    for (let li = 0; li < from; li++) if (net.layers[li].type === 'conv' || net.layers[li].type === 'dense') si++;
-    for (let li = from; li < net.layers.length; li++) {
-        const l = net.layers[li];
+    const L = net.layers;
+    const p0 = net.cuts ? net.cuts[from] : from - 1;
+    if (p0 === undefined) throw new Error(`a inferência não pode começar na camada ${L[from].name ?? from}: há mais de um tensor vivo ali`);
+    const vals = new Array(L.length);
+    let input = null;
+    if (p0 === -1) input = x; else vals[p0] = x;
+    const get = (j) => (j === -1 ? input : vals[j]);
+    let si = 0;
+    for (let li = 0; li < from; li++) if (L[li].w) si++;
+    const siteOfLayer = new Map();
+    for (let li = 0, k = 0; li < L.length; li++) if (L[li].w) siteOfLayer.set(li, k++);
+    for (let li = from; li < L.length; li++) {
+        const l = L[li];
+        x = get(l.src[0]);
         if (record) record(li, x);
-        if (l.type === 'conv' || l.type === 'dense') {
+        if (l.w) {
             const T = tables[si], add = adds[si] ?? null, tree = trees[si] ?? 1, B = biases?.[si] ?? l.b, MS = scales?.[si] ?? l.rq?.m;
             si++;
             const acc = l.type === 'conv' ? convAcc(l, x, T, add, tree, scratch) : denseAcc(l, x, T, add, tree, scratch);
-            const n = l.outShape.reduce((a, b) => a * b, 1), per = n / l.outShape[0];
+            const C = l.outShape[0], n = l.outShape.reduce((a, b) => a * b, 1), per = n / C;
             // O viés entra no fim, como no C: (soma dos produtos) + viés.
-            const bias = scratch.one();
-            if (l.logits) {
-                out = new Int32Array(n);
-                for (let i = 0; i < n; i++) {
-                    const ch = Math.floor(i / per);
-                    if (add) { bias[0] = B[ch]; const a1 = Int32Array.of(acc[i]); add(a1, bias, 1); out[i] = a1[0]; } else out[i] = acc[i] + B[ch];
-                }
-                x = out;
+            if (l.logits || l.accOut) {
+                const o = Int32Array.from(acc.subarray(0, n));
+                addBias(o, B, C, per, add, scratch);
+                vals[li] = o;
             } else {
+                addBias(acc, B, C, per, add, scratch);
                 const y = new Uint8Array(n);
-                if (add) {
-                    // Viés pela unidade também (é mais uma soma do acumulador).
-                    for (let ch = 0; ch < l.outShape[0]; ch++) {
-                        const tmp = scratch.prod(per);
-                        tmp.fill(B[ch], 0, per);
-                        const seg = acc.subarray(ch * per, (ch + 1) * per);
-                        add(seg, tmp, per);
-                    }
-                    for (let i = 0; i < n; i++) y[i] = requantize(l, acc[i], Math.floor(i / per), MS);
-                } else {
-                    for (let i = 0; i < n; i++) { const ch = Math.floor(i / per); y[i] = requantize(l, acc[i] + B[ch], ch, MS); }
-                }
-                x = y;
-                out = y;
+                for (let i = 0; i < n; i++) y[i] = requantize(l, acc[i], Math.floor(i / per), MS);
+                vals[li] = y;
             }
-        } else if (l.type === 'maxpool') {
-            const [C, H, W] = l.inShape, [, PH, PW] = l.outShape, s = l.size;
+        } else if (l.type === 'maxpool' || l.type === 'avgpool') {
+            const [C, H, W] = l.inShape, [, PH, PW] = l.outShape, s = l.size, avg = l.type === 'avgpool', nn = s * s, half = Math.floor(nn / 2);
             const y = new Uint8Array(C * PH * PW);
             for (let c = 0; c < C; c++) {
                 for (let py = 0; py < PH; py++) {
@@ -469,16 +570,37 @@ export function inferFrom(net, x, from, tables, adds = [], scratch = makeScratch
                         let m = 0;
                         for (let dy = 0; dy < s; dy++) for (let dx = 0; dx < s; dx++) {
                             const v = x[(c * H + py * s + dy) * W + px * s + dx];
-                            if (v > m) m = v;
+                            if (avg) m += v; else if (v > m) m = v;
                         }
-                        y[(c * PH + py) * PW + px] = m;
+                        y[(c * PH + py) * PW + px] = avg ? Math.floor((m + half) / nn) : m;
                     }
                 }
             }
-            x = y;
-        }
-        // flatten: o vetor já está em C x H x W, a mesma ordem do C (f, h, w).
+            vals[li] = y;
+        } else if (l.type === 'add') {
+            // Cada entrada já na escala da saída (m em Q32 por canal) e uma reescala só.
+            const C = l.outShape[0], n = l.outShape.reduce((a, b) => a * b, 1), per = n / C, J = l.src.length;
+            const ins = l.src.map(get), ms = l.src.map((j, k) => {
+                const P = j >= 0 ? L[j] : null;
+                return P?.accOut ? (scales?.[siteOfLayer.get(j)] ?? P.rq.m) : l.mIn[k];
+            });
+            const isAcc = l.src.map((j) => j >= 0 && !!L[j].accOut);
+            const v = new Array(J), m = new Array(J), y = new Uint8Array(n);
+            for (let i = 0; i < n; i++) {
+                const ch = Math.floor(i / per);
+                for (let k = 0; k < J; k++) {
+                    v[k] = isAcc[k] ? ins[k][i] : ins[k][i] - l.zInOf[k];
+                    m[k] = ms[k][ms[k].length === 1 ? 0 : ch];
+                }
+                y[i] = clamp8(mulQ32Sum(v, m, l.exp) + l.zOut);
+            }
+            vals[li] = y;
+        } else vals[li] = x; // flatten: o vetor já está em C x H x W, a mesma ordem do C (f, h, w).
+        // Libera o que ninguém mais lê (os ramos das redes grandes ocupam memória).
+        for (const j of l.src) if (j >= 0 && (net.lastUse?.[j] ?? Infinity) <= li) vals[j] = undefined;
     }
+    // As saídas são as da última camada (o maior valor dá a classe).
+    const out = vals[L.length - 1];
     let pred = 0;
     for (let k = 1; k < out.length; k++) if (out[k] > out[pred]) pred = k;
     return { pred, out };

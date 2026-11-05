@@ -29,8 +29,13 @@ export const SEARCH_HEURISTICS = ['sensitivity', 'sequential'];
 
 const isWeighted = (l) => l.type === 'conv' || l.type === 'dense';
 
-/** Avaliador da acurácia com as ativações da configuração base guardadas na entrada de cada camada com pesos. */
-class Evaluator {
+/**
+ * Avaliador da acurácia com as ativações da configuração base guardadas nos cortes da rede (net.cuts: os pontos com
+ * um tensor vivo só). Nas redes em sequência, a entrada de cada camada com pesos; nas com ramos (ResNet 8), trocar a
+ * unidade de uma camada recomeça do último corte antes dela (na ResNet 8: a entrada, a saída da conv1 e a de cada
+ * soma residual), o que guarda 43 kB por imagem em vez dos cerca de 180 kB de todos os tensores vivos.
+ */
+export class Evaluator {
     constructor(net, set, trees, unitOf, biasOf = null) {
         this.net = net;
         this.set = set;
@@ -41,8 +46,15 @@ class Evaluator {
         this.scaleOf = null;
         this.siteLayer = [];
         net.layers.forEach((l, li) => { if (isWeighted(l)) this.siteLayer.push(li); });
-        this.sizes = net.sites.map((l) => l.inShape.reduce((a, b) => a * b, 1));
-        this.buf = this.sizes.map((n) => new Uint8Array(n * set.n));
+        // Corte de onde recomeçar quando a primeira camada diferente é a si: o último corte até ela.
+        const cuts = net.cuts ?? net.layers.map((_, li) => li - 1);
+        this.cutOf = this.siteLayer.map((li) => { let c = li; while (c > 0 && cuts[c] === undefined) c--; return c; });
+        const size = (li) => { const j = cuts[li]; return (j === -1 ? set.size : net.layers[j].outShape.reduce((a, b) => a * b, 1)); };
+        this.bufOf = new Map([...new Set(this.cutOf)].map((li) => [li, new Uint8Array(size(li) * set.n)]));
+        this.sizeOf = new Map([...this.bufOf.keys()].map((li) => [li, size(li)]));
+        this.siteIndex = new Map(this.siteLayer.map((li, si) => [li, si]));
+        // Histograma das ativações de entrada de cada camada com pesos na última passada inteira gravada.
+        this.inputHist = null;
         this.tables = new Map();
         this.adds = new Map();
         this.base = null;
@@ -83,21 +95,28 @@ class Evaluator {
         const biases = this.biasOf ? net.sites.map((_, si) => this.biasOf(si, assign[si]?.mul ?? null, assign[si]?.add ?? null)) : null;
         const scales = this.scaleOf ? net.sites.map((_, si) => this.scaleOf(si, assign[si]?.mul ?? null, assign[si]?.add ?? null)) : null;
         const preds = record ? this.basePreds : new Uint8Array(set.n);
-        const li0 = this.siteLayer[from];
-        const slot = new Map(this.siteLayer.map((li, si) => [li, si]));
+        const li0 = this.cutOf[from];
+        const hist = record && (!this.base || li0 === 0) ? net.sites.map(() => new Float64Array(256)) : null;
         let wrong = 0, k = 0;
         this.evals++;
         for (; k < set.n; k++) {
             let x, li = li0;
-            if (from === 0 && !this.base) { x = inputActivations(net, set.images.subarray(k * set.size, (k + 1) * set.size), this.input); li = 0; }
-            else x = this.buf[from].subarray(k * this.sizes[from], (k + 1) * this.sizes[from]);
-            const rec = record ? (l, v) => { const si = slot.get(l); if (si !== undefined && si >= from) this.buf[si].set(v, k * this.sizes[si]); } : null;
+            if (!this.base) { x = inputActivations(net, set.images.subarray(k * set.size, (k + 1) * set.size), this.input); li = 0; }
+            else { const n = this.sizeOf.get(li0); x = this.bufOf.get(li0).subarray(k * n, (k + 1) * n); }
+            // Na passada que grava a partir da entrada, também o histograma da entrada de cada camada com pesos (os
+            // operandos das candidatas), que fora dos cortes não fica guardada.
+            const rec = record ? (l, v) => {
+                if (l >= li0 && this.bufOf.has(l)) { const n = this.sizeOf.get(l); this.bufOf.get(l).set(v, k * n); }
+                const si = hist ? this.siteIndex.get(l) : undefined;
+                if (si !== undefined) { const h = hist[si]; for (let i = 0; i < v.length; i++) h[v[i]]++; }
+            } : null;
             const { pred } = inferFrom(net, x, li, tables, adds, undefined, this.trees, rec, biases, scales);
             preds[k] = pred;
             if (pred !== set.labels[k] && ++wrong > maxWrong) { k++; break; }
         }
         this.images += k;
         if (record) { this.base = assign.map((a) => ({ mul: a?.mul ?? null, add: a?.add ?? null })); this.baseWrong = wrong; }
+        if (hist && k === set.n) this.inputHist = hist;
         return { feasible: wrong <= maxWrong, wrong, seen: k, preds };
     }
 }
@@ -400,9 +419,7 @@ export function prepareSearch(net, o) {
     const R = rng(2026);
     const samples = o.samples ?? 512;
     const stats = net.sites.map((l, si) => {
-        const ha = new Float64Array(256), hw = new Float64Array(256);
-        const b = val.buf[si];
-        for (let i = 0; i < b.length; i++) ha[b[i]]++;
+        const ha = val.inputHist[si], hw = new Float64Array(256);
         for (const w of l.w) hw[w + 128]++;
         const cdf = (h) => { const c = new Float64Array(256); let s = 0; for (let i = 0; i < 256; i++) { s += h[i]; c[i] = s; } for (let i = 0; i < 256; i++) c[i] /= s; return c; };
         const ca = cdf(ha), cw = cdf(hw);

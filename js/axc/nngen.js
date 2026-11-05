@@ -105,7 +105,17 @@ function treeExpr(terms) {
  * (Hs mod F = g, com g = K na janela inteira e 1 no laço kx); a entrada da rede tem o passo fixo (H), e então o
  * fator é o menor que separa as linhas.
  */
+/**
+ * As redes com ramos, soma residual, média ou borda assimétrica (o formato da ResNet 8, docs/RESNET8.md) ainda não têm
+ * código gerado nem custo: erro claro em vez de um plano que pule essas camadas (etapas 20 e 21 do plano).
+ */
+export function assertSequential(net, what = 'o gerador de código') {
+    const bad = net.layers.find((l) => l.type === 'add' || l.type === 'avgpool' || l.accOut || (l.pads && new Set(l.pads).size > 1));
+    if (net.graph || bad) throw new Error(`${what} ainda não aceita redes com ramos, soma residual, média ou borda assimétrica (${bad?.name ?? net.id})`);
+}
+
 function plan(net, dirs) {
+    assertSequential(net);
     const D = normalizeDirectives(net, dirs);
     const first = net.layers[0].inShape;
     const tensors = [{ shape: first, stride: first[1], fixed: true }];
