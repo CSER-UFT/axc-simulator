@@ -73,7 +73,7 @@ import { designSpace } from '../js/axc/designspace.js';
 import { PRESETS } from '../js/axc/presets.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize, withBiases } from '../js/axc/nn.js';
 import { networkCost, costModel, networkKernels, normalizeDirectives, directiveTrees, CONV_PIPES, DENSE_PIPES } from '../js/axc/nngen.js';
-import { prepareSearch, searchNetwork, hybridSearch, poolEngine, initMessage, SEARCH_OBJECTIVES, SEARCH_HEURISTICS, HYBRID_HEURISTICS, searchCeiling, savingCeiling, BIAS_FIXES } from '../js/axc/nnsearch.js';
+import { prepareSearch, searchNetwork, hybridSearch, poolEngine, initMessage, shardMessage, SEARCH_OBJECTIVES, SEARCH_HEURISTICS, HYBRID_HEURISTICS, searchCeiling, savingCeiling, BIAS_FIXES } from '../js/axc/nnsearch.js';
 import { Worker } from 'node:worker_threads';
 import { networkProject } from '../js/axc/nnexport.js';
 import { csynthSummary, implSummary, carry4Of } from '../js/hls/reports.js';
@@ -296,8 +296,8 @@ switch (cmd) {
                 w.on('message', ({ id, reply }) => { const f = wait.get(id); wait.delete(id); f(reply); });
                 return (msg) => new Promise((res, rej) => { const id = next++; wait.set(id, (r) => (r.type === 'error' ? rej(new Error(r.message)) : res(r))); w.postMessage({ id, msg }); });
             });
-            await Promise.all(send.map((f) => f(init)));
-            engine = poolEngine(send);
+            const ready = await Promise.all(send.map((f, k) => f(shardMessage(init, k, nw))));
+            engine = poolEngine(send, { fullShards: ready.every((r) => r.shard) });
         }
         let last = 0;
         const progress = (p) => { if (!flag('--json') && Date.now() - last > 2000) { last = Date.now(); process.stderr.write(`  ${p.phase}: ${p.evals} avaliações, ${(p.ms / 1000).toFixed(0)} s${p.cost !== undefined ? `, custo ${(100 * p.cost).toFixed(1)}% da exata` : ''}\n`); } };

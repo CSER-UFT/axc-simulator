@@ -8,7 +8,7 @@ import { buildUnit, unitName } from './axc/units.js';
 import { testInputs, errorMetrics } from './axc/metrics.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize, macsPerSite } from './axc/nn.js';
 import { archSvg } from './axc/nnsvg.js';
-import { networkCost, normalizeDirectives, directiveTrees, parOptions, CONV_PIPES, DENSE_PIPES } from './axc/nngen.js';
+import { normalizeDirectives, directiveTrees, parOptions, CONV_PIPES, DENSE_PIPES } from './axc/nngen.js';
 import { esc } from './ui/plots.js';
 import { highlightC } from './hls/highlight.js';
 import { dseStepSvg, accSearchSvg } from './hls/ui.js';
@@ -122,7 +122,7 @@ const getJson = (f) => fetch(f).then((r) => (r.ok ? r.json() : Promise.reject(ne
 const getBin = (f) => fetch(f).then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(f))));
 /** Rede escolhida e o conjunto de teste da sua base (os dois guardados). */
 async function loadNN(id) {
-    registry ??= await getJson('data/nn/models.json');
+    registry ??= await getJson('data/nn/models.json').then((reg) => ({ ...reg, models: reg.models.filter((m) => m.page !== false) }));
     const entry = registry.models.find((m) => m.id === id) ?? registry.models[0];
     if (!modelCache.has(entry.id)) modelCache.set(entry.id, getJson(entry.file).then(decodeNet));
     const net = await modelCache.get(entry.id);
@@ -361,6 +361,17 @@ const whyText = (w) => {
 // Custo do hardware ---------------------------------------------------------------------------------------------
 let hlsData = null, costRun = 0;
 const costCache = new Map();
+// O custo roda num worker (js/nn-cost-worker.js): na ResNet 8, montar o modelo de custo leva cerca de um minuto.
+let costWorker = null, costSeq = 0;
+const costWait = new Map();
+function costJob(file, job) {
+    if (!costWorker) {
+        costWorker = new Worker(new URL('./nn-cost-worker.js', import.meta.url), { type: 'module' });
+        costWorker.onmessage = ({ data: { id, result, error } }) => { const w = costWait.get(id); costWait.delete(id); if (error) w.rej(new Error(error)); else w.res(result); };
+    }
+    const id = ++costSeq;
+    return new Promise((res, rej) => { costWait.set(id, { res, rej }); costWorker.postMessage({ id, file, job }); });
+}
 const loadHls = () => (hlsData ??= Promise.all([getJson('data/hls-cells.json'), getJson('data/vivado-units.json').catch(() => null)]).then(([cells, fpga]) => ({ cells, fpga })));
 /** Custo da configuração e o da rede exata, por camada, pelo modelo de síntese de alto nível (depois da acurácia). */
 async function renderCost() {
@@ -376,7 +387,8 @@ async function renderCost() {
     try { hd = await loadHls(); } catch (e) { $('nnCost').innerHTML = `<p class="note">${t('nn.loadError', { file: 'data/hls-cells.json' })}</p>`; return; }
     await new Promise((r) => setTimeout(r, 0));
     if (run !== costRun) return;
-    const o = { synth, cells: hd.cells, fpga: hd.fpga, target: $('nnTarget').value, clockNs: +$('nnClock').value || 10 };
+    const o = { target: $('nnTarget').value, clockNs: +$('nnClock').value || 10 };
+    const file = registry.models.find((m) => m.id === net.id)?.file;
     const mask = nnMask();
     // Os dois alvos: área e energia do modelo ASIC (sky130), LUT, CARRY4, FF e DSP do modelo FPGA (xc7a100t, quando
     // data/vivado-units.json existe); ciclos e II do alvo escolhido.
@@ -384,19 +396,20 @@ async function renderCost() {
         const key = `${net.id}|${target}|${o.clockNs}|${m ?? '-'}|${a ?? '-'}|${k.join('')}|${JSON.stringify(nnDirs)}|${JSON.stringify(units)}`;
         if (!costCache.has(key)) {
             if (costCache.size > 200) costCache.delete(costCache.keys().next().value);
-            costCache.set(key, networkCost(net, { ...o, target, mul: m, add: a, mask: k, dirs: nnDirs, ...(units ? { units } : {}) }));
+            const p = costJob(file, { clockNs: o.clockNs, target, mul: m, add: a, mask: k, dirs: nnDirs, ...(units ? { units } : {}) });
+            p.catch(() => costCache.delete(key));
+            costCache.set(key, p);
         }
         return costCache.get(key);
     };
-    const both = (m, a, units = null) => {
-        const asic = cost('asic', m, a, mask, units), fpga = hd.fpga ? cost('fpga', m, a, mask, units) : null;
+    const both = async (m, a, units = null) => {
+        const [asic, fpga] = await Promise.all([cost('asic', m, a, mask, units), hd.fpga ? cost('fpga', m, a, mask, units) : null]);
         return { asic, fpga, sel: o.target === 'fpga' && fpga ? fpga : asic };
     };
     let EX, C;
     try {
-        EX = both(null, null);
-        C = nnOverride ? both(null, null, nnOverride) : both(mul ? unitName(mul.cfg) : null, add ? unitName(add.cfg) : null);
-    } catch (e) { $('nnCost').innerHTML = `<p class="note">${esc(e.message)}</p>`; return; }
+        [EX, C] = await Promise.all([both(null, null), nnOverride ? both(null, null, nnOverride) : both(mul ? unitName(mul.cfg) : null, add ? unitName(add.cfg) : null)]);
+    } catch (e) { if (run === costRun) $('nnCost').innerHTML = `<p class="note">${esc(e.message)}</p>`; return; }
     if (run !== costRun) return;
     const c = C.sel, ex = EX.sel;
     const d = (a, b) => (b ? `${a <= b ? '−' : '+'}${nf(Math.abs(100 * (1 - a / b)), 1)}%` : '');
@@ -979,5 +992,5 @@ themeButton.addEventListener('click', () => {
 updateThemeIcon();
 applyDomTranslations();
 
-Promise.all([getJson('data/synth.json'), getJson('data/nn/models.json')]).then(([s, reg]) => { synth = s; registry = reg; fillSelects(); render(); })
+Promise.all([getJson('data/synth.json'), getJson('data/nn/models.json')]).then(([s, reg]) => { synth = s; registry = { ...reg, models: reg.models.filter((m) => m.page !== false) }; fillSelects(); render(); })
     .catch((e) => { $('nnStatus').textContent = t('nn.loadError', { file: e.message }); });

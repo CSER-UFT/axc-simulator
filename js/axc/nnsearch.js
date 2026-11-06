@@ -50,8 +50,10 @@ export class Evaluator {
         const cuts = net.cuts ?? net.layers.map((_, li) => li - 1);
         this.cutOf = this.siteLayer.map((li) => { let c = li; while (c > 0 && cuts[c] === undefined) c--; return c; });
         const size = (li) => { const j = cuts[li]; return (j === -1 ? set.size : net.layers[j].outShape.reduce((a, b) => a * b, 1)); };
-        this.bufOf = new Map([...new Set(this.cutOf)].map((li) => [li, new Uint8Array(size(li) * set.n)]));
-        this.sizeOf = new Map([...this.bufOf.keys()].map((li) => [li, size(li)]));
+        // Os buffers dos cortes são criados na primeira passada que grava (um avaliador que só classifica, como o do
+        // teste, não guarda nada).
+        this.sizeOf = new Map([...new Set(this.cutOf)].map((li) => [li, size(li)]));
+        this.bufOf = new Map();
         this.siteIndex = new Map(this.siteLayer.map((li, si) => [li, si]));
         // Histograma das ativações de entrada de cada camada com pesos na última passada inteira gravada.
         this.inputHist = null;
@@ -106,7 +108,11 @@ export class Evaluator {
             // Na passada que grava a partir da entrada, também o histograma da entrada de cada camada com pesos (os
             // operandos das candidatas), que fora dos cortes não fica guardada.
             const rec = record ? (l, v) => {
-                if (l >= li0 && this.bufOf.has(l)) { const n = this.sizeOf.get(l); this.bufOf.get(l).set(v, k * n); }
+                if (l >= li0 && this.sizeOf.has(l)) {
+                    const n = this.sizeOf.get(l);
+                    if (!this.bufOf.has(l)) this.bufOf.set(l, new Uint8Array(n * set.n));
+                    this.bufOf.get(l).set(v, k * n);
+                }
                 const si = hist ? this.siteIndex.get(l) : undefined;
                 if (si !== undefined) { const h = hist[si]; for (let i = 0; i < v.length; i++) h[v[i]]++; }
             } : null;
@@ -308,12 +314,13 @@ export function localEngine(P) {
  * Motor com vários workers: send[i](mensagem) devolve a resposta do worker i (uma Promise). Cada worker tem o seu
  * avaliador (initMessage) e a sua base; as avaliações vão para o primeiro worker livre.
  */
-export function poolEngine(send) {
+export function poolEngine(send, { fullShards = false } = {}) {
     const free = send.map((_, i) => i), waiting = [];
     const take = () => (free.length ? Promise.resolve(free.shift()) : new Promise((r) => waiting.push(r)));
     const give = (i) => (waiting.length ? waiting.shift()(i) : free.push(i));
     return {
         size: send.length,
+        fullShards,
         run: async (assign, { maxWrong = Infinity, base = assign } = {}) => {
             const i = await take();
             try {
@@ -321,8 +328,28 @@ export function poolEngine(send) {
                 return { feasible: r.feasible, wrong: r.wrong, seen: r.seen };
             } finally { give(i); }
         },
+        // Validação inteira dividida entre os workers (cada um com a sua fatia, shard da initMessage): as fatias
+        // classificam em paralelo e os erros são somados. Só existe quando a busca usa uma amostra.
+        runFull: async (assign, base) => {
+            const rs = await Promise.all(send.map((f) => f({ type: 'runFull', assign, base })));
+            return { wrong: rs.reduce((a, r) => a + r.wrong, 0), seen: rs.reduce((a, r) => a + r.seen, 0) };
+        },
         close: () => {},
     };
+}
+/**
+ * Classificação na validação inteira: pelas fatias dos workers, quando há (engine.runFull), ou pelo avaliador da
+ * preparação (P.fullVal), com a exata gravada como base na primeira vez. Devolve {wrong, feasible} para o limite.
+ */
+async function fullRun(P, engine, assign, limit = Infinity) {
+    const base = P.exact;
+    if (engine?.runFull && engine.fullShards) {
+        const r = await engine.runFull(assign, base);
+        return { wrong: r.wrong, feasible: r.wrong <= limit, seen: r.seen };
+    }
+    if (!P.fullVal.base) P.fullVal.run(base, { record: true });
+    const r = P.fullVal.run(assign, { maxWrong: limit });
+    return { wrong: r.wrong, feasible: r.feasible, seen: r.seen };
 }
 /** Mensagem de início de um worker de avaliação: a rede (JSON), o conjunto de validação e as unidades. */
 /** valN: o número de imagens de valBuf (o padrão é o da rede, dataset.val.n; a linha de comando aceita a validação de 5000). */
@@ -330,9 +357,11 @@ export function initMessage(netJson, valBuf, synth, trees, sample = 0, biasFix =
     const used = synth.designs.filter((d) => (d.cfg.kind === 'mul' && d.cfg.width === 8) || (d.cfg.kind === 'add' && d.cfg.width === 32));
     return { type: 'init', net: netJson, buf: valBuf, designs: used.map((d) => ({ name: d.name, cfg: d.cfg })), trees, sample, biasFix, valN };
 }
+/** A mensagem de início do worker k de n: com amostra, ele também guarda a fatia k da validação inteira. */
+export const shardMessage = (init, k, n) => ({ ...init, shard: init.sample ? { k, n } : null });
 /** Tratador das mensagens de um worker de avaliação (o mesmo no navegador e no Node). */
 export function evalHandler() {
-    let ev = null;
+    let ev = null, full = null;
     return (m) => {
         if (m.type === 'init') {
             const net = decodeNet(m.net), ds = net.dataset;
@@ -341,8 +370,23 @@ export function evalHandler() {
             const unitOf = (name) => { if (!units.has(name)) units.set(name, buildUnit(cfgs.get(name))); return units.get(name); };
             ev = new Evaluator(net, set, m.trees, unitOf);
             // A mesma correção do viés da preparação: o mesmo conjunto (a mesma amostra) e as mesmas imagens.
-            if (m.biasFix && m.biasFix !== 'none') { const f = makeBiasFix(net, set, m.trees, ev, m.biasFix); ev.biasOf = f.biasOf; ev.scaleOf = f.scaleOf; }
-            return { type: 'ready' };
+            let fix = null;
+            if (m.biasFix && m.biasFix !== 'none') { fix = makeBiasFix(net, set, m.trees, ev, m.biasFix); ev.biasOf = fix.biasOf; ev.scaleOf = fix.scaleOf; }
+            // A fatia da validação inteira deste worker (com amostra): as imagens [k N / n, (k + 1) N / n).
+            if (m.shard) {
+                const all = decodeTestSet(m.buf, { ...ds, n: m.valN ?? ds.val.n }), N = all.n;
+                const a = Math.floor((m.shard.k * N) / m.shard.n), b = Math.floor(((m.shard.k + 1) * N) / m.shard.n);
+                const part = { ...all, n: b - a, labels: all.labels.subarray(a, b), images: all.images.subarray(a * all.size, b * all.size) };
+                full = new Evaluator(net, part, m.trees, unitOf);
+                if (fix) { full.biasOf = fix.biasOf; full.scaleOf = fix.scaleOf; }
+            }
+            return { type: 'ready', shard: !!full };
+        }
+        if (m.type === 'runFull') {
+            if (!full) return { type: 'error', message: 'worker sem fatia da validação inteira' };
+            if (full.firstDiff(m.base) !== null) full.run(m.base, { record: true });
+            const r = full.run(m.assign);
+            return { type: 'result', wrong: r.wrong, seen: r.seen };
         }
         if (m.type === 'run') {
             ensureBase(ev, m.base);
@@ -395,7 +439,7 @@ export function prepareSearch(net, o) {
     const target = objective === 'luts' ? 'fpga' : 'asic';
     if (target === 'fpga' && !o.fpga) throw new Error('o objetivo LUT precisa de data/vivado-units.json');
     const trees = o.trees ?? directiveTrees(net, o.dirs);
-    const cm = costModel(net, { synth: o.synth, cells: o.cells, fpga: o.fpga, target, flow: o.flow ?? 'delay', clockNs: o.clockNs ?? 10, dirs: o.dirs });
+    const cm = costModel(net, { synth: o.synth, cells: o.cells, fpga: o.fpga, target, flow: o.flow ?? 'delay', clockNs: o.clockNs ?? 10, dirs: o.dirs, keepResults: false });
     const lib = makeLibrary(o.synth, o.cells, { flow: o.flow ?? 'delay', target, fpga: o.fpga ?? null, wide: true });
     const designs = new Map(o.synth.designs.map((d) => [d.name, d]));
     const units = new Map();
@@ -484,12 +528,7 @@ export function prepareSearch(net, o) {
 export function arithmeticShare(cm, assign, objective) {
     const R = cm.network(assign);
     let arith = 0;
-    for (const l of R.layers) {
-        if (l.site === null) continue;
-        const c = l.result.cost;
-        if (objective === 'energy') { arith += c.energy.ops; continue; }
-        for (const u of c.units) if (u.cls === 'mul' || u.cls === 'add') arith += objective === 'luts' ? u.luts : u.area;
-    }
+    for (const l of R.layers) if (l.site !== null) arith += l.arith[objective];
     const total = R.totals[objective];
     return { arith, total, share: total > 0 ? arith / total : 0 };
 }
@@ -787,7 +826,7 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
     const maxWrong = P.exactWrong + Math.floor((maxDrop * P.n) / 100 + 1e-9);
     let fullLimit = null;
     if (P.fullVal) {
-        const exW = P.fullVal.run(P.exact, { record: true }).wrong;
+        const exW = (await fullRun(P, engine, P.exact)).wrong;
         fullLimit = exW + Math.floor((maxDrop * P.fullVal.set.n) / 100 + 1e-9);
     }
     const exactBase = P.exact.map((x) => ({ ...x }));
@@ -839,7 +878,7 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
             for (const p of batch) {
                 if (!p.measured.ok) { vstep(p); continue; }
                 if (P.fullVal) {
-                    const w = P.fullVal.run(p.assign).wrong;
+                    const w = (await fullRun(P, engine, p.assign)).wrong;
                     p.measured.wrongFull = w;
                     p.measured.fullOk = w <= fullLimit;
                     if (w > fullLimit) { repaired++; vstep(p, { ok: false, fullRejected: true, wrongFull: w, fullLimit }); continue; }
@@ -862,7 +901,7 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
     // amostra, depois de conferido na validação inteira).
     for (const p of allPts.filter((q) => q.measured?.ok && q.measured.fullOk === undefined && (!chosen || q.score < chosen.score)).sort((x, y) => x.score - y.score)) {
         if (P.fullVal) {
-            const w = P.fullVal.run(p.assign).wrong;
+            const w = (await fullRun(P, engine, p.assign)).wrong;
             p.measured.wrongFull = w;
             p.measured.fullOk = w <= fullLimit;
             if (!p.measured.fullOk) continue;
@@ -894,13 +933,13 @@ export async function hybridSearch(P, o = {}, engine = localEngine(P)) {
         ms: Date.now() - t0, phaseMs,
     };
     if (P.fullVal) {
-        const ex = P.fullVal.run(P.exact, { record: true }), b = P.fullVal.run(bestAssign);
+        const ex = await fullRun(P, engine, P.exact), b = await fullRun(P, engine, bestAssign);
         res.exact.accValFull = 1 - ex.wrong / P.fullVal.set.n;
         res.best.accValFull = 1 - b.wrong / P.fullVal.set.n;
         res.valN = P.fullVal.set.n;
     }
     if (P.test) {
-        const ex = P.test.run(P.exact, { record: true }), b = P.test.run(bestAssign);
+        const ex = P.test.run(P.exact), b = P.test.run(bestAssign);
         res.exact.accTest = 1 - ex.wrong / P.test.set.n;
         res.best.accTest = 1 - b.wrong / P.test.set.n;
     }
@@ -1008,10 +1047,10 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
     if (P.fullVal) {
         phase = 'repair';
         const fv = P.fullVal, N = fv.set.n;
-        const exW = fv.run(P.exact, { record: true }).wrong;
+        const exW = (await fullRun(P, engine, P.exact)).wrong;
         const limit = exW + Math.floor((maxDrop * N) / 100 + 1e-9);
         for (const p of byCost.slice(0, o.maxVerify ?? 25)) {
-            const r = fv.run(p.assign, { maxWrong: limit });
+            const r = await fullRun(P, engine, p.assign, limit);
             p.fullWrong = r.feasible ? r.wrong : null;
             p.fullOk = r.feasible;
             progress({ evals, images, phase, cost: p.cost / exactCost, ms: Date.now() - t0 });
@@ -1032,7 +1071,7 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
             const tried = [];
             for (const assign of opts.map((a) => ({ a, c: total(a) })).sort((x, y) => x.c - y.c)) {
                 if (budget-- <= 0) break;
-                const r = fv.run(assign.a, { maxWrong: limit });
+                const r = await fullRun(P, engine, assign.a, limit);
                 const q = { assign: copy(assign.a), cost: assign.c, wrong: null, feasible: true, full: false, repair: true, fullWrong: r.feasible ? r.wrong : null, fullOk: r.feasible, fullSeen: r.seen, fullWrongSeen: r.wrong };
                 points.push(q);
                 tried.push(q);
@@ -1048,7 +1087,7 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
         // o escolhido não pode ficar coberto por um ponto viável que passaria.
         if (chosen) {
             for (const p of byCost.filter((x) => x.fullOk === undefined && x.cost < chosen.cost - 1e-9)) {
-                const r = fv.run(p.assign, { maxWrong: limit });
+                const r = await fullRun(P, engine, p.assign, limit);
                 p.fullWrong = r.feasible ? r.wrong : null;
                 p.fullOk = r.feasible;
                 if (r.feasible) { chosen = p; break; }
@@ -1072,14 +1111,14 @@ export async function searchNetwork(P, o = {}, engine = localEngine(P)) {
     };
     // Com a amostra: a validação inteira, para a exata e o ponto escolhido.
     if (P.fullVal) {
-        const ex = P.fullVal.run(P.exact, { record: true }), b = P.fullVal.run(best);
+        const ex = await fullRun(P, engine, P.exact), b = await fullRun(P, engine, best);
         res.exact.accValFull = 1 - ex.wrong / P.fullVal.set.n;
         res.best.accValFull = 1 - b.wrong / P.fullVal.set.n;
         res.valN = P.fullVal.set.n;
     }
     // Teste: só no fim, para a exata e o ponto escolhido.
     if (P.test) {
-        const ex = P.test.run(P.exact, { record: true }), b = P.test.run(best);
+        const ex = P.test.run(P.exact), b = P.test.run(best);
         res.exact.accTest = 1 - ex.wrong / P.test.set.n;
         res.best.accTest = 1 - b.wrong / P.test.set.n;
     }

@@ -9,7 +9,7 @@
  * índice k) e run-done com o resultado, e no fim vem done.
  */
 import { decodeNet, decodeTestSet } from './axc/nn.js';
-import { prepareSearch, searchNetwork, hybridSearch, poolEngine, initMessage } from './axc/nnsearch.js';
+import { prepareSearch, searchNetwork, hybridSearch, poolEngine, initMessage, shardMessage } from './axc/nnsearch.js';
 
 const getJson = (f) => fetch(f).then((r) => (r.ok ? r.json() : Promise.reject(new Error(f))));
 const getBin = (f) => fetch(f).then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(f))));
@@ -40,8 +40,8 @@ self.onmessage = async ({ data: o }) => {
                     w.onmessage = ({ data: { id, reply } }) => { const f = wait.get(id); wait.delete(id); f(reply); };
                     send.push((msg) => new Promise((res, rej) => { const id = next++; wait.set(id, (r) => (r.type === 'error' ? rej(new Error(r.message)) : res(r))); w.postMessage({ id, msg }); }));
                 }
-                await Promise.all(send.map((f) => f(init)));
-                engine = poolEngine(send);
+                const ready = await Promise.all(send.map((f, k) => f(shardMessage(init, k, n))));
+                engine = poolEngine(send, { fullShards: ready.every((r) => r.shard) });
             } catch { for (const w of subs.splice(0)) w.terminate(); engine = undefined; }
         }
         const runs = o.runs?.length ? o.runs : [{ heuristic: o.heuristic, hybrid: o.hybrid }];

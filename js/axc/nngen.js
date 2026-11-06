@@ -659,12 +659,18 @@ export function costModel(net, o) {
     const ports = o.ports ?? 2, clockNs = o.clockNs ?? 10;
     const base = { synth: o.synth, cells: nnCells(o.cells), fpga: nnFpga(o.fpga), model: { ...MODEL, addrScale: VITIS_NN.addrScale, controlScale: VITIS_NN.controlScale }, target: o.target ?? 'asic', flow: o.flow ?? 'delay', clockNs, ports, wide: true };
     const cache = new Map();
+    // A síntese exata de cada kernel (as operações e as unidades candidatas de cada uma), feita uma vez só.
+    const exactOf = new Map();
+    // keepResults: false (a busca) guarda só o resumo de cada combinação; a síntese inteira (cerca de 1,5 MB por
+    // kernel da ResNet 8) só é necessária para gerar o C++ (nnexport.js).
+    const keep = o.keepResults !== false;
     /** Custo de um kernel com as unidades (null: exata). */
     const kernel = (k, mul = null, add = null) => {
         const key = `${k.name}|${mul ?? '-'}|${add ?? '-'}`;
         if (cache.has(key)) return cache.get(key);
         const design = designOf(k.src, ports);
-        const r0 = synthesize(k.src, { ...base, design });
+        if (!exactOf.has(k.name)) exactOf.set(k.name, synthesize(k.src, { ...base, design }));
+        const r0 = exactOf.get(k.name);
         let r = r0;
         const warnings = [];
         const approx = k.site !== null && !!(mul || add);
@@ -691,9 +697,15 @@ export function costModel(net, o) {
             // Peças de reescala da camada (a rede compartilha uma só entre as camadas, veja network).
             rq: rqParts(r, 'requant'),
             rq2: rqParts(r, 'requant2'),
+            // Custo das unidades de multiplicação e soma (área e LUT pelas instâncias; energia pelas operações), para a
+            // fração aritmética da busca (nnsearch.js, arithmeticShare).
+            arith: (() => {
+                const us = r.cost.units.filter((u) => u.cls === 'mul' || u.cls === 'add');
+                return { area: us.reduce((a, u) => a + u.area, 0), luts: us.reduce((a, u) => a + u.luts, 0), energy: r.cost.energy.ops };
+            })(),
         };
         // A síntese (projeto, atribuição, biblioteca) fica junto, fora do JSON: é dela que sai o C++ (nnexport.js).
-        Object.defineProperty(row, 'result', { value: r, enumerable: false });
+        if (keep) Object.defineProperty(row, 'result', { value: r, enumerable: false });
         cache.set(key, row);
         return row;
     };

@@ -46,6 +46,8 @@ test('somadores das redes na biblioteca (opção wide): largura da soma, técnic
 test('código gerado: os kernels, executados em sequência, dão as mesmas saídas do avaliador das redes', () => {
     for (const m of registry.models) {
         const { net, test: ts } = load(m.id);
+        // As redes com ramos (ResNet 8) têm o teste pelos tensores de cada kernel em test/nngraph.test.js.
+        if (net.graph) continue;
         const ks = networkKernels(net).map((k) => ({ ...k, design: elaborate(parse(k.src), { ports: 2 }) }));
         assert.deepEqual(ks.map((k) => k.type).filter((t) => t === 'conv' || t === 'dense').length, net.sites.length);
         const T = productTable(null), tabs = net.sites.map(() => T);

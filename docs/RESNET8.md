@@ -169,6 +169,12 @@ densa), 44 kB por imagem; guardar todos os tensores vivos antes de cada camada c
 isolada recomeça do último corte antes da camada: 39 ms por imagem na conv1, 38 ms na s1b (recomeça da saída da
 conv1), 23 ms no atalho da pilha 2, 12 ms no da pilha 3 e quase nada na densa.
 
-Memória: com as 5000 imagens, 220 MB por avaliador; a preparação da busca tem o da amostra, o da validação inteira e o
-do teste, e cada worker de avaliação tem o seu da amostra. Na etapa 22, a validação inteira deve ficar só para a
-conferência no fim (sem guardar os cortes) e a amostra de 1000 imagens para a busca (44 MB por worker).
+Memória e tempo da busca (etapa 22): guardar os cortes das 5000 imagens daria 220 MB por avaliador. A validação
+inteira agora fica dividida entre os workers de avaliação (cada um guarda os cortes da sua fatia: com 7 workers,
+cerca de 31 MB cada), e a conferência de um ponto roda nas fatias em paralelo (`engine.runFull`); a thread que
+coordena não guarda nada da validação inteira, e o teste é classificado sem guardar cortes (os buffers dos cortes
+só são criados na primeira passada que grava). A amostra de 1000 imagens fica em cada worker (44 MB). O modelo de
+custo da busca guarda só o resumo de cada combinação de camada, multiplicador e somador (`keepResults: false`; a
+síntese inteira, cerca de 1,5 MB por kernel da ResNet 8, só é necessária para gerar o C++), e a síntese exata de cada
+kernel é feita uma vez só: 53 ms e quase nenhuma memória por combinação nova, contra 117 ms e 1,5 MB antes. Na
+página, o custo roda num worker (`js/nn-cost-worker.js`), porque montar o modelo leva cerca de dois minutos.

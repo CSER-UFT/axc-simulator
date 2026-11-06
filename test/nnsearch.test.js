@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate } from '../js/axc/nn.js';
 import { buildUnit } from '../js/axc/units.js';
 import { networkCost, directiveTrees } from '../js/axc/nngen.js';
-import { prepareSearch, searchNetwork, poolEngine, evalHandler, initMessage } from '../js/axc/nnsearch.js';
+import { prepareSearch, searchNetwork, hybridSearch, poolEngine, evalHandler, initMessage, shardMessage } from '../js/axc/nnsearch.js';
 
 const R = new URL('../', import.meta.url);
 const D = (f) => JSON.parse(readFileSync(new URL(`data/${f}`, R), 'utf8'));
@@ -247,4 +247,30 @@ test('workers: o tamanho da validação vem na mensagem de início (a validaçã
     const w = h({ type: 'run', assign: a, base: Pn.exact, maxWrong: -1 });
     assert.equal(w.seen, n);
     assert.equal(w.wrong, Pn.val.run(a).wrong);
+});
+
+test('validação inteira em fatias nos workers: o mesmo resultado do avaliador local, nas buscas medida e híbrida', async () => {
+    const sample = 250;
+    const mk = () => prepareSearch(net, { val, test: testSet, synth, cells, fpga, objective: 'area', maxCands: 4, sample, biasFix: 'affine' });
+    const Pl = mk(), Pp = mk();
+    const init = initMessage(netJson, valBuf, synth, Pp.trees, sample, 'affine');
+    const hs = [evalHandler(), evalHandler(), evalHandler()];
+    const ready = hs.map((h, k) => h(shardMessage(init, k, hs.length)));
+    assert.ok(ready.every((r) => r.shard));
+    const send = hs.map((h) => (msg) => Promise.resolve(h(msg)));
+    const pool = poolEngine(send, { fullShards: true });
+    // A soma das fatias é a validação inteira.
+    const exact = Pl.exact;
+    assert.equal((await pool.runFull(exact, exact)).wrong, Pl.fullVal.run(exact).wrong);
+    // O avaliador da preparação não guarda nada da validação inteira quando os workers têm as fatias.
+    const a = await searchNetwork(Pl, { heuristic: 'sequential', maxDrop: 1 });
+    const b = await searchNetwork(Pp, { heuristic: 'sequential', maxDrop: 1 }, pool);
+    assert.deepEqual(b.best.assign, a.best.assign);
+    assert.equal(b.exact.accValFull, a.exact.accValFull);
+    assert.equal(b.best.accValFull, a.best.accValFull);
+    assert.equal(Pp.fullVal.bufOf.size, 0);
+    const ha = await hybridSearch(mk(), { heuristic: 'local', maxDrop: 1 });
+    const hb = await hybridSearch(Pp, { heuristic: 'local', maxDrop: 1 }, pool);
+    assert.deepEqual(hb.best.assign, ha.best.assign);
+    assert.equal(hb.best.accValFull, ha.best.accValFull);
 });
