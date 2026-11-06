@@ -118,7 +118,17 @@ Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
     reescalas, ainda sem caracterização própria; a rede compartilha uma requant2 como já fazia com a reescala;
     ResNet 8 com pesos sorteados: 64 ms por imagem a 10 ns, 4,28 mm², 69,6 mil LUTs, 6 DSP; montar o modelo leva
     cerca de 70 s, quase tudo na elaboração das convoluções, então na página isso vai para um worker).
-22. Busca na ResNet 8 (10 camadas com pesos, 20 grupos); ajustar tempos e padrões.
+22. Busca na ResNet 8 (10 camadas com pesos, 20 grupos); ajustar tempos e padrões (feito na linha de comando:
+    validação inteira dividida entre os workers, com a conferência em paralelo e nada dela na thread que coordena;
+    modelo de custo da busca só com o resumo de cada combinação, 53 ms por combinação nova; custo da página num
+    worker; ResNet 8 no registro com page: false). Treino (etapa 17, por Tiago, 500 épocas): ponto flutuante
+    86,23% no teste e 88,14% na validação; 8 bits 85,19% no teste, 87,24% na validação de 5000, 84,5% no
+    subconjunto de 1000 da página. Buscas aqui (2 núcleos, local híbrida, área, limite de 1 ponto): com amostra
+    de 250 da validação de 1000, a margem do limite é de 2 imagens e a busca terminou na exata (0%); com amostra de
+    1000 da validação de 5000 (--val 5000 --sample 1000), 8,4% de área, queda de 0,7 ponto na validação inteira e
+    1,1 no teste de 1000, 22% do teto de 37,8%, em 81 minutos (calibração 25, modelo estático 5, verificação 46)
+    e 1,1 GB. Padrão recomendado para a ResNet 8: --val 5000 --sample 1000. Na página (etapa 25), a validação de
+    1000 dá só uma margem pequena, então ela precisa da de 5000.
 23. Exportação para o Vitis e o Vivado dos tipos novos, com a correção do viés.
 24. Rodada no Vitis e no Vivado (Tiago).
 25. ResNet 8 no seletor, no nnbench e na ajuda; rodada da matriz.
