@@ -17,7 +17,7 @@
  *                camada i refaz só as camadas de i em diante. A avaliação para assim que as imagens erradas passam do
  *                limite (o ponto já é inviável).
  */
-import { productTable, adderAccumulate, inferFrom, inputActivations, sumTerms, decodeNet, decodeTestSet, preActivation } from './nn.js';
+import { sumRule, productTable, adderAccumulate, inferFrom, inputActivations, sumTerms, decodeNet, decodeTestSet, preActivation } from './nn.js';
 import { buildUnit } from './units.js';
 import { costModel, directiveTrees } from './nngen.js';
 import { makeLibrary } from '../hls/lib.js';
@@ -485,7 +485,7 @@ export function prepareSearch(net, o) {
         const fillU = (t, out) => { for (let j = 0; j < samples; j++) { const i = j * K + t; out[j] = T[(W[i] + 128) * 256 + A[i]]; } };
         const exactAdd = (acc, p, n) => { for (let i = 0; i < n; i++) acc[i] += p[i]; return acc; };
         const ex = Int32Array.from(sumTerms(K, fillX, samples, exactAdd, 1).subarray(0, samples));
-        const ap = sumTerms(K, fillU, samples, addf ?? exactAdd, trees[si] ?? 1);
+        const ap = sumTerms(K, fillU, samples, addf ?? exactAdd, trees[si] ?? 1, undefined, addf ? sumRule(net.sites[si]) : null);
         let s1 = 0, s2 = 0;
         for (let j = 0; j < samples; j++) { const e = ap[j] - ex[j]; s1 += e; s2 += e * e; }
         const mean = s1 / samples;

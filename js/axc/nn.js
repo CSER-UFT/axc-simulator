@@ -342,7 +342,7 @@ function requantize(l, acc, ch, M = l.rq.m) {
  *     (acc = 0; acc += árvore, como o laço com o fator de desenrolamento U);
  *   tree = 0: todos os termos numa árvore só (o laço inteiro desenrolado).
  */
-export function sumTerms(nTerms, fill, n, add, tree, scratch = makeScratch()) {
+export function sumTerms(nTerms, fill, n, add, tree, scratch = makeScratch(), rule = null) {
     const acc = scratch.acc(n);
     acc.fill(0, 0, n);
     const U = tree === 0 ? nTerms : Math.max(1, Math.min(tree ?? 1, nTerms));
@@ -356,10 +356,16 @@ export function sumTerms(nTerms, fill, n, add, tree, scratch = makeScratch()) {
         const m = Math.min(U, nTerms - g);
         const level = pool.slice(0, m);
         for (let j = 0; j < m; j++) fill(g + j, level[j]);
+        // cnt: quantos produtos cada elemento da árvore já soma (a faixa dele, para a regra do hardware).
+        const cnt = rule ? Array(m).fill(1) : null;
         for (let len = m; len > 1;) {
             let w = 0;
             for (let i = 0; i < len; i += 2) {
-                if (i + 1 < len) add(level[i], level[i + 1], n);
+                if (i + 1 < len) {
+                    if (rule && rule.pairExact(cnt[i], cnt[i + 1])) { const A = level[i], B = level[i + 1]; for (let e = 0; e < n; e++) A[e] += B[e]; } else add(level[i], level[i + 1], n);
+                    if (cnt) cnt[i] += cnt[i + 1];
+                }
+                if (cnt) cnt[w] = cnt[i];
                 level[w++] = level[i];
             }
             len = w;
@@ -419,7 +425,7 @@ function convAcc(l, x, T, add, tree, scratch) {
             }
         }
     };
-    return sumTerms(C * k * k, fill, n, add, tree, scratch);
+    return sumTerms(C * k * k, fill, n, add, tree, scratch, sumRule(l));
 }
 
 function denseAcc(l, x, T, add, tree, scratch) {
@@ -437,7 +443,7 @@ function denseAcc(l, x, T, add, tree, scratch) {
         return acc;
     }
     const fill = (i, out) => { for (let o = 0; o < O; o++) out[o] = T[(w[o * I + i] + 128) * 256 + x[i]]; };
-    return sumTerms(I, fill, O, add, tree, scratch);
+    return sumTerms(I, fill, O, add, tree, scratch, sumRule(l));
 }
 
 function makeScratch() {
@@ -481,6 +487,7 @@ export function preActivation(l, x, T, add = null, tree = 1, b = l.b, scratch = 
     const acc = l.type === 'conv' ? convAcc(l, x, T, add, tree, scratch) : denseAcc(l, x, T, add, tree, scratch);
     const n = l.outShape.reduce((a, c) => a * c, 1), per = n / l.outShape[0];
     const out = Int32Array.from(acc.subarray(0, n));
+    add = biasAdder(l, add, tree, b);
     if (add) {
         for (let ch = 0; ch < l.outShape[0]; ch++) {
             const tmp = scratch.prod(per);
@@ -508,6 +515,56 @@ export function withBiases(net, delta, scales = null) {
     });
     const layers = net.layers.map((l) => map.get(l) ?? l);
     return { ...net, layers, sites: layers.filter((l) => l.w) };
+}
+
+/** Bits de uma faixa [lo, hi] com sinal se lo < 0 (o mesmo bitsFor de js/hls/elab.js). */
+function bitsOf([lo, hi]) {
+    if (lo >= 0) return Math.max(1, Math.ceil(Math.log2(hi + 1)));
+    return Math.ceil(Math.log2(Math.max(-lo, hi + 1))) + 1;
+}
+const ADD_WIDTHS = [8, 16, 24, 32];
+/**
+ * A soma com unidade aproximada que o hardware deixa exata (js/hls/approx.js e lib.js, opWidth): com sinal, numa
+ * largura W da biblioteca (8, 16, 24 ou 32, a menor que cabe os operandos e o resultado menos um bit), quando o
+ * resultado não cabe em W. As faixas são as do elaborador da página de síntese: a ativação de 0 a 255 (o tipo u8 da
+ * entrada do kernel) vezes a faixa dos pesos da camada inteira (a tabela constante), e cada soma da árvore tem a
+ * faixa da soma dos produtos que ela junta. Com isso, o avaliador usa a unidade nas mesmas somas que o hardware.
+ */
+function exactSum(rA, rB) {
+    const r = [rA[0] + rB[0], rA[1] + rB[1]];
+    const signed = rA[0] < 0 || rB[0] < 0 || r[0] < 0;
+    if (!signed) return false;
+    const w = Math.max(bitsOf(rA), bitsOf(rB), bitsOf(r) - 1);
+    const W = ADD_WIDTHS.find((x) => x >= w) ?? 32;
+    return bitsOf(r) > W;
+}
+/** Regra da soma de uma camada com pesos: pairExact(a, b) para os nós da árvore e biasExact(n) para o viés. */
+const RULES = new WeakMap();
+export function sumRule(l) {
+    // Pela tabela de pesos (os mesmos objetos na rede com o viés corrigido, withBiases).
+    if (RULES.has(l.w)) return RULES.get(l.w);
+    let wmin = 0, wmax = 0;
+    for (let i = 0; i < l.w.length; i++) { if (l.w[i] < wmin) wmin = l.w[i]; if (l.w[i] > wmax) wmax = l.w[i]; }
+    const P = [255 * wmin, 255 * wmax];
+    const R = (c) => [c * P[0], c * P[1]];
+    const memo = new Map();
+    const rule = {
+        pairExact: (a, b) => { const k = a * 4096 + b; if (!memo.has(k)) memo.set(k, exactSum(R(a), R(b))); return memo.get(k); },
+        // A faixa do viés é a da tabela b do kernel: o viés em uso (com a correção, o corrigido).
+        biasExact: (nTerms, B) => {
+            let bmin = Infinity, bmax = -Infinity;
+            for (let i = 0; i < B.length; i++) { if (B[i] < bmin) bmin = B[i]; if (B[i] > bmax) bmax = B[i]; }
+            return exactSum(R(nTerms), [bmin, bmax]);
+        },
+    };
+    RULES.set(l.w, rule);
+    return rule;
+}
+/** O somador da soma do viés: null (exata) quando o hardware a deixa exata (árvore inteira e faixa fora da largura). */
+function biasAdder(l, add, tree, B) {
+    if (!add) return null;
+    const nT = l.type === 'conv' ? l.inShape[0] * l.k * l.k : l.inShape.reduce((a, b) => a * b, 1);
+    return (tree === 0 || tree >= nT) && sumRule(l).biasExact(nT, B) ? null : add;
 }
 
 /** Viés pela unidade (mais uma soma do acumulador) ou exato, canal a canal, em acc (n = canais x per). */
@@ -550,13 +607,15 @@ export function inferFrom(net, x, from, tables, adds = [], scratch = makeScratch
             si++;
             const acc = l.type === 'conv' ? convAcc(l, x, T, add, tree, scratch) : denseAcc(l, x, T, add, tree, scratch);
             const C = l.outShape[0], n = l.outShape.reduce((a, b) => a * b, 1), per = n / C;
-            // O viés entra no fim, como no C: (soma dos produtos) + viés.
+            // O viés entra no fim, como no C: (soma dos produtos) + viés. Com a árvore inteira, a soma do viés tem a
+            // faixa da janela toda, e o hardware a deixa exata quando ela não cabe na largura (sumRule).
+            const addB = biasAdder(l, add, tree, B);
             if (l.logits || l.accOut) {
                 const o = Int32Array.from(acc.subarray(0, n));
-                addBias(o, B, C, per, add, scratch);
+                addBias(o, B, C, per, addB, scratch);
                 vals[li] = o;
             } else {
-                addBias(acc, B, C, per, add, scratch);
+                addBias(acc, B, C, per, addB, scratch);
                 const y = new Uint8Array(n);
                 for (let i = 0; i < n; i++) y[i] = requantize(l, acc[i], Math.floor(i / per), MS);
                 vals[li] = y;

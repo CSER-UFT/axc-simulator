@@ -136,13 +136,18 @@ Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
     com as unidades da busca e ganho e viés: 228 arquivos, compilada com g++ e os cabeçalhos ap_int abertos da
     Xilinx (github.com/Xilinx/HLS_arbitrary_Precision_Types), 0 diferenças contra os kernels na rede e nos
     projetos da soma residual, da borda, da média e do atalho).
-    PENDENTE (decisão do Tiago): diferença antiga entre o avaliador (js/axc/nn.js) e o hardware com somadores
-    aproximados. No hardware, a soma de dois produtos com sinal (o primeiro nível da árvore da janela) fica com 16
-    bits de largura e um resultado de 17, e a regra de js/hls/approx.js deixa só o somador exato para ela; o
-    avaliador aproxima todas as somas com o ADD32. Na MiniLenet com o ADD32 LOA5 em tudo, as saídas diferem em 170
-    de 200 imagens, mas a classe só muda em 0 (LOA10: 2 de 200). Com multiplicadores aproximados, os dois batem.
-    O testbench do Vitis confere contra os kernels (o hardware), então ele passa; o que fica diferente é o que a
-    página e a busca avaliam.
+    Avaliador igual ao hardware nas somas (resolvido, a opção que o avaliador segue o hardware): no hardware, a
+    soma com sinal cujo resultado não cabe na largura da unidade (js/hls/approx.js e lib.js, opWidth) fica com o
+    somador exato; isso acontece no primeiro nível da árvore da janela (dois produtos de 8 x 8 bits, 17 bits), no
+    nível 9 das janelas de 288 e 576 termos da ResNet 8 e, às vezes, na soma do viés. O avaliador (js/axc/nn.js,
+    sumRule) aplica a mesma regra com as mesmas faixas (ativação de 0 a 255 vezes a faixa dos pesos da camada; o
+    viés em uso). Conferido: todos os 59 somadores do grupo que a busca considera (LOA, TRUNC1 a TRUNC17 e TRUNC32,
+    SEG L16) dão as mesmas saídas nos kernels do hardware e no avaliador, na MiniLenet e na LeNet 5 com três jogos
+    de diretivas, e a ResNet 8 treinada com as unidades da busca e a correção dá as mesmas saídas que o projeto
+    exportado. Ficam diferentes só os somadores destrutivos (TRUNC18 a TRUNC31 e muitos SEG): o erro deles passa da
+    faixa do nó, e o hardware estoura e dá a volta na largura do tipo; eles nunca entram nas candidatas (a fronteira
+    de custo e erro os descarta). As buscas gravadas antes desta correção (results/nn-search até a etapa22) usaram o
+    avaliador antigo, um pouco mais pessimista nas somas aproximadas.
 24. Rodada no Vitis e no Vivado (Tiago).
 25. ResNet 8 no seletor, no nnbench e na ajuda; rodada da matriz.
 

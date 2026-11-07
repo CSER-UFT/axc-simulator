@@ -234,36 +234,36 @@ test('correção de ganho numa convolução "acc": muda o m do ramo na add, como
     assert.notDeepEqual(outs(net, scales), outs(net, null));
 });
 
-test('código gerado da rede com ramos: os kernels, executados pelos tensores, dão as saídas do avaliador', async () => {
-    const { networkKernels, directiveTrees } = await import('../js/axc/nngen.js');
-    const { parse } = await import('../js/hls/lang.js');
-    const { elaborate } = await import('../js/hls/elab.js');
+test('código gerado da rede com ramos: os kernels, executados pelos tensores e com as unidades do hardware, dão as saídas do avaliador', async () => {
+    const { costModel, directiveTrees } = await import('../js/axc/nngen.js');
     const { execute, inputArrays, outputArrays } = await import('../js/hls/exec.js');
+    const { opFunction } = await import('../js/hls/approx.js');
     const { resnet8Json } = await import('./fixtures/resnet8.js');
-    const acc = adderAccumulate(unitOf('ADD32 LOA10'));
-    const a1 = new Int32Array(1), b1 = new Int32Array(1);
-    const fadd = (x, y) => { a1[0] = x; b1[0] = y; acc(a1, b1, 1); return a1[0]; };
-    const cases = [[tinyResnet(7), null, false], [tinyResnet(8, { mScale: 40, exp: -6 }), null, true], [resnet8Json(2, 4), null, true]];
-    for (const [json, dirs, approx] of cases) {
+    const D = (f) => JSON.parse(readFileSync(new URL(`data/${f}`, R), 'utf8'));
+    const cells = D('hls-cells.json'), fpga = D('vivado-units.json');
+    const cases = [[tinyResnet(7), null], [tinyResnet(8, { mScale: 40, exp: -6 }), 'ADD32 LOA10'], [resnet8Json(2, 4), 'ADD32 LOA5'], [tinyResnet(9), 'ADD32 TRUNC6']];
+    for (const [json, addName] of cases) {
         const net = decodeNet(json), set = randomSet(2, json.dataset.shape, 5, 4);
-        const ks = networkKernels(net, dirs);
-        const kinds = ks.map((k) => k.type);
+        const cm = costModel(net, { synth, cells, fpga, target: 'fpga', clockNs: 10 });
+        const kinds = cm.kernels.map((k) => k.type);
         assert.ok(kinds.includes('add') && kinds.includes('pad'), kinds.join());
-        const trees = directiveTrees(net, dirs);
+        const units = net.sites.map((_, i) => ({ mul: i % 2 ? 'MUL8 DRUM4' : null, add: addName }));
+        const rows = cm.network(units).layers;
+        const trees = directiveTrees(net, null);
+        const T = units.map((u) => productTable(u.mul ? unitOf(u.mul) : null)), A = units.map((u) => (u.add ? adderAccumulate(unitOf(u.add)) : null));
         for (let i = 0; i < set.n; i++) {
             const img = set.images.subarray(i * set.size, (i + 1) * set.size);
-            const want = [...infer(net, img, net.sites.map(() => productTable(null)), approx ? net.sites.map(() => acc) : [], undefined, trees).out];
+            const want = [...infer(net, img, T, A, undefined, trees).out];
             const mem = new Map([[0, Float64Array.from(inputActivations(net, img))]]);
-            for (const k of ks) {
-                const d = elaborate(parse(k.src), { ports: 2 });
-                const ops = new Map();
-                if (approx && k.site !== null) for (const sg of d.segments) for (const n of sg.nodes) if (n.op === 'add') ops.set(n.id, fadd);
+            cm.kernels.forEach((k, j) => {
+                const r = rows[j].result, d = r.design;
+                const ops = new Map([...r.assign].map(([id, name]) => [id, opFunction(r.lib, r.ops.byId.get(id), name)]));
                 const ins = inputArrays(d), [outA] = outputArrays(d);
                 assert.equal(ins.length, k.ins.length, k.name);
-                const res = execute(d, new Map(ins.map((A, j) => [A.name ?? A, mem.get(k.ins[j])])), { ops });
-                mem.set(k.out, Float64Array.from(res.mem.get(outA.name ?? outA)));
-            }
-            assert.deepEqual([...mem.get(ks.at(-1).out)], want, `${json.id} imagem ${i}`);
+                const res = execute(d, new Map(ins.map((X, q) => [X.name, mem.get(k.ins[q])])), { ops });
+                mem.set(k.out, Float64Array.from(res.mem.get(outA.name)));
+            });
+            assert.deepEqual([...mem.get(cm.kernels.at(-1).out)], want, `${json.id} ${addName} imagem ${i}`);
         }
     }
 });
@@ -375,5 +375,34 @@ test('ResNet 8 treinada: classes e saídas do avaliador iguais às do treino (se
         const r = infer(net, set.images.subarray(k * set.size, (k + 1) * set.size), T, []);
         assert.deepEqual(Array.from(r.out), Array.from(outs.subarray(k * net.classes, (k + 1) * net.classes)), `imagem ${k}`);
         assert.equal(r.pred, net.expected[k], `imagem ${k}`);
+    }
+});
+
+// O avaliador segue o hardware nas somas: o primeiro nível da árvore da janela (dois produtos de 8 x 8 bits com
+// sinal, 17 bits) fica exato, como em js/hls/approx.js. Com os somadores que a busca considera, os kernels do
+// hardware (as unidades do modelo de custo) e o avaliador dão as mesmas saídas.
+test('rede em sequência: avaliador igual aos kernels do hardware com somadores aproximados', async () => {
+    const { costModel, directiveTrees } = await import('../js/axc/nngen.js');
+    const { execute, inputArrays, outputArrays } = await import('../js/hls/exec.js');
+    const { opFunction } = await import('../js/hls/approx.js');
+    const D = (f) => JSON.parse(readFileSync(new URL(`data/${f}`, R), 'utf8'));
+    const json = D('nn/minilenet-mnist.json'), net = decodeNet(json), ds = json.dataset;
+    const set = decodeTestSet(readFileSync(new URL(ds.file, R)), ds);
+    const cm = costModel(net, { synth, cells: D('hls-cells.json'), fpga: D('vivado-units.json'), target: 'fpga', clockNs: 10 });
+    const trees = directiveTrees(net, null);
+    for (const add of ['ADD32 LOA5', 'ADD32 LOA12', 'ADD32 TRUNC6', 'ADD32 TRUNC14', 'ADD32 SEG L16 P16', 'ADD32 TRUNC32']) {
+        const units = net.sites.map(() => ({ mul: 'MUL8 DRUM4', add }));
+        const rows = cm.network(units).layers;
+        const T = units.map(() => productTable(unitOf('MUL8 DRUM4'))), A = units.map(() => adderAccumulate(unitOf(add)));
+        for (let i = 0; i < 2; i++) {
+            const img = set.images.subarray(i * set.size, (i + 1) * set.size);
+            let cur = Float64Array.from(inputActivations(net, img));
+            for (const row of rows) {
+                const r = row.result, d = r.design;
+                const ops = new Map([...r.assign].map(([id, name]) => [id, opFunction(r.lib, r.ops.byId.get(id), name)]));
+                cur = Float64Array.from(execute(d, new Map([[inputArrays(d)[0].name, cur]]), { ops }).mem.get(outputArrays(d)[0].name));
+            }
+            assert.deepEqual([...cur], [...infer(net, img, T, A, undefined, trees).out], `${add} imagem ${i}`);
+        }
     }
 });
