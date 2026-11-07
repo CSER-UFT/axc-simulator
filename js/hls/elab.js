@@ -39,6 +39,16 @@ export function bitsFor([lo, hi]) {
 /** Bits do módulo (para os multiplicadores sem sinal, com o sinal tratado à parte). */
 export const magBits = ([lo, hi]) => Math.max(1, Math.ceil(Math.log2(Math.max(Math.abs(lo), Math.abs(hi)) + 1)));
 
+/**
+ * Menor e maior valor de uma tabela, num laço: Math.min(...v) passa cada valor como argumento e estoura a pilha com
+ * tabelas grandes (a densa da MiniLenet na CIFAR 10 tem 56 mil pesos), sobretudo num worker, que tem pilha menor.
+ */
+export function rangeOf(v) {
+    let lo = Infinity, hi = -Infinity;
+    for (const x of v) { if (x < lo) lo = x; if (x > hi) hi = x; }
+    return [lo, hi];
+}
+
 const R = {
     add: (a, b) => [a[0] + b[0], a[1] + b[1]],
     sub: (a, b) => [a[0] - b[1], a[1] - b[0]],
@@ -454,7 +464,7 @@ export function elaborate(ast, { ports = 2 } = {}) {
         }
         arr.accesses++;
         // Tabela constante: a faixa é a dos valores guardados, não a do tipo.
-        const lr = arr.kind === 'rom' ? [Math.min(...arr.init), Math.max(...arr.init)] : typeRange(arr.type);
+        const lr = arr.kind === 'rom' ? (arr.initRange ??= rangeOf(arr.init)) : typeRange(arr.type);
         return emit('load', [], lr, e.line, { array: arr.name, idx, bank: bankOf(arr, idx), text: `${arr.name}[${idx.map(affText).join('][')}]` });
     }
     function store(target, value, env, line) {
