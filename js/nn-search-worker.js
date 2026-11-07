@@ -22,15 +22,18 @@ self.onmessage = async ({ data: o }) => {
         self.postMessage({ type: 'status', key: 'nn.searchLoading' });
         const [synth, cells, fpga, netJson] = await Promise.all([getJson(url('data/synth.json')), getJson(url('data/hls-cells.json')), getJson(url('data/vivado-units.json')).catch(() => null), getJson(url(o.file))]);
         const net = decodeNet(netJson), ds = net.dataset;
-        const [valBuf, testBuf] = await Promise.all([getBin(url(ds.val.file)), getBin(url(ds.file))]);
-        const val = decodeTestSet(valBuf, { ...ds, n: ds.val.n }), test = decodeTestSet(testBuf, ds);
+        // o.valN: a validação de 1000 (a do JSON) ou a de 5000 (<base>-val5000.bin, scripts/nn/export_val.py).
+        const valN = o.valN ?? ds.val.n;
+        const valFile = valN === ds.val.n ? ds.val.file : ds.val.file.replace(/val\d+\.bin$/, `val${valN}.bin`);
+        const [valBuf, testBuf] = await Promise.all([getBin(url(valFile)), getBin(url(ds.file))]);
+        const val = decodeTestSet(valBuf, { ...ds, n: valN }), test = decodeTestSet(testBuf, ds);
         self.postMessage({ type: 'status', key: 'nn.searchPreparing' });
         const P = prepareSearch(net, { val, test, synth, cells, fpga, objective: o.objective, dirs: o.dirs, trees: o.trees, clockNs: o.clockNs, maxCands: o.maxCands, sample: o.sample, biasFix: o.biasFix ?? 'none' });
         let engine;
         const n = Math.max(1, o.workers ?? 1);
         if (n > 1 && typeof Worker !== 'undefined') {
             try {
-                const init = initMessage(netJson, valBuf, synth, P.trees, o.sample, o.biasFix ?? 'none');
+                const init = initMessage(netJson, valBuf, synth, P.trees, o.sample, o.biasFix ?? 'none', valN);
                 const send = [];
                 for (let i = 0; i < n; i++) {
                     const w = new Worker(new URL('./nn-eval-worker.js', import.meta.url), { type: 'module' });

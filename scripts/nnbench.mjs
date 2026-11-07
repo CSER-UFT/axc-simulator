@@ -13,6 +13,10 @@
  * Heurísticas com h: são da busca híbrida (--hybrid --heuristic ...); as outras, da busca medida. --quick: só a
  * MiniLenet, objetivo área, amostra de 250, sensibilidade e busca local híbrida.
  *
+ * ResNet 8 (cerca de 50 minutos por caso na rodada da etapa 22; só a híbrida, a medida levaria dias):
+ *   node scripts/nnbench.mjs --models resnet8-cifar10 --val 5000 --samples 1000 --objectives area,luts \
+ *        --heuristics h:local,h:efficiency
+ *
  * Para cada caso: a economia do ponto escolhido, a queda de acurácia na amostra (a que a busca vê), na validação
  * inteira (a do limite) e no teste (que a busca não vê), o tempo, as classificações e, na híbrida, quantos pontos
  * foram verificados. A coluna "coberto" diz se algum ponto visitado, viável na amostra e aprovado na validação

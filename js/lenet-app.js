@@ -130,7 +130,18 @@ async function loadNN(id) {
     if (!testCache.has(ds.file)) testCache.set(ds.file, getBin(ds.file).then((b) => decodeTestSet(b, ds)));
     const changed = nnData?.net.id !== net.id;
     nnData = { net, test: await testCache.get(ds.file) };
-    if (changed) { fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); clearSearchView(); $('nnSearchStatus').textContent = ''; renderSearchFig(); }
+    if (changed) {
+        fillLayers(); renderArch(); nnDirs = loadDirs(net); fillDirs(); setOverride(null); clearSearchView(); $('nnSearchStatus').textContent = ''; renderSearchFig();
+        // O custo só é recalculado depois da classificação (na ResNet 8, perto de 1 minuto): até lá, nada da rede anterior.
+        ++costRun; lastKernels = []; renderCode(); $('nnCostSummary').innerHTML = ''; $('nnCostNote').innerHTML = ''; $('nnCost').innerHTML = `<p class="note">${t('nn.costRunning')}</p>`;
+        // Padrões da rede (models.json): a ResNet 8 busca com a validação de 5000 e a amostra de 1000 (com 1000 imagens,
+        // o limite de 1 ponto deixa margem de poucas imagens), e o testbench exportado usa menos imagens (a execução
+        // bit a bit de cada uma leva segundos).
+        $('nnSearchVal').value = String(entry.searchVal ?? 1000);
+        if (entry.searchSample !== undefined) $('nnSearchSample').value = String(entry.searchSample);
+        $('nnExportImages').value = String(entry.exportImages ?? 50);
+        sampleWarn();
+    }
     return nnData;
 }
 
@@ -519,7 +530,11 @@ $('nnSearchStop').onclick = () => stopSearch(t('nn.searchStopped'));
 // Aviso: com a amostra, o limite cabe em poucas imagens (1 ponto em 250 imagens são 2), e a diferença entre a rede
 // aproximada e a exata nessas imagens é dominada pelo acaso de quais imagens a amostra tem.
 function sampleWarn() {
-    const n = +$('nnSearchSample').value || nnData?.net.dataset.val?.n || 1000;
+    const N = +$('nnSearchVal').value || 1000;
+    $('nnSearchSampleAll').textContent = t('nn.searchSampleAllN', { n: nf(N) });
+    // A amostra tem de ser menor que a validação (senão é a validação inteira).
+    if (+$('nnSearchSample').value >= N) $('nnSearchSample').value = '0';
+    const n = +$('nnSearchSample').value || N;
     const k = Math.floor((Math.max(0, +$('nnSearchDrop').value || 0) * n) / 100 + 1e-9);
     $('nnSearchWarn').textContent = k < 5 ? t('nn.searchFewImages', { k, n }) : '';
 }
@@ -529,7 +544,7 @@ for (const id of ['nnSearchObj', 'nnSearchDrop', 'nnSearchSample', 'nnSearchBias
     if (v !== null && (el.tagName !== 'SELECT' || [...el.options].some((o) => o.value === v))) el.value = v;
     el.addEventListener('change', () => store.set(`nn.${id}`, el.value));
 }
-for (const id of ['nnSearchSample', 'nnSearchDrop']) $(id).addEventListener('input', sampleWarn);
+for (const id of ['nnSearchSample', 'nnSearchDrop', 'nnSearchVal']) $(id).addEventListener('input', sampleWarn);
 sampleWarn();
 $('nnSearchBtn').onclick = () => {
     if (!nnData || !registry) return;
@@ -540,7 +555,7 @@ $('nnSearchBtn').onclick = () => {
     const runs = h === 'all' ? HYBRID_LIST.map((x) => ({ heuristic: x, hybrid: true })) : [{ heuristic: h, hybrid }];
     const o = {
         file: entry.file, objective: $('nnSearchObj').value, maxDrop: Math.max(0, +$('nnSearchDrop').value || 0), heuristic: runs[0].heuristic, hybrid: runs[0].hybrid, biasFix: $('nnSearchBias').value,
-        dirs: nnDirs, trees: directiveTrees(net, nnDirs), clockNs: +$('nnClock').value || 10, workers: searchWorkers(), sample: +$('nnSearchSample').value, runs,
+        dirs: nnDirs, trees: directiveTrees(net, nnDirs), clockNs: +$('nnClock').value || 10, workers: searchWorkers(), sample: +$('nnSearchSample').value, valN: +$('nnSearchVal').value || 1000, runs,
     };
     $('nnSearchBtn').disabled = true;
     $('nnSearchStop').disabled = false;
@@ -725,7 +740,7 @@ function renderSearch() {
 // diretivas, período e amostra (o mesmo eixo de custo e a mesma acurácia da exata).
 // var: lidos também ao trocar de modelo, o que pode acontecer antes desta linha na carga da página.
 var nnCompare = [], live = null, searchId = 0, figPending = false; // eslint-disable-line no-var
-const cmpKeyOf = (netId, o) => JSON.stringify([netId, o.objective, o.dirs, o.clockNs, o.sample]);
+const cmpKeyOf = (netId, o) => JSON.stringify([netId, o.objective, o.dirs, o.clockNs, o.sample, o.valN ?? 1000]);
 const hName = (o) => `${o.hybrid ? t(`nn.hyb.${o.heuristic}`) : t(o.heuristic === 'sensitivity' ? 'nn.searchSens' : 'nn.searchSeq')} · ${t(o.hybrid ? 'nn.kindHyb' : 'nn.kindMeas')} · ${nf(o.maxDrop, 2)} ${t('nn.pp')}${o.biasFix && o.biasFix !== 'none' ? ` · ${t(`nn.bias.${o.biasFix}`)}` : ''}`;
 /** Série do gráfico a partir de um resultado da busca (pontos em % do custo da exata e % de acurácia). */
 function seriesOf(r) {

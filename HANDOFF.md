@@ -149,7 +149,12 @@ Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
     de custo e erro os descarta). As buscas gravadas antes desta correção (results/nn-search até a etapa22) usaram o
     avaliador antigo, um pouco mais pessimista nas somas aproximadas.
 24. Rodada no Vitis e no Vivado (Tiago).
-25. ResNet 8 no seletor, no nnbench e na ajuda; rodada da matriz.
+25. ResNet 8 no seletor, no nnbench e na ajuda; rodada da matriz (feito, menos a rodada da matriz, que é do
+    Tiago: a ResNet 8 entrou no seletor da página (models.json sem page:false, com os padrões searchVal 5000,
+    searchSample 1000 e exportImages 10, aplicados ao trocar de modelo); seletor Validação na Exploração (1000 ou
+    5000; o worker baixa o *-val5000.bin; a chave da comparação das execuções inclui a validação); amostra de 1000
+    no seletor; ajuda (pt e en) e README com a ResNet 8 e o seletor; exemplo da matriz da ResNet 8 no cabeçalho do
+    scripts/nnbench.mjs. A matriz pode ser refeita com o avaliador corrigido (as da etapa 22 usaram o antigo).
 
 ## O que já existe
 
