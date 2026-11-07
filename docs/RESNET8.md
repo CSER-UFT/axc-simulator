@@ -135,7 +135,14 @@ limitado pela memória (72 a 288 sem partição), como nas outras redes. Montar 
 quase tudo na elaboração das convoluções (6 a 10 s cada); trocar as unidades depois leva menos de 1 s. Na página, esse
 cálculo precisa ir para um worker (etapa 22 ou 25).
 
-A exportação para o Vitis (`networkProject`) ainda recusa as redes com ramos (etapa 23).
+## Exportação para o Vitis (etapa 23)
+
+`networkProject` (`js/axc/nnexport.js`) liga cada kernel aos vetores dos tensores que ele lê e escreve: no topo
+`network()`, os atalhos leem vetores escritos antes da camada anterior (`s2sc(t7, t12)`, `s2add(t12, t11, t13)`). A
+partição de cada vetor junta a da camada que escreve e as das que leem (vale a da última que lê). A execução bit a
+bit que dá as saídas esperadas do testbench e a entrada de cada projeto por camada segue os mesmos tensores. A
+ResNet 8 treinada, com as unidades da busca e a correção de ganho e viés, sai com 228 arquivos (a rede e as 22
+camadas); compilada com g++ e os cabeçalhos ap_int abertos da Xilinx, dá 0 diferenças contra os kernels.
 
 ## Treino e conferência bit a bit (etapas 17 e 18)
 

@@ -302,9 +302,34 @@ test('custo da rede com ramos: kernels da borda, da soma e da média; reescalas 
     assert.equal(ap.totals.cycles > 0, true);
 });
 
-test('exportação para o Vitis: erro claro nas redes com ramos (etapa 23)', async () => {
+test('exportação para o Vitis da rede com ramos: topo pelos tensores e, com ap_int, g++ igual aos kernels', async () => {
     const { networkProject } = await import('../js/axc/nnexport.js');
-    assert.throws(() => networkProject(decodeNet(tinyResnet()), {}), /ainda não aceita redes com ramos/);
+    const { execSync } = await import('node:child_process');
+    const { mkdtempSync, writeFileSync, mkdirSync, rmSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join, dirname } = await import('node:path');
+    const D = (f) => JSON.parse(readFileSync(new URL(`data/${f}`, R), 'utf8'));
+    const json = tinyResnet(7), net = decodeNet(json), test = randomSet(4, json.dataset.shape, 5, 7);
+    const units = net.sites.map((_, i) => ({ mul: i % 2 ? 'MUL8 DRUM4' : null, add: i % 3 ? 'ADD32 LOA5' : null }));
+    const p = networkProject(net, { synth, cells: D('hls-cells.json'), fpga: D('vivado-units.json'), test, images: 4, units });
+    const cpp = p.files['network/kernel.cpp'];
+    // Os atalhos leem vetores escritos antes da camada anterior; a soma lê os dois ramos.
+    const calls = cpp.slice(cpp.indexOf('// Topo:')).split('\n').filter((l) => /^ {4}\w+\(/.test(l)).map((l) => l.trim());
+    assert.ok(calls.some((c) => /^s1add\(t2, t6, t7\);$/.test(c)), calls.join(' '));
+    assert.ok(calls.some((c) => /^s2sc\(t7, /.test(c)) && cpp.includes('axc_requant2'));
+    assert.ok(p.files['layers/s2add/kernel.cpp'] && p.files['layers/pad4/kernel.cpp']);
+    const inc = process.env.AXC_APINT ?? '/tools/Xilinx/Vitis_HLS/2022.2/include';
+    if (!existsSync(join(inc, 'ap_int.h'))) return;
+    const dir = mkdtempSync(join(tmpdir(), 'axc-r8x-'));
+    try {
+        for (const [f, c] of Object.entries(p.files)) { mkdirSync(dirname(join(dir, f)), { recursive: true }); writeFileSync(join(dir, f), c); }
+        for (const d of ['network', 'layers/s1add', 'layers/s2add', 'layers/pad4', 'layers/pool']) {
+            const cwd = join(dir, d);
+            execSync(`g++ -O0 -std=c++14 -w -I${inc} -I. kernel.cpp tb.cpp $(ls u_*_bb.cpp 2>/dev/null) -o tb`, { cwd, stdio: 'pipe' });
+            const out = execSync('./tb', { cwd, encoding: 'utf8' });
+            assert.match(out, /AXC_MISMATCHES 0 OF/, `${d}: ${out}`);
+        }
+    } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
 // Etapa 18: a inferência inteira do Python (scripts/nn/train.py, int_forward_graph) e a do avaliador dão as mesmas

@@ -129,7 +129,20 @@ Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
     1,1 no teste de 1000, 22% do teto de 37,8%, em 81 minutos (calibração 25, modelo estático 5, verificação 46)
     e 1,1 GB. Padrão recomendado para a ResNet 8: --val 5000 --sample 1000. Na página (etapa 25), a validação de
     1000 dá só uma margem pequena, então ela precisa da de 5000.
-23. Exportação para o Vitis e o Vivado dos tipos novos, com a correção do viés.
+23. Exportação para o Vitis e o Vivado dos tipos novos, com a correção do viés (feito: networkProject liga cada
+    kernel aos vetores dos seus tensores; partição de cada vetor com a camada que escreve e as que leem; topo
+    com os atalhos lendo os vetores escritos antes; execução bit a bit pelos tensores para o testbench e para a
+    entrada dos projetos por camada; o projeto das redes de hoje continua igual, byte a byte. ResNet 8 treinada
+    com as unidades da busca e ganho e viés: 228 arquivos, compilada com g++ e os cabeçalhos ap_int abertos da
+    Xilinx (github.com/Xilinx/HLS_arbitrary_Precision_Types), 0 diferenças contra os kernels na rede e nos
+    projetos da soma residual, da borda, da média e do atalho).
+    PENDENTE (decisão do Tiago): diferença antiga entre o avaliador (js/axc/nn.js) e o hardware com somadores
+    aproximados. No hardware, a soma de dois produtos com sinal (o primeiro nível da árvore da janela) fica com 16
+    bits de largura e um resultado de 17, e a regra de js/hls/approx.js deixa só o somador exato para ela; o
+    avaliador aproxima todas as somas com o ADD32. Na MiniLenet com o ADD32 LOA5 em tudo, as saídas diferem em 170
+    de 200 imagens, mas a classe só muda em 0 (LOA10: 2 de 200). Com multiplicadores aproximados, os dois batem.
+    O testbench do Vitis confere contra os kernels (o hardware), então ele passa; o que fica diferente é o que a
+    página e a busca avaliam.
 24. Rodada no Vitis e no Vivado (Tiago).
 25. ResNet 8 no seletor, no nnbench e na ajuda; rodada da matriz.
 

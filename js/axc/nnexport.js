@@ -4,9 +4,11 @@
  *
  *   network/        a rede inteira: uma função por camada (o projeto elaborado de cada kernel, js/hls/vitis.js,
  *                   exportFunction, com INLINE off para cada uma ter o seu relatório) e o topo network(), que chama as
- *                   camadas em sequência com vetores locais entre elas, como o código C da MiniLenet. A partição de
- *                   cada vetor entre duas camadas é uma só: por dimensão, vale a da camada que lê (a escrita fica com
- *                   ela também), e o LEIAME lista o que a camada que escreve pedia diferente. O testbench passa N
+ *                   camadas em sequência com vetores locais entre elas, como o código C da MiniLenet. Nas redes com
+ *                   ramos (ResNet 8), cada camada lê os vetores dos tensores dela (o atalho e a soma residual leem um
+ *                   vetor escrito antes da camada anterior). A partição de cada vetor é uma só: por dimensão, vale a
+ *                   da camada que lê (a escrita fica com ela também; com duas que leem, a última), e o LEIAME lista o
+ *                   que as outras pediam diferente. O testbench passa N
  *                   imagens de teste e confere todas as saídas com a execução bit a bit do simulador, e a acurácia;
  *   layers/<nome>/  cada camada sozinha, com as suas partições (o que o modelo de custo supõe): o projeto de um
  *                   kernel da página de síntese (projectFiles), com a imagem 0 como entrada;
@@ -15,7 +17,7 @@
  * As unidades aproximadas entram como caixa preta de RTL (o Verilog da netlist com o invólucro que o Vitis pede), ou
  * como C++ da netlist (inline: false), e a reescala (requant) como uma função com a multiplicação em DSP.
  */
-import { costModel, normalizeDirectives, assertSequential } from './nngen.js';
+import { costModel, normalizeDirectives } from './nngen.js';
 import { inputActivations } from './nn.js';
 import { exportFunction, unitsCode, seqUnitsCode, signedCode, REQUANT_CPP, REQUANT2_CPP, projectFiles, blackboxFiles, tclScript, prediction } from '../hls/vitis.js';
 import { execute, inputArrays, outputArrays } from '../hls/exec.js';
@@ -31,16 +33,20 @@ function opsOf(r) {
     return new Map([...r.assign].map(([id, name]) => [id, opFunction(r.lib, r.ops.byId.get(id), name)]));
 }
 
-/** Executa os kernels em sequência (a entrada do primeiro: x). Devolve a saída de cada um. */
+/**
+ * Executa os kernels pelos tensores (k.ins e k.out; o tensor 0 é a entrada da rede, x). Devolve, de cada kernel, as
+ * entradas (o nome do vetor e os valores) e o resultado.
+ */
 function runKernels(ks, x) {
     const outs = [];
-    let cur = x;
+    const mem = new Map([[0, Float64Array.from(x)]]);
     for (const k of ks) {
         const d = k.result.design;
-        const [inA] = inputArrays(d), [outA] = outputArrays(d);
-        const res = execute(d, new Map([[inA.name, Float64Array.from(cur)]]), { ops: k.ops });
-        outs.push({ inName: inA.name, input: Float64Array.from(cur), res });
-        cur = res.mem.get(outA.name);
+        const ins = inputArrays(d), [outA] = outputArrays(d);
+        const inputs = new Map(ins.map((A, j) => [A.name, Float64Array.from(mem.get(k.ins[j]))]));
+        const res = execute(d, inputs, { ops: k.ops });
+        outs.push({ inputs, res });
+        mem.set(k.out, res.mem.get(outA.name));
     }
     return outs;
 }
@@ -55,7 +61,6 @@ function runKernels(ks, x) {
  * @returns {{files: Record<string, string>, summary: object}}
  */
 export function networkProject(net, o) {
-    assertSequential(net);
     const clockNs = o.clockNs ?? 10, part = o.part ?? 'xc7a100tcsg324-1', target = o.target ?? 'fpga';
     const dirs = normalizeDirectives(net, o.dirs);
     const units = net.sites.map((_, si) => ({ mul: o.units?.[si]?.mul ?? null, add: o.units?.[si]?.add ?? null }));
@@ -70,34 +75,54 @@ export function networkProject(net, o) {
     const files = {};
     const warnings = [...cost.warnings], partitionNotes = [];
 
-    // Vetores entre as camadas: a saída de uma é a entrada da seguinte (mesmas dimensões e tipo).
+    // Vetores entre as camadas: um por tensor (k.ins e k.out de cada kernel; o 0 é a entrada da rede), com as mesmas
+    // dimensões e o mesmo tipo em quem escreve e em quem lê. Nas redes em sequência, a saída de uma camada é a
+    // entrada da seguinte.
     const params = ks.map((k) => {
         const d = k.result.design;
-        return { x: d.arrays.find((a) => a.name === inputArrays(d)[0].name), y: d.arrays.find((a) => a.name === outputArrays(d)[0].name) };
+        return { xs: inputArrays(d).map((A) => d.arrays.find((x) => x.name === A.name)), y: d.arrays.find((x) => x.name === outputArrays(d)[0].name) };
     });
-    for (let i = 1; i < ks.length; i++) {
-        const a = params[i - 1].y, b = params[i].x;
-        if (a.dims.join('x') !== b.dims.join('x')) throw new Error(`${ks[i - 1].name} -> ${ks[i].name}: ${a.dims.join('x')} e ${b.dims.join('x')}`);
+    ks.forEach((k, i) => { if (params[i].xs.length !== k.ins.length) throw new Error(`${k.name}: ${params[i].xs.length} vetores de entrada, ${k.ins.length} tensores`); });
+    const writer = new Map(ks.map((k, i) => [k.out, i]));
+    const readers = new Map();
+    ks.forEach((k, i) => k.ins.forEach((t, j) => readers.set(t, [...(readers.get(t) ?? []), { i, j }])));
+    for (const [t, rs] of readers) {
+        const a = t === 0 ? null : params[writer.get(t)].y;
+        for (const { i, j } of rs) {
+            const b = params[i].xs[j];
+            if (a && a.dims.join('x') !== b.dims.join('x')) throw new Error(`${ks[writer.get(t)].name} -> ${ks[i].name}: ${a.dims.join('x')} e ${b.dims.join('x')}`);
+        }
     }
     // Partição de cada vetor: por dimensão, a da camada que lê; a da que escreve só onde a que lê não pede nada.
     const partitions = [];
-    const merge = (writer, reader, label) => {
+    const merge = (writerArr, readerArrs, label) => {
         const byDim = new Map();
-        for (const p of writer?.partitions ?? []) byDim.set(p.dim, { ...p, from: 'w' });
-        for (const p of reader?.partitions ?? []) {
-            const w = byDim.get(p.dim);
-            if (w && (w.type !== p.type || w.factor !== p.factor)) partitionNotes.push(`${label}: dim=${p.dim} ${p.type} ${p.factor} (leitura) no lugar de ${w.type} ${w.factor} (escrita)`);
-            byDim.set(p.dim, { ...p, from: 'r' });
+        for (const p of writerArr?.partitions ?? []) byDim.set(p.dim, { ...p, from: 'w' });
+        for (const [reader, rl] of readerArrs) {
+            for (const p of reader?.partitions ?? []) {
+                const w = byDim.get(p.dim);
+                if (w && (w.type !== p.type || w.factor !== p.factor)) partitionNotes.push(`${label(rl)}: dim=${p.dim} ${p.type} ${p.factor} (${rl}) no lugar de ${w.type} ${w.factor} (${w.from === 'w' ? 'escrita' : w.from})`);
+                byDim.set(p.dim, { ...p, from: rl });
+            }
         }
         if (byDim.has(0) && byDim.size > 1) { const z = byDim.get(0); byDim.clear(); byDim.set(0, z); }
         return [...byDim.values()].sort((a, b) => a.dim - b.dim);
     };
-    const tensors = ks.map((k, i) => ({
-        name: i === ks.length - 1 ? 'out' : `t${i + 1}`,
-        arr: params[i].y,
-        parts: merge(params[i].y, i + 1 < ks.length ? params[i + 1].x : null, `${k.name} -> ${ks[i + 1]?.name ?? 'saída'}`),
-    }));
-    const input = { name: 'in', arr: params[0].x, parts: merge(null, params[0].x, `entrada -> ${ks[0].name}`) };
+    const last = ks.length - 1;
+    const readOf = (t) => (readers.get(t) ?? []).map(({ i, j }) => [params[i].xs[j], ks[i].name]);
+    const seq = !net.graph;
+    // Nomes: in e out; os outros, t<i> pela ordem da camada que escreve (nas redes em sequência, como antes).
+    const tensors = ks.map((k, i) => {
+        const rs = readOf(k.out);
+        return {
+            name: i === last ? 'out' : `t${i + 1}`,
+            arr: params[i].y,
+            parts: merge(params[i].y, rs.map(([x, n]) => [x, seq ? 'leitura' : `leitura em ${n}`]), (rl) => (seq ? `${k.name} -> ${ks[i + 1]?.name ?? 'saída'}` : `${k.name} -> ${rl.replace('leitura em ', '')}`)),
+        };
+    });
+    const nameOf = (t) => (t === 0 ? 'in' : tensors[writer.get(t)].name);
+    const r0 = readOf(0);
+    const input = { name: 'in', arr: r0[0][0], parts: merge(null, r0.map(([x, n]) => [x, seq ? 'leitura' : `leitura em ${n}`]), (rl) => (seq ? `entrada -> ${ks[0].name}` : `entrada -> ${rl.replace('leitura em ', '')}`)) };
     const decl = (t) => `${arrType(t.arr.type)} ${t.name}[${t.arr.dims.join('][')}]`;
     const partLines = (t) => t.parts.map((p) => `#pragma HLS ARRAY_PARTITION variable=${t.name} type=${p.type}${p.type !== 'complete' ? ` factor=${p.factor}` : ''} dim=${p.dim}`);
 
@@ -124,14 +149,15 @@ export function networkProject(net, o) {
         fns.some((f) => f.requant2) ? REQUANT2_CPP : '',
         '',
         ...layerCode,
-        `// Topo: as camadas em sequência, com os vetores entre elas (sem dataflow, como no código C da MiniLenet).`,
+        seq ? `// Topo: as camadas em sequência, com os vetores entre elas (sem dataflow, como no código C da MiniLenet).`
+            : `// Topo: as camadas em sequência, cada uma com os vetores dos seus tensores (os atalhos leem um vetor escrito antes).`,
         `${top} {`,
         '#pragma HLS INTERFACE mode=ap_memory port=in storage_type=ram_t2p',
         '#pragma HLS INTERFACE mode=ap_memory port=out storage_type=ram_t2p',
         ...partLines(input),
         ...partLines(tensors.at(-1)),
         ...tensors.slice(0, -1).flatMap((t) => [`    ${decl(t)};`, ...partLines(t)]),
-        ...ks.map((k, i) => `    ${k.name}(${i === 0 ? 'in' : tensors[i - 1].name}, ${tensors[i].name});`),
+        ...ks.map((k, i) => `    ${k.name}(${[...k.ins.map(nameOf), tensors[i].name].join(', ')});`),
         '}',
         '',
     ].join('\n');
@@ -154,7 +180,7 @@ export function networkProject(net, o) {
         if (k === 0) ks.forEach((kk, i) => { kk.first = runs[i]; });
         progress(k + 1, N);
     }
-    if (inA.size !== o.test.size && inA.size !== ks[0].first.input.length) throw new Error('entrada da rede com tamanho inesperado');
+    if (inA.size !== o.test.size && inA.size !== [...ks[0].first.inputs.values()][0].length) throw new Error('entrada da rede com tamanho inesperado');
     const flat = (name, a) => `(&${name}${a.dims.map(() => '[0]').join('')})`;
     const tb = `// Testbench da rede ${net.name}: ${N} imagens de teste; confere cada saída com a execução bit a bit do
 // axc-simulator (os mesmos kernels e unidades) e conta os acertos.
@@ -223,7 +249,7 @@ ${top};
     if (o.layers !== false) {
         for (const k of ks) {
             const exp = k.first.res;
-            const lf = projectFiles(k.result, { inputs: new Map([[k.first.inName, k.first.input]]), expected: exp, part, clockNs, id: `${id}_${k.name}`, note: `${net.name}, camada ${k.name}${k.site !== null ? `, ${unitsText(net, [units[k.site]], [k.name])}` : ''}`, target, tcl: { autoPartition: false }, romStorage: 'bram' });
+            const lf = projectFiles(k.result, { inputs: k.first.inputs, expected: exp, part, clockNs, id: `${id}_${k.name}`, note: `${net.name}, camada ${k.name}${k.site !== null ? `, ${unitsText(net, [units[k.site]], [k.name])}` : ''}`, target, tcl: { autoPartition: false }, romStorage: 'bram' });
             for (const [f, c] of Object.entries(lf)) files[`layers/${k.name}/${f}`] = c;
             names.push(`layers/${k.name}`);
         }
