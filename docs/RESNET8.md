@@ -144,6 +144,61 @@ bit que dá as saídas esperadas do testbench e a entrada de cada projeto por ca
 ResNet 8 treinada, com as unidades da busca e a correção de ganho e viés, sai com 228 arquivos (a rede e as 22
 camadas); compilada com g++ e os cabeçalhos ap_int abertos da Xilinx, dá 0 diferenças contra os kernels.
 
+## Vitis HLS e Vivado (etapa 24)
+
+Rodada da ResNet 8 treinada com as unidades exatas, a 10 ns, na xc7a100t (`bash run_all.sh -j 3 --impl`; a
+comparação é a do `node bin/axc.mjs nnvitis`):
+
+| | Modelo | Medido | Desvio |
+| --- | ---: | ---: | ---: |
+| csim da rede (10 imagens) | | 0 diferenças em 100 saídas, 10 acertos | |
+| csim das 22 camadas | | 0 diferenças | |
+| Latência da rede (síntese HLS) | 6.376.893 (em sequência) | 6.283.626 | 1% |
+| Soma das camadas sozinhas: latência | 6.376.893 | 6.414.680 | -1% |
+| Soma das camadas sozinhas: LUT (Vivado) | 77.641 | 80.744 | -4% |
+| Soma das camadas sozinhas: FF (Vivado) | 60.844 | 57.727 | 5% |
+| Soma das camadas sozinhas: DSP | 24 | 24 | 0% |
+| BRAM18 da rede (síntese HLS) | | 239 (165 dos tensores, 74 das ROMs) | |
+
+A implementação da rede inteira não terminou em 3 horas: a xc7a100t tem 63.400 LUT e 270 BRAM18, a rede pede cerca de
+80 mil LUT, e o Vivado chegou a 305 BRAM18 ("Resources of type BRAM have been overutilized ... Will try to implement
+using LUT-RAM"). Por isso a ResNet 8 vai para a xc7a200t (134.600 LUT, 730 BRAM18; `"part"` no `models.json`), a mesma
+família: o modelo de custo e as 22 camadas medidas continuam valendo, só a rede inteira precisa ser implementada de
+novo. A MiniLenet e a LeNet 5 continuam na xc7a100t (de 8% a 16% dos LUT).
+
+O que entrou no modelo com essa rodada:
+
+* **Ramos em paralelo.** A rede mediu 131.054 ciclos a menos que a soma das camadas, que é s2sc + s3sc (65.544 +
+  65.550): o Vitis roda a convolução do atalho junto com o ramo principal, porque as duas chamadas não dependem uma da
+  outra. A latência da rede agora é o caminho mais longo entre os tensores (`costModel`, `network`): 6.245.815
+  ciclos, 0,6% abaixo do medido; a soma das camadas fica em `cyclesSeq`.
+* **BRAM18.** `bram18Of` (`js/axc/nngen.js`) segue a alocação do Vitis vista nos relatórios: com menos de 64 palavras
+  ou até 512 bits, LUT ou registradores; a profundidade sobe para a potência de 2; até 512 palavras, um BRAM18 por 36
+  bits; acima disso, colunas de 18 bits com 1024 palavras e o resto da largura na configuração mais estreita que
+  cabe. As ROMs usam a largura dos valores (o Vitis guarda 15 ou 16 bits dos vieses e 24 das reescalas); os tensores de
+  acumulador, 16 bits mais log2 das parcelas. Na ResNet 8: 236 BRAM18 (162 dos tensores, 74 das ROMs), contra 239 da
+  síntese. O Vivado usou mais (305), e a diferença não está no modelo.
+* **Ocupação.** A página (Custo) e o LEIAME do projeto exportado mostram LUT, FF, DSP e BRAM18 contra a peça
+  escolhida e avisam quando a rede não cabe (`js/axc/parts.js`).
+
+Limitações que ficam (o gerador não muda):
+
+* **s3a: o Vitis não compartilhou os multiplicadores.** São 288 multiplicações por saída com II 144: o modelo supõe 2
+  multiplicadores, e o Vivado tem 182 (11.631 LUT); a camada mediu 23.223 LUT contra 13.261 previstos (+75%). Na s1a
+  (144 multiplicações, II 72), o Vitis fez 4. Os relatórios não dizem por que a s3a é diferente; a s2a (+23%) deve
+  ser o mesmo caso. Um `ALLOCATION` dos multiplicadores no código gerado resolveria, mas mudaria os projetos já medidos.
+* **s3b: o Vitis desiste do pipeline com II acima de 256.** A ROM de pesos de 2 portas pede II 288 (576 leituras);
+  o log mostra o Vitis subindo o II até 256 e depois "unable to pipeline". O laço fica sem pipeline, com 296 ciclos
+  por saída (+2,8% na latência da camada), menos LUT que o previsto (21.823 contra 26.108) e o timing estourado
+  (10,65 ns no Vivado com período de 10 ns).
+* **LUT dominados pela árvore de soma.** Cada saída soma todas as parcelas numa árvore desenrolada, com um somador
+  por parcela (somadores não são compartilhados): na s3b, 96 dos 21.823 LUT são dos multiplicadores. É isso que faz
+  a rede passar de 63 mil LUT; uma convolução com acumulador (P multiplicações por ciclo) caberia na xc7a100t, mas
+  mudaria o gerador, o escalonamento e o avaliador (a ordem das somas define o erro dos somadores aproximados).
+* **pad e add.** Os pads medem de 4% a 12% mais ciclos que o modelo (o custo de entrada e saída de cada laço) e menos
+  LUT; as somas residuais medem mais LUT e FF que o previsto (cerca de 200 e 300, contra 132 e 170). Em valor
+  absoluto, pouco.
+
 ## Treino e conferência bit a bit (etapas 17 e 18)
 
 `scripts/nn/train.py resnet8 cifar10 <pasta>` treina a rede (classe `ResNet8`, com a borda do Keras e o BN de

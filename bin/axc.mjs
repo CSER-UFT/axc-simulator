@@ -39,7 +39,7 @@
  *       custo da rede exata nos multiplicadores e somadores das camadas com pesos, e a economia com a unidade mais
  *       barata da biblioteca em cada camada (e só com multiplicadores, e só com somadores), por camada e na rede
  *   node bin/axc.mjs nnexport [--model ...] [--dirs "..."] [--mul <m> --add <s> --layers ... | --units "conv1:MUL8 T4+ADD32 LOA10;..."
- *                             | --search resultado.json] [--clock 10] [--part xc7a100tcsg324-1] [--images 100] [--no-layers]
+ *                             | --search resultado.json] [--clock 10] [--part <peça; padrão: a do models.json, ou xc7a100tcsg324-1>] [--images 100] [--no-layers]
  *                             [--rtl-network] [--out pasta]
  *       projeto da rede para o Vitis HLS e o Vivado (js/axc/nnexport.js): network/ (a rede inteira, testbench com
  *       --images imagens de teste), layers/<camada>/ (cada camada sozinha), run_all.sh; --search usa o modelo, as
@@ -63,6 +63,7 @@
  * diretivas do código, a restrição de erro e o objetivo dados; --heuristic all compara as heurísticas.
  * Todos os comandos aceitam --json.
  */
+import { DEFAULT_PART, PARTS, occupancy, occupancyText } from '../js/axc/parts.js';
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -396,7 +397,7 @@ switch (cmd) {
             r = networkProject(net, {
                 synth: synthData(), cells: JSON.parse(readFileSync(join(ROOT, 'data/hls-cells.json'), 'utf8')),
                 fpga: existsSync(join(ROOT, 'data/vivado-units.json')) ? JSON.parse(readFileSync(join(ROOT, 'data/vivado-units.json'), 'utf8')) : null,
-                target: 'fpga', clockNs, part: opt('--part', 'xc7a100tcsg324-1'), dirs, units, test, images: +opt('--images', 100), id,
+                target: 'fpga', clockNs, part: opt('--part', entry.part ?? DEFAULT_PART), dirs, units, test, images: +opt('--images', 100), id,
                 layers: !flag('--no-layers'), inline: flag('--rtl-network') ? 'rtl' : false,
                 progress: (k, n) => { if (!flag('--json') && (k === n || k % 20 === 0)) process.stderr.write(`  saída esperada: ${k} de ${n} imagens\n`); },
             });
@@ -407,7 +408,8 @@ switch (cmd) {
             `${net.name}: ${Object.keys(r.files).length} arquivos em ${outDir}`,
             `unidades: ${net.sites.map((l, i) => `${l.name} ${[units[i].mul, units[i].add].filter(Boolean).join(' + ') || 'exatas'}`).join('; ')}`,
             `testbench: ${r.summary.images} imagens, acurácia no simulador ${(100 * r.summary.accuracySim).toFixed(1)}%`,
-            `previsão: ${r.summary.totals.cycles} ciclos (${r.summary.totals.timeUs.toFixed(1)} µs), LUT ${r.summary.totals.luts}, FF ${r.summary.totals.ff}, DSP ${r.summary.totals.dsp}`,
+            `previsão: ${r.summary.totals.cycles} ciclos (${r.summary.totals.timeUs.toFixed(1)} µs), LUT ${r.summary.totals.luts}, FF ${r.summary.totals.ff}, DSP ${r.summary.totals.dsp}, BRAM18 ${r.summary.totals.bram18}`,
+            `ocupação na ${r.summary.part}: ${occupancyText(r.summary.occupancy)}`,
             ...r.summary.partitionNotes.map((w) => `partição: ${w}`),
             ...r.summary.warnings.map((w) => `aviso: ${w}`),
             `para rodar: bash ${join(outDir, 'run_all.sh')} -j 4 --impl; depois: node bin/axc.mjs nnvitis ${outDir}`,
@@ -458,13 +460,17 @@ switch (cmd) {
         const lines = [
             `# ${netModel.name}: modelo contra Vitis HLS e Vivado`, '',
             `Pasta ${dir}; período de ${netModel.clockNs} ns, parte ${netModel.part}. Gerado por \`node bin/axc.mjs nnvitis\` em ${new Date().toISOString().slice(0, 10)}.`, '',
+            ...(netModel.totals.bram18 !== undefined && PARTS[netModel.part] ? [`Ocupação prevista na ${netModel.part} (${PARTS[netModel.part].name}): ${occupancyText(occupancy(netModel.totals, netModel.part))}.`, ''] : []),
             '## Rede inteira (network/)', '',
             '| | Modelo | Vitis / Vivado | Desvio |', '| --- | ---: | ---: | ---: |',
             `| Latência (ciclos) | ${f(netModel.totals.cycles)} | ${f(res.network.hls?.latencyWorst)} | ${dev(netModel.totals.cycles, res.network.hls?.latencyWorst)} |`,
             `| LUT (Vivado) | ${f(netModel.totals.luts)} | ${f(nImpl?.lut)} | ${dev(netModel.totals.luts, nImpl?.lut)} |`,
             `| FF (Vivado) | ${f(netModel.totals.ff)} | ${f(nImpl?.ff)} | ${dev(netModel.totals.ff, nImpl?.ff)} |`,
             `| DSP | ${f(netModel.totals.dsp)} | ${f(nImpl?.dsp ?? res.network.hls?.dsp)} | ${dev(netModel.totals.dsp, nImpl?.dsp ?? res.network.hls?.dsp)} |`,
+            ...(netModel.totals.bram18 !== undefined ? [`| BRAM18 (síntese HLS) | ${f(netModel.totals.bram18)} | ${f(res.network.hls?.bram)} | ${dev(netModel.totals.bram18, res.network.hls?.bram)} |`,
+                `| BRAM18 (Vivado) | ${f(netModel.totals.bram18)} | ${f(nImpl?.bram)} | ${dev(netModel.totals.bram18, nImpl?.bram)} |`] : []),
             `| Período (ns) | ${f(netModel.clockNs, 1)} | ${f(nImpl?.achievedNs, 2)} | |`,
+            ...(netModel.totals.cyclesSeq !== undefined && netModel.totals.cyclesSeq !== netModel.totals.cycles ? [`| Latência com as camadas em sequência | ${f(netModel.totals.cyclesSeq)} | | |`] : []),
             ...(() => {
                 // Soma das camadas sozinhas (o que o modelo supõe: cada camada com as suas partições).
                 const iso = rows.map((r2) => r2.iso);

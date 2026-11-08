@@ -148,7 +148,14 @@ Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
     faixa do nó, e o hardware estoura e dá a volta na largura do tipo; eles nunca entram nas candidatas (a fronteira
     de custo e erro os descarta). As buscas gravadas antes desta correção (results/nn-search até a etapa22) usaram o
     avaliador antigo, um pouco mais pessimista nas somas aproximadas.
-24. Rodada no Vitis e no Vivado (Tiago).
+24. Rodada no Vitis e no Vivado (Tiago; a da xc7a100t feita, falta a rede inteira na xc7a200t): as 22 camadas e a
+    rede inteira com 0 diferenças na csim; latência da rede a 1% do modelo, soma dos LUT das camadas a 4%. A rede
+    inteira não coube na xc7a100t (cerca de 80 mil LUT; 305 BRAM18 no Vivado), e a ResNet 8 passou para a
+    xc7a200t (`"part"` no models.json; a MiniLenet e a LeNet 5 ficam na 100T). Com os relatórios: ramos em paralelo
+    na latência da rede (o atalho junto com o ramo principal), estimativa de BRAM18 (`bram18Of`, 236 contra 239 da
+    síntese), seletor de peça e ocupação na página e no LEIAME (`js/axc/parts.js`). Limitações documentadas em
+    docs/RESNET8.md (s3a sem compartilhar multiplicadores, s3b sem pipeline acima de II 256, LUT da árvore de soma).
+    Falta: exportar a ResNet 8 na 200T e rodar `bash run_all.sh --only network --impl --timeout 6h`, depois nnvitis.
 25. ResNet 8 no seletor, no nnbench e na ajuda; rodada da matriz (feito, menos a rodada da matriz, que é do
     Tiago: a ResNet 8 entrou no seletor da página (models.json sem page:false, com os padrões searchVal 5000,
     searchSample 1000 e exportImages 10, aplicados ao trocar de modelo); seletor Validação na Exploração (1000 ou

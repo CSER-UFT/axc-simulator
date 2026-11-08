@@ -17,6 +17,7 @@
  * As unidades aproximadas entram como caixa preta de RTL (o Verilog da netlist com o invólucro que o Vitis pede), ou
  * como C++ da netlist (inline: false), e a reescala (requant) como uma função com a multiplicação em DSP.
  */
+import { DEFAULT_PART, PARTS, occupancy, occupancyText } from './parts.js';
 import { costModel, normalizeDirectives } from './nngen.js';
 import { inputActivations } from './nn.js';
 import { exportFunction, unitsCode, seqUnitsCode, signedCode, REQUANT_CPP, REQUANT2_CPP, projectFiles, blackboxFiles, tclScript, prediction } from '../hls/vitis.js';
@@ -61,7 +62,7 @@ function runKernels(ks, x) {
  * @returns {{files: Record<string, string>, summary: object}}
  */
 export function networkProject(net, o) {
-    const clockNs = o.clockNs ?? 10, part = o.part ?? 'xc7a100tcsg324-1', target = o.target ?? 'fpga';
+    const clockNs = o.clockNs ?? 10, part = o.part ?? DEFAULT_PART, target = o.target ?? 'fpga';
     const dirs = normalizeDirectives(net, o.dirs);
     const units = net.sites.map((_, si) => ({ mul: o.units?.[si]?.mul ?? null, add: o.units?.[si]?.add ?? null }));
     const id = o.id ?? `${net.id}_${String(clockNs).replace('.', 'p')}ns`;
@@ -240,6 +241,7 @@ ${top};
     const summary = {
         id, model: net.id, name: net.name, clockNs, part, target, dirs, units, images: N, accuracySim: right / N,
         totals: cost.totals, layers: layerPred, warnings: [...new Set(warnings)], partitionNotes,
+        occupancy: PARTS[part] ? occupancy(cost.totals, part) : null,
     };
     net_['model.json'] = `${JSON.stringify(summary, null, 1)}\n`;
     for (const [f, c] of Object.entries(net_)) files[`network/${f}`] = c;
@@ -311,7 +313,11 @@ function readme(s, names, inline) {
     const row = (l) => `  ${l.name.padEnd(9)} ${String(l.cycles).padStart(9)} ${String(l.II ?? '-').padStart(4)} ${String(l.luts).padStart(7)} ${String(l.ff).padStart(7)} ${String(l.dsp).padStart(4)}  ${l.site !== null ? [l.mul ?? 'MUL8 exato', l.add ?? 'ADD32 exato'].join(' + ') : ''}`;
     return `Rede ${s.name} (${s.model}) para o Vitis HLS 2022.2 e o Vivado: gerado pelo axc-simulator
 (https://github.com/CSER-UFT/axc-simulator), período de ${s.clockNs} ns, parte ${s.part}.
-
+${s.occupancy ? `\nOcupação prevista na ${s.part} (${s.occupancy.name}): ${occupancyText(s.occupancy)}.
+${s.occupancy.over.length ? `A rede inteira não cabe nessa peça: a síntese HLS e a csim de network/ funcionam, mas a implementação no Vivado
+(--impl) falha ou leva horas. Os projetos por camada cabem e servem para conferir o modelo.
+` : ''}A estimativa de BRAM18 segue a síntese HLS; o Vivado pode usar mais (na ResNet 8 na xc7a100t: 239 na síntese, 305 no Vivado).
+` : ''}
 Pastas
   network/          a rede inteira: kernel.cpp tem uma função por camada (INLINE off, cada uma com o seu relatório)
                     e o topo network(), que as chama em sequência; o testbench passa ${s.images} imagens de teste e
@@ -335,6 +341,7 @@ diretiva de partição do simulador.
 Previsões do modelo (atrasos ${s.target === 'fpga' ? 'do Vivado' : 'do sky130'}; a soma das camadas, cada uma com as suas partições)
   camada       ciclos   II     LUT      FF  DSP  unidades
 ${L.map(row).join('\n')}
-  total     ${String(s.totals.cycles).padStart(9)}      ${String(s.totals.luts).padStart(7)} ${String(s.totals.ff).padStart(7)} ${String(s.totals.dsp).padStart(4)}  (${s.totals.timeUs.toFixed(1)} µs por imagem)
+  total     ${String(s.totals.cycles).padStart(9)}      ${String(s.totals.luts).padStart(7)} ${String(s.totals.ff).padStart(7)} ${String(s.totals.dsp).padStart(4)}  (${s.totals.timeUs.toFixed(1)} µs por imagem${s.totals.cyclesSeq !== undefined && s.totals.cyclesSeq !== s.totals.cycles ? `; os atalhos rodam junto com o ramo principal, com as camadas em sequência seriam ${s.totals.cyclesSeq} ciclos` : ''})
+  BRAM18 ${s.totals.bram18 ?? '-'} (${s.totals.tensorBram18 ?? '-'} dos vetores entre as camadas, o resto das ROMs de pesos, vieses e reescalas)
 ${s.partitionNotes.length ? `\nPartições dos vetores entre camadas que a camada que escreve pedia diferente (na rede, ficou a da camada que lê;\nnos projetos por camada, cada uma tem a sua)\n${s.partitionNotes.map((w) => `  ${w}`).join('\n')}\n` : ''}${s.warnings.length ? `\nAvisos\n${s.warnings.map((w) => `  ${w}`).join('\n')}\n` : ''}`;
 }

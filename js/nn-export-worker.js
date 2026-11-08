@@ -20,7 +20,7 @@ self.onmessage = async ({ data: o }) => {
         self.postMessage({ type: 'status', key: 'nn.exportBuilding' });
         let last = 0;
         const { files, summary } = networkProject(net, {
-            synth, cells, fpga, target: 'fpga', clockNs: o.clockNs, dirs: o.dirs, units: o.units, test, images: o.images, id: o.id, layers: o.layers,
+            synth, cells, fpga, target: 'fpga', clockNs: o.clockNs, part: o.part, dirs: o.dirs, units: o.units, test, images: o.images, id: o.id, layers: o.layers,
             progress: (k, n) => { const now = Date.now(); if (now - last > 300 || k === n) { last = now; self.postMessage({ type: 'progress', k, n }); } },
         });
         const zip = makeZip(Object.fromEntries(Object.entries(files).map(([f, c]) => [`${o.id}/${f}`, c])));

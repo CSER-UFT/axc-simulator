@@ -9,6 +9,7 @@ import { testInputs, errorMetrics } from './axc/metrics.js';
 import { decodeNet, decodeTestSet, productTable, classifyRange, adderAccumulate, summarize, macsPerSite } from './axc/nn.js';
 import { archSvg } from './axc/nnsvg.js';
 import { normalizeDirectives, directiveTrees, parOptions, CONV_PIPES, DENSE_PIPES } from './axc/nngen.js';
+import { PARTS, DEFAULT_PART, occupancy } from './axc/parts.js';
 import { esc } from './ui/plots.js';
 import { highlightC } from './hls/highlight.js';
 import { dseStepSvg, accSearchSvg } from './hls/ui.js';
@@ -140,6 +141,7 @@ async function loadNN(id) {
         $('nnSearchVal').value = String(entry.searchVal ?? 1000);
         if (entry.searchSample !== undefined) $('nnSearchSample').value = String(entry.searchSample);
         $('nnExportImages').value = String(entry.exportImages ?? 50);
+        $('nnPart').value = entry.part && PARTS[entry.part] ? entry.part : DEFAULT_PART;
         sampleWarn();
     }
     return nnData;
@@ -450,7 +452,13 @@ async function renderCost() {
         fp ? card('FF', nf(TF.ff), t('nn.m.ffU')) : '',
         fp ? card('DSP48', nf(TF.dsp), t('nn.m.dspU')) : '',
         card(t('nn.m.energy'), nf(TA.energy / 1e6, 1), `nJ ${TA.energy !== XA.energy ? d(TA.energy, XA.energy) : ''}`),
-    ].join('')}</div>`;
+    ].join('')}</div>${fp ? (() => {
+        // Ocupação da peça escolhida (LUT, FF e DSP do modelo FPGA; BRAM18 dos vetores e das ROMs).
+        const oc = occupancy(TF, $('nnPart').value);
+        const cell = (r) => `<span class="${r.frac > 1 ? 'bad' : ''}">${esc(r.label)} ${nf(r.used)} / ${nf(r.cap)} (${nf(100 * r.frac, 0)}%)</span>`;
+        return `<p class="note"><b>${esc(t('nn.occTitle', { part: oc.name }))}:</b> ${oc.rows.map(cell).join(' · ')}. ${esc(t('nn.occNote'))}</p>`
+            + (oc.over.length ? `<p class="note"><b class="bad">${esc(t('nn.occOver', { part: oc.name, list: oc.over.map((r) => r.label).join(', ') }))}</b></p>` : '');
+    })() : ''}`;
     lastKernels = c.layers.map((l) => ({ name: l.name, site: l.site, src: l.src }));
     renderCode();
     // Partição da janela inteira: cada uma das K x K x C leituras escolhe entre K x K x C bancos que mudam a cada pixel.
@@ -459,7 +467,9 @@ async function renderCost() {
     const limited = c.layers.filter((l) => whyText(l.IIwhy)).map((l) => `${esc(l.name)} (${esc(whyText(l.IIwhy))})`);
     $('nnCostNote').innerHTML = (slow.length ? `<b>${esc(t('nn.slowPart', { list: slow.join(', ') }))}</b> ` : '') + (limited.length ? `${t('nn.whyNote', { list: limited.join('; ') })} ` : '') + t('nn.costNote', { us: nf(T.timeUs, 1), clock: nf(o.clockNs, 1) }) + (c.warnings.length ? ` ${esc(c.warnings.join('; '))}` : '');
 }
-for (const id of ['nnClock', 'nnTarget']) $(id).addEventListener('change', () => renderCost());
+$('nnPart').innerHTML = Object.entries(PARTS).map(([id, P]) => `<option value="${id}">${esc(P.name)} (${id})</option>`).join('');
+$('nnPart').value = DEFAULT_PART;
+for (const id of ['nnClock', 'nnTarget', 'nnPart']) $(id).addEventListener('change', () => renderCost());
 
 for (const id of ['nnMul', 'nnAdder', 'nnModel', 'nnAccum']) $(id).addEventListener('change', () => { store.set(`nn.${id}`, $(id).value); if (id !== 'nnAccum') setOverride(null); render(); });
 $('nnLayers').addEventListener('change', () => { setOverride(null); render(); });
@@ -499,7 +509,7 @@ $('nnExportBtn').onclick = () => {
         }
     };
     exportWorker.onerror = (e) => done(e.message || t('nn.searchError'));
-    exportWorker.postMessage({ file: entry.file, clockNs, dirs: nnDirs, units, biasDelta: nnOverride ? nnOverrideBias : null, requantM: nnOverride ? nnOverrideM : null, images: Math.max(1, Math.min(1000, +$('nnExportImages').value || 50)), id, layers: $('nnExportLayers').checked });
+    exportWorker.postMessage({ file: entry.file, clockNs, dirs: nnDirs, units, biasDelta: nnOverride ? nnOverrideBias : null, requantM: nnOverride ? nnOverrideM : null, images: Math.max(1, Math.min(1000, +$('nnExportImages').value || 50)), id, layers: $('nnExportLayers').checked, part: $('nnPart').value });
 };
 
 // Busca das unidades por camada ------------------------------------------------------------------------------------

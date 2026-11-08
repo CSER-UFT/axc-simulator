@@ -169,3 +169,4 @@ table.metrics td.note { text-align: left; }
 .nn-search-out { display: grid; grid-template-columns: auto minmax(320px, 1fr); gap: 20px; align-items: start; }
 .nn-search-out .hls-table { width: auto; }
 @media (max-width: 1300px) { .nn-search-out { grid-template-columns: 1fr; } }
+.note .bad { color: var(--warn); font-weight: 600; }

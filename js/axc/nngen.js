@@ -28,6 +28,42 @@
  * (lib.adderFor). A reescala é uma peça exata (data/hls-cells.json).
  */
 import { synthesize } from '../hls/index.js';
+import { rangeOf } from '../hls/elab.js';
+
+// Memória em bloco -------------------------------------------------------------------------------------------------
+
+/**
+ * BRAM18 de um banco de memória com words palavras de bits bits, como o Vitis HLS 2022.2 os aloca (conferido nos
+ * relatórios da ResNet 8): com menos de 64 palavras ou até 512 bits, fica em LUT ou registradores; a profundidade sobe para a potência de 2; até
+ * 512 palavras, um BRAM18 por 36 bits de largura; acima disso, colunas de 18 bits com 1024 palavras por BRAM e o resto
+ * da largura na configuração mais estreita que cabe (1, 2, 4 ou 9 bits com 16384, 8192, 4096 ou 2048 palavras).
+ * Na ResNet 8, a soma dá 236 BRAM18, contra 239 na síntese da rede (o Vivado chegou a 305, veja docs/RESNET8.md).
+ */
+export function bram18Of(words, bits) {
+    if (words < 64 || words * bits <= 512) return 0;
+    const D = 2 ** Math.ceil(Math.log2(words));
+    if (D <= 512) return Math.ceil(bits / 36);
+    const n18 = Math.floor(bits / 18), rem = bits - 18 * n18;
+    const cap = rem <= 1 ? 16384 : rem <= 2 ? 8192 : rem <= 4 ? 4096 : rem <= 9 ? 2048 : 1024;
+    return n18 * Math.ceil(D / 1024) + (rem > 0 ? Math.ceil(D / cap) : 0);
+}
+
+/** Bancos de um vetor pelas partições (complete: um banco por elemento da dimensão). */
+const banksOf = (a) => (a.partitions ?? []).reduce((b, p) => b * (p.factor ?? 1), 1);
+
+/** BRAM18 de um vetor com a largura de bits (a declarada, quando não é dada) e as partições dele. */
+export function arrayBram18(a, bits = a.type.bits) {
+    const B = banksOf(a);
+    return B * bram18Of(Math.ceil(a.size / B), bits);
+}
+
+/** Largura das palavras de uma ROM pelos valores dela (o Vitis guarda só os bits que os valores usam). */
+function romBits(a) {
+    if (!a.init?.length) return a.type.bits;
+    const [lo, hi] = (a.initRange ??= rangeOf(a.init));
+    const ub = (v) => (v > 0 ? Math.floor(Math.log2(v)) + 1 : 0);
+    return lo < 0 ? Math.max(ub(hi), ub(-lo - 1)) + 1 : Math.max(1, ub(hi));
+}
 import { MODEL } from '../hls/sched.js';
 import { parse } from '../hls/lang.js';
 import { elaborate } from '../hls/elab.js';
@@ -699,6 +735,17 @@ export function costModel(net, o) {
             rq2: rqParts(r, 'requant2'),
             // Custo das unidades de multiplicação e soma (área e LUT pelas instâncias; energia pelas operações), para a
             // fração aritmética da busca (nnsearch.js, arithmeticShare).
+            // ROMs da camada (pesos, vieses e reescalas) em BRAM18; os vetores entre as camadas entram na rede.
+            bram18: r.design.arrays.filter((a) => a.kind === 'rom').reduce((n, a) => n + arrayBram18(a, romBits(a)), 0),
+            // Saída da camada (o tensor que ela escreve), para a memória entre as camadas (network).
+            out: (() => {
+                const y = r.design.arrays.filter((a) => a.kind === 'param').at(-1);
+                // Acumulador de 32 bits (a saída 'acc' das convoluções da soma residual): o Vitis guarda só a largura
+                // da soma, 16 bits do produto de 8 por 8 e mais log2 das parcelas (na ResNet 8, de 20 a 26 bits).
+                const w = r.design.arrays.find((a) => a.kind === 'rom' && a.name === 'w');
+                const bits = y.type.bits === 32 && w ? 16 + Math.ceil(Math.log2(w.dims.at(-1))) : y.type.bits;
+                return { size: y.size, bits, partitions: y.partitions };
+            })(),
             arith: (() => {
                 const us = r.cost.units.filter((u) => u.cls === 'mul' || u.cls === 'add');
                 return { area: us.reduce((a, u) => a + u.area, 0), luts: us.reduce((a, u) => a + u.luts, 0), energy: r.cost.energy.ops };
@@ -716,7 +763,22 @@ export function costModel(net, o) {
     const network = (units = []) => {
         const layers = kernels.map((k) => (k.site === null ? kernel(k) : kernel(k, units[k.site]?.mul ?? null, units[k.site]?.add ?? null)));
         const sum = (f) => layers.reduce((a, x) => a + x[f], 0);
-        const cycles = sum('cycles');
+        // Latência: cada camada começa quando as entradas ficam prontas. Nas redes em sequência, é a soma; na ResNet 8,
+        // a convolução do atalho roda junto com o ramo principal, como o Vitis 2022.2 faz com chamadas independentes
+        // (medido: a rede levou s2sc + s3sc ciclos a menos que a soma das camadas).
+        const ready = new Map([[0, 0]]);
+        let cycles = 0;
+        kernels.forEach((k, i) => {
+            const end = Math.max(0, ...(k.ins ?? [i]).map((t) => ready.get(t) ?? 0)) + layers[i].cycles;
+            ready.set(k.out ?? i + 1, end);
+            cycles = Math.max(cycles, end);
+        });
+        const cyclesSeq = sum('cycles');
+        // Memória entre as camadas: um vetor por tensor, com a partição de quem escreve e de quem lê (a maior); a saída
+        // da última camada é a porta da rede, fora da conta. As partições de leitura vêm das entradas dos kernels.
+        const outIdx = kernels.length - 1;
+        const tensorBram = layers.reduce((n, l, i) => (i === outIdx ? n : n + arrayBram18({ size: l.out.size, partitions: l.out.partitions, type: { bits: l.out.bits } }, l.out.bits)), 0);
+        const bram18 = sum('bram18') + tensorBram;
         // Reescala compartilhada: as camadas rodam uma depois da outra, e o Vitis 2022.2 instancia o módulo da reescala
         // uma vez só no topo da rede (MiniLenet: 2 DSP48 na rede, 2 em cada camada sozinha). Na soma, ficam as peças
         // da camada que mais usa, no lugar das de todas.
@@ -730,7 +792,7 @@ export function costModel(net, o) {
         const shared = (f) => s1(f) + s2(f);
         return {
             layers, warnings: [...new Set(layers.flatMap((l) => l.warnings))],
-            totals: { cycles, timeUs: (cycles * clockNs) / 1000, area: sum('area') - shared('area'), luts: sum('luts') - shared('luts'), carry4: sum('carry4') - shared('carry4'), ff: sum('ff'), dsp: sum('dsp') - shared('dsp'), energy: sum('energy'), clockNs, requantShared: shared('dsp') > 0 || shared('luts') > 0 },
+            totals: { cycles, timeUs: (cycles * clockNs) / 1000, area: sum('area') - shared('area'), luts: sum('luts') - shared('luts'), carry4: sum('carry4') - shared('carry4'), ff: sum('ff'), dsp: sum('dsp') - shared('dsp'), energy: sum('energy'), clockNs, requantShared: shared('dsp') > 0 || shared('luts') > 0, cyclesSeq, bram18, tensorBram18: tensorBram },
         };
     };
     return { kernels, kernel, site, network, clockNs };

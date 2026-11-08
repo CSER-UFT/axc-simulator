@@ -7,6 +7,6 @@
   { "id": "lenet5-fashion", "file": "data/nn/lenet5-fashion.json", "name": "LeNet 5", "dataset": "Fashion MNIST" },
   { "id": "minilenet-cifar10", "file": "data/nn/minilenet-cifar10.json", "name": "MiniLenet", "dataset": "CIFAR 10" },
   { "id": "lenet5-cifar10", "file": "data/nn/lenet5-cifar10.json", "name": "LeNet 5", "dataset": "CIFAR 10" },
-  { "id": "resnet8-cifar10", "file": "data/nn/resnet8-cifar10.json", "name": "ResNet 8", "dataset": "CIFAR 10", "searchVal": 5000, "searchSample": 1000, "exportImages": 10 }
+  { "id": "resnet8-cifar10", "file": "data/nn/resnet8-cifar10.json", "name": "ResNet 8", "dataset": "CIFAR 10", "searchVal": 5000, "searchSample": 1000, "exportImages": 10, "part": "xc7a200tsbg484-1" }
  ]
 }
