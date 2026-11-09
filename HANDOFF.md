@@ -2,7 +2,13 @@
 
 Resumo para continuar o trabalho numa conversa nova. Estado do repositório no commit deste arquivo.
 
-## Plano em andamento (29/out)
+## Plano concluído (29/out a 9/nov)
+
+As 25 etapas estão feitas. Ficam abertos só os opcionais: refazer a matriz da ResNet 8 com o avaliador corrigido
+(`scripts/nnbench.mjs`, cabeçalho) e recalibrar a quantização da ResNet 8 por percentil. As limitações conhecidas da
+geração de hardware (s3a, s3b, árvore de soma, síntese da rede inteira no Vivado) estão em docs/RESNET8.md.
+
+## Plano (29/out)
 
 Decisões: exaustiva e aleatória fora da busca das redes por completo (página, linha de comando, nnbench; o módulo
 genérico continua porque a linha de comando da HLS ainda usa as duas); busca medida (sensibilidade e sequencial
@@ -148,14 +154,15 @@ Parte C, ResNet 8 (MLPerf Tiny, CIFAR 10):
     faixa do nó, e o hardware estoura e dá a volta na largura do tipo; eles nunca entram nas candidatas (a fronteira
     de custo e erro os descarta). As buscas gravadas antes desta correção (results/nn-search até a etapa22) usaram o
     avaliador antigo, um pouco mais pessimista nas somas aproximadas.
-24. Rodada no Vitis e no Vivado (Tiago; a da xc7a100t feita, falta a rede inteira na xc7a200t): as 22 camadas e a
+24. Rodada no Vitis e no Vivado (feito; a implementação da rede inteira fica como limitação): as 22 camadas e a
     rede inteira com 0 diferenças na csim; latência da rede a 1% do modelo, soma dos LUT das camadas a 4%. A rede
     inteira não coube na xc7a100t (cerca de 80 mil LUT; 305 BRAM18 no Vivado), e a ResNet 8 passou para a
     xc7a200t (`"part"` no models.json; a MiniLenet e a LeNet 5 ficam na 100T). Com os relatórios: ramos em paralelo
     na latência da rede (o atalho junto com o ramo principal), estimativa de BRAM18 (`bram18Of`, 236 contra 239 da
     síntese), seletor de peça e ocupação na página e no LEIAME (`js/axc/parts.js`). Limitações documentadas em
     docs/RESNET8.md (s3a sem compartilhar multiplicadores, s3b sem pipeline acima de II 256, LUT da árvore de soma).
-    Falta: exportar a ResNet 8 na 200T e rodar `bash run_all.sh --only network --impl --timeout 6h`, depois nnvitis.
+    Na 200T, a síntese no Vivado da rede inteira travou no mapeamento para a tecnologia (6 h com --impl; 3 h fora de
+    contexto sem achatar); a etapa fecha com a csim e a síntese HLS da rede e as 22 camadas implementadas (feito).
 25. ResNet 8 no seletor, no nnbench e na ajuda; rodada da matriz (feito, menos a rodada da matriz, que é do
     Tiago: a ResNet 8 entrou no seletor da página (models.json sem page:false, com os padrões searchVal 5000,
     searchSample 1000 e exportImages 10, aplicados ao trocar de modelo); seletor Validação na Exploração (1000 ou

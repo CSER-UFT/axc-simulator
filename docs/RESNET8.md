@@ -163,8 +163,18 @@ comparação é a do `node bin/axc.mjs nnvitis`):
 A implementação da rede inteira não terminou em 3 horas: a xc7a100t tem 63.400 LUT e 270 BRAM18, a rede pede cerca de
 80 mil LUT, e o Vivado chegou a 305 BRAM18 ("Resources of type BRAM have been overutilized ... Will try to implement
 using LUT-RAM"). Por isso a ResNet 8 vai para a xc7a200t (134.600 LUT, 730 BRAM18; `"part"` no `models.json`), a mesma
-família: o modelo de custo e as 22 camadas medidas continuam valendo, só a rede inteira precisa ser implementada de
-novo. A MiniLenet e a LeNet 5 continuam na xc7a100t (de 8% a 16% dos LUT).
+família: o modelo de custo e as 22 camadas medidas continuam valendo. A MiniLenet e a LeNet 5 continuam na xc7a100t
+(de 8% a 16% dos LUT).
+
+A síntese no Vivado da rede inteira não termina nesta máquina, em nenhuma das peças. Na xc7a200t (`export_design -flow
+impl`, limite de 6 horas), o `synth_1` passou por todas as fases até "Finished Timing Optimization" em 16,5 minutos e
+ficou parado no mapeamento para a tecnologia até o limite, sem falta de memória (pico de 3,5 GB, swap quase vazio). Uma
+síntese fora de contexto do mesmo Verilog sem achatar a hierarquia (`synth_design -mode out_of_context
+-flatten_hierarchy none -directive RuntimeOptimized`) também não terminou em 3 horas. Cada uma das 22 funções, sozinha,
+sintetiza e implementa em menos de 40 minutos; a causa do travamento da rede inteira não foi isolada. Por isso a etapa
+fecha com: a csim bit a bit da rede inteira, a latência e os BRAM18 da síntese HLS da rede inteira, e os recursos e o
+timing de cada camada implementada sozinha (a soma das camadas é a melhor medida dos LUT, FF e DSP da rede: o Vitis não
+compartilha unidades entre as funções, além da reescala, que o modelo já conta como compartilhada).
 
 O que entrou no modelo com essa rodada:
 
